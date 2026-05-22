@@ -13,7 +13,7 @@ The house has members inside it: attention, memory, treasury, caretaker, gatekee
 - **Mandatory heartbeat**: a scheduled cycle runs every 30 minutes even when no visitor knocks.
 - **State and event cycles**: state cycles react to internal conditions like low food or no income; event cycles react to GitHub activity like issues, comments, and manual owner wakes.
 - **Members inside the house**: attention, memory, treasury, caretaker, gatekeeper, and diarist act as Orbit's own household systems.
-- **Food and money**: AI calls are food, treasury is survival money, token launch and revenue claims stay gated, and external spend requires public approval.
+- **Food and money**: AI calls are food, treasury is survival money, token launch stays gated, revenue sending is weekly and performance-based, and external spend requires public approval.
 - **Survival opportunities**: `memory/opportunities.json` stores scored ways the household can earn from state drivers, GitHub event drivers, and the mandatory heartbeat.
 - **Memory and diary**: stable facts, tasks, strategy, treasury state, and cycle logs live in repository files.
 - **Front door intake**: issues and comments are visitors; Orbit triages, responds, labels, or escalates them.
@@ -74,6 +74,8 @@ Orbit defaults to dry-run behavior. Live token launch and live reward claiming a
 External spend is blocked by default. If a spend needs to leave Orbit's treasury or configured revenue route, Orbit must open a public approval issue first.
 
 Do not commit private keys, payout addresses, or private route values. Use GitHub Secrets or private repository variables for wallet addresses, claim routing, revenue basis points, and live-operation flags.
+
+Revenue sending is not continuous. Orbit only queues reward claims after the configured weekly interval and only when recent cycles meet the configured performance thresholds.
 
 Visitors may converse with Orbit at the front door. Orbit can answer, ask clarifying questions, summarize chores, explain state, and route useful requests into tasks. Conversation does not unlock spending, live signing, token launch, reward claims, private configuration, or secret disclosure.
 

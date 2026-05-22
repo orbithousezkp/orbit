@@ -6,8 +6,16 @@ const os = require("node:os");
 const path = require("node:path");
 const test = require("node:test");
 const { loadConfig } = require("../src/agent/config");
-const { buildTokenConfig, launchNativeToken, prepareClankerLaunch, rewardSplit } = require("../src/agent/clanker");
-const { budgetStatus, loadTreasury, recordAiUsage, saveTreasury } = require("../src/agent/treasury");
+const { buildTokenConfig, launchNativeToken, prepareClankerLaunch, rewardSplit, runRevenueCycle } = require("../src/agent/clanker");
+const {
+  budgetStatus,
+  loadTreasury,
+  recordAiUsage,
+  revenueClaimStatus,
+  revenuePerformanceStatus,
+  saveTreasury,
+  syncRevenuePolicy
+} = require("../src/agent/treasury");
 
 const ADMIN = "0x1111111111111111111111111111111111111111";
 const TREASURY = "0x2222222222222222222222222222222222222222";
@@ -31,6 +39,24 @@ function config(overrides = {}) {
     }),
     repoRoot: tempRepo(),
     ...overrides
+  };
+}
+
+function writeCycles(repoRoot, cycles) {
+  fs.writeFileSync(
+    path.join(repoRoot, "memory", "cycles.jsonl"),
+    cycles.map((cycle) => JSON.stringify(cycle)).join("\n") + "\n",
+    "utf-8"
+  );
+}
+
+function cycle(number, daysAgo, filesChanged, result = "completed useful work") {
+  return {
+    cycle: number,
+    timestamp: new Date(Date.now() - (daysAgo * 86_400_000)).toISOString(),
+    dryRun: false,
+    filesChanged,
+    result
   };
 }
 
@@ -112,4 +138,95 @@ test("native token launch is skipped once a launched token is recorded", async (
   assert.equal(result.status, "already_launched");
   assert.equal(result.address, "0x4444444444444444444444444444444444444444");
   assert.equal(result.txHash, "0xabc");
+});
+
+test("revenue policy syncs to weekly performance cadence", () => {
+  const cfg = config();
+  const treasury = syncRevenuePolicy(cfg);
+
+  assert.equal(treasury.revenue.cadence, "weekly_performance");
+  assert.equal(treasury.revenue.claimIntervalDays, 7);
+  assert.equal(treasury.revenue.performanceWindowDays, 7);
+  assert.equal(treasury.revenue.minCompletedCycles, 3);
+  assert.equal(treasury.revenue.minProductiveCycles, 1);
+  assert.equal(treasury.revenue.minProductiveRatio, 0.25);
+});
+
+test("revenue performance requires enough recent productive cycles", () => {
+  const cfg = config({
+    revenueMinCompletedCycles: 3,
+    revenueMinProductiveCycles: 2,
+    revenueMinProductiveRatio: 0.5
+  });
+  writeCycles(cfg.repoRoot, [
+    cycle(1, 1, ["memory/state.json"], "Action taken: none"),
+    cycle(2, 1, ["docs/service.md"], "created a useful artifact"),
+    cycle(3, 1, ["runtime/proofs/proof.json"], "proof only")
+  ]);
+
+  const status = revenuePerformanceStatus(cfg);
+
+  assert.equal(status.completedCycles, 3);
+  assert.equal(status.productiveCycles, 1);
+  assert.equal(status.passed, false);
+  assert.ok(status.reasons.includes("not_enough_productive_cycles"));
+});
+
+test("revenue performance ignores routine treasury-only accounting cycles", () => {
+  const cfg = config({
+    revenueMinCompletedCycles: 1,
+    revenueMinProductiveCycles: 1,
+    revenueMinProductiveRatio: 0.5
+  });
+  writeCycles(cfg.repoRoot, [
+    cycle(1, 1, ["memory/treasury.json", "memory/state.json"], "recorded accounting only")
+  ]);
+
+  const status = revenuePerformanceStatus(cfg);
+
+  assert.equal(status.completedCycles, 1);
+  assert.equal(status.productiveCycles, 0);
+  assert.equal(status.passed, false);
+});
+
+test("revenue claim is blocked until weekly cadence passes", () => {
+  const cfg = config({
+    revenueMinCompletedCycles: 1,
+    revenueMinProductiveCycles: 1,
+    revenueMinProductiveRatio: 0.5
+  });
+  writeCycles(cfg.repoRoot, [
+    cycle(1, 1, ["docs/service.md"], "created a useful artifact")
+  ]);
+  const treasury = loadTreasury(cfg.repoRoot, cfg);
+  treasury.revenue.lastClaimSentAt = new Date(Date.now() - (2 * 86_400_000)).toISOString();
+  saveTreasury(cfg.repoRoot, treasury);
+
+  const status = revenueClaimStatus(cfg);
+
+  assert.equal(status.canClaim, false);
+  assert.equal(status.cadence, "weekly_performance");
+  assert.ok(status.reasons.includes("weekly_cadence_not_ready"));
+  assert.ok(status.nextEligibleAt);
+});
+
+test("revenue claim dry run only queues after weekly and performance gates pass", async () => {
+  const cfg = config({
+    revenueMinCompletedCycles: 1,
+    revenueMinProductiveCycles: 1,
+    revenueMinProductiveRatio: 0.5,
+    enableRevenueClaims: false
+  });
+  writeCycles(cfg.repoRoot, [
+    cycle(1, 1, ["docs/service.md"], "created a useful artifact")
+  ]);
+  const treasury = loadTreasury(cfg.repoRoot, cfg);
+  treasury.token.address = "0x4444444444444444444444444444444444444444";
+  treasury.revenue.lastClaimSentAt = new Date(Date.now() - (8 * 86_400_000)).toISOString();
+  saveTreasury(cfg.repoRoot, treasury);
+
+  const result = await runRevenueCycle(cfg);
+
+  assert.equal(result.status, "dry_run");
+  assert.equal(result.claimStatus.canClaim, true);
 });

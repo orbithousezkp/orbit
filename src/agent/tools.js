@@ -335,7 +335,7 @@ const TOOLS = [
   },
   {
     name: "run_revenue_cycle",
-    description: "Claim configured Clanker paired-token rewards for the configured reward recipient. This only sends a transaction if ORBIT_ENABLE_REVENUE_CLAIMS is true.",
+    description: "Claim configured Clanker paired-token rewards for the configured reward recipient. This is weekly and performance-gated, and only sends a transaction if ORBIT_ENABLE_REVENUE_CLAIMS is true.",
     inputSchema: {
       type: "object",
       properties: {},

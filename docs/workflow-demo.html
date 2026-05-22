@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Orbit Workflow Demo</title>
-    <meta name="description" content="An interactive Orbit workflow demo showing maintenance, token launch prep, and daily revenue claiming.">
+    <meta name="description" content="An interactive Orbit workflow demo showing maintenance, token launch prep, and weekly performance-based revenue claiming.">
     <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
     <style>
       :root {
@@ -520,10 +520,10 @@
           ]
         },
         revenue: {
-          label: "Daily revenue claim",
+          label: "Weekly performance revenue",
           description: "Show how Orbit would claim paired-token rewards through the private configured route.",
           accent: "revenue",
-          phase: "revenue claim",
+          phase: "performance-gated revenue claim",
           budget: { daily: "$4.95", monthly: "$89.25", status: "safe", ratio: 98 },
           treasury: { operator: "private", orbit: "private", asset: "paired rewards", status: "claimable" },
           launch: { status: "launched", detail: "Token exists and reward claims can be queued if the flag is enabled." },

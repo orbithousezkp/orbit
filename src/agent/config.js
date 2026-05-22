@@ -26,6 +26,11 @@ function parseNumberEnv(value, fallback) {
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback;
 }
 
+function parseRatioEnv(value, fallback) {
+  const parsed = Number.parseFloat(value);
+  return Number.isFinite(parsed) && parsed >= 0 && parsed <= 1 ? parsed : fallback;
+}
+
 function splitCsv(value, fallback) {
   if (!value) return fallback;
   return String(value)
@@ -237,6 +242,11 @@ function loadConfig(env = process.env) {
     treasuryAddress: env.ORBIT_TREASURY_ADDRESS || "",
     operatorRevenueAddress: env.ORBIT_OPERATOR_REVENUE_ADDRESS || "",
     operatorRevenueBps: parseNonNegativeIntEnv(env.ORBIT_OPERATOR_REVENUE_BPS, 0),
+    revenueClaimIntervalDays: parseIntEnv(env.ORBIT_REVENUE_CLAIM_INTERVAL_DAYS, 7),
+    revenuePerformanceWindowDays: parseIntEnv(env.ORBIT_REVENUE_PERFORMANCE_WINDOW_DAYS, 7),
+    revenueMinCompletedCycles: parseNonNegativeIntEnv(env.ORBIT_REVENUE_MIN_COMPLETED_CYCLES, 3),
+    revenueMinProductiveCycles: parseNonNegativeIntEnv(env.ORBIT_REVENUE_MIN_PRODUCTIVE_CYCLES, 1),
+    revenueMinProductiveRatio: parseRatioEnv(env.ORBIT_REVENUE_MIN_PRODUCTIVE_RATIO, 0.25),
     vaultPercentage: parseNumberEnv(env.ORBIT_TOKEN_VAULT_PERCENTAGE, 10),
     vaultLockupDays: parseIntEnv(env.ORBIT_TOKEN_VAULT_LOCKUP_DAYS, 30),
     vaultVestingDays: parseIntEnv(env.ORBIT_TOKEN_VAULT_VESTING_DAYS, 30),
@@ -253,5 +263,6 @@ module.exports = {
   parseBool,
   parseNonNegativeIntEnv,
   parseNumberEnv,
+  parseRatioEnv,
   splitCsv
 };

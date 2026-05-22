@@ -4,9 +4,12 @@ const { aiFoodPolicy, publicPurchaseProviderName } = require("./ai-food");
 const { assertSafeTextForWrite, readSafeTextFile, writeSafeTextFile } = require("./safety");
 
 const TREASURY_PATH = "memory/treasury.json";
+const CYCLES_PATH = "memory/cycles.jsonl";
+const DAY_MS = 86_400_000;
 const MAX_LEDGER_ENTRIES = 500;
 const MAX_REFILL_ENTRIES = 100;
 const CREDIT_PURCHASE_MODE = "owner_approved_manual_credit_top_up";
+const REVENUE_CADENCE = "weekly_performance";
 
 function dayKey(date = new Date()) {
   return date.toISOString().slice(0, 10);
@@ -48,10 +51,16 @@ function defaultTreasury(config) {
       operatorShareBps: config.operatorRevenueBps,
       treasuryShareBps: 10000 - config.operatorRevenueBps,
       payoutAsset: "configured-paired-token",
-      cadence: "daily",
+      cadence: REVENUE_CADENCE,
+      claimIntervalDays: config.revenueClaimIntervalDays,
+      performanceWindowDays: config.revenuePerformanceWindowDays,
+      minCompletedCycles: config.revenueMinCompletedCycles,
+      minProductiveCycles: config.revenueMinProductiveCycles,
+      minProductiveRatio: config.revenueMinProductiveRatio,
       operatorRecipientEnv: "ORBIT_OPERATOR_REVENUE_ADDRESS",
       treasuryRecipientEnv: "ORBIT_TREASURY_ADDRESS",
       lastClaimAttemptAt: null,
+      lastClaimSentAt: null,
       lastClaimResult: null
     },
     token: {
@@ -115,6 +124,119 @@ function spendTotals(treasury, now = new Date()) {
     },
     { today: 0, month: 0, lifetime: 0 }
   );
+}
+
+function readCycleEntries(repoRoot) {
+  try {
+    return readSafeTextFile(repoRoot, CYCLES_PATH)
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map((line) => {
+        try {
+          return JSON.parse(line);
+        } catch {
+          return null;
+        }
+      })
+      .filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+function timestampMs(value) {
+  const parsed = Date.parse(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function productiveFiles(files = []) {
+  return (Array.isArray(files) ? files : []).filter((file) => {
+    const normalized = String(file || "").replace(/\\/g, "/");
+    if (!normalized) return false;
+    if (normalized === "memory/state.json" || normalized === "memory/cycles.jsonl" || normalized === TREASURY_PATH) return false;
+    if (normalized.startsWith("runtime/proofs/")) return false;
+    if (normalized.startsWith("memory/cycles/")) return false;
+    return true;
+  });
+}
+
+function isProductiveCycle(cycle = {}) {
+  const result = String(cycle.result || "").toLowerCase();
+  const quietOnly = /action taken\W*none|no new action|no safe useful action|cycle finished without tool calls/.test(result);
+  return productiveFiles(cycle.filesChanged).length > 0 && !quietOnly;
+}
+
+function revenuePerformanceStatus(config, repoRoot = config.repoRoot, now = new Date()) {
+  const windowDays = Math.max(1, Number(config.revenuePerformanceWindowDays || 7));
+  const cutoff = now.getTime() - (windowDays * DAY_MS);
+  const cycles = readCycleEntries(repoRoot).filter((cycle) => {
+    const timestamp = timestampMs(cycle.timestamp);
+    return timestamp !== null && timestamp >= cutoff && timestamp <= now.getTime();
+  });
+  const completedCycles = cycles.length;
+  const productiveCycles = cycles.filter(isProductiveCycle).length;
+  const productiveRatio = completedCycles ? productiveCycles / completedCycles : 0;
+  const thresholds = {
+    minCompletedCycles: Number(config.revenueMinCompletedCycles || 0),
+    minProductiveCycles: Number(config.revenueMinProductiveCycles || 0),
+    minProductiveRatio: Number(config.revenueMinProductiveRatio || 0)
+  };
+  const reasons = [];
+
+  if (completedCycles < thresholds.minCompletedCycles) {
+    reasons.push("not_enough_completed_cycles");
+  }
+  if (productiveCycles < thresholds.minProductiveCycles) {
+    reasons.push("not_enough_productive_cycles");
+  }
+  if (productiveRatio < thresholds.minProductiveRatio) {
+    reasons.push("productive_ratio_too_low");
+  }
+
+  return {
+    windowDays,
+    completedCycles,
+    productiveCycles,
+    productiveRatio: Number(productiveRatio.toFixed(4)),
+    thresholds,
+    passed: reasons.length === 0,
+    reasons
+  };
+}
+
+function lastRevenueSentAt(revenue = {}) {
+  if (revenue.lastClaimSentAt) return revenue.lastClaimSentAt;
+  if (revenue.lastClaimResult && revenue.lastClaimResult.txHash && revenue.lastClaimAttemptAt) {
+    return revenue.lastClaimAttemptAt;
+  }
+  return null;
+}
+
+function revenueClaimStatus(config, repoRoot = config.repoRoot, treasury = loadTreasury(repoRoot, config), now = new Date()) {
+  const intervalDays = Math.max(1, Number(config.revenueClaimIntervalDays || 7));
+  const lastSentAt = lastRevenueSentAt(treasury.revenue || {});
+  const lastSentMs = lastSentAt ? timestampMs(lastSentAt) : null;
+  const nextEligibleAt = lastSentMs === null
+    ? null
+    : new Date(lastSentMs + (intervalDays * DAY_MS)).toISOString();
+  const cadenceReady = lastSentMs === null || now.getTime() >= lastSentMs + (intervalDays * DAY_MS);
+  const performance = revenuePerformanceStatus(config, repoRoot, now);
+  const reasons = [
+    ...(cadenceReady ? [] : ["weekly_cadence_not_ready"]),
+    ...(performance.passed ? [] : performance.reasons)
+  ];
+
+  return {
+    cadence: REVENUE_CADENCE,
+    intervalDays,
+    lastSentAt,
+    nextEligibleAt,
+    cadenceReady,
+    performance,
+    canClaim: reasons.length === 0,
+    reasons
+  };
 }
 
 function budgetStatus(config, repoRoot = config.repoRoot) {
@@ -189,7 +311,12 @@ function syncRevenuePolicy(config, repoRoot = config.repoRoot) {
   treasury.revenue.operatorShareBps = config.operatorRevenueBps;
   treasury.revenue.treasuryShareBps = 10000 - config.operatorRevenueBps;
   treasury.revenue.payoutAsset = "configured-paired-token";
-  treasury.revenue.cadence = "daily";
+  treasury.revenue.cadence = REVENUE_CADENCE;
+  treasury.revenue.claimIntervalDays = config.revenueClaimIntervalDays;
+  treasury.revenue.performanceWindowDays = config.revenuePerformanceWindowDays;
+  treasury.revenue.minCompletedCycles = config.revenueMinCompletedCycles;
+  treasury.revenue.minProductiveCycles = config.revenueMinProductiveCycles;
+  treasury.revenue.minProductiveRatio = config.revenueMinProductiveRatio;
   treasury.token.name = config.tokenName;
   treasury.token.symbol = config.tokenSymbol;
   saveTreasury(repoRoot, treasury);
@@ -288,6 +415,8 @@ module.exports = {
   recordAiUsage,
   recordAiCreditRefill,
   saveTreasury,
+  revenueClaimStatus,
+  revenuePerformanceStatus,
   spendTotals,
   syncRevenuePolicy,
   upsertPendingTopUp

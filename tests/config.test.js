@@ -75,6 +75,22 @@ test("local command execution is disabled unless explicitly configured", () => {
   assert.deepEqual(config.commandAllowlist, []);
 });
 
+test("revenue claim cadence and performance gates are configurable", () => {
+  const config = loadConfig({
+    ORBIT_REVENUE_CLAIM_INTERVAL_DAYS: "14",
+    ORBIT_REVENUE_PERFORMANCE_WINDOW_DAYS: "10",
+    ORBIT_REVENUE_MIN_COMPLETED_CYCLES: "5",
+    ORBIT_REVENUE_MIN_PRODUCTIVE_CYCLES: "3",
+    ORBIT_REVENUE_MIN_PRODUCTIVE_RATIO: "0.6"
+  });
+
+  assert.equal(config.revenueClaimIntervalDays, 14);
+  assert.equal(config.revenuePerformanceWindowDays, 10);
+  assert.equal(config.revenueMinCompletedCycles, 5);
+  assert.equal(config.revenueMinProductiveCycles, 3);
+  assert.equal(config.revenueMinProductiveRatio, 0.6);
+});
+
 test("invalid provider JSON leaves Orbit without an AI provider", () => {
   const config = loadConfig({
     ORBIT_AI_PROVIDERS: "not-json"

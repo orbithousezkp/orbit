@@ -2,7 +2,7 @@
 
 const { base } = require("viem/chains");
 const { assertAddress, assertPrivateKey, isAddress } = require("./addresses");
-const { TREASURY_PATH, loadTreasury, saveTreasury, syncRevenuePolicy } = require("./treasury");
+const { TREASURY_PATH, loadTreasury, revenueClaimStatus, saveTreasury, syncRevenuePolicy } = require("./treasury");
 
 const SECONDS_PER_DAY = 86_400;
 
@@ -191,23 +191,34 @@ async function runRevenueCycle(config) {
   const treasury = loadTreasury(config.repoRoot, config);
   const token = treasury.token.address;
   const operatorRecipient = config.operatorRevenueAddress;
+  const claimStatus = revenueClaimStatus(config, config.repoRoot, treasury);
 
   if (!token) {
     return {
       status: "no_token",
-      message: "No launched token address is recorded yet."
+      message: "No launched token address is recorded yet.",
+      claimStatus
     };
   }
 
   assertAddress(token, "token address");
   assertAddress(operatorRecipient, "operator revenue address");
 
+  if (!claimStatus.canClaim) {
+    return {
+      status: "blocked_by_revenue_policy",
+      message: "Revenue sending is weekly and performance-gated.",
+      claimStatus
+    };
+  }
+
   if (!config.enableRevenueClaims) {
     return {
       status: "dry_run",
       message: "Revenue claim is prepared but ORBIT_ENABLE_REVENUE_CLAIMS is not true.",
       token,
-      rewardRecipient: operatorRecipient
+      rewardRecipient: operatorRecipient,
+      claimStatus
     };
   }
 
@@ -221,6 +232,9 @@ async function runRevenueCycle(config) {
   treasury.revenue.lastClaimResult = result.error
     ? { error: result.error.message || String(result.error) }
     : { txHash: result.txHash, rewardRecipient: operatorRecipient };
+  if (!result.error) {
+    treasury.revenue.lastClaimSentAt = treasury.revenue.lastClaimAttemptAt;
+  }
   saveTreasury(config.repoRoot, treasury);
 
   if (result.error) throw result.error;

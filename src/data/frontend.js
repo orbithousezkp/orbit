@@ -333,7 +333,7 @@ export const boundaries = [
   },
   {
     title: 'Money has locks',
-    desc: 'External spend, live claims, and token launches require explicit flags or public approval.',
+    desc: 'External spend, live claims, and token launches require explicit flags or public approval. Revenue sending is weekly and performance-gated.',
     icon: LockKeyhole,
   },
   {

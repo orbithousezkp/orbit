@@ -5,6 +5,7 @@ const rows = [
   ['Monthly cap', '$100.00', 'Household food budget'],
   ['AI routes', 'Private', 'Configured route order'],
   ['AI buys', 'Gated', 'Owner-approved credits'],
+  ['Revenue', 'Weekly', 'Performance-gated'],
   ['Live launch', 'Off', 'Signing stays gated'],
 ];
 

@@ -62,7 +62,7 @@ const FEATURES = Object.freeze([
   { id: "token-launch-gate", category: "Token Economy", status: "available", name: "Token Launch Gate", description: "Requires explicit launch flags and wallet config before signing." },
   { id: "paired-reward-policy", category: "Token Economy", status: "available", name: "Paired Reward Policy", description: "Routes rewards through the configured paired-token claim path." },
   { id: "vaulted-treasury", category: "Token Economy", status: "available", name: "Vaulted Treasury Allocation", description: "Configures a locked treasury allocation for the native token." },
-  { id: "revenue-claim-gate", category: "Token Economy", status: "available", name: "Revenue Claim Gate", description: "Claims rewards only when the explicit revenue claim flag is enabled." },
+  { id: "revenue-claim-gate", category: "Token Economy", status: "available", name: "Revenue Claim Gate", description: "Claims rewards only when weekly cadence, performance thresholds, and the explicit revenue claim flag all pass." },
   { id: "token-admin-validator", category: "Token Economy", status: "available", name: "Token Admin Validator", description: "Requires a valid admin address before live launch." },
   { id: "operator-recipient-validator", category: "Token Economy", status: "available", name: "Operator Recipient Validator", description: "Requires a valid configured reward recipient before launch or claim." },
   { id: "treasury-recipient-validator", category: "Token Economy", status: "available", name: "Treasury Recipient Validator", description: "Requires a valid Orbit treasury address before launch." },
