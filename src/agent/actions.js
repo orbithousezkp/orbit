@@ -58,6 +58,10 @@ const SECRET_ENV_PATTERNS = [
   /^GITHUB_/i,
   /^ORBIT_.*KEY/i
 ];
+const APPROVAL_ISSUE_LABEL = "orbit:approval";
+const APPROVAL_ISSUE_PATTERNS = [
+  /\b(owner approval|approval required|approval issue|external spend|wallet spend|send money|transfer funds|token launch|reward claim|change payout|payout route|operator revenue|treasury recipient|sign transaction|major movement|risky movement)\b/i
+];
 
 function track(relativePath) {
   filesChanged.add(relativePath.replace(/\\/g, "/"));
@@ -94,6 +98,24 @@ function safePublicLabels(labels = []) {
     .slice(0, 20);
   assertSafeTextForWrite(normalized.join("\n"));
   return normalized;
+}
+
+function assertApprovalIssueOnly(config, title, body, labels = []) {
+  const normalizedLabels = safePublicLabels(labels);
+  const requiredLabel = String(config.approvalIssueLabel || APPROVAL_ISSUE_LABEL).toLowerCase();
+  if (!normalizedLabels.some((label) => String(label || "").toLowerCase() === requiredLabel)) {
+    throw new Error("generic create_issue is limited to approval-class issues with the approval label");
+  }
+
+  const text = `${title}\n${body}`;
+  const risk = scanTextRisk(text);
+  const approvalSignals = APPROVAL_ISSUE_PATTERNS.some((pattern) => pattern.test(text));
+
+  if (!approvalSignals && risk.score < 70) {
+    throw new Error("generic create_issue is limited to approval-class issues for wallet spending or major risky movements");
+  }
+
+  return normalizedLabels;
 }
 
 function assertNoApprovalDecisionLabels(config, labels = []) {
@@ -224,7 +246,7 @@ async function executeTool(config, github, cycle, name, input) {
 
     case "create_issue": {
       assertSafePublicReply(`${input.title}\n${input.body}`);
-      const labels = safePublicLabels(input.labels || []);
+      const labels = assertApprovalIssueOnly(config, input.title, input.body, input.labels || []);
       assertNoApprovalDecisionLabels(config, labels);
       return github.createIssue({
         title: input.title,

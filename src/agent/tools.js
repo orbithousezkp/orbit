@@ -103,7 +103,7 @@ const TOOLS = [
   },
   {
     name: "create_issue",
-    description: "Create a public GitHub issue for tasks, approvals, bug reports, or owner review.",
+    description: "Create a public approval issue only for wallet spending, payments, signing, token actions, payout-route changes, or major risky external movement. Routine code, frontend, docs, memory, templates, chores, bugs, and owner-review notes must use files, tasks, comments, or commits instead.",
     inputSchema: {
       type: "object",
       properties: {

@@ -294,6 +294,72 @@ test("Orbit tools cannot write approval stores or apply approval decision labels
   );
 });
 
+test("generic issue creation rejects routine review or task issues", async () => {
+  const repoRoot = tempRepo();
+  const orbitConfig = cfg(repoRoot);
+  const github = {
+    async createIssue() {
+      throw new Error("should not create routine issue");
+    }
+  };
+
+  await assert.rejects(
+    () => executeTool(orbitConfig, github, 1, "create_issue", {
+      title: "Review README service pitch",
+      body: "Please review the tone and scope before the next safe artifact.",
+      labels: ["orbit:task"]
+    }),
+    /limited to approval-class issues/
+  );
+});
+
+test("generic issue creation accepts approval-class risky movement issues", async () => {
+  const repoRoot = tempRepo();
+  const orbitConfig = cfg(repoRoot);
+  const createdIssues = [];
+  const github = {
+    async createIssue(issue) {
+      createdIssues.push(issue);
+      return { number: 8, url: "https://github.com/owner/orbit/issues/8" };
+    }
+  };
+
+  const result = await executeTool(orbitConfig, github, 1, "create_issue", {
+    title: "Owner approval required: major risky external movement",
+    body: "Approval issue for a proposed wallet spend or major risky external movement. No action will happen unless the owner confirms.",
+    labels: ["orbit:approval"]
+  });
+
+  assert.equal(result.number, 8);
+  assert.equal(createdIssues.length, 1);
+  assert.deepEqual(createdIssues[0].labels, ["orbit:approval"]);
+});
+
+test("governance approval path still creates spend approval issue", async () => {
+  const repoRoot = tempRepo();
+  const orbitConfig = cfg(repoRoot);
+  const createdIssues = [];
+  const github = {
+    async createIssue(issue) {
+      createdIssues.push(issue);
+      return { number: 9, url: "https://github.com/owner/orbit/issues/9" };
+    }
+  };
+
+  const result = await requestOwnerApproval(orbitConfig, github, {
+    category: "external_spend",
+    purpose: "buy AI-call food credits",
+    asset: "USD credits",
+    amount: 25,
+    recipient: "openrouter"
+  });
+
+  assert.equal(result.status, "blocked_pending_owner_approval");
+  assert.equal(createdIssues.length, 1);
+  assert.match(createdIssues[0].title, /\[orbit approval\] external spend/);
+  assert.ok(createdIssues[0].labels.includes("orbit:approval"));
+});
+
 test("forced owner approval check revalidates stale local approval", async () => {
   const repoRoot = tempRepo();
   fs.writeFileSync(path.join(repoRoot, "memory", "approvals.json"), JSON.stringify({

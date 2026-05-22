@@ -11,6 +11,7 @@ test("behavior contract names household activities and hard limits", () => {
   assert.ok(ACTIVITY_CONTRACT.some((activity) => activity.id === "intake"));
   assert.ok(ACTIVITY_CONTRACT.some((activity) => activity.id === "token_operations"));
   assert.ok(HARD_LIMITS.some((limit) => limit.includes("No treasury transfer")));
+  assert.ok(HARD_LIMITS.some((limit) => limit.includes("No approval issue")));
 });
 
 test("cycle plan reviews risky issues before ordinary task work", () => {
@@ -170,6 +171,7 @@ test("cycle plan unblocks adjacent survival work when owner review blocks a task
 
   assert.equal(plan.nextStep.kind, "blocked_task_unblock");
   assert.match(plan.nextStep.detail, /safe adjacent artifact/);
+  assert.doesNotMatch(plan.nextStep.toolHint, /create_issue/);
 });
 
 test("cycle plan keeps survival moving for active service opportunities", () => {
@@ -192,6 +194,7 @@ test("cycle plan keeps survival moving for active service opportunities", () => 
 
   assert.equal(plan.nextStep.kind, "survival_backlog");
   assert.ok(plan.recommendedSteps.some((step) => step.kind === "survival_backlog"));
+  assert.doesNotMatch(plan.nextStep.toolHint, /create_issue/);
 });
 
 test("deterministic fallback uses behavior plan next step", () => {
