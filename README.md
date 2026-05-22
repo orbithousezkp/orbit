@@ -70,7 +70,7 @@ Provider routing can also live in `memory/ai-providers.json`. That file is publi
 {"freemodel":"...","opengateway":"...","openrouter":"..."}
 ```
 
-`ORBIT_AI_PROVIDERS` is still supported as a full ordered JSON override. Orbit tries each provider in order and falls back to the next one when a request fails. Additions, removals, reordering, model changes, and provider changes happen through JSON, not code.
+`ORBIT_AI_PROVIDERS` is still supported as a full ordered JSON override. Orbit tries each provider in order and falls back to the next one when a request fails. Additions, removals, reordering, model changes, and provider changes happen through JSON, not code. The current OpenGateway registry target is the Gitlawb host at `https://opengateway.gitlawb.com/v1/xiaomi-mimo` with `mimo-v2.5-pro`; it is configured as auth-optional, matching the installed OpenClaude Gitlawb OpenGateway profile.
 
 AI-credit purchases are separate from inference routing. Orbit may ask for an owner-approved AI-food refill, but the purchase target is restricted to OpenRouter credits. FreeModel and OpenGateway stay inference-only; they are not top-up destinations. The runtime records the approval and completion proof; it does not silently execute payment.
 

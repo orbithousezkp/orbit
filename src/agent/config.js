@@ -6,7 +6,7 @@ const path = require("path");
 const AI_PROVIDERS_PATH = "memory/ai-providers.json";
 const REGISTRY_PROVIDER_DOMAINS = {
   freemodel: ["freemodel.dev"],
-  opengateway: ["opengateway.ai"],
+  opengateway: ["opengateway.ai", "opengateway.gitlawb.com"],
   openrouter: ["openrouter.ai"]
 };
 
@@ -59,7 +59,7 @@ function hostMatches(hostname, domains) {
 }
 
 function providerConfigured(provider) {
-  return Boolean(provider && provider.apiKey && provider.apiBase && provider.model);
+  return Boolean(provider && provider.apiBase && provider.model && (provider.apiKey || provider.requiresAuth === false));
 }
 
 function parseJsonEnv(value, fallback) {
@@ -102,6 +102,9 @@ function normalizeProvider(raw = {}, env = {}, keyMap = {}, index = 0) {
     apiBase: cleanBase(env[apiBaseEnv] || raw.apiBase || ""),
     model: env[modelEnv] || raw.model || "",
     chatPath: raw.chatPath || "/chat/completions",
+    requiresAuth: raw.requiresAuth !== false,
+    authHeader: raw.authHeader || "Authorization",
+    authScheme: raw.authScheme || "bearer",
     extraHeaders: raw.extraHeaders && typeof raw.extraHeaders === "object" && !Array.isArray(raw.extraHeaders)
       ? raw.extraHeaders
       : {},
@@ -113,11 +116,18 @@ function normalizeProvider(raw = {}, env = {}, keyMap = {}, index = 0) {
 }
 
 function providerDefinitions(env, repoRoot) {
-  const configured = parseJsonEnv(env.ORBIT_AI_PROVIDERS, null);
-  if (Array.isArray(configured)) {
+  if (env.ORBIT_AI_PROVIDERS) {
+    const configured = parseJsonEnv(env.ORBIT_AI_PROVIDERS, null);
+    if (Array.isArray(configured)) {
+      return {
+        source: "env",
+        providers: configured
+      };
+    }
+
     return {
       source: "env",
-      providers: configured
+      providers: []
     };
   }
 

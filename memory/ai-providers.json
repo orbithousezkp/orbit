@@ -1,7 +1,7 @@
 {
   "version": 1,
   "mode": "ordered_failover",
-  "notes": "Public provider registry only. Do not put API keys here. Put keys in ORBIT_AI_PROVIDER_KEYS or ORBIT_AI_PROVIDERS GitHub Secrets. Inference priority is FreeModel, then OpenGateway, then OpenRouter. AI-credit purchases are OpenRouter-only.",
+  "notes": "Public provider registry only. Do not put API keys here. Put keys in ORBIT_AI_PROVIDER_KEYS or ORBIT_AI_PROVIDERS GitHub Secrets. Inference priority is FreeModel, then Gitlawb OpenGateway, then OpenRouter. AI-credit purchases are OpenRouter-only.",
   "providers": [
     {
       "name": "freemodel",
@@ -14,12 +14,15 @@
     },
     {
       "name": "opengateway",
-      "label": "Opengateway",
+      "label": "Gitlawb OpenGateway MiMo 2.5 Pro",
       "enabled": true,
+      "requiresAuth": false,
       "apiKeyRef": "opengateway",
-      "apiBase": "",
+      "apiBase": "https://opengateway.gitlawb.com/v1/xiaomi-mimo",
       "chatPath": "/chat/completions",
-      "model": ""
+      "model": "mimo-v2.5-pro",
+      "authHeader": "api-key",
+      "authScheme": "raw"
     },
     {
       "name": "openrouter",

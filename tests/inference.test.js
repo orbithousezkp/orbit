@@ -178,3 +178,113 @@ test("provider extra headers cannot override Authorization", async () => {
     global.fetch = originalFetch;
   }
 });
+
+test("auth-optional providers omit authorization when no key is configured", async () => {
+  const originalFetch = global.fetch;
+  let headers = {};
+
+  global.fetch = async (_url, options) => {
+    headers = options.headers;
+    return {
+      ok: true,
+      async json() {
+        return {
+          choices: [
+            {
+              message: {
+                content: "ok",
+                tool_calls: []
+              },
+              finish_reason: "stop"
+            }
+          ],
+          usage: { prompt_tokens: 1, completion_tokens: 1, total_tokens: 2 }
+        };
+      }
+    };
+  };
+
+  try {
+    const result = await infer(config({
+      aiProviders: [
+        {
+          name: "opengateway",
+          label: "Gitlawb OpenGateway MiMo 2.5 Pro",
+          apiKey: "",
+          requiresAuth: false,
+          apiBase: "https://opengateway.gitlawb.com/v1/xiaomi-mimo",
+          model: "mimo-v2.5-pro",
+          chatPath: "/chat/completions",
+          authHeader: "api-key",
+          authScheme: "raw",
+          priority: 1
+        }
+      ]
+    }), [
+      { role: "user", content: "context", context: {} }
+    ], []);
+
+    assert.equal(result.fallback, false);
+    assert.equal(headers.Authorization, undefined);
+    assert.equal(headers.authorization, undefined);
+    assert.equal(headers["api-key"], undefined);
+  } finally {
+    global.fetch = originalFetch;
+  }
+});
+
+test("provider-specific auth headers use configured scheme and cannot be overridden", async () => {
+  const originalFetch = global.fetch;
+  let headers = {};
+
+  global.fetch = async (_url, options) => {
+    headers = options.headers;
+    return {
+      ok: true,
+      async json() {
+        return {
+          choices: [
+            {
+              message: {
+                content: "ok",
+                tool_calls: []
+              },
+              finish_reason: "stop"
+            }
+          ],
+          usage: { prompt_tokens: 1, completion_tokens: 1, total_tokens: 2 }
+        };
+      }
+    };
+  };
+
+  try {
+    const result = await infer(config({
+      aiProviders: [
+        {
+          name: "opengateway",
+          label: "Gitlawb OpenGateway MiMo 2.5 Pro",
+          apiKey: "real-key",
+          requiresAuth: false,
+          apiBase: "https://opengateway.gitlawb.com/v1/xiaomi-mimo",
+          model: "mimo-v2.5-pro",
+          chatPath: "/chat/completions",
+          authHeader: "api-key",
+          authScheme: "raw",
+          extraHeaders: {
+            "api-key": "attacker-key"
+          },
+          priority: 1
+        }
+      ]
+    }), [
+      { role: "user", content: "context", context: {} }
+    ], []);
+
+    assert.equal(result.fallback, false);
+    assert.equal(headers.Authorization, undefined);
+    assert.equal(headers["api-key"], "real-key");
+  } finally {
+    global.fetch = originalFetch;
+  }
+});

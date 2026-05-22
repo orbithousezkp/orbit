@@ -141,8 +141,9 @@ test("keeps configured AI model priority order", () => {
       {
         name: "opengateway",
         apiKeyRef: "opengateway",
-        apiBase: "https://api.opengateway.ai/v1",
-        model: "opengateway-model",
+        apiBase: "https://opengateway.gitlawb.com/v1/xiaomi-mimo",
+        model: "mimo-v2.5-pro",
+        requiresAuth: false,
         enabled: true
       },
       {
@@ -169,6 +170,57 @@ test("keeps configured AI model priority order", () => {
     "openrouter"
   ]);
   assert.deepEqual(providers.map((provider) => provider.priority), [1, 2, 3]);
+});
+
+test("builds the Gitlawb OpenGateway registry provider", () => {
+  const repoRoot = tempRepo();
+  fs.writeFileSync(path.join(repoRoot, "memory", "ai-providers.json"), JSON.stringify({
+    providers: [
+      {
+        name: "opengateway",
+        apiKeyRef: "opengateway",
+        apiBase: "https://opengateway.gitlawb.com/v1/xiaomi-mimo",
+        model: "mimo-v2.5-pro",
+        requiresAuth: false,
+        enabled: true
+      }
+    ]
+  }, null, 2));
+
+  const providers = buildAiProviders({
+    ORBIT_AI_PROVIDER_KEYS: JSON.stringify({
+      opengateway: "opengateway-key"
+    })
+  }, repoRoot);
+
+  assert.equal(providers.length, 1);
+  assert.equal(providers[0].name, "opengateway");
+  assert.equal(providers[0].apiBase, "https://opengateway.gitlawb.com/v1/xiaomi-mimo");
+  assert.equal(providers[0].model, "mimo-v2.5-pro");
+  assert.equal(providers[0].requiresAuth, false);
+});
+
+test("builds the Gitlawb OpenGateway registry provider without a key", () => {
+  const repoRoot = tempRepo();
+  fs.writeFileSync(path.join(repoRoot, "memory", "ai-providers.json"), JSON.stringify({
+    providers: [
+      {
+        name: "opengateway",
+        apiKeyRef: "opengateway",
+        apiBase: "https://opengateway.gitlawb.com/v1/xiaomi-mimo",
+        model: "mimo-v2.5-pro",
+        requiresAuth: false,
+        enabled: true
+      }
+    ]
+  }, null, 2));
+
+  const providers = buildAiProviders({}, repoRoot);
+
+  assert.equal(providers.length, 1);
+  assert.equal(providers[0].name, "opengateway");
+  assert.equal(providers[0].apiKey, "");
+  assert.equal(providers[0].requiresAuth, false);
 });
 
 test("public provider registry cannot redirect known provider keys to unknown domains", () => {

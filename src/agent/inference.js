@@ -48,10 +48,20 @@ function compactToolSchema(tools) {
   }));
 }
 
-function safeExtraHeaders(headers = {}) {
+function safeExtraHeaders(headers = {}, protectedHeaders = ["Authorization"]) {
+  const protectedNames = new Set(protectedHeaders.map((header) => String(header).toLowerCase()));
   return Object.fromEntries(
-    Object.entries(headers).filter(([key]) => key.toLowerCase() !== "authorization")
+    Object.entries(headers).filter(([key]) => !protectedNames.has(key.toLowerCase()))
   );
+}
+
+function authHeaders(provider) {
+  if (!provider.apiKey) return {};
+
+  const header = provider.authHeader || "Authorization";
+  const scheme = String(provider.authScheme || "bearer").toLowerCase();
+  const value = scheme === "raw" ? provider.apiKey : `${scheme === "bearer" ? "Bearer" : provider.authScheme} ${provider.apiKey}`;
+  return { [header]: value };
 }
 
 async function infer(config, messages, tools) {
@@ -113,8 +123,8 @@ async function infer(config, messages, tools) {
       const response = await fetch(`${provider.apiBase}${chatPath.startsWith("/") ? chatPath : `/${chatPath}`}`, {
         method: "POST",
         headers: {
-          ...safeExtraHeaders(provider.extraHeaders || {}),
-          Authorization: `Bearer ${provider.apiKey}`,
+          ...safeExtraHeaders(provider.extraHeaders || {}, [provider.authHeader || "Authorization", "Authorization"]),
+          ...authHeaders(provider),
           "Content-Type": "application/json",
           "HTTP-Referer": config.publicBaseUrl || "https://github.com",
           "X-Title": "Orbit"
@@ -168,5 +178,6 @@ async function infer(config, messages, tools) {
 module.exports = {
   infer,
   deterministicResponse,
+  authHeaders,
   safeExtraHeaders
 };
