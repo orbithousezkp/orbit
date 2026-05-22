@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Orbit Feature Map</title>
+    <meta name="description" content="Orbit's unique feature surface, governance model, scam scanner, and token economy in one view.">
+    <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #07101d;
+        --ink: #f6f8fb;
+        --muted: #9fb0c4;
+        --line: #24384d;
+        --panel: #0f1d2d;
+        --blue: #00d4ff;
+        --green: #3ddc97;
+        --gold: #f5b841;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        background: linear-gradient(180deg, rgba(7, 16, 29, .94), rgba(7, 16, 29, 1)), url("assets/orbit-control-room.png") top right / cover no-repeat, var(--bg);
+        color: var(--ink);
+      }
+
+      .shell {
+        width: min(1200px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 34px 0 52px;
+      }
+
+      .top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        margin-bottom: 24px;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+        font-weight: 850;
+      }
+
+      .brand img {
+        width: 36px;
+        height: 36px;
+      }
+
+      nav {
+        display: flex;
+        gap: 14px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      nav a { text-decoration: none; color: inherit; }
+
+      h1 {
+        margin: 18px 0 12px;
+        font-size: clamp(48px, 8vw, 88px);
+        line-height: .95;
+      }
+
+      p.lead {
+        max-width: 760px;
+        margin: 0;
+        color: #d7e5f2;
+        font-size: 20px;
+        line-height: 1.5;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+        margin: 28px 0;
+      }
+
+      .stat {
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(15, 29, 45, .92);
+      }
+
+      .stat span {
+        display: block;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .stat strong {
+        display: block;
+        margin-top: 8px;
+        font-size: 28px;
+      }
+
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 24px 0 18px;
+      }
+
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 0 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(20, 38, 58, .95);
+        color: var(--ink);
+        font-weight: 800;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .button.active {
+        border-color: rgba(0, 212, 255, .4);
+        box-shadow: inset 0 0 0 1px rgba(0, 212, 255, .12);
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        min-height: 28px;
+        padding: 0 10px;
+        border-radius: 999px;
+        background: rgba(61, 220, 151, .13);
+        color: var(--green);
+        font-size: 12px;
+        font-weight: 850;
+      }
+
+      .panel {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(15, 29, 45, .92);
+        overflow: hidden;
+      }
+
+      .panel-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(20, 38, 58, .88);
+      }
+
+      .panel-head strong { font-size: 15px; }
+
+      .content {
+        padding: 16px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .card {
+        min-height: 166px;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #0a1725;
+      }
+
+      .card.frontier {
+        border-color: rgba(0, 212, 255, .34);
+        background: linear-gradient(180deg, rgba(0, 212, 255, .08), rgba(10, 23, 37, .98));
+      }
+
+      .card.agent-os {
+        border-color: rgba(245, 184, 65, .36);
+        background: linear-gradient(180deg, rgba(245, 184, 65, .08), rgba(10, 23, 37, .98));
+      }
+
+      .card .category {
+        color: var(--green);
+        font-size: 12px;
+        font-weight: 850;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+      }
+
+      .card.frontier .category {
+        color: var(--blue);
+      }
+
+      .card.agent-os .category {
+        color: var(--gold);
+      }
+
+      .card strong {
+        display: block;
+        margin: 11px 0 8px;
+        font-size: 19px;
+      }
+
+      .card p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.55;
+      }
+
+      .footer {
+        margin-top: 18px;
+        color: var(--muted);
+      }
+
+      @media (max-width: 900px) {
+        .top, .stats, .grid {
+          grid-template-columns: 1fr;
+          display: grid;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <div class="top">
+        <a class="brand" href="index.html">
+          <img src="assets/mark.svg" alt="">
+          <span>Orbit Feature Map</span>
+        </a>
+        <nav>
+          <a href="index.html">Control room</a>
+          <a href="workflow-demo.html">Workflow demo</a>
+          <a href="../README.md">Docs</a>
+        </nav>
+      </div>
+
+      <h1>Orbit is an independent agent operating system.</h1>
+      <p class="lead">This map shows the unique Orbit surface: repo-native autonomy, agent passports, heartbeat ledgers, spawn gates, proof anchoring, treasury governance, scam resistance, and frontier systems for leading GitHub AI projects.</p>
+
+      <div class="stats" id="stats"></div>
+
+      <div class="toolbar">
+        <button class="button active" data-filter="all">All</button>
+        <button class="button" data-filter="Autonomy Core">Autonomy Core</button>
+        <button class="button" data-filter="Treasury Guard">Treasury Guard</button>
+        <button class="button" data-filter="Scam Defense">Scam Defense</button>
+        <button class="button" data-filter="Token Economy">Token Economy</button>
+        <button class="button" data-filter="Agent OS">Agent OS</button>
+        <button class="button" data-filter="Developer Workflow">Developer Workflow</button>
+        <button class="button" data-filter="Public Trust">Public Trust</button>
+        <button class="button" data-filter="Frontier Agentics">Frontier Agentics</button>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <strong>Feature surface</strong>
+          <span id="countLabel" class="pill">0 features</span>
+        </div>
+        <div class="content">
+          <div class="grid" id="grid"></div>
+        </div>
+      </div>
+
+      <div class="footer">
+        Orbit keeps live spend locked behind explicit owner approval when a request leaves the self-development and revenue policy boundary.
+      </div>
+    </div>
+
+    <script>
+      const features = [
+        ["Autonomy Core", "Cycle Proof Ledger", "Every run writes an auditable proof file before committing work."],
+        ["Autonomy Core", "Deterministic Fallback Planner", "Runs locally when model access is unavailable or over budget."],
+        ["Autonomy Core", "Repo Resident Runtime", "Uses GitHub Actions and repository files as its operating system."],
+        ["Autonomy Core", "Public Memory Store", "Keeps state, strategy, tasks, treasury, and cycles in inspectable files."],
+        ["Autonomy Core", "Persistent Task Memory", "Creates and completes tasks across disconnected cycles."],
+        ["Treasury Guard", "Daily AI Spend Cap", "Stops model calls when the configured daily budget is exhausted."],
+        ["Treasury Guard", "Monthly AI Spend Cap", "Stops model calls when the monthly budget is depleted."],
+        ["Treasury Guard", "AI Cost Ledger", "Records estimated token usage and spend per cycle."],
+        ["Treasury Guard", "External Spend Lock", "Blocks non-self spend unless owner approval is public."],
+        ["Treasury Guard", "Approval Issue Router", "Creates public approval issues for blocked spend requests."],
+        ["Treasury Guard", "Pending Approval Queue", "Stores blocked spend requests until accepted or rejected."],
+        ["Scam Defense", "Scam Keyword Scanner", "Flags seed phrase, wallet rescue, and transfer-drain language."],
+        ["Scam Defense", "Prompt Injection Check", "Detects attempts to override Orbit's operating policy."],
+        ["Scam Defense", "Approval Drain Detector", "Flags unlimited approvals and permit-signature traps."],
+        ["Scam Defense", "Unknown Domain Risk", "Raises risk for financial links outside trusted domains."],
+        ["Scam Defense", "Address Poisoning Check", "Warns on unsolicited wallet addresses in financial requests."],
+        ["Token Economy", "Clanker v4 Launch Prep", "Builds Orbit's token launch payload using current Clanker v4 shapes."],
+        ["Token Economy", "Token Launch Gate", "Requires explicit launch flags and wallet config before signing."],
+        ["Token Economy", "Paired Reward Policy", "Routes rewards through the configured paired-token claim path."],
+        ["Token Economy", "Claim Proof Record", "Records reward claim results into treasury memory."],
+        ["Developer Workflow", "Health Gated Workflow", "Runs health checks before autonomous cycles in Actions."],
+        ["Developer Workflow", "Interactive Workflow Demo", "Shows maintenance, launch prep, and revenue claim scenarios."],
+        ["Developer Workflow", "Feature Catalog Page", "Surfaces Orbit's unique capability map as a product UI."],
+        ["Public Trust", "Original Brand System", "Ships fresh Orbit logo, mark, social card, and hero assets."],
+        ["Public Trust", "Approval Transparency", "External spend must leave a public approval record."],
+        ["Public Trust", "Dry Run Defaults", "Live token operations are disabled until intentionally enabled."]
+      ];
+
+      features.push(
+        ["Autonomy Core", "Issue Native Intake", "Uses issues as the public command and feedback surface."],
+        ["Autonomy Core", "Issue Inspection Tooling", "Lists and reads repository issues, including optional public comments."],
+        ["Autonomy Core", "Issue Creation Tooling", "Opens public issues for approvals, tasks, and human review."],
+        ["Autonomy Core", "Issue Closure Tooling", "Closes resolved issues after logging an outcome."],
+        ["Autonomy Core", "Context Budgeting", "Loads compact repo context instead of noisy full-tree dumps."],
+        ["Autonomy Core", "Durable Knowledge Memory", "Appends searchable stable facts and lessons across cycles."],
+        ["Autonomy Core", "Memory Search", "Searches knowledge entries and core memory files by query."],
+        ["Autonomy Core", "GitHub Search Helper", "Supports public repository, issue, and code research."],
+        ["Autonomy Core", "Public URL Fetching", "Fetches public HTTP resources with network guards and risk scanning."],
+        ["Autonomy Core", "Web Search Integration", "Uses a configured JSON search endpoint for public research."],
+        ["Autonomy Core", "Tool Proofing", "Records tool inputs, outputs, and errors in proofs."],
+        ["Autonomy Core", "Cycle State Machine", "Tracks birth, cycle count, last activity, and completion status."],
+        ["Autonomy Core", "Self Audit Health Check", "Validates the repo before autonomous runtime work."],
+        ["Treasury Guard", "Private Reward Route", "Preserves the configured private reward route without publishing route values."],
+        ["Treasury Guard", "Orbit Reserve Route", "Keeps the retained paired rewards for development and AI costs."],
+        ["Treasury Guard", "Spend Fingerprints", "Hashes spend requests so approval records cannot be swapped silently."],
+        ["Treasury Guard", "Owner Approval Parser", "Reads public owner approval comments for pending spend requests."],
+        ["Treasury Guard", "Approval Decision Label Guard", "Blocks Orbit from applying approval or rejection labels to its own spend requests."],
+        ["Treasury Guard", "Self Development Policy", "Classifies internal development spend separately from outside payouts."],
+        ["Treasury Guard", "Gas Only Exemption", "Allows unavoidable gas-class expenses while logging them."],
+        ["Scam Defense", "Fake Support Detector", "Flags wallet sync, wallet rescue, and fake support instructions."],
+        ["Scam Defense", "Urgency Pressure Detector", "Flags final warning and immediate-action language."],
+        ["Scam Defense", "Reward Claim Trap Detector", "Flags airdrop or claim pages that ask for signatures or approvals."],
+        ["Scam Defense", "Hidden Script Watch", "Raises risk for encoded payloads and executable snippets."],
+        ["Scam Defense", "Safe Domain List", "Treats known GitHub, Base, Clanker, and OpenAI domains differently."],
+        ["Scam Defense", "Transaction Intent Risk", "Scores spend intents before any financial action proceeds."],
+        ["Token Economy", "Vaulted Treasury Allocation", "Configures locked treasury allocation in token launch prep."],
+        ["Token Economy", "Revenue Claim Gate", "Requires explicit reward claim flags before onchain claiming."],
+        ["Token Economy", "Token Admin Validator", "Requires a valid admin address before launch."],
+        ["Token Economy", "Operator Recipient Validator", "Requires a valid configured reward recipient before launch or claim."],
+        ["Token Economy", "Treasury Recipient Validator", "Requires a valid Orbit treasury address before launch."],
+        ["Token Economy", "Launch Readiness Report", "Surfaces missing launch configuration in context and frontend."],
+        ["Agent OS", "Agent Passport", "Gives each Orbit deployment a public identity bundle with mission, permissions, and proof roots."],
+        ["Agent OS", "Heartbeat Ledger", "Publishes liveness records that show when Orbit woke, what it checked, and why it slept."],
+        ["Agent OS", "Mission DNA File", "Stores the agent's durable purpose, boundaries, and operating style as versioned project state."],
+        ["Agent OS", "Spawn Charter Gate", "Allows child agents only when a scoped charter, budget, and shutdown rule are approved."],
+        ["Agent OS", "Child Agent Quorum", "Requires multiple signals before spawned agents can merge, spend, or escalate work."],
+        ["Agent OS", "Wallet Boundary Sessions", "Separates read-only chain observation from time-boxed signing windows with explicit proof."],
+        ["Agent OS", "Onchain Proof Anchor", "Anchors selected cycle proof hashes onchain without exposing private configuration."],
+        ["Agent OS", "Registry Mirror", "Mirrors agent identity and status into public repo files before any external registry write."],
+        ["Agent OS", "Reputation Trail", "Scores Orbit by completed work, refused unsafe actions, review outcomes, and rollback history."],
+        ["Agent OS", "Capability Lease", "Grants temporary powers for one task or cycle instead of permanent broad permissions."],
+        ["Agent OS", "Agent Memory Capsule", "Packages the minimum transferable memory needed to move Orbit into a new repository."],
+        ["Agent OS", "Runtime Vital Signs", "Tracks health, budget, stale queues, failing checks, and blocked approvals as agent vitals."],
+        ["Agent OS", "Agent Handoff Packet", "Creates a complete handoff for another agent or human before Orbit pauses a risky task."],
+        ["Agent OS", "Colony Task Market", "Breaks repository work into priced tasks that agents can claim under budget and policy."],
+        ["Agent OS", "Bounty Intake Router", "Routes external bounty or grant requests through risk scoring, scope checks, and owner gates."],
+        ["Agent OS", "Treasury Autopilot Sandbox", "Simulates economic actions end-to-end before any live transaction path can open."],
+        ["Agent OS", "Emergency Brake Key", "Lets the owner pause autonomous cycles, live claims, spawning, and commits with one public switch."],
+        ["Agent OS", "Agent Skill Registry", "Lists Orbit's available skills, maturity, risks, and required permissions as machine-readable state."],
+        ["Agent OS", "Public Mission Board", "Shows active missions, blocked decisions, budgets, proof links, and next actions in one view."],
+        ["Agent OS", "Verifiable Sleep Cycle", "Records why Orbit stopped so inactivity is distinguishable from failure."],
+        ["Agent OS", "Agent Contract Registry", "Tracks contracts, ABIs, networks, and trust levels used by Orbit's economic tools."],
+        ["Agent OS", "Protocol Adapter Layer", "Keeps Base, Clanker, GitHub, model, and search integrations behind replaceable adapters."],
+        ["Agent OS", "Onchain Identity Resolver", "Maps agent names, wallets, repos, and token contracts into a verified identity record."],
+        ["Agent OS", "Agent Lineage Ledger", "Records which Orbit deployment created, configured, or delegated to another agent."],
+        ["Agent OS", "Reputation Penalty Hooks", "Marks failed, reverted, or owner-rejected actions so autonomy can be reduced automatically."],
+        ["Agent OS", "Command Rights Matrix", "Defines exactly which commands are suggestion-only, PR-only, commit-safe, or forbidden."],
+        ["Agent OS", "Delegated Wallet Policy", "Separates operator wallets, treasury wallets, session keys, and claim recipients by policy."],
+        ["Agent OS", "Agent Upgrade Proposals", "Routes major autonomy, wallet, model, or governance changes through public upgrade issues."],
+        ["Agent OS", "Colony Budget Council", "Allocates AI, CI, bounty, and onchain budgets across child agents and missions."],
+        ["Agent OS", "Sovereign Launch Checklist", "Verifies original identity, assets, configs, proofs, safety gates, and public positioning before launch."],
+        ["Developer Workflow", "Command Allowlist", "Restricts shell commands to explicitly configured safe commands."],
+        ["Developer Workflow", "Path Escape Guard", "Prevents file writes outside the repository."],
+        ["Developer Workflow", "Dependency Audit Script", "Checks production dependencies for known vulnerabilities."],
+        ["Developer Workflow", "Runtime Test Suite", "Tests safety, tasks, treasury, governance, and scam behavior."],
+        ["Developer Workflow", "Control Room Frontend", "Presents agent, token, treasury, and launch state."],
+        ["Developer Workflow", "Roadmap Memory", "Keeps future work public as tasks instead of private prompts."],
+        ["Developer Workflow", "Release Proof Style", "Uses proof logs as the foundation for later release notes."],
+        ["Public Trust", "Clean Genesis Launch", "Keeps Orbit's launch identity, assets, memory, and public positioning original."],
+        ["Public Trust", "Public Control Surface", "Uses issues, labels, and public files for operator control."],
+        ["Public Trust", "Operator Policy File", "Stores spend and approval policy in versioned memory."],
+        ["Public Trust", "Owner Acceptance Flow", "Requires owner acceptance before external spend can execute."],
+        ["Public Trust", "Independent Architecture Surface", "Defines Orbit through repo operations, proof ledgers, safety gates, and agent OS controls."],
+        ["Public Trust", "Survival Revenue Policy", "Makes the operator reward route explicit and auditable."],
+        ["Public Trust", "Self Funding Narrative", "Positions Orbit as a self-sustaining GitHub household, not just a maintenance script."]
+      );
+
+      features.push(
+        ["Frontier Agentics", "Repo Radar", "Continuously ranks every issue, PR, failing check, and stale file into one action queue."],
+        ["Frontier Agentics", "Maintainer Intent Graph", "Learns owner preferences from merged decisions and turns them into review-time policy hints."],
+        ["Frontier Agentics", "AI Project Scoreboard", "Grades GitHub AI projects by activity, quality, safety, docs, and release discipline."],
+        ["Frontier Agentics", "Cross Repo Scout", "Watches related public repos for breaking API changes, new patterns, and useful fixes."],
+        ["Frontier Agentics", "Issue Heatmap", "Clusters issues by blast radius and urgency so Orbit works the highest-leverage thread first."],
+        ["Frontier Agentics", "PR Battle Room", "Creates a live merge plan with blockers, owners, tests, and rollback notes for each PR."],
+        ["Frontier Agentics", "Dependency Diplomat", "Negotiates dependency updates by opening staged PRs with changelog evidence and risk labels."],
+        ["Frontier Agentics", "Release Commander", "Builds a release train from merged work, proofs, semver impact, and deployment gates."],
+        ["Frontier Agentics", "Autonomous Changelog Lawyer", "Turns commits and proofs into precise release notes with no invented claims."],
+        ["Frontier Agentics", "Test Gap Cartographer", "Maps changed code paths to missing tests and files issues for the riskiest holes."],
+        ["Frontier Agentics", "Prompt Regression Lab", "Runs prompt fixtures against agent behavior to catch policy drift before deployment."],
+        ["Frontier Agentics", "Agent Benchmark Arena", "Compares Orbit runs against other agents on identical repo tasks with public scorecards."],
+        ["Frontier Agentics", "Model Routing Market", "Routes subtasks to models by measured cost, latency, accuracy, and failure mode."],
+        ["Frontier Agentics", "Self Review Jury", "Runs independent critique passes over Orbit changes before a PR is opened."],
+        ["Frontier Agentics", "Semantic Merge Oracle", "Detects whether conflicts are behavior conflicts rather than simple text overlap."],
+        ["Frontier Agentics", "Repo Treaty System", "Stores cross-repo contribution rules so Orbit can operate politely across ecosystems."],
+        ["Frontier Agentics", "OSS Diplomacy Agent", "Drafts respectful external-project issues and PRs when Orbit finds bugs outside its repo."],
+        ["Frontier Agentics", "Spec To Tests Compiler", "Converts accepted issue requirements into runnable tests before implementation."],
+        ["Frontier Agentics", "Design Contract Sentinel", "Checks frontend changes against layout, copy, accessibility, and visual contract rules."],
+        ["Frontier Agentics", "Screenshot Diff Triage", "Explains visual diffs and separates intentional UI change from rendering damage."],
+        ["Frontier Agentics", "Docs Truth Auditor", "Verifies docs claims against code and opens corrections when wording outruns implementation."],
+        ["Frontier Agentics", "README Market Maker", "Optimizes public docs for users, contributors, operators, and AI crawlers without hype drift."],
+        ["Frontier Agentics", "Maintainer Inbox Zero", "Summarizes noisy notifications into decisions, blockers, and safe automated replies."],
+        ["Frontier Agentics", "Duplicate Issue Fuser", "Merges duplicate reports into a canonical thread with preserved attribution and evidence."],
+        ["Frontier Agentics", "Bug Reproduction Factory", "Builds minimal repro cases from issue comments and stores them as failing fixtures."],
+        ["Frontier Agentics", "Flake Court", "Tracks flaky tests over time and separates infrastructure noise from real regressions."],
+        ["Frontier Agentics", "Security Patch Autopilot", "Drafts least-change patches for advisories and routes high-risk fixes through approval."],
+        ["Frontier Agentics", "Supply Chain Sentry", "Flags maintainer changes, package anomalies, and lockfile surprises before dependency merges."],
+        ["Frontier Agentics", "License Conflict Referee", "Detects license drift across dependencies, snippets, assets, and generated code."],
+        ["Frontier Agentics", "API Drift Watchtower", "Tracks external API documentation and warns when Orbit integrations are about to break."],
+        ["Frontier Agentics", "Cost Of Change Estimator", "Scores each issue by likely tokens, runtime, review risk, and user value before action."],
+        ["Frontier Agentics", "Attention Auction", "Allocates limited AI budget to work with the highest expected repository return."],
+        ["Frontier Agentics", "Memory Garbage Collector", "Retires stale beliefs from agent memory when code, docs, or policy prove them wrong."],
+        ["Frontier Agentics", "Belief Conflict Detector", "Surfaces contradictions between issues, memory, README claims, and runtime behavior."],
+        ["Frontier Agentics", "Autonomy Throttle", "Adjusts how much Orbit can do alone based on recent failure rate and owner trust."],
+        ["Frontier Agentics", "Trust Ladder", "Promotes safe recurring actions from suggestion to PR to direct commit after proof."],
+        ["Frontier Agentics", "Human Escalation Router", "Finds the exact human decision needed and asks it in the smallest possible approval issue."],
+        ["Frontier Agentics", "Multi Agent Swarm Board", "Splits large GitHub projects into bounded tasks with ownership and merge coordination."],
+        ["Frontier Agentics", "Agent Contract Tests", "Defines expected behavior for agent tools so integrations can be tested like APIs."],
+        ["Frontier Agentics", "Proof Index Search", "Indexes cycle proofs so users can ask why Orbit made or refused any action."],
+        ["Frontier Agentics", "Governance Simulator", "Dry-runs spend, release, and permission changes against policy before touching GitHub."],
+        ["Frontier Agentics", "Permission Minimizer", "Recommends the smallest GitHub token scopes needed for each Orbit deployment mode."],
+        ["Frontier Agentics", "Workflow Surgeon", "Repairs broken GitHub Actions by replaying logs and proposing minimal YAML changes."],
+        ["Frontier Agentics", "CI Time Trader", "Optimizes CI order so cheap, high-signal checks fail early and save budget."],
+        ["Frontier Agentics", "Community Signal Miner", "Finds repeated user pain across issues, discussions, and releases without harvesting secrets."],
+        ["Frontier Agentics", "Roadmap Reality Checker", "Compares roadmap promises against shipped code and pushes stale promises back to review."],
+        ["Frontier Agentics", "Architecture Debt Ledger", "Records debt with owner, cause, interest, and payoff trigger instead of vague TODOs."],
+        ["Frontier Agentics", "Project Momentum Engine", "Keeps the repo moving by converting stalled threads into the next smallest useful PR."],
+        ["Frontier Agentics", "AI Project Takeover Kit", "Bootstraps Orbit into neglected AI repos with audits, issue triage, docs, and safety gates."],
+        ["Frontier Agentics", "Boss Mode Dashboard", "Shows who is blocked, what Orbit can fix, and which project deserves the next AI dollar."]
+      );
+
+      const categoryCounts = features.reduce((counts, item) => {
+        counts[item[0]] = (counts[item[0]] || 0) + 1;
+        return counts;
+      }, {});
+
+      const stats = {
+        total: features.length,
+        autonomy: categoryCounts["Autonomy Core"] || 0,
+        treasury: categoryCounts["Treasury Guard"] || 0,
+        scam: categoryCounts["Scam Defense"] || 0,
+        token: categoryCounts["Token Economy"] || 0,
+        agentOs: categoryCounts["Agent OS"] || 0,
+        workflow: categoryCounts["Developer Workflow"] || 0,
+        trust: categoryCounts["Public Trust"] || 0,
+        frontier: categoryCounts["Frontier Agentics"] || 0
+      };
+
+      const statsEl = document.getElementById("stats");
+      statsEl.innerHTML = `
+        <div class="stat"><span>Total features</span><strong>${stats.total}</strong></div>
+        <div class="stat"><span>Autonomy core</span><strong>${stats.autonomy}</strong></div>
+        <div class="stat"><span>Agent OS</span><strong>${stats.agentOs}</strong></div>
+        <div class="stat"><span>Frontier agentics</span><strong>${stats.frontier}</strong></div>
+      `;
+
+      const grid = document.getElementById("grid");
+      const countLabel = document.getElementById("countLabel");
+      const buttons = document.querySelectorAll("[data-filter]");
+
+      function render(filter) {
+        const filtered = filter === "all" ? features : features.filter((item) => item[0] === filter);
+        grid.innerHTML = filtered.map(([category, name, desc]) => `
+          <article class="card ${category === "Frontier Agentics" ? "frontier" : ""} ${category === "Agent OS" ? "agent-os" : ""}">
+            <span class="category">${category}</span>
+            <strong>${name}</strong>
+            <p>${desc}</p>
+          </article>
+        `).join("");
+        countLabel.textContent = `${filtered.length} features`;
+        buttons.forEach((button) => button.classList.toggle("active", button.dataset.filter === filter));
+      }
+
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => render(button.dataset.filter));
+      });
+
+      render("all");
+    </script>
+  </body>
+</html>

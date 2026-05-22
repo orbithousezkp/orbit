@@ -1,0 +1,34 @@
+name: Issue Gate
+
+on:
+  issues:
+    types: [opened, edited, reopened]
+
+permissions:
+  issues: write
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Classify issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const title = issue.title || "";
+            const body = issue.body || "";
+            const text = `${title}\n${body}`.toLowerCase();
+
+            const labels = new Set(["orbit:inbox"]);
+            if (/^\[directive\]/i.test(title)) labels.add("orbit:directive");
+            if (/\bbug\b|\berror\b|\bfail(ed|ing)?\b|\bcrash\b/.test(text)) labels.add("type:bug");
+            if (/\bidea\b|\bfeature\b|\bimprove\b|\bproposal\b/.test(text)) labels.add("type:idea");
+            if (/\bsecurity\b|\bsecret\b|\btoken\b|\bprivate key\b/.test(text)) labels.add("orbit:needs-human");
+
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              labels: [...labels]
+            });

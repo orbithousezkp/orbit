@@ -1,0 +1,61 @@
+name: Orbit Event Cycle
+
+on:
+  issues:
+    types: [opened, edited, reopened]
+  issue_comment:
+    types: [created, edited]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+
+concurrency:
+  group: orbit-cycle
+  cancel-in-progress: false
+
+jobs:
+  cycle:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Health check
+        run: npm run health
+
+      - name: Orbit event cycle
+        run: npm run cycle
+        env:
+          ORBIT_AI_DAILY_BUDGET_USD: ${{ vars.ORBIT_AI_DAILY_BUDGET_USD }}
+          ORBIT_AI_MONTHLY_BUDGET_USD: ${{ vars.ORBIT_AI_MONTHLY_BUDGET_USD }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          ORBIT_CYCLE_TRIGGER: ${{ github.event_name }}
+          ORBIT_CYCLE_TRIGGER_ACTION: ${{ github.event.action }}
+          ORBIT_OWNER_USERNAME: ${{ vars.ORBIT_OWNER_USERNAME }}
+          ORBIT_APPROVAL_ISSUE_LABEL: ${{ vars.ORBIT_APPROVAL_ISSUE_LABEL }}
+          ORBIT_APPROVAL_ACCEPTED_LABEL: ${{ vars.ORBIT_APPROVAL_ACCEPTED_LABEL }}
+          ORBIT_APPROVAL_REJECTED_LABEL: ${{ vars.ORBIT_APPROVAL_REJECTED_LABEL }}
+          ORBIT_DRY_RUN: "false"
+          ORBIT_COMMIT_CHANGES: "false"
+          ORBIT_PUSH_CHANGES: "false"
+          ORBIT_ALLOW_COMMANDS: "false"
+          ORBIT_ENABLE_TOKEN_LAUNCH: "false"
+          ORBIT_ENABLE_REVENUE_CLAIMS: "false"

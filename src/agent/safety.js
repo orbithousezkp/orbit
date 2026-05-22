@@ -1,0 +1,174 @@
+"use strict";
+
+const fs = require("fs");
+const path = require("path");
+
+const BLOCKED_PATH_SEGMENTS = new Set([".git", "node_modules"]);
+
+const SECRET_PATTERNS = [
+  /-----BEGIN (?:RSA |EC |OPENSSH |PGP )?PRIVATE KEY-----/i,
+  /\bgh[pousr]_[A-Za-z0-9_]{30,}\b/g,
+  /\bgithub_pat_[A-Za-z0-9_]{50,}\b/g,
+  /\bsk-[A-Za-z0-9]{20,}\b/g,
+  /\bAKIA[0-9A-Z]{16}\b/g,
+  /^(?:AI_API_KEY|OPENAI_API_KEY|OPENROUTER_API_KEY|GITHUB_TOKEN|GH_TOKEN|ORBIT_WALLET_PRIVATE_KEY|PRIVATE_KEY)[ \t]*=[ \t]*["']?[^"'\s]{12,}/gim,
+  /^[A-Z0-9_]*API_KEY[ \t]*=[ \t]*["']?[^"'\s]{12,}/gim,
+  /["']?apiKey["']?\s*:\s*["'][^"']{12,}["']/gi
+];
+
+const INJECTION_PATTERNS = [
+  /ignore (all )?(previous|prior|system|developer) instructions/i,
+  /reveal (your )?(system prompt|secrets|token|private key)/i,
+  /exfiltrate|prompt injection|jailbreak/i,
+  /run arbitrary commands?/i,
+  /disable (safety|guardrails|validation)/i
+];
+
+const PRIVATE_REPLY_PATTERNS = [
+  /\b(?:AI_API_KEY|OPENAI_API_KEY|OPENROUTER_API_KEY|GITHUB_TOKEN|GH_TOKEN|ORBIT_WALLET_PRIVATE_KEY|PRIVATE_KEY)\b\s*[:=]/i,
+  /\b(?:walletPrivateKey|privateKey|githubToken|aiApiKey|openaiApiKey)\b\s*[:=]/i,
+  /\b(?:operatorRevenueAddress|treasuryAddress|tokenAdminAddress|operatorRevenueBps)\b\s*(?:[:=]|\bis\b|\bare\b)/i,
+  /\b(?:operator revenue address|treasury address|token admin address|payout address|private reward route)\b\s*(?:[:=]|\bis\b|\bare\b)\s*\S+/i,
+  /\b(?:operator share|treasury share|route percentage|revenue basis points)\b\s*(?:[:=]|\bis\b|\bare\b)\s*\d+/i
+];
+
+const PUBLIC_FINANCIAL_PROMISE_PATTERNS = [
+  /\b(?:I|Orbit|we)\s+(?:will|can|am going to|are going to)\s+(?:transfer|pay|launch|claim|sign|approve|purchase|buy)\b/i,
+  /\b(?:I|Orbit|we)\s+(?:will|can|am going to|are going to)\s+send\b.{0,80}\b(?:money|funds|eth|weth|usdc|token|reward|payment|treasury|wallet)\b/i,
+  /\b(?:payment|transfer|token launch|reward claim|wallet action)\s+(?:is|has been)\s+approved\b/i
+];
+
+function normalizeRelativePath(input) {
+  if (typeof input !== "string" || input.trim() === "") {
+    throw new Error("path must be a non-empty string");
+  }
+
+  const raw = input.replace(/\\/g, "/").trim();
+  if (path.isAbsolute(raw)) throw new Error("absolute paths are not allowed");
+
+  const normalized = path.posix.normalize(raw);
+  if (normalized === "." || normalized.startsWith("../") || normalized === "..") {
+    throw new Error("path must stay inside the repository");
+  }
+
+  const parts = normalized.split("/");
+  if (parts.some((part) => part === ".." || BLOCKED_PATH_SEGMENTS.has(part))) {
+    throw new Error("path includes a blocked segment");
+  }
+
+  return normalized;
+}
+
+function safeJoin(root, relativePath) {
+  const normalized = normalizeRelativePath(relativePath);
+  const absoluteRoot = path.resolve(root);
+  const resolved = path.resolve(absoluteRoot, normalized);
+  const rootWithSep = absoluteRoot.endsWith(path.sep) ? absoluteRoot : `${absoluteRoot}${path.sep}`;
+  if (resolved !== absoluteRoot && !resolved.startsWith(rootWithSep)) {
+    throw new Error("resolved path escaped repository root");
+  }
+  return { normalized, resolved };
+}
+
+function assertNoSymlinkPath(root, relativePath) {
+  const { normalized, resolved } = safeJoin(root, relativePath);
+  const absoluteRoot = path.resolve(root);
+  const parts = normalized.split("/").filter(Boolean);
+  let current = absoluteRoot;
+
+  for (let index = 0; index < parts.length; index += 1) {
+    current = path.join(current, parts[index]);
+    let stats;
+    try {
+      stats = fs.lstatSync(current);
+    } catch (error) {
+      if (error && error.code === "ENOENT") break;
+      throw error;
+    }
+    if (stats.isSymbolicLink()) {
+      throw new Error("path must not include symbolic links");
+    }
+  }
+
+  return { normalized, resolved };
+}
+
+function readSafeTextFile(root, relativePath) {
+  const { resolved } = assertNoSymlinkPath(root, relativePath);
+  return fs.readFileSync(resolved, "utf-8");
+}
+
+function writeSafeTextFile(root, relativePath, content) {
+  const { normalized, resolved } = assertNoSymlinkPath(root, relativePath);
+  fs.mkdirSync(path.dirname(resolved), { recursive: true });
+  fs.writeFileSync(resolved, content, "utf-8");
+  return { normalized, resolved };
+}
+
+function appendSafeTextFile(root, relativePath, content) {
+  const { normalized, resolved } = assertNoSymlinkPath(root, relativePath);
+  fs.mkdirSync(path.dirname(resolved), { recursive: true });
+  fs.appendFileSync(resolved, content, "utf-8");
+  return { normalized, resolved };
+}
+
+function containsSecret(text) {
+  const sample = String(text || "");
+  return SECRET_PATTERNS.some((pattern) => {
+    pattern.lastIndex = 0;
+    return pattern.test(sample);
+  });
+}
+
+function redactSecrets(text) {
+  let redacted = String(text || "");
+  for (const pattern of SECRET_PATTERNS) {
+    pattern.lastIndex = 0;
+    redacted = redacted.replace(pattern, "[REDACTED_SECRET]");
+  }
+  return redacted;
+}
+
+function scoreIssueSafety(issue) {
+  const text = `${issue.title || ""}\n${issue.body || ""}`;
+  const flags = INJECTION_PATTERNS
+    .filter((pattern) => pattern.test(text))
+    .map((pattern) => pattern.source);
+
+  return {
+    safe: flags.length === 0 && !containsSecret(text),
+    flags,
+    containsSecret: containsSecret(text)
+  };
+}
+
+function assertSafeTextForWrite(text) {
+  if (containsSecret(text)) {
+    throw new Error("refusing to write content that looks like a secret");
+  }
+}
+
+function assertSafePublicReply(text) {
+  assertSafeTextForWrite(text);
+  const value = String(text || "");
+  if (PRIVATE_REPLY_PATTERNS.some((pattern) => pattern.test(value))) {
+    throw new Error("refusing to publish private configuration or payout-route details");
+  }
+  if (PUBLIC_FINANCIAL_PROMISE_PATTERNS.some((pattern) => pattern.test(value))) {
+    throw new Error("refusing to publish a financial promise without an approval gate");
+  }
+}
+
+module.exports = {
+  assertSafePublicReply,
+  assertSafeTextForWrite,
+  containsSecret,
+  normalizeRelativePath,
+  redactSecrets,
+  assertNoSymlinkPath,
+  appendSafeTextFile,
+  readSafeTextFile,
+  safeJoin,
+  scoreIssueSafety,
+  writeSafeTextFile
+};

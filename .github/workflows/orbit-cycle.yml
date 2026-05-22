@@ -1,0 +1,67 @@
+name: Orbit Cycle
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: read
+
+concurrency:
+  group: orbit-cycle
+  cancel-in-progress: false
+
+jobs:
+  cycle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Health check
+        run: npm run health
+
+      - name: Orbit autonomous cycle
+        run: npm run cycle
+        env:
+          ORBIT_AI_PROVIDERS: ${{ secrets.ORBIT_AI_PROVIDERS || vars.ORBIT_AI_PROVIDERS }}
+          ORBIT_AI_PROVIDER_KEYS: ${{ secrets.ORBIT_AI_PROVIDER_KEYS }}
+          ORBIT_AI_DAILY_BUDGET_USD: ${{ vars.ORBIT_AI_DAILY_BUDGET_USD }}
+          ORBIT_AI_MONTHLY_BUDGET_USD: ${{ vars.ORBIT_AI_MONTHLY_BUDGET_USD }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          ORBIT_CYCLE_TRIGGER: ${{ github.event_name }}
+          ORBIT_CYCLE_TRIGGER_ACTION: ${{ github.event.action }}
+          ORBIT_OWNER_USERNAME: ${{ vars.ORBIT_OWNER_USERNAME }}
+          ORBIT_APPROVAL_ISSUE_LABEL: ${{ vars.ORBIT_APPROVAL_ISSUE_LABEL }}
+          ORBIT_APPROVAL_ACCEPTED_LABEL: ${{ vars.ORBIT_APPROVAL_ACCEPTED_LABEL }}
+          ORBIT_APPROVAL_REJECTED_LABEL: ${{ vars.ORBIT_APPROVAL_REJECTED_LABEL }}
+          ORBIT_DRY_RUN: "false"
+          ORBIT_COMMIT_CHANGES: "true"
+          ORBIT_PUSH_CHANGES: "true"
+          ORBIT_ALLOW_COMMANDS: "false"
+          ORBIT_TOKEN_ADMIN_ADDRESS: ${{ vars.ORBIT_TOKEN_ADMIN_ADDRESS }}
+          ORBIT_TREASURY_ADDRESS: ${{ vars.ORBIT_TREASURY_ADDRESS }}
+          ORBIT_OPERATOR_REVENUE_ADDRESS: ${{ vars.ORBIT_OPERATOR_REVENUE_ADDRESS }}
+          ORBIT_OPERATOR_REVENUE_BPS: ${{ vars.ORBIT_OPERATOR_REVENUE_BPS }}
+          ORBIT_BASE_RPC_URL: ${{ vars.ORBIT_BASE_RPC_URL }}
+          ORBIT_WALLET_PRIVATE_KEY: ${{ secrets.ORBIT_WALLET_PRIVATE_KEY }}
+          ORBIT_ENABLE_TOKEN_LAUNCH: ${{ vars.ORBIT_ENABLE_TOKEN_LAUNCH }}
+          ORBIT_ENABLE_REVENUE_CLAIMS: ${{ vars.ORBIT_ENABLE_REVENUE_CLAIMS }}

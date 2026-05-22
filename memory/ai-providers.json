@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "mode": "ordered_failover",
+  "notes": "Public provider registry only. Do not put API keys here. Put keys in ORBIT_AI_PROVIDER_KEYS or ORBIT_AI_PROVIDERS GitHub Secrets. Inference priority is FreeModel, then OpenGateway, then OpenRouter. AI-credit purchases are OpenRouter-only.",
+  "providers": [
+    {
+      "name": "freemodel",
+      "label": "Freemodel",
+      "enabled": true,
+      "apiKeyRef": "freemodel",
+      "apiBase": "",
+      "chatPath": "/chat/completions",
+      "model": ""
+    },
+    {
+      "name": "opengateway",
+      "label": "Opengateway",
+      "enabled": true,
+      "apiKeyRef": "opengateway",
+      "apiBase": "",
+      "chatPath": "/chat/completions",
+      "model": ""
+    },
+    {
+      "name": "openrouter",
+      "label": "OpenRouter",
+      "enabled": true,
+      "apiKeyRef": "openrouter",
+      "apiBase": "https://openrouter.ai/api/v1",
+      "chatPath": "/chat/completions",
+      "model": ""
+    }
+  ]
+}
