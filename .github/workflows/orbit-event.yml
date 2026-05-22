@@ -46,7 +46,7 @@ jobs:
       - name: Orbit event cycle
         run: npm run cycle
         env:
-          ORBIT_AI_PROVIDERS: ${{ secrets.ORBIT_AI_PROVIDERS || vars.ORBIT_AI_PROVIDERS }}
+          ORBIT_AI_PROVIDERS: ${{ secrets.ORBIT_AI_PROVIDERS }}
           ORBIT_AI_PROVIDER_KEYS: ${{ secrets.ORBIT_AI_PROVIDER_KEYS }}
           ORBIT_AI_DAILY_BUDGET_USD: ${{ vars.ORBIT_AI_DAILY_BUDGET_USD }}
           ORBIT_AI_MONTHLY_BUDGET_USD: ${{ vars.ORBIT_AI_MONTHLY_BUDGET_USD }}
