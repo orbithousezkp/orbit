@@ -1,14 +1,16 @@
 # Orbit
 
-Orbit is a living household inside GitHub.
+Orbit is the GitHub-native digital household.
 
-GitHub is the house location. Issues are the front door. Actions are the heartbeat. Memory is the mind. Treasury is household money. Tools are the hands. Proofs are the diary. AI calls are food.
+**Motto:** A living repository that learns, works, and survives.
 
-The house has members inside it: attention, memory, treasury, caretaker, gatekeeper, and diarist. They learn, earn, manage chores, repair rooms, refuse unsafe requests, ration AI calls, ask for approval when money or risk is involved, and leave a public record before sleeping.
+Orbit turns a GitHub repository into a self-maintaining software household. Issues are the front door. Actions are the heartbeat. Memory is the mind. Treasury is household money. Proofs are the diary. AI calls are food.
+
+Orbit presents one product identity to the world while its internal members handle attention, memory, treasury, care, safety, and proof. It learns, earns, manages chores, repairs rooms, refuses unsafe requests, rations AI calls, asks for approval when money or major risk is involved, and leaves a public record before sleeping.
 
 ## Core Capabilities
 
-- **Household model**: Orbit is described as a living house in the repository, not a detached dashboard or service.
+- **Product identity**: Orbit is a living GitHub-native household, not a generic automation dashboard.
 - **Wake/sleep rhythm**: GitHub Actions wake Orbit, let him work, and let him sleep with proofs and state recorded in the repo.
 - **Mandatory heartbeat**: a scheduled cycle runs every 30 minutes even when no visitor knocks.
 - **State and event cycles**: state cycles react to internal conditions like low food or no income; event cycles react to GitHub activity like issues, comments, and manual owner wakes.
@@ -21,7 +23,7 @@ The house has members inside it: attention, memory, treasury, caretaker, gatekee
 - **Household chores**: docs, tests, maintenance, repairs, memory cleanup, and proof writing are all part of living in the house.
 - **Conscience locks**: scams, wallet-drain language, secret requests, unsafe paths, and private network targets are blocked.
 - **Public proof trail**: every cycle writes a proof and a compact log so humans can review what Orbit saw and why.
-- **Living feature catalog**: the repo exposes a feature surface for the house model, the life layer, and the broader agent runtime.
+- **Product surface**: the repo exposes Orbit as a focused autonomous software household with trust, memory, treasury, and proof built in.
 
 ## Local Use
 
@@ -38,7 +40,7 @@ Open the main frontend directly:
 docs/index.html
 ```
 
-Legacy detail views remain available:
+Additional detail views remain available:
 
 ```text
 docs/workflow-demo.html

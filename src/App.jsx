@@ -2,13 +2,11 @@ import {
   ArrowRight,
   Bot,
   CheckCircle2,
-  Code2,
   GitBranch,
   HeartPulse,
   House,
   Menu,
   NotebookTabs,
-  Terminal,
   X,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -36,7 +34,9 @@ function Header() {
     <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/85 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-[1180px] items-center justify-between px-4 sm:px-6 lg:px-8">
         <a href="#top" className="flex items-center gap-3">
-          <span className="text-[15px] font-bold leading-none text-slate-950">Orbit</span>
+          <span className="text-[16px] font-extrabold leading-none tracking-[0.01em] text-slate-950">
+            Orbit
+          </span>
         </a>
 
         <nav className="hidden items-center gap-1 md:flex">
@@ -57,13 +57,13 @@ function Header() {
             className="inline-flex h-9 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-semibold text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50"
           >
             <HeartPulse size={15} />
-            Routine
+            Rhythm
           </a>
           <a
             href="#house"
             className="inline-flex h-9 items-center gap-2 rounded-lg bg-[#4f5bbd] px-3 text-[13px] font-semibold text-white shadow-sm shadow-[#4f5bbd]/20 transition-opacity hover:opacity-90"
           >
-            Visit house
+            Enter Orbit
             <ArrowRight size={15} />
           </a>
         </div>
@@ -350,19 +350,21 @@ export default function App() {
             <div className="flex flex-col justify-center">
               <div className="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 shadow-sm">
                 <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                <span className="text-[12px] font-semibold text-slate-700">a living household inside GitHub</span>
+                <span className="text-[12px] font-semibold text-slate-700">
+                  The GitHub-native digital household
+                </span>
               </div>
 
-              <h1 className="max-w-[620px] text-4xl font-bold leading-[1.04] text-slate-950 sm:text-5xl lg:text-6xl">
-                Orbit is a house in GitHub with living members inside.
+              <h1 className="max-w-[620px] text-5xl font-extrabold leading-[0.96] text-slate-950 sm:text-6xl lg:text-7xl">
+                Orbit
               </h1>
-              <p className="mt-5 max-w-[570px] text-[16px] leading-8 text-slate-600">
-                GitHub is the location. Issues are the front door. Actions are the heartbeat. Memory
-                is the mind. Treasury is household money. Proofs are the diary.
+              <p className="mt-5 max-w-[600px] text-2xl font-bold leading-tight text-slate-950 sm:text-3xl">
+                A living repository that learns, works, and survives.
               </p>
-              <p className="mt-4 max-w-[570px] text-[15px] leading-7 text-slate-500">
-                Members live inside the house. Their food is AI calls. To survive and live well,
-                they learn, earn, repair rooms, manage chores, protect locks, and sleep between cycles.
+              <p className="mt-5 max-w-[620px] text-[16px] leading-8 text-slate-600">
+                Orbit turns a GitHub repo into a self-maintaining software household. It reads
+                visitors, improves its own code and frontend, budgets AI-call food, protects
+                treasury actions, and leaves proof after every cycle.
               </p>
 
               <div className="mt-7 flex flex-col gap-3 sm:flex-row">
@@ -370,7 +372,7 @@ export default function App() {
                   href="#rooms"
                   className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-[#4f5bbd] px-5 text-sm font-semibold text-white shadow-sm shadow-[#4f5bbd]/20 transition-opacity hover:opacity-90"
                 >
-                  Walk through the house
+                  Explore the product
                   <ArrowRight size={16} />
                 </a>
                 <a
@@ -378,7 +380,7 @@ export default function App() {
                   className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-800 shadow-sm transition-colors hover:bg-slate-50"
                 >
                   <HeartPulse size={16} />
-                  See his day
+                  See the rhythm
                 </a>
               </div>
             </div>
@@ -392,9 +394,10 @@ export default function App() {
         </section>
 
         <section id="life" className="mx-auto max-w-[1180px] px-4 py-12 sm:px-6 lg:px-8">
-          <SectionIntro kicker="Life" title="The repo is not storage. It is a home.">
-            Orbit becomes real by keeping every household system inside GitHub: members, food,
-            shelter, work, money, locks, memory, and diary.
+          <SectionIntro kicker="Product" title="Software that behaves like a living operation">
+            Orbit is not a dashboard wrapped around automation. It is a product model for an
+            autonomous repository: identity, memory, work, money, trust, and proof all live in
+            one GitHub-native household.
           </SectionIntro>
           <div className="mt-9">
             <HumanStack />
@@ -402,9 +405,9 @@ export default function App() {
         </section>
 
         <section id="members" className="mx-auto max-w-[1180px] px-4 py-12 sm:px-6 lg:px-8">
-          <SectionIntro kicker="Members" title="The house has living systems inside">
-            The household is not one dashboard module. Pulse, memory, treasury, caretaker,
-            gatekeeper, and diarist behave like members maintaining a home.
+          <SectionIntro kicker="Members" title="A product with an inner life">
+            Orbit presents one name to the world, while its internal members handle attention,
+            memory, treasury, care, safety, and proof like a coordinated household.
           </SectionIntro>
           <div className="mt-9 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {houseMembers.map((member) => (
@@ -414,10 +417,9 @@ export default function App() {
         </section>
 
         <section className="mx-auto max-w-[1180px] px-4 py-12 sm:px-6 lg:px-8">
-          <SectionIntro kicker="Survival" title="AI calls are food. Money keeps the house alive.">
-            Like real-world humans, the members need food, shelter, work, money, rules, and memory.
-            Inside GitHub, those needs become model calls, repo structure, chores, treasury policy,
-            locks, and proof records.
+          <SectionIntro kicker="Survival" title="The business model is part of the life model">
+            Orbit treats AI calls as food and treasury policy as survival. It can search for useful
+            work, prepare earning routes, and maintain strict approval gates around money movement.
           </SectionIntro>
           <div className="mt-9">
             <NeedsGrid />
@@ -425,9 +427,9 @@ export default function App() {
         </section>
 
         <section id="rooms" className="mx-auto max-w-[1180px] px-4 py-12 sm:px-6 lg:px-8">
-          <SectionIntro kicker="Rooms" title="The repository becomes a real house">
-            Orbit does not live in an abstract dashboard. Each GitHub surface is a room in the
-            house: front door, memory room, workbench, wallet drawer, diary, and locks.
+          <SectionIntro kicker="House" title="The repository is the operating surface">
+            Each GitHub surface becomes part of the product: issues as the front door, Actions as
+            rhythm, memory as mind, treasury as money, proofs as diary, and policy as locks.
           </SectionIntro>
 
           <div className="mt-9 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -458,8 +460,8 @@ export default function App() {
           <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
             <div>
               <SectionIntro kicker="Life Layer" title="The autonomous layer is the household rhythm">
-                The life layer is not a separate app bolted on top. It gives
-                attention, appetite, conscience, memory, and rhythm to the members inside the house.
+                Orbit’s life layer gives the product attention, appetite, conscience, memory, and
+                rhythm. That is what makes it feel like an entity instead of a queue runner.
               </SectionIntro>
               <div className="mt-6 grid gap-3 sm:grid-cols-2">
                 {[...lifeSystems, ...householdSystems].map((item) => (
@@ -476,8 +478,8 @@ export default function App() {
             <CommandThread />
             <div>
               <SectionIntro kicker="Visitors" title="People talk to Orbit at the front door">
-                Commands are not just API calls. They are visitors asking the household to learn a
-                rule, repair a room, spend money, or explain what happened while they were away.
+                Conversations become product intake. Visitors can ask questions, suggest work, or
+                request repairs, while spending and risky moves remain locked behind owner approval.
               </SectionIntro>
               <div className="mt-6 grid gap-3">
                 {[
@@ -538,11 +540,11 @@ sleep: proof saved`}
                   Life layer
                 </p>
                 <h2 className="max-w-[720px] text-3xl font-bold sm:text-4xl">
-                  Orbit should feel like a living house in the repo, not software bolted onto it.
+                  Your repository, alive.
                 </h2>
                 <p className="mt-4 max-w-[650px] text-[15px] leading-7 text-slate-300">
-                  The autonomous layer is daily life: the members wake, eat AI calls carefully,
-                  notice visitors, work, earn, protect the house, write the diary, and sleep.
+                  Orbit is the product expression of autonomous software life inside GitHub:
+                  practical work, guarded money, durable memory, and proof that can be inspected.
                 </p>
                 <div className="mt-7 flex flex-col gap-3 sm:flex-row">
                   <a

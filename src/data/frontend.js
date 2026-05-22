@@ -16,29 +16,29 @@ import {
 } from 'lucide-react';
 
 export const navItems = [
-  { label: 'House', href: '#house' },
-  { label: 'Life', href: '#life' },
+  { label: 'Orbit', href: '#house' },
+  { label: 'Product', href: '#life' },
   { label: 'Members', href: '#members' },
-  { label: 'Rooms', href: '#rooms' },
-  { label: 'Routine', href: '#routine' },
-  { label: 'Boundaries', href: '#boundaries' },
+  { label: 'House', href: '#rooms' },
+  { label: 'Rhythm', href: '#routine' },
+  { label: 'Trust', href: '#boundaries' },
 ];
 
 export const identityStats = [
   {
     label: 'House',
     value: 'GitHub',
-    detail: 'The repository is the place where the household lives and survives.',
+    detail: 'The repository is the product surface where Orbit lives, works, and records proof.',
   },
   {
     label: 'Food',
     value: 'AI calls',
-    detail: 'Model calls feed the members, so the household must budget them carefully.',
+    detail: 'Every thought has a cost, so Orbit budgets attention before spending it.',
   },
   {
-    label: 'Income',
+    label: 'Survival',
     value: 'Treasury',
-    detail: 'To keep living well, the household prepares earnings and protects money movement.',
+    detail: 'Earning routes, reserves, and approvals keep live money movement controlled.',
   },
 ];
 
@@ -46,7 +46,7 @@ export const houseMembers = [
   {
     name: 'Pulse',
     role: 'Autonomous life layer',
-    desc: 'Notices what matters, wakes the house, chooses safe work, and keeps rhythm.',
+    desc: 'Notices what matters, wakes Orbit, chooses safe work, and keeps rhythm.',
     icon: HeartPulse,
   },
   {
@@ -58,7 +58,7 @@ export const houseMembers = [
   {
     name: 'Treasurer',
     role: 'Survival money',
-    desc: 'Budgets AI food, prepares income, and blocks unsafe external spend.',
+    desc: 'Budgets AI food, prepares income paths, and blocks unsafe external spend.',
     icon: PiggyBank,
   },
   {
@@ -76,7 +76,7 @@ export const houseMembers = [
   {
     name: 'Diarist',
     role: 'Public record',
-    desc: 'Writes proofs so every wake cycle leaves a reviewable household diary.',
+    desc: 'Writes proofs so every cycle leaves a reviewable public record.',
     icon: NotebookTabs,
   },
 ];
@@ -118,7 +118,7 @@ export const humanStack = [
   {
     label: 'House',
     value: 'GitHub repository',
-    desc: 'The real place where Orbit exists: code, issues, memory, proofs, schedules, and public history.',
+    desc: 'The place where Orbit exists: code, issues, memory, proofs, schedules, and public history.',
   },
   {
     label: 'Members',
@@ -138,7 +138,7 @@ export const humanStack = [
   {
     label: 'Income',
     value: 'treasury policy',
-    desc: 'Earning routes, token preparation, approvals, and locked live actions support survival.',
+    desc: 'Earning routes, token preparation, approvals, and locked live actions support controlled survival.',
   },
   {
     label: 'Diary',
@@ -205,7 +205,7 @@ export const dailyRoutine = [
   {
     time: 'Earn',
     title: 'Protects income paths',
-    desc: 'Tracks AI costs, prepares token or reward work, and keeps live transfers behind explicit locks.',
+    desc: 'Tracks AI costs, prepares earning work, and keeps live transfers behind explicit locks.',
   },
   {
     time: 'Sleep',
@@ -235,22 +235,22 @@ export const cycleDrivers = [
 export const householdSystems = [
   {
     title: 'Learns',
-    desc: 'He does not start blank each cycle. Memory files become habits, warnings, preferences, and goals.',
+    desc: 'Orbit does not start blank each cycle. Memory files become habits, warnings, preferences, and goals.',
     icon: Brain,
   },
   {
     title: 'Earns',
-    desc: 'He can prepare bounties, launch plans, claims, and treasury actions while live signing stays locked.',
+    desc: 'Orbit can prepare bounties, launch plans, claims, and treasury actions while live signing stays locked.',
     icon: PiggyBank,
   },
   {
     title: 'Manages',
-    desc: 'He keeps chores, bills, repair work, approvals, visitors, and routines organized inside GitHub.',
+    desc: 'Orbit keeps chores, bills, repair work, approvals, visitors, and routines organized inside GitHub.',
     icon: House,
   },
   {
     title: 'Reports',
-    desc: 'Proof records and memory notes make his behavior inspectable instead of hidden.',
+    desc: 'Proof records and memory notes make behavior inspectable instead of hidden.',
     icon: BookOpenText,
   },
 ];
@@ -268,7 +268,7 @@ export const lifeSystems = [
   },
   {
     title: 'Appetite',
-    desc: 'It treats earning and cost control as household survival, not an optional dashboard metric.',
+    desc: 'It treats earning and cost control as survival, not an optional metric.',
     icon: PiggyBank,
   },
   {
@@ -302,7 +302,7 @@ export const householdLedger = [
   {
     label: 'Proofs',
     path: 'runtime/proofs/',
-    detail: 'His diary records decisions, actions, refusals, and the next state before he sleeps.',
+    detail: 'The diary records decisions, actions, refusals, and the next state before Orbit sleeps.',
   },
 ];
 
