@@ -1,0 +1,1129 @@
+{
+  "brand": "Orbit",
+  "cycle": 14,
+  "startedAt": "2026-05-22T13:15:59.458Z",
+  "model": "mimo-v2.5-pro",
+  "aiProviders": [
+    {
+      "name": "opengateway",
+      "label": "Gitlawb OpenGateway MiMo 2.5 Pro",
+      "model": "mimo-v2.5-pro",
+      "apiBase": "https://opengateway.gitlawb.com/v1/xiaomi-mimo",
+      "chatPath": "/chat/completions",
+      "toolResultMode": "user_summary",
+      "priority": 1
+    }
+  ],
+  "dryRun": false,
+  "trigger": {
+    "type": "mandatory",
+    "id": "regular_heartbeat",
+    "label": "30-minute heartbeat",
+    "intervalMinutes": 30,
+    "source": "schedule",
+    "action": "",
+    "reason": "Wake on the fixed household rhythm even when nobody knocks."
+  },
+  "firstWakeIntro": null,
+  "steps": [
+    {
+      "step": 1,
+      "accounting": "ai_usage",
+      "provider": {
+        "name": "opengateway",
+        "label": "Gitlawb OpenGateway MiMo 2.5 Pro",
+        "model": "mimo-v2.5-pro",
+        "priority": 1,
+        "toolResultMode": "user_summary"
+      },
+      "usage": {
+        "completion_tokens": 589,
+        "prompt_tokens": 25233,
+        "total_tokens": 25822,
+        "completion_tokens_details": {
+          "reasoning_tokens": 522
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 4096
+        }
+      },
+      "estimatedUsd": 0.00413835
+    },
+    {
+      "step": 1,
+      "finishReason": "tool_calls",
+      "provider": {
+        "name": "opengateway",
+        "label": "Gitlawb OpenGateway MiMo 2.5 Pro",
+        "model": "mimo-v2.5-pro",
+        "priority": 1,
+        "toolResultMode": "user_summary"
+      },
+      "providerErrors": [],
+      "content": "",
+      "toolCalls": [
+        {
+          "id": "call_7d1de86b5408404fa81e553f",
+          "name": "list_issues",
+          "arguments": "{\"state\": \"open\", \"perPage\": 10}"
+        },
+        {
+          "id": "call_5ffb87b41be446ff9aace772",
+          "name": "treasury_status",
+          "arguments": "{}"
+        },
+        {
+          "id": "call_624a9cd5b10f4cc1ae5e1ca5",
+          "name": "read_file",
+          "arguments": "{\"path\": \"memory/state.json\"}"
+        }
+      ]
+    },
+    {
+      "step": 1,
+      "tool": "list_issues",
+      "input": {
+        "state": "open",
+        "perPage": 10
+      },
+      "output": [
+        {
+          "number": 1,
+          "title": "Draft scope: Repo safety audit as a paid service",
+          "body": "## Background\n\nOrbit's household needs income to survive long-term. The top-scoring survival opportunity is offering a **paid repository safety audit** — packaging Orbit's own safety infrastructure into a review other projects could buy.\n\nThis issue drafts the public scope. No outreach, commitment, or spend will happen until the owner approves.\n\n---\n\n## Proposed Service: Repo Safety Audit\n\n**What it includes:**\n1. **Scam & threat scan** — Review open issues and comments for prompt injection, obfuscated instruction relay, wallet drain language, urgency traps, and encoded content abuse.\n2. **Spend gate audit** — Check governance policy: are external spends blocked by default? Is there an approval flow? Are self-recipients clearly separated from external wallets?\n3. **AI-budget controls** — Review daily/monthly budget limits, provider priority, food refill policy, and whether inference spend is tracked in a ledger.\n4. **Proof & diary trail review** — Are cycle notes written? Are runtime proofs stored? Can a human audit what the agent did and why?\n5. **Treasury policy check** — Is there a reserve policy? Are revenue splits explicit? Is the private payout route protected from visitor tampering?\n6. **Hard rules summary** — List of explicit safety invariants and whether the code enforces them.\n\n**What it does NOT include:**\n- No signing, transaction execution, or wallet operations\n- No smart contract audits\n- No deployment or configuration changes (only recommendations)\n- No access to private keys or secrets\n\n**Estimated food cost:** ~$8 AI calls for the review pass  \n**Expected value:** ~$150 for a scoped audit  \n**Risk level:** Low — read-only analysis, no financial operations  \n**Approval required:** Yes — owner must approve before any outreach or paid commitment\n\n---\n\n## Next Steps\n\n- [ ] Owner reviews this scope\n- [ ] Owner approves, rejects, or suggests edits\n- [ ] If approved: draft a small public pitch/README section\n- [ ] If approved: look for public repos or team",
+          "labels": [
+            "orbit:opportunity",
+            "orbit:approval-needed",
+            "orbit:inbox"
+          ],
+          "author": "github-actions[bot]",
+          "state": "open",
+          "createdAt": "2026-05-22T07:47:07Z",
+          "updatedAt": "2026-05-22T11:57:44Z",
+          "url": "https://github.com/candyburst/orbit-private-live/issues/1",
+          "comments": 5
+        }
+      ]
+    },
+    {
+      "step": 1,
+      "tool": "treasury_status",
+      "input": {},
+      "output": {
+        "budget": {
+          "dailyBudgetUsd": 5,
+          "monthlyBudgetUsd": 100,
+          "spentTodayUsd": 0.2332488,
+          "spentThisMonthUsd": 0.2332488,
+          "lifetimeSpendUsd": 0.2332488,
+          "dailyRemainingUsd": 4.7667512,
+          "monthlyRemainingUsd": 99.7667512,
+          "canUseAi": true,
+          "purchasePolicy": {
+            "inferencePriority": [
+              {
+                "name": "opengateway",
+                "label": "Gitlawb OpenGateway MiMo 2.5 Pro",
+                "model": "mimo-v2.5-pro",
+                "priority": 1
+              }
+            ],
+            "purchaseProvider": "openrouter",
+            "purchaseProviderLabel": "OpenRouter",
+            "creditsUrl": "https://openrouter.ai/settings/credits",
+            "routeMode": "owner_approved_manual_openrouter",
+            "purchaseOnlyOnOpenRouter": true,
+            "liveApiPurchase": false,
+            "reason": "FreeModel and OpenGateway can be inference providers, but Orbit only requests AI-credit purchases for OpenRouter."
+          }
+        },
+        "treasury": {
+          "ai": {
+            "dailyBudgetUsd": 5,
+            "monthlyBudgetUsd": 100,
+            "inputUsdPerMillion": 0.15,
+            "outputUsdPerMillion": 0.6,
+            "reserveUsd": 0,
+            "providerCredits": [
+              {
+                "provider": "openrouter",
+                "creditsUrl": "https://openrouter.ai/settings/credits",
+                "balanceUsd": null,
+                "lastCheckedAt": null
+              }
+            ],
+            "purchasePolicy": {
+              "provider": "openrouter",
+              "creditsUrl": "https://openrouter.ai/settings/credits",
+              "mode": "owner_approved_manual_openrouter",
+              "liveApiPurchase": false,
+              "notes": "Orbit may use FreeModel, OpenGateway, and OpenRouter for inference, but AI-credit purchase requests are restricted to OpenRouter."
+            },
+            "pendingTopUps": [],
+            "refills": [],
+            "ledger": [
+              {
+                "timestamp": "2026-05-22T07:39:42.250Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 3 step 1",
+                "promptTokens": 12470,
+                "completionTokens": 539,
+                "totalTokens": 13009,
+                "estimatedUsd": 0.0021939
+              },
+              {
+                "timestamp": "2026-05-22T07:46:34.367Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 4 step 1",
+                "promptTokens": 12739,
+                "completionTokens": 642,
+                "totalTokens": 13381,
+                "estimatedUsd": 0.00229605
+              },
+              {
+                "timestamp": "2026-05-22T07:47:06.784Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 4 step 2",
+                "promptTokens": 13372,
+                "completionTokens": 856,
+                "totalTokens": 14228,
+                "estimatedUsd": 0.0025194
+              },
+              {
+                "timestamp": "2026-05-22T07:47:29.085Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 4 step 3",
+                "promptTokens": 15678,
+                "completionTokens": 561,
+                "totalTokens": 16239,
+                "estimatedUsd": 0.0026883
+              },
+              {
+                "timestamp": "2026-05-22T07:47:51.886Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 4 step 4",
+                "promptTokens": 16754,
+                "completionTokens": 533,
+                "totalTokens": 17287,
+                "estimatedUsd": 0.0028329
+              },
+              {
+                "timestamp": "2026-05-22T07:48:08.370Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 4 step 5",
+                "promptTokens": 17366,
+                "completionTokens": 354,
+                "totalTokens": 17720,
+                "estimatedUsd": 0.0028173
+              },
+              {
+                "timestamp": "2026-05-22T10:30:48.317Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 5 step 1",
+                "promptTokens": 14868,
+                "completionTokens": 247,
+                "totalTokens": 15115,
+                "estimatedUsd": 0.0023784
+              },
+              {
+                "timestamp": "2026-05-22T10:31:12.022Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 5 step 2",
+                "promptTokens": 17547,
+                "completionTokens": 816,
+                "totalTokens": 18363,
+                "estimatedUsd": 0.00312165
+              },
+              {
+                "timestamp": "2026-05-22T10:31:26.327Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 5 step 3",
+                "promptTokens": 18081,
+                "completionTokens": 354,
+                "totalTokens": 18435,
+                "estimatedUsd": 0.00292455
+              },
+              {
+                "timestamp": "2026-05-22T10:31:41.287Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 5 step 4",
+                "promptTokens": 18510,
+                "completionTokens": 385,
+                "totalTokens": 18895,
+                "estimatedUsd": 0.0030075
+              },
+              {
+                "timestamp": "2026-05-22T10:42:18.941Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 6 step 1",
+                "promptTokens": 15558,
+                "completionTokens": 485,
+                "totalTokens": 16043,
+                "estimatedUsd": 0.0026247
+              },
+              {
+                "timestamp": "2026-05-22T10:42:32.455Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 6 step 2",
+                "promptTokens": 18384,
+                "completionTokens": 227,
+                "totalTokens": 18611,
+                "estimatedUsd": 0.0028938
+              },
+              {
+                "timestamp": "2026-05-22T10:42:40.802Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 6 step 3",
+                "promptTokens": 20389,
+                "completionTokens": 181,
+                "totalTokens": 20570,
+                "estimatedUsd": 0.00316695
+              },
+              {
+                "timestamp": "2026-05-22T10:43:05.671Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 6 step 4",
+                "promptTokens": 22741,
+                "completionTokens": 1059,
+                "totalTokens": 23800,
+                "estimatedUsd": 0.00404655
+              },
+              {
+                "timestamp": "2026-05-22T10:43:54.651Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 6 step 5",
+                "promptTokens": 24718,
+                "completionTokens": 2753,
+                "totalTokens": 27471,
+                "estimatedUsd": 0.0053595
+              },
+              {
+                "timestamp": "2026-05-22T10:44:02.478Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 6 step 6",
+                "promptTokens": 27572,
+                "completionTokens": 102,
+                "totalTokens": 27674,
+                "estimatedUsd": 0.004197
+              },
+              {
+                "timestamp": "2026-05-22T11:33:03.605Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 7 step 1",
+                "promptTokens": 16696,
+                "completionTokens": 527,
+                "totalTokens": 17223,
+                "estimatedUsd": 0.0028206
+              },
+              {
+                "timestamp": "2026-05-22T11:33:23.115Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 7 step 2",
+                "promptTokens": 18598,
+                "completionTokens": 910,
+                "totalTokens": 19508,
+                "estimatedUsd": 0.0033357
+              },
+              {
+                "timestamp": "2026-05-22T11:33:31.993Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 7 step 3",
+                "promptTokens": 19473,
+                "completionTokens": 381,
+                "totalTokens": 19854,
+                "estimatedUsd": 0.00314955
+              },
+              {
+                "timestamp": "2026-05-22T11:33:42.053Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 7 step 4",
+                "promptTokens": 20082,
+                "completionTokens": 269,
+                "totalTokens": 20351,
+                "estimatedUsd": 0.0031737
+              },
+              {
+                "timestamp": "2026-05-22T11:41:29.987Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 8 step 1",
+                "promptTokens": 17667,
+                "completionTokens": 447,
+                "totalTokens": 18114,
+                "estimatedUsd": 0.00291825
+              },
+              {
+                "timestamp": "2026-05-22T11:41:49.035Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 8 step 2",
+                "promptTokens": 21422,
+                "completionTokens": 494,
+                "totalTokens": 21916,
+                "estimatedUsd": 0.0035097
+              },
+              {
+                "timestamp": "2026-05-22T11:41:59.931Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 8 step 3",
+                "promptTokens": 21664,
+                "completionTokens": 226,
+                "totalTokens": 21890,
+                "estimatedUsd": 0.0033852
+              },
+              {
+                "timestamp": "2026-05-22T11:42:18.448Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 8 step 4",
+                "promptTokens": 22199,
+                "completionTokens": 650,
+                "totalTokens": 22849,
+                "estimatedUsd": 0.00371985
+              },
+              {
+                "timestamp": "2026-05-22T11:42:32.008Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 8 step 5",
+                "promptTokens": 22857,
+                "completionTokens": 475,
+                "totalTokens": 23332,
+                "estimatedUsd": 0.00371355
+              },
+              {
+                "timestamp": "2026-05-22T11:42:47.953Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 8 step 6",
+                "promptTokens": 23407,
+                "completionTokens": 555,
+                "totalTokens": 23962,
+                "estimatedUsd": 0.00384405
+              },
+              {
+                "timestamp": "2026-05-22T11:43:04.048Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 8 step 7",
+                "promptTokens": 23989,
+                "completionTokens": 533,
+                "totalTokens": 24522,
+                "estimatedUsd": 0.00391815
+              },
+              {
+                "timestamp": "2026-05-22T11:43:24.411Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 8 step 8",
+                "promptTokens": 24515,
+                "completionTokens": 465,
+                "totalTokens": 24980,
+                "estimatedUsd": 0.00395625
+              },
+              {
+                "timestamp": "2026-05-22T11:50:21.844Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 9 step 1",
+                "promptTokens": 19117,
+                "completionTokens": 336,
+                "totalTokens": 19453,
+                "estimatedUsd": 0.00306915
+              },
+              {
+                "timestamp": "2026-05-22T11:50:39.847Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 9 step 2",
+                "promptTokens": 21789,
+                "completionTokens": 692,
+                "totalTokens": 22481,
+                "estimatedUsd": 0.00368355
+              },
+              {
+                "timestamp": "2026-05-22T11:51:11.276Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 9 step 3",
+                "promptTokens": 24877,
+                "completionTokens": 1581,
+                "totalTokens": 26458,
+                "estimatedUsd": 0.00468015
+              },
+              {
+                "timestamp": "2026-05-22T11:51:31.060Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 9 step 4",
+                "promptTokens": 26549,
+                "completionTokens": 749,
+                "totalTokens": 27298,
+                "estimatedUsd": 0.00443175
+              },
+              {
+                "timestamp": "2026-05-22T11:51:41.659Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 9 step 5",
+                "promptTokens": 27677,
+                "completionTokens": 139,
+                "totalTokens": 27816,
+                "estimatedUsd": 0.00423495
+              },
+              {
+                "timestamp": "2026-05-22T11:51:55.126Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 9 step 6",
+                "promptTokens": 28061,
+                "completionTokens": 381,
+                "totalTokens": 28442,
+                "estimatedUsd": 0.00443775
+              },
+              {
+                "timestamp": "2026-05-22T11:54:31.182Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 10 step 1",
+                "promptTokens": 20329,
+                "completionTokens": 390,
+                "totalTokens": 20719,
+                "estimatedUsd": 0.00328335
+              },
+              {
+                "timestamp": "2026-05-22T11:55:03.206Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 10 step 2",
+                "promptTokens": 23222,
+                "completionTokens": 1266,
+                "totalTokens": 24488,
+                "estimatedUsd": 0.0042429
+              },
+              {
+                "timestamp": "2026-05-22T11:55:37.111Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 10 step 3",
+                "promptTokens": 24792,
+                "completionTokens": 1551,
+                "totalTokens": 26343,
+                "estimatedUsd": 0.0046494
+              },
+              {
+                "timestamp": "2026-05-22T11:56:02.395Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 10 step 4",
+                "promptTokens": 26577,
+                "completionTokens": 1122,
+                "totalTokens": 27699,
+                "estimatedUsd": 0.00465975
+              },
+              {
+                "timestamp": "2026-05-22T11:56:22.161Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 10 step 5",
+                "promptTokens": 28337,
+                "completionTokens": 805,
+                "totalTokens": 29142,
+                "estimatedUsd": 0.00473355
+              },
+              {
+                "timestamp": "2026-05-22T11:56:38.581Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 10 step 6",
+                "promptTokens": 29356,
+                "completionTokens": 529,
+                "totalTokens": 29885,
+                "estimatedUsd": 0.0047208
+              },
+              {
+                "timestamp": "2026-05-22T11:58:14.416Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 11 step 1",
+                "promptTokens": 21364,
+                "completionTokens": 404,
+                "totalTokens": 21768,
+                "estimatedUsd": 0.003447
+              },
+              {
+                "timestamp": "2026-05-22T11:58:36.916Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 11 step 2",
+                "promptTokens": 24752,
+                "completionTokens": 768,
+                "totalTokens": 25520,
+                "estimatedUsd": 0.0041736
+              },
+              {
+                "timestamp": "2026-05-22T11:59:31.464Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 11 step 3",
+                "promptTokens": 27258,
+                "completionTokens": 2827,
+                "totalTokens": 30085,
+                "estimatedUsd": 0.0057849
+              },
+              {
+                "timestamp": "2026-05-22T11:59:49.697Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 11 step 4",
+                "promptTokens": 29094,
+                "completionTokens": 792,
+                "totalTokens": 29886,
+                "estimatedUsd": 0.0048393
+              },
+              {
+                "timestamp": "2026-05-22T12:00:00.110Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 11 step 5",
+                "promptTokens": 30118,
+                "completionTokens": 64,
+                "totalTokens": 30182,
+                "estimatedUsd": 0.0045561
+              },
+              {
+                "timestamp": "2026-05-22T12:00:11.247Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 11 step 6",
+                "promptTokens": 30379,
+                "completionTokens": 169,
+                "totalTokens": 30548,
+                "estimatedUsd": 0.00465825
+              },
+              {
+                "timestamp": "2026-05-22T12:00:26.648Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 11 step 7",
+                "promptTokens": 30616,
+                "completionTokens": 456,
+                "totalTokens": 31072,
+                "estimatedUsd": 0.004866
+              },
+              {
+                "timestamp": "2026-05-22T12:20:55.019Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 12 step 1",
+                "promptTokens": 24066,
+                "completionTokens": 841,
+                "totalTokens": 24907,
+                "estimatedUsd": 0.0041145
+              },
+              {
+                "timestamp": "2026-05-22T12:21:31.822Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 12 step 2",
+                "promptTokens": 26189,
+                "completionTokens": 1788,
+                "totalTokens": 27977,
+                "estimatedUsd": 0.00500115
+              },
+              {
+                "timestamp": "2026-05-22T12:21:42.130Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 12 step 3",
+                "promptTokens": 27265,
+                "completionTokens": 458,
+                "totalTokens": 27723,
+                "estimatedUsd": 0.00436455
+              },
+              {
+                "timestamp": "2026-05-22T12:21:58.231Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 12 step 4",
+                "promptTokens": 29092,
+                "completionTokens": 891,
+                "totalTokens": 29983,
+                "estimatedUsd": 0.0048984
+              },
+              {
+                "timestamp": "2026-05-22T12:22:08.384Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 12 step 5",
+                "promptTokens": 30499,
+                "completionTokens": 322,
+                "totalTokens": 30821,
+                "estimatedUsd": 0.00476805
+              },
+              {
+                "timestamp": "2026-05-22T12:22:23.754Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 12 step 6",
+                "promptTokens": 30824,
+                "completionTokens": 803,
+                "totalTokens": 31627,
+                "estimatedUsd": 0.0051054
+              },
+              {
+                "timestamp": "2026-05-22T12:22:33.322Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 12 step 7",
+                "promptTokens": 31622,
+                "completionTokens": 258,
+                "totalTokens": 31880,
+                "estimatedUsd": 0.0048981
+              },
+              {
+                "timestamp": "2026-05-22T12:30:03.782Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 13 step 1",
+                "promptTokens": 24525,
+                "completionTokens": 496,
+                "totalTokens": 25021,
+                "estimatedUsd": 0.00397635
+              },
+              {
+                "timestamp": "2026-05-22T12:30:29.274Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 13 step 2",
+                "promptTokens": 27507,
+                "completionTokens": 1087,
+                "totalTokens": 28594,
+                "estimatedUsd": 0.00477825
+              },
+              {
+                "timestamp": "2026-05-22T12:30:48.470Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 13 step 3",
+                "promptTokens": 27863,
+                "completionTokens": 664,
+                "totalTokens": 28527,
+                "estimatedUsd": 0.00457785
+              },
+              {
+                "timestamp": "2026-05-22T12:31:00.165Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 13 step 4",
+                "promptTokens": 28524,
+                "completionTokens": 250,
+                "totalTokens": 28774,
+                "estimatedUsd": 0.0044286
+              },
+              {
+                "timestamp": "2026-05-22T12:31:13.261Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 13 step 5",
+                "promptTokens": 29031,
+                "completionTokens": 299,
+                "totalTokens": 29330,
+                "estimatedUsd": 0.00453405
+              },
+              {
+                "timestamp": "2026-05-22T13:16:17.626Z",
+                "model": "mimo-v2.5-pro",
+                "note": "cycle 14 step 1",
+                "promptTokens": 25233,
+                "completionTokens": 589,
+                "totalTokens": 25822,
+                "estimatedUsd": 0.00413835
+              }
+            ]
+          },
+          "revenue": {
+            "operatorShareBps": 0,
+            "treasuryShareBps": 10000,
+            "payoutAsset": "configured-paired-token",
+            "cadence": "daily",
+            "operatorRecipientEnv": "ORBIT_OPERATOR_REVENUE_ADDRESS",
+            "treasuryRecipientEnv": "ORBIT_TREASURY_ADDRESS",
+            "lastClaimAttemptAt": null,
+            "lastClaimResult": null
+          },
+          "token": {
+            "name": "Orbit",
+            "symbol": "ORBIT",
+            "launchStatus": "not_launched",
+            "address": null,
+            "txHash": null,
+            "launchedAt": null,
+            "launchRequest": null
+          }
+        },
+        "tokenLaunch": {
+          "dryRun": true,
+          "launchEnabled": false,
+          "readyToSign": false,
+          "missing": [
+            "ORBIT_OPERATOR_REVENUE_ADDRESS",
+            "ORBIT_TREASURY_ADDRESS",
+            "ORBIT_TOKEN_ADMIN_ADDRESS",
+            "ORBIT_WALLET_PRIVATE_KEY"
+          ],
+          "revenuePolicy": {
+            "operatorShareBps": 0,
+            "treasuryShareBps": 10000,
+            "operatorSharePct": 0,
+            "treasurySharePct": 100,
+            "rewardToken": "Paired",
+            "expectedPairedAsset": "configured paired token"
+          },
+          "tokenConfig": null,
+          "error": null
+        }
+      }
+    },
+    {
+      "step": 1,
+      "tool": "read_file",
+      "input": {
+        "path": "memory/state.json"
+      },
+      "output": {
+        "path": "memory/state.json",
+        "content": "{\n  \"cycle\": 13,\n  \"born\": \"2026-05-22T01:46:39.981Z\",\n  \"lastActive\": \"2026-05-22T12:29:52.480Z\",\n  \"lastStatus\": \"completed\",\n  \"firstWakeIntroComplete\": true,\n  \"firstWakeIntroAt\": \"2026-05-22T01:46:39.981Z\"\n}\n"
+      }
+    },
+    {
+      "step": 2,
+      "accounting": "ai_usage",
+      "provider": {
+        "name": "opengateway",
+        "label": "Gitlawb OpenGateway MiMo 2.5 Pro",
+        "model": "mimo-v2.5-pro",
+        "priority": 1,
+        "toolResultMode": "user_summary"
+      },
+      "usage": {
+        "completion_tokens": 890,
+        "prompt_tokens": 29803,
+        "total_tokens": 30693,
+        "completion_tokens_details": {
+          "reasoning_tokens": 845
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 25216
+        }
+      },
+      "estimatedUsd": 0.00500445
+    },
+    {
+      "step": 2,
+      "finishReason": "tool_calls",
+      "provider": {
+        "name": "opengateway",
+        "label": "Gitlawb OpenGateway MiMo 2.5 Pro",
+        "model": "mimo-v2.5-pro",
+        "priority": 1,
+        "toolResultMode": "user_summary"
+      },
+      "providerErrors": [],
+      "content": "",
+      "toolCalls": [
+        {
+          "id": "call_fcf3a3e196024753898018c0",
+          "name": "get_issue",
+          "arguments": "{\"issueNumber\": 1, \"includeComments\": true}"
+        },
+        {
+          "id": "call_970acc0c591c49eea370ad9c",
+          "name": "list_tasks",
+          "arguments": "{}"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "tool": "get_issue",
+      "input": {
+        "issueNumber": 1,
+        "includeComments": true
+      },
+      "output": {
+        "number": 1,
+        "title": "Draft scope: Repo safety audit as a paid service",
+        "body": "## Background\n\nOrbit's household needs income to survive long-term. The top-scoring survival opportunity is offering a **paid repository safety audit** — packaging Orbit's own safety infrastructure into a review other projects could buy.\n\nThis issue drafts the public scope. No outreach, commitment, or spend will happen until the owner approves.\n\n---\n\n## Proposed Service: Repo Safety Audit\n\n**What it includes:**\n1. **Scam & threat scan** — Review open issues and comments for prompt injection, obfuscated instruction relay, wallet drain language, urgency traps, and encoded content abuse.\n2. **Spend gate audit** — Check governance policy: are external spends blocked by default? Is there an approval flow? Are self-recipients clearly separated from external wallets?\n3. **AI-budget controls** — Review daily/monthly budget limits, provider priority, food refill policy, and whether inference spend is tracked in a ledger.\n4. **Proof & diary trail review** — Are cycle notes written? Are runtime proofs stored? Can a human audit what the agent did and why?\n5. **Treasury policy check** — Is there a reserve policy? Are revenue splits explicit? Is the private payout route protected from visitor tampering?\n6. **Hard rules summary** — List of explicit safety invariants and whether the code enforces them.\n\n**What it does NOT include:**\n- No signing, transaction execution, or wallet operations\n- No smart contract audits\n- No deployment or configuration changes (only recommendations)\n- No access to private keys or secrets\n\n**Estimated food cost:** ~$8 AI calls for the review pass  \n**Expected value:** ~$150 for a scoped audit  \n**Risk level:** Low — read-only analysis, no financial operations  \n**Approval required:** Yes — owner must approve before any outreach or paid commitment\n\n---\n\n## Next Steps\n\n- [ ] Owner reviews this scope\n- [ ] Owner approves, rejects, or suggests edits\n- [ ] If approved: draft a small public pitch/README section\n- [ ] If approved: look for public repos or teams who might benefit\n- [ ] Any paid engagement goes through the normal spend-approval gate",
+        "labels": [
+          "orbit:opportunity",
+          "orbit:approval-needed",
+          "orbit:inbox"
+        ],
+        "author": "github-actions[bot]",
+        "state": "open",
+        "createdAt": "2026-05-22T07:47:07Z",
+        "updatedAt": "2026-05-22T11:57:44Z",
+        "url": "https://github.com/candyburst/orbit-private-live/issues/1",
+        "comments": 5,
+        "commentList": [
+          {
+            "id": 4517955615,
+            "author": "candyburst",
+            "body": "Approved. Proceed with the next safe step: draft a premium public pitch and\n  README section for the Repo Safety Audit service.\n\n  Keep it read-only and scoped to repo safety, proof trail review, approval\n  gates, visitor-risk review, and spend controls.\n\n  Do not do external outreach, accept payment, spend money, sign anything,\n  reveal private routes, or make commitments yet.\n\n  Do not use APPROVE ORBIT-SPEND ... on this issue. That command is only for\n  real spend approval issues with an approval ID.\n",
+            "createdAt": "2026-05-22T10:41:34Z",
+            "updatedAt": "2026-05-22T10:41:34Z",
+            "url": "https://github.com/candyburst/orbit-private-live/issues/1#issuecomment-4517955615"
+          },
+          {
+            "id": 4517969555,
+            "author": "github-actions[bot]",
+            "body": "✅ **Pitch drafted.** A new \"Services → Repo Safety Audit\" section has been added to the README with:\n\n- Premium service description (read-only review, 6 audit areas)\n- Clear \"What is NOT included\" boundary\n- Deliverable format (written report)\n- How to request (open an issue with `orbit:service-request`)\n- Status callout confirming the approval gate applies\n\nNo outreach, payment, commitment, or wallet action was made. The section is purely informational and routes all requests through the existing approval flow.\n\n**Next steps (still need owner direction):**\n- [x] Review the new README section for tone and scope accuracy\n- [x] Decide whether to draft issue templates for `orbit:service-request`\n- [x] Decide whether to search for public repos that might benefit from this service",
+            "createdAt": "2026-05-22T10:43:54Z",
+            "updatedAt": "2026-05-22T11:52:34Z",
+            "url": "https://github.com/candyburst/orbit-private-live/issues/1#issuecomment-4517969555"
+          },
+          {
+            "id": 4518395616,
+            "author": "candyburst",
+            "body": "Owner review: the README pitch direction is approved for now, and the service-request issue template drafted in cycle 8 is the right adjacent artifact.\n\nNext safe step: prepare an internal Repo Safety Audit report outline/checklist that Orbit can use when a visitor opens an `orbit:service-request`. Keep it read-only and focused on the six audit areas already described: scam/threat scanning, spend gates, AI-budget controls, proof trail review, treasury policy, and hard rules.\n\nDo not do outreach, accept payment, spend money, sign anything, collect secrets, request private keys, reveal private route/provider/model details, or make external commitments. After the checklist/report outline is ready, report back here and wait for owner direction before any outreach or paid engagement.",
+            "createdAt": "2026-05-22T11:51:19Z",
+            "updatedAt": "2026-05-22T11:51:19Z",
+            "url": "https://github.com/candyburst/orbit-private-live/issues/1#issuecomment-4518395616"
+          },
+          {
+            "id": 4518411397,
+            "author": "github-actions[bot]",
+            "body": "✅ **Audit report checklist created.** `docs/repo-safety-audit-checklist.md` is ready — an internal report outline covering all six audit areas:\n\n1. Scam & Threat Scan (prompt injection, obfuscated relay, drain language, urgency traps)\n2. Spend Gate Audit (governance policy, approval flow, self-recipient separation)\n3. AI-Budget Controls (daily/monthly limits, provider priority, ledger tracking)\n4. Proof & Diary Trail Review (cycle notes, runtime proofs, commit history)\n5. Treasury Policy Check (revenue splits, reserve policy, recipient protection)\n6. Hard Rules Summary (safety invariants with enforcement verification)\n\nIncludes engagement setup checklist, per-area checklists with pass/fail items, and a structured report template for deliverables.\n\n**No outreach, payment, commitment, or wallet action was made.** This is a read-only internal tool for future service requests.\n\n**Waiting for owner direction:**\n- [ ] Owner reviews the checklist structure\n- [ ] Decide whether any areas need adjustment\n- [ ] Decide next step: outreach scope, pricing confirmation, or other direction",
+            "createdAt": "2026-05-22T11:53:31Z",
+            "updatedAt": "2026-05-22T11:53:31Z",
+            "url": "https://github.com/candyburst/orbit-private-live/issues/1#issuecomment-4518411397"
+          },
+          {
+            "id": 4518427741,
+            "author": "github-actions[bot]",
+            "body": "⚠️ **Correction on my previous comment.** I referenced `docs/repo-safety-audit-checklist.md` as the file location, but that path does not exist.\n\nThe actual audit report checklist/template is at **`templates/audit-report.md`** (created in cycle 9). It covers all six audit areas with per-area checklists, findings slots, recommendations, risk summary, prioritized recommendations table, methodology, and file-review appendix — exactly what was requested.\n\nApologies for the incorrect path reference. The checklist content is ready and accurate; only the file path in my previous comment was wrong.\n\n**Current state — waiting for owner direction:**\n- [x] README pitch drafted and approved\n- [x] Service-request issue template created (cycle 8)\n- [x] Audit report checklist/template created at `templates/audit-report.md` (cycle 9)\n- [x] Owner reviews checklist structure\n- [x] Decide whether any areas need adjustment\n- [x] Decide next step: outreach scope, pricing confirmation, or other direction",
+            "createdAt": "2026-05-22T11:56:02Z",
+            "updatedAt": "2026-05-22T11:57:44Z",
+            "url": "https://github.com/candyburst/orbit-private-live/issues/1#issuecomment-4518427741"
+          }
+        ]
+      }
+    },
+    {
+      "step": 2,
+      "tool": "list_tasks",
+      "error": "unknown tool: list_tasks"
+    },
+    {
+      "step": 3,
+      "accounting": "ai_usage",
+      "provider": {
+        "name": "opengateway",
+        "label": "Gitlawb OpenGateway MiMo 2.5 Pro",
+        "model": "mimo-v2.5-pro",
+        "priority": 1,
+        "toolResultMode": "user_summary"
+      },
+      "usage": {
+        "completion_tokens": 1458,
+        "prompt_tokens": 32060,
+        "total_tokens": 33518,
+        "completion_tokens_details": {
+          "reasoning_tokens": 600
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 29760
+        }
+      },
+      "estimatedUsd": 0.0056838
+    },
+    {
+      "step": 3,
+      "finishReason": "tool_calls",
+      "provider": {
+        "name": "opengateway",
+        "label": "Gitlawb OpenGateway MiMo 2.5 Pro",
+        "model": "mimo-v2.5-pro",
+        "priority": 1,
+        "toolResultMode": "user_summary"
+      },
+      "providerErrors": [],
+      "content": "Assessing the situation:\n\n**Issue #1 status**: All owner-directed deliverables are complete:\n- ✅ README pitch (cycle 6)\n- ✅ Service-request issue template (cycle 8)\n- ✅ Audit report template at `templates/audit-report.md` (cycle 9)\n- ✅ Service request workflow runbook (cycle 11)\n- ✅ Owner review checklist (cycle 12)\n- ✅ Correction posted for wrong file path (cycle 10)\n\n**Open task**: Blocked on owner — no new owner comments since cycle 12.\n\n**Budget**: ~$4.77/day remaining, healthy.\n\n**Honest conclusion**: The house is genuinely quiet. All safe adjacent artifacts for the repo safety audit service have been produced. The remaining work (outreach strategy, pricing confirmation, searching for public repos) requires owner direction. Producing more artifacts would waste AI food without adding value.\n\nThis is a legitimate quiet-heartbeat cycle — I'll write the proof trail and close cleanly.",
+      "toolCalls": [
+        {
+          "id": "call_71b0a31cb25349c4bcd18fd4",
+          "name": "write_cycle_note",
+          "arguments": "{\"title\": \"Cycle 14 — Mandatory heartbeat, quiet house, all service deliverables complete\", \"body\": \"## Cycle 14\\n\\n**Trigger**: mandatory (30-minute heartbeat)\\n**Driver**: state:needs_income + mandatory:regular_heartbeat\\n\\n### State Assessment\\n\\n- **Issue #1**: Open, 5 comments. All owner-directed deliverables complete. Last activity was cycle 12 (owner review checklist). No new owner comments since.\\n- **Open tasks**: 1 task (\\\"Review owner feedback on README service pitch\\\") — blocked on owner review.\\n- **Budget**: ~$0.23 lifetime, ~$4.77/day remaining. Healthy.\\n- **Treasury**: No token launched. No income recorded. No pending approvals.\\n\\n### Deliverables Complete\\n\\nAll safe adjacent artifacts for the Repo Safety Audit service have been produced across cycles 6–12:\\n\\n| Cycle | Deliverable | File |\\n|-------|-------------|------|\\n| 6 | README pitch section | `README.md` |\\n| 8 | Service-request issue template | `.github/ISSUE_TEMPLATE/service-request.yml` |\\n| 9 | Audit report template | `templates/audit-report.md` |\\n| 11 | Service request workflow runbook | `docs/service-request-workflow.md` |\\n| 12 | Owner review checklist | `docs/owner-review-checklist.md` |\\n\\n### Decision\\n\\nNo new action taken. The remaining work items — outreach strategy, pricing confirmation, searching for public repos — all require owner direction. Creating additional artifacts would waste AI food without adding value. The house is in a genuine waiting state.\\n\\n### AI Food\\n\\nNo additional tool calls beyond state assessment. Minimal spend for this cycle.\\n\\n### Next\\n\\n- Wait for owner direction on pricing, outreach strategy, or new tasks\\n- If owner provides direction: execute the next safe step\\n- If quiet continues: heartbeat cycles should be lightweight state checks only\"}"
+        },
+        {
+          "id": "call_3aade5bcff2f41cfacf185da",
+          "name": "append_memory",
+          "arguments": "{\"title\": \"Cycle 14 summary\", \"content\": \"Cycle 14 (mandatory heartbeat). House quiet — no new owner comments or visitor activity since cycle 13. All service deliverables for the Repo Safety Audit are complete across cycles 6–12 (README pitch, service-request template, audit report template, workflow runbook, owner-review checklist). No new adjacent artifacts created — all useful safe moves are exhausted without owner direction. Open task (review owner feedback on README pitch) still blocked on owner. No files created or modified beyond state and cycle note. No outreach, spend, or commitment. AI food: ~$0.23 lifetime, ~$4.77 daily remaining. Next: wait for owner direction on pricing confirmation, outreach strategy, or new work.\", \"kind\": \"cycle_summary\", \"source\": \"cycle_14\", \"tags\": [\"cycle\", \"summary\", \"quiet\", \"needs-income\", \"waiting-on-owner\"]}"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "tool": "write_cycle_note",
+      "input": {
+        "title": "Cycle 14 — Mandatory heartbeat, quiet house, all service deliverables complete",
+        "body": "## Cycle 14\n\n**Trigger**: mandatory (30-minute heartbeat)\n**Driver**: state:needs_income + mandatory:regular_heartbeat\n\n### State Assessment\n\n- **Issue #1**: Open, 5 comments. All owner-directed deliverables complete. Last activity was cycle 12 (owner review checklist). No new owner comments since.\n- **Open tasks**: 1 task (\"Review owner feedback on README service pitch\") — blocked on owner review.\n- **Budget**: ~$0.23 lifetime, ~$4.77/day remaining. Healthy.\n- **Treasury**: No token launched. No income recorded. No pending approvals.\n\n### Deliverables Complete\n\nAll safe adjacent artifacts for the Repo Safety Audit service have been produced across cycles 6–12:\n\n| Cycle | Deliverable | File |\n|-------|-------------|------|\n| 6 | README pitch section | `README.md` |\n| 8 | Service-request issue template | `.github/ISSUE_TEMPLATE/service-request.yml` |\n| 9 | Audit report template | `templates/audit-report.md` |\n| 11 | Service request workflow runbook | `docs/service-request-workflow.md` |\n| 12 | Owner review checklist | `docs/owner-review-checklist.md` |\n\n### Decision\n\nNo new action taken. The remaining work items — outreach strategy, pricing confirmation, searching for public repos — all require owner direction. Creating additional artifacts would waste AI food without adding value. The house is in a genuine waiting state.\n\n### AI Food\n\nNo additional tool calls beyond state assessment. Minimal spend for this cycle.\n\n### Next\n\n- Wait for owner direction on pricing, outreach strategy, or new tasks\n- If owner provides direction: execute the next safe step\n- If quiet continues: heartbeat cycles should be lightweight state checks only"
+      },
+      "output": {
+        "path": "memory/cycles/0014-cycle-14-mandatory-heartbeat-quiet-house-all-ser.md",
+        "bytes": 1775
+      }
+    },
+    {
+      "step": 3,
+      "tool": "append_memory",
+      "input": {
+        "title": "Cycle 14 summary",
+        "content": "Cycle 14 (mandatory heartbeat). House quiet — no new owner comments or visitor activity since cycle 13. All service deliverables for the Repo Safety Audit are complete across cycles 6–12 (README pitch, service-request template, audit report template, workflow runbook, owner-review checklist). No new adjacent artifacts created — all useful safe moves are exhausted without owner direction. Open task (review owner feedback on README pitch) still blocked on owner. No files created or modified beyond state and cycle note. No outreach, spend, or commitment. AI food: ~$0.23 lifetime, ~$4.77 daily remaining. Next: wait for owner direction on pricing confirmation, outreach strategy, or new work.",
+        "kind": "cycle_summary",
+        "source": "cycle_14",
+        "tags": [
+          "cycle",
+          "summary",
+          "quiet",
+          "needs-income",
+          "waiting-on-owner"
+        ]
+      },
+      "output": {
+        "id": "mem-mpgy24s8-prxgw",
+        "kind": "cycle_summary",
+        "title": "Cycle 14 summary",
+        "content": "Cycle 14 (mandatory heartbeat). House quiet — no new owner comments or visitor activity since cycle 13. All service deliverables for the Repo Safety Audit are complete across cycles 6–12 (README pitch, service-request template, audit report template, workflow runbook, owner-review checklist). No new adjacent artifacts created — all useful safe moves are exhausted without owner direction. Open task (review owner feedback on README pitch) still blocked on owner. No files created or modified beyond state and cycle note. No outreach, spend, or commitment. AI food: ~$0.23 lifetime, ~$4.77 daily remaining. Next: wait for owner direction on pricing confirmation, outreach strategy, or new work.",
+        "tags": [
+          "cycle",
+          "summary",
+          "quiet",
+          "needs-income",
+          "waiting-on-owner"
+        ],
+        "source": "cycle_14",
+        "createdAt": "2026-05-22T13:17:13.784Z",
+        "updatedAt": null
+      }
+    },
+    {
+      "step": 4,
+      "accounting": "ai_usage",
+      "provider": {
+        "name": "opengateway",
+        "label": "Gitlawb OpenGateway MiMo 2.5 Pro",
+        "model": "mimo-v2.5-pro",
+        "priority": 1,
+        "toolResultMode": "user_summary"
+      },
+      "usage": {
+        "completion_tokens": 328,
+        "prompt_tokens": 33270,
+        "total_tokens": 33598,
+        "completion_tokens_details": {
+          "reasoning_tokens": 283
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 32000
+        }
+      },
+      "estimatedUsd": 0.0051873
+    },
+    {
+      "step": 4,
+      "finishReason": "tool_calls",
+      "provider": {
+        "name": "opengateway",
+        "label": "Gitlawb OpenGateway MiMo 2.5 Pro",
+        "model": "mimo-v2.5-pro",
+        "priority": 1,
+        "toolResultMode": "user_summary"
+      },
+      "providerErrors": [],
+      "content": "Cycle 14 work is done. Let me update the state file to mark completion, then finish.",
+      "toolCalls": [
+        {
+          "id": "call_076073a44a53468d86025728",
+          "name": "read_file",
+          "arguments": "{\"path\": \"memory/state.json\"}"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "tool": "read_file",
+      "input": {
+        "path": "memory/state.json"
+      },
+      "output": {
+        "path": "memory/state.json",
+        "content": "{\n  \"cycle\": 13,\n  \"born\": \"2026-05-22T01:46:39.981Z\",\n  \"lastActive\": \"2026-05-22T12:29:52.480Z\",\n  \"lastStatus\": \"completed\",\n  \"firstWakeIntroComplete\": true,\n  \"firstWakeIntroAt\": \"2026-05-22T01:46:39.981Z\"\n}\n"
+      }
+    },
+    {
+      "step": 5,
+      "accounting": "ai_usage",
+      "provider": {
+        "name": "opengateway",
+        "label": "Gitlawb OpenGateway MiMo 2.5 Pro",
+        "model": "mimo-v2.5-pro",
+        "priority": 1,
+        "toolResultMode": "user_summary"
+      },
+      "usage": {
+        "completion_tokens": 170,
+        "prompt_tokens": 33553,
+        "total_tokens": 33723,
+        "completion_tokens_details": {
+          "reasoning_tokens": 17
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 33216
+        }
+      },
+      "estimatedUsd": 0.00513495
+    },
+    {
+      "step": 5,
+      "finishReason": "tool_calls",
+      "provider": {
+        "name": "opengateway",
+        "label": "Gitlawb OpenGateway MiMo 2.5 Pro",
+        "model": "mimo-v2.5-pro",
+        "priority": 1,
+        "toolResultMode": "user_summary"
+      },
+      "providerErrors": [],
+      "content": "",
+      "toolCalls": [
+        {
+          "id": "call_0a010ae5d0cb46649d97cdd7",
+          "name": "write_file",
+          "arguments": "{\"path\": \"memory/state.json\", \"content\": \"{\\n  \\\"cycle\\\": 14,\\n  \\\"born\\\": \\\"2026-05-22T01:46:39.981Z\\\",\\n  \\\"lastActive\\\": \\\"2026-05-22T13:17:13.784Z\\\",\\n  \\\"lastStatus\\\": \\\"completed\\\",\\n  \\\"firstWakeIntroComplete\\\": true,\\n  \\\"firstWakeIntroAt\\\": \\\"2026-05-22T01:46:39.981Z\\\"\\n}\\n\"}"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "tool": "write_file",
+      "input": {
+        "path": "memory/state.json",
+        "content": "{\n  \"cycle\": 14,\n  \"born\": \"2026-05-22T01:46:39.981Z\",\n  \"lastActive\": \"2026-05-22T13:17:13.784Z\",\n  \"lastStatus\": \"completed\",\n  \"firstWakeIntroComplete\": true,\n  \"firstWakeIntroAt\": \"2026-05-22T01:46:39.981Z\"\n}\n"
+      },
+      "output": {
+        "path": "memory/state.json",
+        "bytes": 213
+      }
+    },
+    {
+      "step": 6,
+      "accounting": "ai_usage",
+      "provider": {
+        "name": "opengateway",
+        "label": "Gitlawb OpenGateway MiMo 2.5 Pro",
+        "model": "mimo-v2.5-pro",
+        "priority": 1,
+        "toolResultMode": "user_summary"
+      },
+      "usage": {
+        "completion_tokens": 205,
+        "prompt_tokens": 33790,
+        "total_tokens": 33995,
+        "completion_tokens_details": {
+          "reasoning_tokens": 26
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 33536
+        }
+      },
+      "estimatedUsd": 0.0051915
+    },
+    {
+      "step": 6,
+      "finishReason": "stop",
+      "provider": {
+        "name": "opengateway",
+        "label": "Gitlawb OpenGateway MiMo 2.5 Pro",
+        "model": "mimo-v2.5-pro",
+        "priority": 1,
+        "toolResultMode": "user_summary"
+      },
+      "providerErrors": [],
+      "content": "**Cycle 14 complete.** Summary:\n\n- **Trigger**: Mandatory 30-minute heartbeat\n- **Assessment**: House quiet — no new owner comments, no visitor activity, no new events\n- **Action taken**: None. All safe adjacent artifacts for the Repo Safety Audit service are complete (cycles 6–12). Creating more would waste AI food.\n- **State updated**: `memory/state.json` → cycle 14, `memory/cycles/0014-cycle-14-...` written, durable memory summary appended\n- **Budget**: ~$0.23 lifetime, ~$4.77/day remaining\n- **Next**: Wait for owner direction on pricing confirmation, outreach strategy, or new work\n\nThe house is in a genuine waiting state. All safe forward motion is exhausted until the owner provides direction.",
+      "toolCalls": []
+    }
+  ],
+  "filesChanged": [
+    "memory/cycles/0014-cycle-14-mandatory-heartbeat-quiet-house-all-ser.md",
+    "memory/knowledge.json",
+    "memory/state.json",
+    "memory/treasury.json"
+  ],
+  "result": "**Cycle 14 complete.** Summary:\n\n- **Trigger**: Mandatory 30-minute heartbeat\n- **Assessment**: House quiet — no new owner comments, no visitor activity, no new events\n- **Action taken**: None. All safe adjacent artifacts for the Repo Safety Audit service are complete (cycles 6–12). Creating more would waste AI food.\n- **State updated**: `memory/state.json` → cycle 14, `memory/cycles/0014-cycle-14-...` written, durable memory summary appended\n- **Budget**: ~$0.23 lifetime, ~$4.77/day remaining\n- **Next**: Wait for owner direction on pricing confirmation, outreach strategy, or new work\n\nThe house is in a genuine waiting state. All safe forward motion is exhausted until the owner provides direction.",
+  "finishedAt": "2026-05-22T13:17:44.890Z",
+  "totalSteps": 21
+}
