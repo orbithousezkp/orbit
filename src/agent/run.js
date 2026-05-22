@@ -17,6 +17,43 @@ const { appendSafeTextFile, assertNoSymlinkPath, readSafeTextFile, redactSecrets
 const { TREASURY_PATH, recordAiUsage } = require("./treasury");
 const { privateAiRouteId, privateAiRoutes, privateProviderErrors } = require("./provider-privacy");
 
+const REDACTED_PRIVATE_CONFIG = "[REDACTED_PRIVATE_CONFIG]";
+const REDACTED_ADDRESS = "[REDACTED_ADDRESS]";
+const PRIVATE_PROOF_KEYS = new Set([
+  "acceptEncoding",
+  "apiBase",
+  "apiKey",
+  "apiKeyEnv",
+  "apiKeyRef",
+  "authHeader",
+  "authScheme",
+  "baseRpcUrl",
+  "githubToken",
+  "headers",
+  "launchRequest",
+  "model",
+  "operatorRevenueAddress",
+  "operatorRevenueBps",
+  "operatorShareBps",
+  "operatorSharePct",
+  "privateKey",
+  "rewardRecipient",
+  "tokenAdmin",
+  "tokenAdminAddress",
+  "tokenConfig",
+  "treasuryAddress",
+  "treasuryShareBps",
+  "treasurySharePct",
+  "walletPrivateKey"
+]);
+const PRIVATE_PROOF_KEY_PATTERNS = [
+  /authorization/i,
+  /private.*key/i,
+  /secret/i,
+  /token.*admin/i
+];
+const EVM_ADDRESS_PATTERN = /\b0x[a-fA-F0-9]{40}\b/g;
+
 function log(message) {
   console.log(`[orbit] ${message}`);
 }
@@ -290,18 +327,40 @@ async function main() {
 }
 
 function sanitizeProofInput(input) {
-  if (!input || typeof input !== "object") return input;
-  return JSON.parse(redactSecrets(JSON.stringify(input)));
+  return sanitizePublicArtifact(input);
 }
 
 function sanitizeProofOutput(output) {
-  if (output === null || output === undefined) return output;
-  if (typeof output === "string") return redactSecrets(output).slice(0, 8000);
-  try {
-    return JSON.parse(redactSecrets(JSON.stringify(output)));
-  } catch {
-    return String(output).slice(0, 8000);
+  return sanitizePublicArtifact(output);
+}
+
+function isPrivateProofKey(key) {
+  if (!key) return false;
+  return PRIVATE_PROOF_KEYS.has(key) || PRIVATE_PROOF_KEY_PATTERNS.some((pattern) => pattern.test(key));
+}
+
+function sanitizePublicString(value) {
+  return redactSecrets(String(value || ""))
+    .replace(EVM_ADDRESS_PATTERN, REDACTED_ADDRESS)
+    .slice(0, 8000);
+}
+
+function sanitizePublicArtifact(value, key = "") {
+  if (value === null || value === undefined) return value;
+  if (isPrivateProofKey(key)) return REDACTED_PRIVATE_CONFIG;
+  if (typeof value === "string") return sanitizePublicString(value);
+  if (typeof value === "number" || typeof value === "boolean") return value;
+  if (Array.isArray(value)) {
+    return value.map((item) => sanitizePublicArtifact(item, key));
   }
+  if (typeof value === "object") {
+    const result = {};
+    for (const [entryKey, entryValue] of Object.entries(value)) {
+      result[entryKey] = sanitizePublicArtifact(entryValue, entryKey);
+    }
+    return result;
+  }
+  return sanitizePublicString(value);
 }
 
 function assistantMessageForResult(result, toolResultMode = "native") {
@@ -362,6 +421,7 @@ module.exports = {
   parseToolInput,
   sanitizeProofInput,
   sanitizeProofOutput,
+  sanitizePublicArtifact,
   stageChangedPaths,
   toolResultsUserMessage
 };

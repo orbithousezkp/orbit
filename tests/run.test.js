@@ -11,6 +11,7 @@ const {
   addToolResultMessage,
   assistantMessageForResult,
   changedPathsForCommit,
+  sanitizeProofOutput,
   stageChangedPaths,
   toolResultsUserMessage
 } = require("../src/agent/run");
@@ -150,4 +151,41 @@ test("user summary tool result mode avoids native tool messages", () => {
   assert.equal(userMessage.role, "user");
   assert.match(userMessage.content, /Tool results/);
   assert.match(userMessage.content, /list_memory/);
+});
+
+test("proof sanitizer redacts private routes, token configs, and addresses", () => {
+  const sanitized = sanitizeProofOutput({
+    treasury: {
+      token: {
+        launchRequest: {
+          rewards: {
+            recipients: [
+              {
+                recipient: "0x3333333333333333333333333333333333333333",
+                bps: 1234
+              }
+            ]
+          }
+        }
+      }
+    },
+    prepared: {
+      tokenConfig: {
+        tokenAdmin: "0x1111111111111111111111111111111111111111"
+      },
+      revenuePolicy: {
+        operatorShareBps: 1234,
+        treasurySharePct: 87.66
+      }
+    },
+    publicNote: "pay to 0x2222222222222222222222222222222222222222"
+  });
+
+  const text = JSON.stringify(sanitized);
+  assert.doesNotMatch(text, /0x[0-9a-fA-F]{40}/);
+  assert.doesNotMatch(text, /1234/);
+  assert.equal(sanitized.treasury.token.launchRequest, "[REDACTED_PRIVATE_CONFIG]");
+  assert.equal(sanitized.prepared.tokenConfig, "[REDACTED_PRIVATE_CONFIG]");
+  assert.equal(sanitized.prepared.revenuePolicy.operatorShareBps, "[REDACTED_PRIVATE_CONFIG]");
+  assert.equal(sanitized.publicNote, "pay to [REDACTED_ADDRESS]");
 });

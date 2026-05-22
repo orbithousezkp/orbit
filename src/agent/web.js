@@ -3,7 +3,7 @@
 const dns = require("dns").promises;
 const net = require("net");
 const { redactSecrets } = require("./safety");
-const { scanTextRisk, scanUrl } = require("./scam");
+const { omitUnsafeVisitorContent, scanTextRisk, scanUrl } = require("./scam");
 
 const MAX_REDIRECTS = 5;
 const SENSITIVE_REDIRECT_HEADERS = new Set([
@@ -168,10 +168,15 @@ function summarizeJsonSearch(data) {
     : data.results || data.items || (data.webPages && data.webPages.value) || [];
 
   return items.slice(0, 10).map((item) => ({
-    title: item.title || item.name || item.full_name || "",
+    title: safeResearchText(item.title || item.name || item.full_name || "", 300),
     url: item.url || item.html_url || item.link || "",
-    snippet: item.snippet || item.description || item.body || item.text || ""
+    snippet: safeResearchText(item.snippet || item.description || item.body || item.text || "", 2000)
   }));
+}
+
+function safeResearchText(text, maxLength = 4000) {
+  const redacted = redactSecrets(String(text || ""));
+  return omitUnsafeVisitorContent(redacted, scanTextRisk(redacted)).slice(0, maxLength);
 }
 
 async function fetchUrl(config, input = {}) {
@@ -215,8 +220,9 @@ async function fetchUrl(config, input = {}) {
   const response = fetched.response;
   const contentType = response.headers.get("content-type") || "";
   const { text, truncated } = await readLimitedText(response, maxBytes);
-  const body = redactSecrets(text);
-  const textRisk = scanTextRisk(body);
+  const redactedBody = redactSecrets(text);
+  const textRisk = scanTextRisk(redactedBody);
+  const body = omitUnsafeVisitorContent(redactedBody, textRisk);
   return {
     url: fetched.finalUrl,
     status: response.status,
@@ -311,10 +317,11 @@ async function webSearch(config, input = {}) {
   try {
     parsed = JSON.parse(text);
   } catch {
+    const redacted = redactSecrets(text);
     return {
       available: true,
       query,
-      raw: redactSecrets(text).slice(0, 4000)
+      raw: omitUnsafeVisitorContent(redacted, scanTextRisk(redacted)).slice(0, 4000)
     };
   }
 

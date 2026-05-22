@@ -1,5 +1,13 @@
 "use strict";
 
+const { omitUnsafeVisitorContent, scanTextRisk } = require("./scam");
+const { redactSecrets } = require("./safety");
+
+function safePublicText(text, maxLength = 2000) {
+  const redacted = redactSecrets(String(text || ""));
+  return omitUnsafeVisitorContent(redacted, scanTextRisk(redacted)).slice(0, maxLength);
+}
+
 class GitHubClient {
   constructor(config) {
     this.token = config.githubToken;
@@ -182,11 +190,11 @@ class GitHubClient {
       totalCount: response.total_count || 0,
       incompleteResults: Boolean(response.incomplete_results),
       results: (response.items || []).slice(0, capped).map((item) => ({
-        name: item.full_name || item.title || item.name || "",
-        path: item.path || "",
+        name: safePublicText(item.full_name || item.title || item.name || "", 300),
+        path: safePublicText(item.path || "", 500),
         url: item.html_url || "",
         state: item.state || "",
-        description: item.description || item.body || "",
+        description: safePublicText(item.description || item.body || "", 2000),
         score: item.score
       }))
     };
