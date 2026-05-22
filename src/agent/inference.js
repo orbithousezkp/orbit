@@ -64,6 +64,22 @@ function authHeaders(provider) {
   return { [header]: value };
 }
 
+function providerHeaders(config, provider) {
+  const headers = {
+    ...safeExtraHeaders(provider.extraHeaders || {}, [provider.authHeader || "Authorization", "Authorization"]),
+    ...authHeaders(provider),
+    "Content-Type": "application/json",
+    "HTTP-Referer": config.publicBaseUrl || "https://github.com",
+    "X-Title": "Orbit"
+  };
+
+  if (provider.acceptEncoding) {
+    headers["Accept-Encoding"] = provider.acceptEncoding;
+  }
+
+  return headers;
+}
+
 async function infer(config, messages, tools) {
   const contextMessage = messages.find((message) => message.role === "user");
   const context = contextMessage && contextMessage.context ? contextMessage.context : {};
@@ -122,13 +138,7 @@ async function infer(config, messages, tools) {
       const chatPath = provider.chatPath || "/chat/completions";
       const response = await fetch(`${provider.apiBase}${chatPath.startsWith("/") ? chatPath : `/${chatPath}`}`, {
         method: "POST",
-        headers: {
-          ...safeExtraHeaders(provider.extraHeaders || {}, [provider.authHeader || "Authorization", "Authorization"]),
-          ...authHeaders(provider),
-          "Content-Type": "application/json",
-          "HTTP-Referer": config.publicBaseUrl || "https://github.com",
-          "X-Title": "Orbit"
-        },
+        headers: providerHeaders(config, provider),
         body: JSON.stringify(body)
       });
 
@@ -179,5 +189,6 @@ module.exports = {
   infer,
   deterministicResponse,
   authHeaders,
+  providerHeaders,
   safeExtraHeaders
 };

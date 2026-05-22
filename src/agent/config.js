@@ -105,6 +105,7 @@ function normalizeProvider(raw = {}, env = {}, keyMap = {}, index = 0) {
     requiresAuth: raw.requiresAuth !== false,
     authHeader: raw.authHeader || "Authorization",
     authScheme: raw.authScheme || "bearer",
+    acceptEncoding: raw.acceptEncoding || "",
     extraHeaders: raw.extraHeaders && typeof raw.extraHeaders === "object" && !Array.isArray(raw.extraHeaders)
       ? raw.extraHeaders
       : {},

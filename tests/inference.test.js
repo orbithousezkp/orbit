@@ -288,3 +288,56 @@ test("provider-specific auth headers use configured scheme and cannot be overrid
     global.fetch = originalFetch;
   }
 });
+
+test("provider headers can request identity encoding for gateways with bad gzip metadata", async () => {
+  const originalFetch = global.fetch;
+  let headers = {};
+
+  global.fetch = async (_url, options) => {
+    headers = options.headers;
+    return {
+      ok: true,
+      async json() {
+        return {
+          choices: [
+            {
+              message: {
+                content: "ok",
+                tool_calls: []
+              },
+              finish_reason: "stop"
+            }
+          ],
+          usage: { prompt_tokens: 1, completion_tokens: 1, total_tokens: 2 }
+        };
+      }
+    };
+  };
+
+  try {
+    const result = await infer(config({
+      aiProviders: [
+        {
+          name: "opengateway",
+          label: "Gitlawb OpenGateway MiMo 2.5 Pro",
+          apiKey: "",
+          requiresAuth: false,
+          apiBase: "https://opengateway.gitlawb.com/v1/xiaomi-mimo",
+          model: "mimo-v2.5-pro",
+          chatPath: "/chat/completions",
+          authHeader: "api-key",
+          authScheme: "raw",
+          acceptEncoding: "identity",
+          priority: 1
+        }
+      ]
+    }), [
+      { role: "user", content: "context", context: {} }
+    ], []);
+
+    assert.equal(result.fallback, false);
+    assert.equal(headers["Accept-Encoding"], "identity");
+  } finally {
+    global.fetch = originalFetch;
+  }
+});
