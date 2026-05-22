@@ -159,7 +159,8 @@ async function infer(config, messages, tools) {
           name: provider.name,
           label: provider.label,
           model: provider.model,
-          priority: provider.priority
+          priority: provider.priority,
+          toolResultMode: provider.toolResultMode || "native"
         },
         providerErrors,
         content: choice.message.content || "",

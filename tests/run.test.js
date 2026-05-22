@@ -7,7 +7,13 @@ const path = require("node:path");
 const { execFileSync } = require("node:child_process");
 const test = require("node:test");
 const { filesChanged } = require("../src/agent/actions");
-const { changedPathsForCommit, stageChangedPaths } = require("../src/agent/run");
+const {
+  addToolResultMessage,
+  assistantMessageForResult,
+  changedPathsForCommit,
+  stageChangedPaths,
+  toolResultsUserMessage
+} = require("../src/agent/run");
 
 function tempRepo() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "orbit-run-test-"));
@@ -80,4 +86,68 @@ test("changed path staging does not add unrelated worktree changes", { skip: !gi
   } finally {
     filesChanged.clear();
   }
+});
+
+test("native tool result mode keeps OpenAI tool message shape", () => {
+  const messages = [];
+  const summaries = [];
+  const assistant = assistantMessageForResult({
+    content: "checking",
+    toolCalls: [
+      {
+        id: "call_1",
+        function: {
+          name: "list_memory",
+          arguments: "{}"
+        }
+      }
+    ]
+  }, "native");
+
+  addToolResultMessage(messages, summaries, "native", {
+    id: "call_1",
+    name: "list_memory",
+    content: "[]"
+  });
+
+  assert.equal(assistant.tool_calls.length, 1);
+  assert.deepEqual(messages, [
+    {
+      role: "tool",
+      tool_call_id: "call_1",
+      content: "[]"
+    }
+  ]);
+  assert.deepEqual(summaries, []);
+});
+
+test("user summary tool result mode avoids native tool messages", () => {
+  const messages = [];
+  const summaries = [];
+  const assistant = assistantMessageForResult({
+    content: "checking",
+    toolCalls: [
+      {
+        id: "call_1",
+        function: {
+          name: "list_memory",
+          arguments: "{}"
+        }
+      }
+    ]
+  }, "user_summary");
+
+  addToolResultMessage(messages, summaries, "user_summary", {
+    id: "call_1",
+    name: "list_memory",
+    input: { limit: 1 },
+    content: "[]"
+  });
+  const userMessage = toolResultsUserMessage(summaries);
+
+  assert.equal(assistant.tool_calls, undefined);
+  assert.deepEqual(messages, []);
+  assert.equal(userMessage.role, "user");
+  assert.match(userMessage.content, /Tool results/);
+  assert.match(userMessage.content, /list_memory/);
 });

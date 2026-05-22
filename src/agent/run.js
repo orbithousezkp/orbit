@@ -136,6 +136,7 @@ async function main() {
       model: provider.model,
       apiBase: provider.apiBase,
       chatPath: provider.chatPath,
+      toolResultMode: provider.toolResultMode,
       priority: provider.priority
     })),
     dryRun: config.dryRun,
@@ -202,27 +203,28 @@ async function main() {
       }))
     });
 
-    messages.push({
-      role: "assistant",
-      content: result.content || "",
-      tool_calls: result.toolCalls
-    });
+    const toolResultMode = result.provider && result.provider.toolResultMode === "user_summary"
+      ? "user_summary"
+      : "native";
+    messages.push(assistantMessageForResult(result, toolResultMode));
 
     if (!result.toolCalls.length) {
       proof.result = redactSecrets(result.content || "Cycle finished without tool calls.");
       break;
     }
 
+    const summarizedToolResults = [];
     for (const toolCall of result.toolCalls) {
       const name = toolCall.function && toolCall.function.name;
       try {
         const input = parseToolInput(toolCall);
         const output = await executeTool(config, github, state.cycle, name, input);
         const toolContent = JSON.stringify(sanitizeProofOutput(output));
-        messages.push({
-          role: "tool",
-          tool_call_id: toolCall.id,
-          content: toolContent.slice(0, 12_000)
+        addToolResultMessage(messages, summarizedToolResults, toolResultMode, {
+          id: toolCall.id,
+          name,
+          input: sanitizeProofInput(input),
+          content: toolContent
         });
         proof.steps.push({
           step,
@@ -232,10 +234,10 @@ async function main() {
         });
       } catch (error) {
         const content = redactSecrets(`tool error: ${error.message}`);
-        messages.push({
-          role: "tool",
-          tool_call_id: toolCall.id,
-          content
+        addToolResultMessage(messages, summarizedToolResults, toolResultMode, {
+          id: toolCall.id,
+          name,
+          error: content
         });
         proof.steps.push({
           step,
@@ -243,6 +245,10 @@ async function main() {
           error: redactSecrets(error.message)
         });
       }
+    }
+
+    if (toolResultMode === "user_summary" && summarizedToolResults.length) {
+      messages.push(toolResultsUserMessage(summarizedToolResults));
     }
   }
 
@@ -299,6 +305,48 @@ function sanitizeProofOutput(output) {
   }
 }
 
+function assistantMessageForResult(result, toolResultMode = "native") {
+  const message = {
+    role: "assistant",
+    content: result.content || ""
+  };
+  if (toolResultMode === "native" && result.toolCalls && result.toolCalls.length) {
+    message.tool_calls = result.toolCalls;
+  }
+  return message;
+}
+
+function addToolResultMessage(messages, summarizedToolResults, toolResultMode, result) {
+  const content = result.error || String(result.content || "").slice(0, 12_000);
+  if (toolResultMode === "native") {
+    messages.push({
+      role: "tool",
+      tool_call_id: result.id,
+      content
+    });
+    return;
+  }
+
+  summarizedToolResults.push({
+    toolCallId: result.id,
+    tool: result.name,
+    input: result.input,
+    output: result.error ? undefined : content,
+    error: result.error
+  });
+}
+
+function toolResultsUserMessage(summarizedToolResults) {
+  return {
+    role: "user",
+    content: [
+      "Tool results from the previous assistant-requested actions:",
+      JSON.stringify(summarizedToolResults).slice(0, 12_000),
+      "Use these safe tool results to choose the next small household action. If enough work is done, finish without more tool calls."
+    ].join("\n")
+  };
+}
+
 if (require.main === module) {
   main().catch((error) => {
     console.error(redactSecrets(`[orbit:fatal] ${error.stack || error.message}`));
@@ -308,10 +356,13 @@ if (require.main === module) {
 
 module.exports = {
   changedPathsForCommit,
+  addToolResultMessage,
+  assistantMessageForResult,
   commitIfNeeded,
   main,
   parseToolInput,
   sanitizeProofInput,
   sanitizeProofOutput,
-  stageChangedPaths
+  stageChangedPaths,
+  toolResultsUserMessage
 };

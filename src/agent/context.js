@@ -129,6 +129,7 @@ async function gatherContext(config) {
         model: provider.model,
         apiBase: provider.apiBase,
         chatPath: provider.chatPath,
+        toolResultMode: provider.toolResultMode,
         priority: provider.priority
       })),
       githubConfigured: github.configured(),
