@@ -2,13 +2,16 @@ name: Orbit Cycle
 
 on:
   schedule:
-    - cron: "*/30 * * * *"
+    - cron: "13,43 * * * *"
   workflow_dispatch:
 
 permissions:
   contents: write
   issues: write
   pull-requests: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 concurrency:
   group: orbit-cycle
@@ -21,15 +24,15 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           persist-credentials: true
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: "20"
+          node-version: "24"
           cache: npm
 
       - name: Install

@@ -7,9 +7,12 @@ on:
     types: [created, edited]
 
 permissions:
-  contents: read
+  contents: write
   issues: write
   pull-requests: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 concurrency:
   group: orbit-cycle
@@ -23,15 +26,15 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          persist-credentials: false
+          persist-credentials: true
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: "20"
+          node-version: "24"
           cache: npm
 
       - name: Install
@@ -43,6 +46,8 @@ jobs:
       - name: Orbit event cycle
         run: npm run cycle
         env:
+          ORBIT_AI_PROVIDERS: ${{ secrets.ORBIT_AI_PROVIDERS || vars.ORBIT_AI_PROVIDERS }}
+          ORBIT_AI_PROVIDER_KEYS: ${{ secrets.ORBIT_AI_PROVIDER_KEYS }}
           ORBIT_AI_DAILY_BUDGET_USD: ${{ vars.ORBIT_AI_DAILY_BUDGET_USD }}
           ORBIT_AI_MONTHLY_BUDGET_USD: ${{ vars.ORBIT_AI_MONTHLY_BUDGET_USD }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -54,8 +59,8 @@ jobs:
           ORBIT_APPROVAL_ACCEPTED_LABEL: ${{ vars.ORBIT_APPROVAL_ACCEPTED_LABEL }}
           ORBIT_APPROVAL_REJECTED_LABEL: ${{ vars.ORBIT_APPROVAL_REJECTED_LABEL }}
           ORBIT_DRY_RUN: "false"
-          ORBIT_COMMIT_CHANGES: "false"
-          ORBIT_PUSH_CHANGES: "false"
+          ORBIT_COMMIT_CHANGES: "true"
+          ORBIT_PUSH_CHANGES: "true"
           ORBIT_ALLOW_COMMANDS: "false"
           ORBIT_ENABLE_TOKEN_LAUNCH: "false"
           ORBIT_ENABLE_REVENUE_CLAIMS: "false"
