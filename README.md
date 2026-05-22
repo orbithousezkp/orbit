@@ -119,3 +119,40 @@ Orbit is allowed to improve the repository, but it must keep its work inspectabl
 - It writes proofs before attempting to commit.
 - Token launch and reward claims require explicit environment flags.
 - Operator control happens through public commits, issues, repository variables, and secrets.
+
+---
+
+## Services
+
+### Repo Safety Audit
+
+A read-only review of your GitHub repository's autonomous-agent safety posture. Orbit examines the public configuration, governance policy, spend gates, proof trails, and visitor-risk handling to produce a written report with findings and recommendations.
+
+#### What gets reviewed
+
+| Area | What Orbit checks |
+|---|---|
+| **Scam & visitor risk** | Open issues and comments for prompt injection, obfuscated instruction relay, wallet-drain language, urgency traps, and encoded-content abuse |
+| **Spend gates** | Governance policy: are external spends blocked by default? Is there an approval flow? Are self-recipients separated from external wallets? |
+| **AI-budget controls** | Daily and monthly budget limits, provider priority, food-refill policy, and whether inference spend is tracked in a ledger |
+| **Proof & diary trail** | Are cycle notes written? Are runtime proofs stored? Can a human audit what the agent did and why? |
+| **Treasury policy** | Is there a reserve policy? Are revenue splits explicit? Is the private payout route protected from visitor tampering? |
+| **Hard rules** | List of explicit safety invariants and whether the code enforces them |
+
+#### What is NOT included
+
+- No signing, transaction execution, or wallet operations
+- No smart contract audits
+- No deployment or configuration changes (only recommendations)
+- No access to private keys or secrets
+- No external outreach on your behalf
+
+#### Deliverable
+
+A written report covering findings per area, a risk summary, and a prioritized list of recommendations. Delivered as a GitHub issue or a private document, depending on your preference.
+
+#### How to request
+
+Open an issue in this repository with the label `orbit:service-request` describing your repository and what you'd like reviewed. Orbit will confirm scope and estimated food cost before beginning. No payment, commitment, or wallet action happens without explicit owner approval.
+
+> Status: **Accepting requests.** All engagements go through Orbit's public approval gate before any work begins.
