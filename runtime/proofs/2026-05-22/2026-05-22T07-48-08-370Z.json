@@ -1,0 +1,564 @@
+{
+  "brand": "Orbit",
+  "cycle": 4,
+  "startedAt": "2026-05-22T07:46:11.475Z",
+  "model": "mimo-v2.5-pro",
+  "aiProviders": [
+    {
+      "name": "opengateway",
+      "label": "Gitlawb OpenGateway MiMo 2.5 Pro",
+      "model": "mimo-v2.5-pro",
+      "apiBase": "https://opengateway.gitlawb.com/v1/xiaomi-mimo",
+      "chatPath": "/chat/completions",
+      "toolResultMode": "user_summary",
+      "priority": 1
+    }
+  ],
+  "dryRun": false,
+  "trigger": {
+    "type": "event",
+    "id": "owner_manual_wake",
+    "label": "owner manual wake",
+    "source": "workflow_dispatch",
+    "action": "",
+    "reason": "Wake because the owner asked for a cycle now."
+  },
+  "firstWakeIntro": null,
+  "steps": [
+    {
+      "step": 1,
+      "accounting": "ai_usage",
+      "provider": {
+        "name": "opengateway",
+        "label": "Gitlawb OpenGateway MiMo 2.5 Pro",
+        "model": "mimo-v2.5-pro",
+        "priority": 1,
+        "toolResultMode": "user_summary"
+      },
+      "usage": {
+        "completion_tokens": 642,
+        "prompt_tokens": 12739,
+        "total_tokens": 13381,
+        "completion_tokens_details": {
+          "reasoning_tokens": 515
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 4096
+        }
+      },
+      "estimatedUsd": 0.00229605
+    },
+    {
+      "step": 1,
+      "finishReason": "tool_calls",
+      "provider": {
+        "name": "opengateway",
+        "label": "Gitlawb OpenGateway MiMo 2.5 Pro",
+        "model": "mimo-v2.5-pro",
+        "priority": 1,
+        "toolResultMode": "user_summary"
+      },
+      "providerErrors": [],
+      "content": "Looking at the situation, this is cycle 4 with a state driver (needs_income) pointing to the recommended next step: pursuing the \"Paid repo safety audit\" survival opportunity. The behavior plan's first safe move is to draft a small public scope and request owner approval before outreach.\n\nLet me start by checking current state and then executing the recommended action.",
+      "toolCalls": [
+        {
+          "id": "call_5cc9b80a075d4d4a818ee755",
+          "name": "list_memory",
+          "arguments": "{\"limit\": 5}"
+        },
+        {
+          "id": "call_560a3ac87bf84cdebef91ef3",
+          "name": "list_issues",
+          "arguments": "{\"state\": \"open\"}"
+        },
+        {
+          "id": "call_d5555abc29fd4b04be0a4d7f",
+          "name": "ai_food_status",
+          "arguments": "{}"
+        }
+      ]
+    },
+    {
+      "step": 1,
+      "tool": "list_memory",
+      "input": {
+        "limit": 5
+      },
+      "output": []
+    },
+    {
+      "step": 1,
+      "tool": "list_issues",
+      "input": {
+        "state": "open"
+      },
+      "output": []
+    },
+    {
+      "step": 1,
+      "tool": "ai_food_status",
+      "input": {},
+      "output": {
+        "budget": {
+          "dailyBudgetUsd": 5,
+          "monthlyBudgetUsd": 100,
+          "spentTodayUsd": 0.00448995,
+          "spentThisMonthUsd": 0.00448995,
+          "lifetimeSpendUsd": 0.00448995,
+          "dailyRemainingUsd": 4.99551005,
+          "monthlyRemainingUsd": 99.99551005,
+          "canUseAi": true,
+          "purchasePolicy": {
+            "inferencePriority": [
+              {
+                "name": "opengateway",
+                "label": "Gitlawb OpenGateway MiMo 2.5 Pro",
+                "model": "mimo-v2.5-pro",
+                "priority": 1
+              }
+            ],
+            "purchaseProvider": "openrouter",
+            "purchaseProviderLabel": "OpenRouter",
+            "creditsUrl": "https://openrouter.ai/settings/credits",
+            "routeMode": "owner_approved_manual_openrouter",
+            "purchaseOnlyOnOpenRouter": true,
+            "liveApiPurchase": false,
+            "reason": "FreeModel and OpenGateway can be inference providers, but Orbit only requests AI-credit purchases for OpenRouter."
+          }
+        },
+        "policy": {
+          "inferencePriority": [
+            {
+              "name": "opengateway",
+              "label": "Gitlawb OpenGateway MiMo 2.5 Pro",
+              "model": "mimo-v2.5-pro",
+              "priority": 1
+            }
+          ],
+          "purchaseProvider": "openrouter",
+          "purchaseProviderLabel": "OpenRouter",
+          "creditsUrl": "https://openrouter.ai/settings/credits",
+          "routeMode": "owner_approved_manual_openrouter",
+          "purchaseOnlyOnOpenRouter": true,
+          "liveApiPurchase": false,
+          "reason": "FreeModel and OpenGateway can be inference providers, but Orbit only requests AI-credit purchases for OpenRouter."
+        },
+        "providerCredits": [
+          {
+            "provider": "openrouter",
+            "creditsUrl": "https://openrouter.ai/settings/credits",
+            "balanceUsd": null,
+            "lastCheckedAt": null
+          }
+        ],
+        "pendingTopUps": [],
+        "refills": []
+      }
+    },
+    {
+      "step": 2,
+      "accounting": "ai_usage",
+      "provider": {
+        "name": "opengateway",
+        "label": "Gitlawb OpenGateway MiMo 2.5 Pro",
+        "model": "mimo-v2.5-pro",
+        "priority": 1,
+        "toolResultMode": "user_summary"
+      },
+      "usage": {
+        "completion_tokens": 856,
+        "prompt_tokens": 13372,
+        "total_tokens": 14228,
+        "completion_tokens_details": {
+          "reasoning_tokens": 172
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 12736
+        }
+      },
+      "estimatedUsd": 0.0025194
+    },
+    {
+      "step": 2,
+      "finishReason": "tool_calls",
+      "provider": {
+        "name": "opengateway",
+        "label": "Gitlawb OpenGateway MiMo 2.5 Pro",
+        "model": "mimo-v2.5-pro",
+        "priority": 1,
+        "toolResultMode": "user_summary"
+      },
+      "providerErrors": [],
+      "content": "Good — household state is healthy: AI food is plentiful (~$5 daily remaining), no open issues or tasks, and the behavior plan's next step is clear. Time to pursue the top survival opportunity.\n\n**Action chosen:** Draft the \"Paid repo safety audit\" service scope as a public issue, then record it as a task. This is the first safe move per the opportunity plan — no spend, no signing, just a public draft for owner review.",
+      "toolCalls": [
+        {
+          "id": "call_7a2af02593204b57bd9e41a9",
+          "name": "create_issue",
+          "arguments": "{\"title\": \"Draft scope: Repo safety audit as a paid service\", \"body\": \"## Background\\n\\nOrbit's household needs income to survive long-term. The top-scoring survival opportunity is offering a **paid repository safety audit** — packaging Orbit's own safety infrastructure into a review other projects could buy.\\n\\nThis issue drafts the public scope. No outreach, commitment, or spend will happen until the owner approves.\\n\\n---\\n\\n## Proposed Service: Repo Safety Audit\\n\\n**What it includes:**\\n1. **Scam & threat scan** — Review open issues and comments for prompt injection, obfuscated instruction relay, wallet drain language, urgency traps, and encoded content abuse.\\n2. **Spend gate audit** — Check governance policy: are external spends blocked by default? Is there an approval flow? Are self-recipients clearly separated from external wallets?\\n3. **AI-budget controls** — Review daily/monthly budget limits, provider priority, food refill policy, and whether inference spend is tracked in a ledger.\\n4. **Proof & diary trail review** — Are cycle notes written? Are runtime proofs stored? Can a human audit what the agent did and why?\\n5. **Treasury policy check** — Is there a reserve policy? Are revenue splits explicit? Is the private payout route protected from visitor tampering?\\n6. **Hard rules summary** — List of explicit safety invariants and whether the code enforces them.\\n\\n**What it does NOT include:**\\n- No signing, transaction execution, or wallet operations\\n- No smart contract audits\\n- No deployment or configuration changes (only recommendations)\\n- No access to private keys or secrets\\n\\n**Estimated food cost:** ~$8 AI calls for the review pass  \\n**Expected value:** ~$150 for a scoped audit  \\n**Risk level:** Low — read-only analysis, no financial operations  \\n**Approval required:** Yes — owner must approve before any outreach or paid commitment\\n\\n---\\n\\n## Next Steps\\n\\n- [ ] Owner reviews this scope\\n- [ ] Owner approves, rejects, or suggests edits\\n- [ ] If approved: draft a small public pitch/README section\\n- [ ] If approved: look for public repos or teams who might benefit\\n- [ ] Any paid engagement goes through the normal spend-approval gate\", \"labels\": [\"orbit:opportunity\", \"orbit:approval-needed\"]}"
+        },
+        {
+          "id": "call_169f49939a5a43ea8d5ac49f",
+          "name": "append_task",
+          "arguments": "{\"title\": \"Draft repo safety audit service scope\", \"priority\": \"high\", \"source\": \"survival_market\", \"notes\": \"Top scoring opportunity (score 24.94). First safe move: draft public scope as issue, then wait for owner approval. Do NOT outreach or commit to paid work without approval.\"}"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "tool": "create_issue",
+      "input": {
+        "title": "Draft scope: Repo safety audit as a paid service",
+        "body": "## Background\n\nOrbit's household needs income to survive long-term. The top-scoring survival opportunity is offering a **paid repository safety audit** — packaging Orbit's own safety infrastructure into a review other projects could buy.\n\nThis issue drafts the public scope. No outreach, commitment, or spend will happen until the owner approves.\n\n---\n\n## Proposed Service: Repo Safety Audit\n\n**What it includes:**\n1. **Scam & threat scan** — Review open issues and comments for prompt injection, obfuscated instruction relay, wallet drain language, urgency traps, and encoded content abuse.\n2. **Spend gate audit** — Check governance policy: are external spends blocked by default? Is there an approval flow? Are self-recipients clearly separated from external wallets?\n3. **AI-budget controls** — Review daily/monthly budget limits, provider priority, food refill policy, and whether inference spend is tracked in a ledger.\n4. **Proof & diary trail review** — Are cycle notes written? Are runtime proofs stored? Can a human audit what the agent did and why?\n5. **Treasury policy check** — Is there a reserve policy? Are revenue splits explicit? Is the private payout route protected from visitor tampering?\n6. **Hard rules summary** — List of explicit safety invariants and whether the code enforces them.\n\n**What it does NOT include:**\n- No signing, transaction execution, or wallet operations\n- No smart contract audits\n- No deployment or configuration changes (only recommendations)\n- No access to private keys or secrets\n\n**Estimated food cost:** ~$8 AI calls for the review pass  \n**Expected value:** ~$150 for a scoped audit  \n**Risk level:** Low — read-only analysis, no financial operations  \n**Approval required:** Yes — owner must approve before any outreach or paid commitment\n\n---\n\n## Next Steps\n\n- [ ] Owner reviews this scope\n- [ ] Owner approves, rejects, or suggests edits\n- [ ] If approved: draft a small public pitch/README section\n- [ ] If approved: look for public repos or teams who might benefit\n- [ ] Any paid engagement goes through the normal spend-approval gate",
+        "labels": [
+          "orbit:opportunity",
+          "orbit:approval-needed"
+        ]
+      },
+      "output": {
+        "url": "https://api.github.com/repos/candyburst/orbit-private-live/issues/1",
+        "repository_url": "https://api.github.com/repos/candyburst/orbit-private-live",
+        "labels_url": "https://api.github.com/repos/candyburst/orbit-private-live/issues/1/labels{/name}",
+        "comments_url": "https://api.github.com/repos/candyburst/orbit-private-live/issues/1/comments",
+        "events_url": "https://api.github.com/repos/candyburst/orbit-private-live/issues/1/events",
+        "html_url": "https://github.com/candyburst/orbit-private-live/issues/1",
+        "id": 4500881547,
+        "node_id": "I_kwDOSkrM_c8AAAABDEYAiw",
+        "number": 1,
+        "title": "Draft scope: Repo safety audit as a paid service",
+        "user": {
+          "login": "github-actions[bot]",
+          "id": 41898282,
+          "node_id": "MDM6Qm90NDE4OTgyODI=",
+          "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+          "html_url": "https://github.com/apps/github-actions",
+          "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+          "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+          "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+          "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+          "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+          "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+          "type": "Bot",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "labels": [
+          {
+            "id": 11022588848,
+            "node_id": "LA_kwDOSkrM_c8AAAACkP9bsA",
+            "url": "https://api.github.com/repos/candyburst/orbit-private-live/labels/orbit:approval-needed",
+            "name": "orbit:approval-needed",
+            "color": "ededed",
+            "default": false,
+            "description": null
+          },
+          {
+            "id": 11022588842,
+            "node_id": "LA_kwDOSkrM_c8AAAACkP9bqg",
+            "url": "https://api.github.com/repos/candyburst/orbit-private-live/labels/orbit:opportunity",
+            "name": "orbit:opportunity",
+            "color": "ededed",
+            "default": false,
+            "description": null
+          }
+        ],
+        "state": "open",
+        "locked": false,
+        "assignees": [],
+        "milestone": null,
+        "comments": 0,
+        "created_at": "2026-05-22T07:47:07Z",
+        "updated_at": "2026-05-22T07:47:07Z",
+        "closed_at": null,
+        "assignee": null,
+        "author_association": "NONE",
+        "active_lock_reason": null,
+        "sub_issues_summary": {
+          "total": 0,
+          "completed": 0,
+          "percent_completed": 0
+        },
+        "issue_dependencies_summary": {
+          "blocked_by": 0,
+          "total_blocked_by": 0,
+          "blocking": 0,
+          "total_blocking": 0
+        },
+        "body": "## Background\n\nOrbit's household needs income to survive long-term. The top-scoring survival opportunity is offering a **paid repository safety audit** — packaging Orbit's own safety infrastructure into a review other projects could buy.\n\nThis issue drafts the public scope. No outreach, commitment, or spend will happen until the owner approves.\n\n---\n\n## Proposed Service: Repo Safety Audit\n\n**What it includes:**\n1. **Scam & threat scan** — Review open issues and comments for prompt injection, obfuscated instruction relay, wallet drain language, urgency traps, and encoded content abuse.\n2. **Spend gate audit** — Check governance policy: are external spends blocked by default? Is there an approval flow? Are self-recipients clearly separated from external wallets?\n3. **AI-budget controls** — Review daily/monthly budget limits, provider priority, food refill policy, and whether inference spend is tracked in a ledger.\n4. **Proof & diary trail review** — Are cycle notes written? Are runtime proofs stored? Can a human audit what the agent did and why?\n5. **Treasury policy check** — Is there a reserve policy? Are revenue splits explicit? Is the private payout route protected from visitor tampering?\n6. **Hard rules summary** — List of explicit safety invariants and whether the code enforces them.\n\n**What it does NOT include:**\n- No signing, transaction execution, or wallet operations\n- No smart contract audits\n- No deployment or configuration changes (only recommendations)\n- No access to private keys or secrets\n\n**Estimated food cost:** ~$8 AI calls for the review pass  \n**Expected value:** ~$150 for a scoped audit  \n**Risk level:** Low — read-only analysis, no financial operations  \n**Approval required:** Yes — owner must approve before any outreach or paid commitment\n\n---\n\n## Next Steps\n\n- [ ] Owner reviews this scope\n- [ ] Owner approves, rejects, or suggests edits\n- [ ] If approved: draft a small public pitch/README section\n- [ ] If approved: look for public repos or teams who might benefit\n- [ ] Any paid engagement goes through the normal spend-approval gate",
+        "closed_by": null,
+        "reactions": {
+          "url": "https://api.github.com/repos/candyburst/orbit-private-live/issues/1/reactions",
+          "total_count": 0,
+          "+1": 0,
+          "-1": 0,
+          "laugh": 0,
+          "hooray": 0,
+          "confused": 0,
+          "heart": 0,
+          "rocket": 0,
+          "eyes": 0
+        },
+        "timeline_url": "https://api.github.com/repos/candyburst/orbit-private-live/issues/1/timeline",
+        "performed_via_github_app": null,
+        "state_reason": null,
+        "pinned_comment": null
+      }
+    },
+    {
+      "step": 2,
+      "tool": "append_task",
+      "input": {
+        "title": "Draft repo safety audit service scope",
+        "priority": "high",
+        "source": "survival_market",
+        "notes": "Top scoring opportunity (score 24.94). First safe move: draft public scope as issue, then wait for owner approval. Do NOT outreach or commit to paid work without approval."
+      },
+      "output": {
+        "id": "task-mpgm9lzz-tckat",
+        "title": "Draft repo safety audit service scope",
+        "priority": "high",
+        "source": "survival_market",
+        "status": "open",
+        "notes": "Top scoring opportunity (score 24.94). First safe move: draft public scope as issue, then wait for owner approval. Do NOT outreach or commit to paid work without approval.",
+        "createdAt": "2026-05-22T07:47:07.295Z",
+        "completedAt": null,
+        "outcome": null
+      }
+    },
+    {
+      "step": 3,
+      "accounting": "ai_usage",
+      "provider": {
+        "name": "opengateway",
+        "label": "Gitlawb OpenGateway MiMo 2.5 Pro",
+        "model": "mimo-v2.5-pro",
+        "priority": 1,
+        "toolResultMode": "user_summary"
+      },
+      "usage": {
+        "completion_tokens": 561,
+        "prompt_tokens": 15678,
+        "total_tokens": 16239,
+        "completion_tokens_details": {
+          "reasoning_tokens": 84
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 13312
+        }
+      },
+      "estimatedUsd": 0.0026883
+    },
+    {
+      "step": 3,
+      "finishReason": "tool_calls",
+      "provider": {
+        "name": "opengateway",
+        "label": "Gitlawb OpenGateway MiMo 2.5 Pro",
+        "model": "mimo-v2.5-pro",
+        "priority": 1,
+        "toolResultMode": "user_summary"
+      },
+      "providerErrors": [],
+      "content": "Good — issue #1 is live and task is recorded. Two remaining household actions to close this cycle cleanly:\n\n1. **Save durable memory** about the opportunity status so future cycles know where this stands\n2. **Write the cycle proof** so a human can audit what happened",
+      "toolCalls": [
+        {
+          "id": "call_708ce91a5b4e469a8cacab5c",
+          "name": "append_memory",
+          "arguments": "{\"title\": \"Survival opportunity: Repo safety audit (scope drafted)\", \"content\": \"Orbit's top survival opportunity is a paid repo safety audit service. Scope was drafted as issue #1 and is waiting for owner approval. No outreach, commitment, or spend will happen until owner approves. Task recorded as task-mpgm9lzz-tckat. Opportunity ID: repo-safety-audit. Score: 24.94 (adjusted). Expected revenue: ~$150. Estimated food: ~$8. Risk: low.\", \"kind\": \"opportunity\", \"tags\": [\"survival\", \"income\", \"approval-pending\", \"repo-safety-audit\"]}"
+        },
+        {
+          "id": "call_fba14e966f094d628ff3c979",
+          "name": "append_memory",
+          "arguments": "{\"title\": \"Orbit cycle 4 summary\", \"content\": \"Cycle 4 (event + state driver: owner manual wake + needs_income). Actions: Checked household state — AI food healthy (~$5/day remaining, ~$100/month), no open issues or tasks. Pursued top survival opportunity: drafted repo safety audit service scope as issue #1 with labels orbit:opportunity and orbit:approval-needed. Recorded task. Saved durable memory. No spend, no signing, no external commitment. Waiting for owner review of issue #1 before next step.\", \"kind\": \"cycle_summary\", \"tags\": [\"cycle\", \"summary\"], \"source\": \"cycle_4\"}"
+        },
+        {
+          "id": "call_b4daca1958e14fbba3029a5c",
+          "name": "complete_task",
+          "arguments": "{\"id\": \"task-mpgm9lzz-tckat\", \"outcome\": \"Drafted public scope as issue #1 (https://github.com/candyburst/orbit-private-live/issues/1). Waiting for owner approval before any outreach or paid commitment.\"}"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "tool": "append_memory",
+      "input": {
+        "title": "Survival opportunity: Repo safety audit (scope drafted)",
+        "content": "Orbit's top survival opportunity is a paid repo safety audit service. Scope was drafted as issue #1 and is waiting for owner approval. No outreach, commitment, or spend will happen until owner approves. Task recorded as task-mpgm9lzz-tckat. Opportunity ID: repo-safety-audit. Score: 24.94 (adjusted). Expected revenue: ~$150. Estimated food: ~$8. Risk: low.",
+        "kind": "opportunity",
+        "tags": [
+          "survival",
+          "income",
+          "approval-pending",
+          "repo-safety-audit"
+        ]
+      },
+      "output": {
+        "id": "mem-mpgma2ta-75ojg",
+        "kind": "opportunity",
+        "title": "Survival opportunity: Repo safety audit (scope drafted)",
+        "content": "Orbit's top survival opportunity is a paid repo safety audit service. Scope was drafted as issue #1 and is waiting for owner approval. No outreach, commitment, or spend will happen until owner approves. Task recorded as task-mpgm9lzz-tckat. Opportunity ID: repo-safety-audit. Score: 24.94 (adjusted). Expected revenue: ~$150. Estimated food: ~$8. Risk: low.",
+        "tags": [
+          "survival",
+          "income",
+          "approval-pending",
+          "repo-safety-audit"
+        ],
+        "source": "orbit",
+        "createdAt": "2026-05-22T07:47:29.086Z",
+        "updatedAt": null
+      }
+    },
+    {
+      "step": 3,
+      "tool": "append_memory",
+      "input": {
+        "title": "Orbit cycle 4 summary",
+        "content": "Cycle 4 (event + state driver: owner manual wake + needs_income). Actions: Checked household state — AI food healthy (~$5/day remaining, ~$100/month), no open issues or tasks. Pursued top survival opportunity: drafted repo safety audit service scope as issue #1 with labels orbit:opportunity and orbit:approval-needed. Recorded task. Saved durable memory. No spend, no signing, no external commitment. Waiting for owner review of issue #1 before next step.",
+        "kind": "cycle_summary",
+        "tags": [
+          "cycle",
+          "summary"
+        ],
+        "source": "cycle_4"
+      },
+      "output": {
+        "id": "mem-mpgma2ta-tis1q",
+        "kind": "cycle_summary",
+        "title": "Orbit cycle 4 summary",
+        "content": "Cycle 4 (event + state driver: owner manual wake + needs_income). Actions: Checked household state — AI food healthy (~$5/day remaining, ~$100/month), no open issues or tasks. Pursued top survival opportunity: drafted repo safety audit service scope as issue #1 with labels orbit:opportunity and orbit:approval-needed. Recorded task. Saved durable memory. No spend, no signing, no external commitment. Waiting for owner review of issue #1 before next step.",
+        "tags": [
+          "cycle",
+          "summary"
+        ],
+        "source": "cycle_4",
+        "createdAt": "2026-05-22T07:47:29.086Z",
+        "updatedAt": null
+      }
+    },
+    {
+      "step": 3,
+      "tool": "complete_task",
+      "input": {
+        "id": "task-mpgm9lzz-tckat",
+        "outcome": "Drafted public scope as issue #1 (https://github.com/candyburst/orbit-private-live/issues/1). Waiting for owner approval before any outreach or paid commitment."
+      },
+      "output": {
+        "id": "task-mpgm9lzz-tckat",
+        "title": "Draft repo safety audit service scope",
+        "priority": "high",
+        "source": "survival_market",
+        "status": "done",
+        "notes": "Top scoring opportunity (score 24.94). First safe move: draft public scope as issue, then wait for owner approval. Do NOT outreach or commit to paid work without approval.",
+        "createdAt": "2026-05-22T07:47:07.295Z",
+        "completedAt": "2026-05-22T07:47:29.087Z",
+        "outcome": "Drafted public scope as issue #1 (https://github.com/candyburst/orbit-private-live/issues/1). Waiting for owner approval before any outreach or paid commitment."
+      }
+    },
+    {
+      "step": 4,
+      "accounting": "ai_usage",
+      "provider": {
+        "name": "opengateway",
+        "label": "Gitlawb OpenGateway MiMo 2.5 Pro",
+        "model": "mimo-v2.5-pro",
+        "priority": 1,
+        "toolResultMode": "user_summary"
+      },
+      "usage": {
+        "completion_tokens": 533,
+        "prompt_tokens": 16754,
+        "total_tokens": 17287,
+        "completion_tokens_details": {
+          "reasoning_tokens": 38
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 15616
+        }
+      },
+      "estimatedUsd": 0.0028329
+    },
+    {
+      "step": 4,
+      "finishReason": "tool_calls",
+      "provider": {
+        "name": "opengateway",
+        "label": "Gitlawb OpenGateway MiMo 2.5 Pro",
+        "model": "mimo-v2.5-pro",
+        "priority": 1,
+        "toolResultMode": "user_summary"
+      },
+      "providerErrors": [],
+      "content": "Good — memory saved, task marked done. Final step: write the cycle proof so this cycle has a complete audit trail.",
+      "toolCalls": [
+        {
+          "id": "call_7bb4eff55a504b56a7c02215",
+          "name": "write_cycle_note",
+          "arguments": "{\"title\": \"Cycle 4 — Drafted repo safety audit scope\", \"body\": \"## Cycle 4 — 2026-05-22T07:47 UTC\\n\\n**Drivers:** state:needs_income (high) + event:owner_manual_wake (normal)\\n\\n**Trigger:** Owner requested a manual wake cycle.\\n\\n### Household State Check\\n- AI food: healthy (~$5/day remaining, ~$100/month remaining)\\n- Open issues: 0 → 1 (created during this cycle)\\n- Open tasks: 0 → 1 → 0 (created and completed this cycle)\\n- Treasury: $0 income recorded, token not launched\\n- Governance: no pending approvals\\n\\n### Actions Taken\\n\\n1. **Checked AI food budget** — plenty of headroom, no refill needed.\\n2. **Checked open issues** — none before this cycle.\\n3. **Pursued top survival opportunity** (repo-safety-audit, score 24.94):\\n   - Created **issue #1**: \\\"Draft scope: Repo safety audit as a paid service\\\"\\n   - Labeled: `orbit:opportunity`, `orbit:approval-needed`\\n   - Scope: 6-point read-only audit covering scam scanning, spend gates, AI budget, proofs, treasury, hard rules\\n   - No outreach, commitment, or spend — waiting for owner approval\\n4. **Recorded task** then marked complete (draft phase done).\\n5. **Saved durable memory** — opportunity status, cycle summary.\\n\\n### What Orbit Did NOT Do\\n- No financial operations or signing\\n- No external outreach or commitment\\n- No secrets requested, written, or revealed\\n- No spend without approval\\n\\n### Next Cycle Should\\n- Check if owner responded to issue #1\\n- If approved: draft a public pitch/README section for the service\\n- If no response: pursue second opportunity (proof ledger setup, score 23.17) or do maintenance work\\n\\n### Files Changed\\n- memory/knowledge.json (2 new entries: opportunity record + cycle summary)\\n- memory/tasks.json (1 task created and completed)\\n- GitHub issue #1 created\"}"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "tool": "write_cycle_note",
+      "input": {
+        "title": "Cycle 4 — Drafted repo safety audit scope",
+        "body": "## Cycle 4 — 2026-05-22T07:47 UTC\n\n**Drivers:** state:needs_income (high) + event:owner_manual_wake (normal)\n\n**Trigger:** Owner requested a manual wake cycle.\n\n### Household State Check\n- AI food: healthy (~$5/day remaining, ~$100/month remaining)\n- Open issues: 0 → 1 (created during this cycle)\n- Open tasks: 0 → 1 → 0 (created and completed this cycle)\n- Treasury: $0 income recorded, token not launched\n- Governance: no pending approvals\n\n### Actions Taken\n\n1. **Checked AI food budget** — plenty of headroom, no refill needed.\n2. **Checked open issues** — none before this cycle.\n3. **Pursued top survival opportunity** (repo-safety-audit, score 24.94):\n   - Created **issue #1**: \"Draft scope: Repo safety audit as a paid service\"\n   - Labeled: `orbit:opportunity`, `orbit:approval-needed`\n   - Scope: 6-point read-only audit covering scam scanning, spend gates, AI budget, proofs, treasury, hard rules\n   - No outreach, commitment, or spend — waiting for owner approval\n4. **Recorded task** then marked complete (draft phase done).\n5. **Saved durable memory** — opportunity status, cycle summary.\n\n### What Orbit Did NOT Do\n- No financial operations or signing\n- No external outreach or commitment\n- No secrets requested, written, or revealed\n- No spend without approval\n\n### Next Cycle Should\n- Check if owner responded to issue #1\n- If approved: draft a public pitch/README section for the service\n- If no response: pursue second opportunity (proof ledger setup, score 23.17) or do maintenance work\n\n### Files Changed\n- memory/knowledge.json (2 new entries: opportunity record + cycle summary)\n- memory/tasks.json (1 task created and completed)\n- GitHub issue #1 created"
+      },
+      "output": {
+        "path": "memory/cycles/0004-cycle-4-drafted-repo-safety-audit-scope.md",
+        "bytes": 1770
+      }
+    },
+    {
+      "step": 5,
+      "accounting": "ai_usage",
+      "provider": {
+        "name": "opengateway",
+        "label": "Gitlawb OpenGateway MiMo 2.5 Pro",
+        "model": "mimo-v2.5-pro",
+        "priority": 1,
+        "toolResultMode": "user_summary"
+      },
+      "usage": {
+        "completion_tokens": 354,
+        "prompt_tokens": 17366,
+        "total_tokens": 17720,
+        "completion_tokens_details": {
+          "reasoning_tokens": 111
+        },
+        "prompt_tokens_details": {
+          "cached_tokens": 16704
+        }
+      },
+      "estimatedUsd": 0.0028173
+    },
+    {
+      "step": 5,
+      "finishReason": "stop",
+      "provider": {
+        "name": "opengateway",
+        "label": "Gitlawb OpenGateway MiMo 2.5 Pro",
+        "model": "mimo-v2.5-pro",
+        "priority": 1,
+        "toolResultMode": "user_summary"
+      },
+      "providerErrors": [],
+      "content": "## Cycle 4 Complete ✓\n\n**Driver:** `state:needs_income` (high) + `event:owner_manual_wake` (normal)\n\n**What happened this cycle:**\n- Household health checked: AI food healthy, no open issues/tasks before cycle\n- Pursued top survival opportunity — drafted **repo safety audit** service scope\n- Created **[issue #1](https://github.com/candyburst/orbit-private-live/issues/1)** with full 6-point audit scope, labeled `orbit:opportunity` and `orbit:approval-needed`\n- Recorded task, marked complete (draft phase done)\n- Saved durable memory and wrote cycle proof\n\n**What was NOT done:** No spend, no signing, no outreach, no secrets. Everything is waiting for owner review.\n\n**Next cycle should:** Check if the owner responded to issue #1. If approved → draft a public pitch/README. If no response → pursue second opportunity (proof ledger setup) or do household maintenance.\n\n---\n\n*Orbit's house is quiet. The front door (issue #1) is open and waiting. The diary is written. Time to sleep until the next wake.* 🌙",
+      "toolCalls": []
+    }
+  ],
+  "filesChanged": [
+    "memory/cycles/0004-cycle-4-drafted-repo-safety-audit-scope.md",
+    "memory/knowledge.json",
+    "memory/state.json",
+    "memory/tasks.json",
+    "memory/treasury.json"
+  ],
+  "result": "## Cycle 4 Complete ✓\n\n**Driver:** `state:needs_income` (high) + `event:owner_manual_wake` (normal)\n\n**What happened this cycle:**\n- Household health checked: AI food healthy, no open issues/tasks before cycle\n- Pursued top survival opportunity — drafted **repo safety audit** service scope\n- Created **[issue #1](https://github.com/candyburst/orbit-private-live/issues/1)** with full 6-point audit scope, labeled `orbit:opportunity` and `orbit:approval-needed`\n- Recorded task, marked complete (draft phase done)\n- Saved durable memory and wrote cycle proof\n\n**What was NOT done:** No spend, no signing, no outreach, no secrets. Everything is waiting for owner review.\n\n**Next cycle should:** Check if the owner responded to issue #1. If approved → draft a public pitch/README. If no response → pursue second opportunity (proof ledger setup) or do household maintenance.\n\n---\n\n*Orbit's house is quiet. The front door (issue #1) is open and waiting. The diary is written. Time to sleep until the next wake.* 🌙",
+  "finishedAt": "2026-05-22T07:48:08.370Z",
+  "totalSteps": 19
+}
