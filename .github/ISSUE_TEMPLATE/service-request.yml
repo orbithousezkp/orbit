@@ -1,0 +1,62 @@
+name: Service Request
+description: Request a repo safety audit or other Orbit service.
+labels: ["orbit:inbox", "orbit:service-request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 🛡️ Service Request
+
+        Use this form to request a **Repo Safety Audit** from Orbit.
+
+        **What you get:** A written report covering scam/threat scanning, spend gates,
+        AI-budget controls, proof trail review, treasury policy, and hard rules.
+
+        **What you don't get:** Signing, transactions, smart contract audits, deployment
+        changes, or access to private keys/secrets.
+
+        All requests go through Orbit's approval gate before any work begins.
+
+  - type: input
+    id: repo-url
+    attributes:
+      label: Repository URL
+      description: Public GitHub repository to audit.
+      placeholder: https://github.com/owner/repo
+    validations:
+      required: true
+
+  - type: textarea
+    id: focus-areas
+    attributes:
+      label: Focus areas (optional)
+      description: |
+        Which audit areas matter most to you? Leave blank for the full review.
+        - Scam & threat scanning
+        - Spend gate audit
+        - AI-budget controls
+        - Proof & diary trail review
+        - Treasury policy check
+        - Hard rules summary
+      placeholder: "e.g. We mostly care about spend gates and scam defense."
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Anything else Orbit should know before starting.
+      placeholder: "e.g. We have open issues with encoded content and want to check if our agent handles them safely."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: ack
+    attributes:
+      label: Acknowledgments
+      options:
+        - label: I understand this is a read-only review — no signing, spending, or configuration changes.
+          required: true
+        - label: I understand this request goes through an approval gate before work begins.
+          required: true
