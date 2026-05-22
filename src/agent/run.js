@@ -15,6 +15,7 @@ const { TOOLS } = require("./tools");
 const { executeTool, filesChanged, writeFile } = require("./actions");
 const { appendSafeTextFile, assertNoSymlinkPath, readSafeTextFile, redactSecrets } = require("./safety");
 const { TREASURY_PATH, recordAiUsage } = require("./treasury");
+const { privateAiRouteId, privateAiRoutes, privateProviderErrors } = require("./provider-privacy");
 
 function log(message) {
   console.log(`[orbit] ${message}`);
@@ -120,6 +121,9 @@ async function main() {
   if (context.opportunities && context.opportunities.changed && context.opportunities.path) {
     filesChanged.add(context.opportunities.path);
   }
+  if (context.learningLab && context.learningLab.changedPaths) {
+    for (const path of context.learningLab.changedPaths) filesChanged.add(path);
+  }
   context.cycle = state.cycle;
   if (firstWakeIntro) {
     context.firstWakeIntro = firstWakeIntro;
@@ -129,16 +133,11 @@ async function main() {
     brand: config.brandName,
     cycle: state.cycle,
     startedAt: state.lastActive,
-    model: config.aiModel,
-    aiProviders: config.aiProviders.map((provider) => ({
-      name: provider.name,
-      label: provider.label,
-      model: provider.model,
-      apiBase: provider.apiBase,
-      chatPath: provider.chatPath,
-      toolResultMode: provider.toolResultMode,
-      priority: provider.priority
-    })),
+    aiRoute: {
+      configured: config.aiProviders.length > 0,
+      count: config.aiProviders.length,
+      routes: privateAiRoutes(config.aiProviders)
+    },
     dryRun: config.dryRun,
     trigger: cycleTrigger,
     firstWakeIntro,
@@ -156,13 +155,13 @@ async function main() {
     log(`step ${step}/${config.maxSteps}`);
     const result = await infer(config, messages, TOOLS);
     if (!result.fallback && result.usage) {
-      const providerModel = result.provider && result.provider.model ? result.provider.model : config.aiModel;
-      const usage = recordAiUsage(config, config.repoRoot, result.usage, providerModel, `cycle ${state.cycle} step ${step}`);
+      const aiRoute = result.provider && result.provider.route ? result.provider.route : privateAiRouteId({}, 0);
+      const usage = recordAiUsage(config, config.repoRoot, result.usage, aiRoute, `cycle ${state.cycle} step ${step}`);
       filesChanged.add(TREASURY_PATH);
       proof.steps.push({
         step,
         accounting: "ai_usage",
-        provider: result.provider || null,
+        aiRoute,
         usage: result.usage,
         estimatedUsd: usage.estimatedUsd
       });
@@ -173,7 +172,7 @@ async function main() {
         step,
         fallback: true,
         content: redactSecrets(result.content),
-        providerErrors: result.providerErrors || [],
+        providerErrors: privateProviderErrors(result.providerErrors || []),
         actions: sanitizeProofOutput(result.actions)
       });
 
@@ -193,8 +192,8 @@ async function main() {
     proof.steps.push({
       step,
       finishReason: result.finishReason,
-      provider: result.provider || null,
-      providerErrors: result.providerErrors || [],
+      aiRoute: result.provider || null,
+      providerErrors: privateProviderErrors(result.providerErrors || []),
       content: redactSecrets(result.content || ""),
       toolCalls: result.toolCalls.map((call) => ({
         id: call.id,
@@ -272,7 +271,7 @@ async function main() {
   appendLine(config.repoRoot, "memory/cycles.jsonl", {
     cycle: state.cycle,
     timestamp: finishedAt,
-    model: config.aiModel,
+    aiRoute: config.aiProviders.length ? "private" : "deterministic",
     dryRun: config.dryRun,
     filesChanged: proof.filesChanged,
     result: redactSecrets(String(proof.result || "")).slice(0, 240)

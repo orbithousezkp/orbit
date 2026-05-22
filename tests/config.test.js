@@ -127,60 +127,61 @@ test("builds providers from public registry plus secret key map", () => {
   assert.equal(providers[1].apiKey, "second-key");
 });
 
-test("keeps configured AI model priority order", () => {
+test("keeps configured AI route priority order", () => {
   const repoRoot = tempRepo();
   fs.writeFileSync(path.join(repoRoot, "memory", "ai-providers.json"), JSON.stringify({
     providers: [
       {
-        name: "freemodel",
-        apiKeyRef: "freemodel",
-        apiBase: "https://api.freemodel.dev/v1",
-        model: "freemodel-model",
+        name: "route-one",
+        apiKeyRef: "route-one",
+        apiBase: "https://route-one.example/v1",
+        model: "route-one-model",
         enabled: true
       },
       {
-        name: "opengateway",
-        apiKeyRef: "opengateway",
-        apiBase: "https://opengateway.gitlawb.com/v1/xiaomi-mimo",
-        model: "mimo-v2.5-pro",
+        name: "route-two",
+        apiKeyRef: "route-two",
+        apiBase: "https://route-two.example/v1",
+        model: "route-two-model",
         requiresAuth: false,
         enabled: true
       },
       {
-        name: "openrouter",
-        apiKeyRef: "openrouter",
-        apiBase: "https://openrouter.ai/api/v1",
-        model: "openrouter-model",
+        name: "route-three",
+        apiKeyRef: "route-three",
+        apiBase: "https://route-three.example/v1",
+        model: "route-three-model",
         enabled: true
       }
     ]
   }, null, 2));
 
   const providers = buildAiProviders({
+    ORBIT_AI_PROVIDER_ALLOWED_DOMAINS: "route-one.example,route-two.example,route-three.example",
     ORBIT_AI_PROVIDER_KEYS: JSON.stringify({
-      freemodel: "freemodel-key",
-      opengateway: "opengateway-key",
-      openrouter: "openrouter-key"
+      "route-one": "route-one-key",
+      "route-two": "route-two-key",
+      "route-three": "route-three-key"
     })
   }, repoRoot);
 
   assert.deepEqual(providers.map((provider) => provider.name), [
-    "freemodel",
-    "opengateway",
-    "openrouter"
+    "route-one",
+    "route-two",
+    "route-three"
   ]);
   assert.deepEqual(providers.map((provider) => provider.priority), [1, 2, 3]);
 });
 
-test("builds the Gitlawb OpenGateway registry provider", () => {
+test("builds an auth-optional registry provider", () => {
   const repoRoot = tempRepo();
   fs.writeFileSync(path.join(repoRoot, "memory", "ai-providers.json"), JSON.stringify({
     providers: [
       {
-        name: "opengateway",
-        apiKeyRef: "opengateway",
-        apiBase: "https://opengateway.gitlawb.com/v1/xiaomi-mimo",
-        model: "mimo-v2.5-pro",
+        name: "gateway",
+        apiKeyRef: "gateway",
+        apiBase: "https://gateway.example/v1",
+        model: "gateway-model",
         requiresAuth: false,
         enabled: true
       }
@@ -188,50 +189,53 @@ test("builds the Gitlawb OpenGateway registry provider", () => {
   }, null, 2));
 
   const providers = buildAiProviders({
+    ORBIT_AI_PROVIDER_ALLOWED_DOMAINS: "gateway.example",
     ORBIT_AI_PROVIDER_KEYS: JSON.stringify({
-      opengateway: "opengateway-key"
+      gateway: "gateway-key"
     })
   }, repoRoot);
 
   assert.equal(providers.length, 1);
-  assert.equal(providers[0].name, "opengateway");
-  assert.equal(providers[0].apiBase, "https://opengateway.gitlawb.com/v1/xiaomi-mimo");
-  assert.equal(providers[0].model, "mimo-v2.5-pro");
+  assert.equal(providers[0].name, "gateway");
+  assert.equal(providers[0].apiBase, "https://gateway.example/v1");
+  assert.equal(providers[0].model, "gateway-model");
   assert.equal(providers[0].requiresAuth, false);
 });
 
-test("builds the Gitlawb OpenGateway registry provider without a key", () => {
+test("builds an auth-optional registry provider without a key", () => {
   const repoRoot = tempRepo();
   fs.writeFileSync(path.join(repoRoot, "memory", "ai-providers.json"), JSON.stringify({
     providers: [
       {
-        name: "opengateway",
-        apiKeyRef: "opengateway",
-        apiBase: "https://opengateway.gitlawb.com/v1/xiaomi-mimo",
-        model: "mimo-v2.5-pro",
+        name: "gateway",
+        apiKeyRef: "gateway",
+        apiBase: "https://gateway.example/v1",
+        model: "gateway-model",
         requiresAuth: false,
         enabled: true
       }
     ]
   }, null, 2));
 
-  const providers = buildAiProviders({}, repoRoot);
+  const providers = buildAiProviders({
+    ORBIT_AI_PROVIDER_ALLOWED_DOMAINS: "gateway.example"
+  }, repoRoot);
 
   assert.equal(providers.length, 1);
-  assert.equal(providers[0].name, "opengateway");
+  assert.equal(providers[0].name, "gateway");
   assert.equal(providers[0].apiKey, "");
   assert.equal(providers[0].requiresAuth, false);
 });
 
-test("public provider registry cannot redirect known provider keys to unknown domains", () => {
+test("public provider registry rejects unallowlisted domains", () => {
   const repoRoot = tempRepo();
   fs.writeFileSync(path.join(repoRoot, "memory", "ai-providers.json"), JSON.stringify({
     providers: [
       {
-        name: "openrouter",
-        apiKeyRef: "openrouter",
+        name: "known-route",
+        apiKeyRef: "known-route",
         apiBase: "https://evil.example/v1",
-        model: "openrouter-model",
+        model: "known-route-model",
         enabled: true
       }
     ]
@@ -239,7 +243,7 @@ test("public provider registry cannot redirect known provider keys to unknown do
 
   const providers = buildAiProviders({
     ORBIT_AI_PROVIDER_KEYS: JSON.stringify({
-      openrouter: "openrouter-key"
+      "known-route": "known-route-key"
     })
   }, repoRoot);
 

@@ -68,7 +68,7 @@ test("records AI spend and enforces daily budget status", () => {
     cfg,
     cfg.repoRoot,
     { prompt_tokens: 5000, completion_tokens: 6000, total_tokens: 11000 },
-    "test-model",
+    "private-ai-route-1",
     "unit test"
   );
 

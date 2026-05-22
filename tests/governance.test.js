@@ -117,10 +117,10 @@ test("repeated spend approval requests reuse one approval despite timestamp drif
   const orbitConfig = cfg(repoRoot);
   const request = {
     category: "external_spend",
-    purpose: "buy OpenRouter credits",
+    purpose: "buy AI-call food credits",
     asset: "USD credits",
     amount: 10,
-    recipient: "openrouter"
+    recipient: "configured-ai-credit-provider"
   };
 
   const first = await requestOwnerApproval(orbitConfig, null, request);
@@ -137,7 +137,7 @@ test("approval issue creation rejects private config leakage", async () => {
       purpose: "operatorRevenueAddress: 0x3333333333333333333333333333333333333333",
       asset: "USDC",
       amount: 1,
-      recipient: "openrouter"
+      recipient: "configured-ai-credit-provider"
     }),
     /private configuration/
   );
@@ -351,7 +351,7 @@ test("governance approval path still creates spend approval issue", async () => 
     purpose: "buy AI-call food credits",
     asset: "USD credits",
     amount: 25,
-    recipient: "openrouter"
+    recipient: "configured-ai-credit-provider"
   });
 
   assert.equal(result.status, "blocked_pending_owner_approval");

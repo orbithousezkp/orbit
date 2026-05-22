@@ -78,7 +78,7 @@ test("inference falls through to the next configured provider", async () => {
     ], []);
 
     assert.equal(result.fallback, false);
-    assert.equal(result.provider.name, "second");
+    assert.equal(result.provider.route, "private-ai-route-2");
     assert.equal(result.providerErrors.length, 1);
     assert.equal(calls[0], "https://first.example/v1/chat/completions");
     assert.equal(calls[1], "https://second.example/v1/chat/completions");
@@ -116,7 +116,7 @@ test("inference redacts provider failure messages before fallback proof", async 
     ], []);
 
     assert.equal(result.fallback, true);
-    assert.match(result.providerErrors[0].error, /\[REDACTED_SECRET\]/);
+    assert.equal(result.providerErrors[0].error, "AI route failed");
     assert.doesNotMatch(result.providerErrors[0].error, /abcdefghijklmnopqrstuvwxyz123456/);
   } finally {
     global.fetch = originalFetch;
@@ -208,12 +208,12 @@ test("auth-optional providers omit authorization when no key is configured", asy
     const result = await infer(config({
       aiProviders: [
         {
-          name: "opengateway",
-          label: "Gitlawb OpenGateway MiMo 2.5 Pro",
+          name: "gateway",
+          label: "Gateway",
           apiKey: "",
           requiresAuth: false,
-          apiBase: "https://opengateway.gitlawb.com/v1/xiaomi-mimo",
-          model: "mimo-v2.5-pro",
+          apiBase: "https://gateway.example/v1",
+          model: "gateway-model",
           chatPath: "/chat/completions",
           authHeader: "api-key",
           authScheme: "raw",
@@ -262,12 +262,12 @@ test("provider-specific auth headers use configured scheme and cannot be overrid
     const result = await infer(config({
       aiProviders: [
         {
-          name: "opengateway",
-          label: "Gitlawb OpenGateway MiMo 2.5 Pro",
+          name: "gateway",
+          label: "Gateway",
           apiKey: "real-key",
           requiresAuth: false,
-          apiBase: "https://opengateway.gitlawb.com/v1/xiaomi-mimo",
-          model: "mimo-v2.5-pro",
+          apiBase: "https://gateway.example/v1",
+          model: "gateway-model",
           chatPath: "/chat/completions",
           authHeader: "api-key",
           authScheme: "raw",
@@ -318,12 +318,12 @@ test("provider headers can request identity encoding for gateways with bad gzip 
     const result = await infer(config({
       aiProviders: [
         {
-          name: "opengateway",
-          label: "Gitlawb OpenGateway MiMo 2.5 Pro",
+          name: "gateway",
+          label: "Gateway",
           apiKey: "",
           requiresAuth: false,
-          apiBase: "https://opengateway.gitlawb.com/v1/xiaomi-mimo",
-          model: "mimo-v2.5-pro",
+          apiBase: "https://gateway.example/v1",
+          model: "gateway-model",
           chatPath: "/chat/completions",
           authHeader: "api-key",
           authScheme: "raw",

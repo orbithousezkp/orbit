@@ -3,8 +3,8 @@ import { Wallet } from 'lucide-react';
 const rows = [
   ['Daily cap', '$5.00', 'AI-call spend limit'],
   ['Monthly cap', '$100.00', 'Household food budget'],
-  ['Model order', 'FM -> OG -> OR', 'FreeModel, OpenGateway, OpenRouter'],
-  ['AI buys', 'OpenRouter', 'Credit top-ups only'],
+  ['AI routes', 'Private', 'Configured route order'],
+  ['AI buys', 'Gated', 'Owner-approved credits'],
   ['Live launch', 'Off', 'Signing stays gated'],
 ];
 

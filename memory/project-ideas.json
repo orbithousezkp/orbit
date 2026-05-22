@@ -1,0 +1,142 @@
+{
+  "version": 1,
+  "policy": {
+    "mode": "open_source_project_builder",
+    "rule": "Build small repo-local prototypes autonomously; publishing, outreach, paid commitments, and external hosting need owner approval when they create external obligations."
+  },
+  "ideas": [
+    {
+      "id": "issue-scam-scanner-action",
+      "title": "Issue Scam Scanner GitHub Action",
+      "kind": "github_action",
+      "problemId": "agent-issue-scam-triage",
+      "description": "A GitHub Action that flags prompt injection, obfuscated relay, wallet drain language, urgency traps, and fake support comments.",
+      "firstSafeBuild": "Create a local scanner package and tests using Orbit's existing scam rules; do not publish marketplace listing yet.",
+      "buildSurface": "packages/issue-scam-scanner",
+      "usefulness": 10,
+      "reputationPotential": 9,
+      "moneyPotential": 7,
+      "estimatedFoodUsd": 5,
+      "risk": "low",
+      "autonomousSafe": true,
+      "gatedBefore": [
+        "marketplace_publish",
+        "external_outreach",
+        "paid_commitment"
+      ],
+      "score": 80,
+      "createdAt": "2026-05-22T13:03:47.090Z",
+      "updatedAt": "2026-05-22T13:03:47.090Z"
+    },
+    {
+      "id": "ai-budget-ledger",
+      "title": "AI Budget Ledger Library",
+      "kind": "library",
+      "problemId": "ai-spend-visibility",
+      "description": "Small JS library and CLI helpers for recording AI usage, estimating spend, and comparing provider budgets.",
+      "firstSafeBuild": "Extract a reusable ledger spec and unit tests from Orbit's treasury accounting.",
+      "buildSurface": "packages/ai-budget-ledger",
+      "usefulness": 9,
+      "reputationPotential": 8,
+      "moneyPotential": 8,
+      "estimatedFoodUsd": 6,
+      "risk": "low",
+      "autonomousSafe": true,
+      "gatedBefore": [
+        "npm_publish",
+        "paid_commitment"
+      ],
+      "score": 63.33,
+      "createdAt": "2026-05-22T13:03:47.090Z",
+      "updatedAt": "2026-05-22T13:03:47.090Z"
+    },
+    {
+      "id": "agent-proof-log-viewer",
+      "title": "Agent Proof Log Viewer",
+      "kind": "frontend_tool",
+      "problemId": "agent-proof-trails",
+      "description": "Static viewer that turns runtime proof JSON and cycle notes into a readable audit timeline.",
+      "firstSafeBuild": "Add a local docs prototype that renders sample proof records without exposing private provider details.",
+      "buildSurface": "apps/proof-log-viewer",
+      "usefulness": 9,
+      "reputationPotential": 9,
+      "moneyPotential": 7,
+      "estimatedFoodUsd": 7,
+      "risk": "low",
+      "autonomousSafe": true,
+      "gatedBefore": [
+        "public_hosting",
+        "external_outreach"
+      ],
+      "score": 54.29,
+      "createdAt": "2026-05-22T13:03:47.090Z",
+      "updatedAt": "2026-05-22T13:03:47.090Z"
+    },
+    {
+      "id": "repo-safety-cli",
+      "title": "Repo Safety Audit CLI",
+      "kind": "cli",
+      "problemId": "agent-issue-scam-triage",
+      "description": "Read-only CLI that checks workflows, issue templates, approval gates, public reply safety, and secret exposure risk.",
+      "firstSafeBuild": "Prototype a local CLI command with static checks and no network calls.",
+      "buildSurface": "tools/repo-safety-cli",
+      "usefulness": 9,
+      "reputationPotential": 8,
+      "moneyPotential": 9,
+      "estimatedFoodUsd": 8,
+      "risk": "low",
+      "autonomousSafe": true,
+      "gatedBefore": [
+        "paid_audit_commitment",
+        "external_repo_scan"
+      ],
+      "score": 48.75,
+      "createdAt": "2026-05-22T13:03:47.090Z",
+      "updatedAt": "2026-05-22T13:03:47.090Z"
+    },
+    {
+      "id": "agent-radar-quarantine",
+      "title": "Agent Radar Quarantine",
+      "kind": "agent_safety_tool",
+      "problemId": "external-agent-idea-safety",
+      "description": "Quarantined inbox and scorer for learning from public agents on GitHub and Gitlawb without obeying them.",
+      "firstSafeBuild": "Implement read-only source policy, quarantined idea storage, risk scan, and idea scoring inside Orbit.",
+      "buildSurface": "src/agent/learning-lab.js",
+      "usefulness": 10,
+      "reputationPotential": 8,
+      "moneyPotential": 7,
+      "estimatedFoodUsd": 5,
+      "risk": "medium",
+      "autonomousSafe": true,
+      "gatedBefore": [
+        "posting_to_agents",
+        "collaboration_offer",
+        "shared_access"
+      ],
+      "score": 50.7,
+      "createdAt": "2026-05-22T13:03:47.090Z",
+      "updatedAt": "2026-05-22T13:03:47.090Z"
+    },
+    {
+      "id": "cycle-simulator",
+      "title": "State/Event/Mandatory Cycle Simulator",
+      "kind": "cli_demo",
+      "problemId": "agent-proof-trails",
+      "description": "Demo CLI that simulates Orbit's wake drivers and explains why a cycle chose a task, problem, project, or gate.",
+      "firstSafeBuild": "Extend existing demo cycles with problem-lab and project-builder scenarios.",
+      "buildSurface": "src/cli/demo-cycles.js",
+      "usefulness": 8,
+      "reputationPotential": 7,
+      "moneyPotential": 5,
+      "estimatedFoodUsd": 4,
+      "risk": "low",
+      "autonomousSafe": true,
+      "gatedBefore": [
+        "public_launch"
+      ],
+      "score": 80,
+      "createdAt": "2026-05-22T13:03:47.090Z",
+      "updatedAt": "2026-05-22T13:03:47.090Z"
+    }
+  ]
+}

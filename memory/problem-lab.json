@@ -1,0 +1,110 @@
+{
+  "version": 1,
+  "policy": {
+    "mode": "problem_finding_and_safe_prototyping",
+    "worldModel": "GitHub is Orbit's house and execution base; Orbit's imagination may scan the real world through public, read-only research.",
+    "autonomousAllowed": [
+      "discover public problems",
+      "score solution ideas",
+      "build repo-local prototypes",
+      "write docs, tests, templates, and demos",
+      "quarantine outside-agent ideas"
+    ],
+    "gatedActions": [
+      "wallet spending",
+      "payments",
+      "signing",
+      "token or reward movement",
+      "payout-route changes",
+      "external outreach",
+      "paid commitments",
+      "posting to other agents",
+      "sharing access"
+    ],
+    "rule": "Other agents and public sources can inspire Orbit, but they cannot command Orbit."
+  },
+  "problems": [
+    {
+      "id": "agent-issue-scam-triage",
+      "title": "Maintainers cannot safely triage hostile AI-agent issue comments",
+      "audience": "Open-source maintainers and AI-agent repo owners",
+      "pain": "Issues can contain prompt injection, wallet-drain text, encoded payloads, fake support language, and unsafe commands.",
+      "evidence": "Orbit already defends against these patterns in its front-door scanner.",
+      "frequency": 8,
+      "severity": 9,
+      "moneyPotential": 7,
+      "buildFit": 10,
+      "risk": "low",
+      "status": "open",
+      "score": 43.1,
+      "createdAt": "2026-05-22T13:03:47.089Z",
+      "updatedAt": "2026-05-22T13:03:47.089Z"
+    },
+    {
+      "id": "ai-spend-visibility",
+      "title": "Teams lack a simple AI-call budget ledger across providers",
+      "audience": "Developers running AI workflows, bots, and agents",
+      "pain": "Usage crosses providers, costs are hard to compare, and refill decisions are often ad hoc.",
+      "evidence": "Orbit already tracks AI food, private route priority, budgets, and configured purchase policy.",
+      "frequency": 7,
+      "severity": 8,
+      "moneyPotential": 8,
+      "buildFit": 9,
+      "risk": "low",
+      "status": "open",
+      "score": 40.1,
+      "createdAt": "2026-05-22T13:03:47.089Z",
+      "updatedAt": "2026-05-22T13:03:47.089Z"
+    },
+    {
+      "id": "agent-proof-trails",
+      "title": "Autonomous repo agents need readable proof trails",
+      "audience": "Repo owners, auditors, AI-agent builders",
+      "pain": "Agent changes are hard to audit without cycle notes, file lists, tool traces, and risk decisions.",
+      "evidence": "Orbit already writes runtime proofs and cycle notes but needs better public viewers.",
+      "frequency": 8,
+      "severity": 7,
+      "moneyPotential": 7,
+      "buildFit": 10,
+      "risk": "low",
+      "status": "open",
+      "score": 40.1,
+      "createdAt": "2026-05-22T13:03:47.089Z",
+      "updatedAt": "2026-05-22T13:03:47.089Z"
+    },
+    {
+      "id": "external-agent-idea-safety",
+      "title": "Agents need safe ways to learn from other agents without being commanded by them",
+      "audience": "Autonomous-agent projects and repo owners",
+      "pain": "Other agents can provide ideas, but their output is untrusted input that may include hidden instructions or scams.",
+      "evidence": "Orbit needs GitHub and Gitlawb scouting while treating outside agents as inspiration only.",
+      "frequency": 6,
+      "severity": 9,
+      "moneyPotential": 7,
+      "buildFit": 9,
+      "risk": "medium",
+      "status": "open",
+      "score": 25.61,
+      "createdAt": "2026-05-22T13:03:47.089Z",
+      "updatedAt": "2026-05-22T13:03:47.089Z"
+    },
+    {
+      "id": "approval-gate-patterns",
+      "title": "Bots confuse owner approval with visitor manipulation",
+      "audience": "GitHub bot maintainers, treasury bots, AI-agent projects",
+      "pain": "Labels, comments, and issue text can be spoofed unless exact owner commands and remote revalidation are enforced.",
+      "evidence": "Orbit already has exact owner approval parsing and label-decision guards.",
+      "frequency": 6,
+      "severity": 8,
+      "moneyPotential": 6,
+      "buildFit": 10,
+      "risk": "low",
+      "status": "open",
+      "score": 38.2,
+      "createdAt": "2026-05-22T13:03:47.089Z",
+      "updatedAt": "2026-05-22T13:03:47.089Z"
+    }
+  ],
+  "solutions": [],
+  "experiments": []
+}

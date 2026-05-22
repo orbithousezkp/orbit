@@ -1,63 +1,68 @@
 "use strict";
 
-const OPENROUTER_CREDITS_URL = "https://openrouter.ai/settings/credits";
-const OPENROUTER_PROVIDER_NAME = "openrouter";
-
 function normalizeProviderName(value) {
   return String(value || "").trim().toLowerCase();
 }
 
-function openRouterProvider(config = {}) {
+function publicPurchaseProviderName() {
+  return "configured-ai-credit-provider";
+}
+
+function configuredPurchaseProviderName(config = {}) {
+  return normalizeProviderName(config.aiFoodPurchaseProvider) || publicPurchaseProviderName();
+}
+
+function configuredInferenceProvider(config = {}) {
+  const purchaseProvider = configuredPurchaseProviderName(config);
   const providers = Array.isArray(config.aiProviders) ? config.aiProviders : [];
-  return providers.find((provider) => normalizeProviderName(provider.name) === OPENROUTER_PROVIDER_NAME) || null;
+  return providers.find((provider) => normalizeProviderName(provider.name) === purchaseProvider) || null;
 }
 
 function providerPriority(config = {}) {
   const providers = Array.isArray(config.aiProviders) ? config.aiProviders : [];
-  return providers.map((provider) => ({
-    name: provider.name,
-    label: provider.label || provider.name,
-    model: provider.model,
-    priority: provider.priority
+  return providers.map((provider, index) => ({
+    route: `private-ai-route-${Number(provider.priority) || index + 1}`,
+    priority: Number(provider.priority) || index + 1
   }));
 }
 
-function openRouterUrl(value) {
+function configuredCreditUrl(config = {}, value) {
+  const fallback = config.aiFoodPurchaseUrl || "";
+  const raw = value || fallback;
+  if (!raw) return "";
   try {
-    const parsed = new URL(value);
-    const host = parsed.hostname.toLowerCase();
-    return host === "openrouter.ai" || host.endsWith(".openrouter.ai")
-      ? parsed.toString()
-      : OPENROUTER_CREDITS_URL;
+    const parsed = new URL(raw);
+    return parsed.protocol === "https:" ? parsed.toString() : "";
   } catch {
-    return OPENROUTER_CREDITS_URL;
+    return "";
   }
 }
 
 function aiFoodPolicy(config = {}, treasury = {}) {
   const policy = treasury.ai && treasury.ai.purchasePolicy ? treasury.ai.purchasePolicy : {};
-  const purchaseProvider = OPENROUTER_PROVIDER_NAME;
-  const creditsUrl = openRouterUrl(policy.creditsUrl || OPENROUTER_CREDITS_URL);
-  const routeMode = policy.mode || "owner_approved_manual_openrouter";
+  const purchaseUrlConfigured = Boolean(config.aiFoodPurchaseUrl || policy.creditsUrl);
 
   return {
     inferencePriority: providerPriority(config),
-    purchaseProvider,
-    purchaseProviderLabel: "OpenRouter",
-    creditsUrl,
-    routeMode,
-    purchaseOnlyOnOpenRouter: true,
+    purchaseProvider: publicPurchaseProviderName(),
+    purchaseProviderLabel: "configured AI-credit provider",
+    creditsUrl: "",
+    purchaseUrlConfigured,
+    routeMode: "owner_approved_manual_credit_top_up",
+    purchaseOnlyOnConfiguredProvider: true,
     liveApiPurchase: false,
-    reason: "FreeModel and OpenGateway can be inference providers, but Orbit only requests AI-credit purchases for OpenRouter."
+    reason: "Inference routes are separate from AI-credit purchases; Orbit only requests credit purchases through the configured owner-approved vendor."
   };
 }
 
-function assertOpenRouterPurchase(providerName) {
-  const requested = normalizeProviderName(providerName || OPENROUTER_PROVIDER_NAME);
-  if (requested !== OPENROUTER_PROVIDER_NAME) {
-    throw new Error("AI credit purchases are restricted to OpenRouter.");
+function assertConfiguredAiFoodPurchase(config = {}, providerName) {
+  const publicProvider = publicPurchaseProviderName();
+  const configuredProvider = configuredPurchaseProviderName(config);
+  const requested = normalizeProviderName(providerName || configuredProvider);
+  if (requested !== configuredProvider && requested !== publicProvider) {
+    throw new Error("AI credit purchases are restricted to the configured owner-approved credit provider.");
   }
-  return requested;
+  return publicProvider;
 }
 
 function normalizeUsdAmount(amountUsd) {
@@ -69,34 +74,35 @@ function normalizeUsdAmount(amountUsd) {
 }
 
 function buildAiFoodRefillRequest(config, treasury, input = {}) {
-  const provider = assertOpenRouterPurchase(input.provider || OPENROUTER_PROVIDER_NAME);
+  const provider = assertConfiguredAiFoodPurchase(config, input.provider);
   const amountUsd = normalizeUsdAmount(input.amountUsd);
   const policy = aiFoodPolicy(config, treasury);
-  const configuredProvider = openRouterProvider(config);
+  const configuredProvider = configuredInferenceProvider(config);
 
   return {
     category: "ai_food_refill",
-    purpose: `Buy $${amountUsd.toFixed(2)} of Orbit AI-call food credits on OpenRouter`,
+    purpose: `Buy $${amountUsd.toFixed(2)} of Orbit AI-call food credits through the configured provider`,
     asset: "USD credits",
     amount: amountUsd,
-    recipient: "openrouter",
-    url: policy.creditsUrl,
+    recipient: provider,
+    url: "",
     notes: [
-      "Purchase target is restricted to OpenRouter.",
-      "FreeModel and OpenGateway remain inference-only fallback providers.",
+      "Purchase target is restricted to the configured owner-approved AI-credit provider.",
+      "Inference route order remains separate from credit purchases.",
       configuredProvider
-        ? `Configured OpenRouter model: ${configuredProvider.model}.`
-        : "OpenRouter inference provider is not configured yet, but it remains the only approved credit purchase target.",
+        ? "The configured credit provider is also present in the private inference route list."
+        : "The configured credit provider is not required to be an inference route.",
       input.reason ? `Owner-visible reason: ${input.reason}` : ""
     ].filter(Boolean).join(" ")
   };
 }
 
 module.exports = {
-  OPENROUTER_CREDITS_URL,
-  OPENROUTER_PROVIDER_NAME,
   aiFoodPolicy,
-  assertOpenRouterPurchase,
+  assertConfiguredAiFoodPurchase,
   buildAiFoodRefillRequest,
-  openRouterProvider
+  configuredCreditUrl,
+  configuredInferenceProvider,
+  configuredPurchaseProviderName,
+  publicPurchaseProviderName
 };

@@ -7,7 +7,7 @@ const path = require("node:path");
 const test = require("node:test");
 const {
   aiFoodPolicy,
-  assertOpenRouterPurchase,
+  assertConfiguredAiFoodPurchase,
   buildAiFoodRefillRequest
 } = require("../src/agent/ai-food");
 const { executeTool } = require("../src/agent/actions");
@@ -29,49 +29,77 @@ function config(repoRoot) {
     repoRoot,
     aiProviders: [
       {
-        name: "freemodel",
-        label: "FreeModel",
-        model: "freemodel-model",
+        name: "route-one",
+        label: "Route One",
+        model: "model-one",
         priority: 1
       },
       {
-        name: "opengateway",
-        label: "OpenGateway",
-        model: "opengateway-model",
+        name: "route-two",
+        label: "Route Two",
+        model: "model-two",
         priority: 2
       },
       {
-        name: "openrouter",
-        label: "OpenRouter",
-        model: "openrouter-model",
+        name: "configured-ai-credit-provider",
+        label: "Credit Route",
+        model: "credit-route-model",
         priority: 3
       }
     ]
   };
 }
 
-test("AI food policy keeps model priority and OpenRouter-only buying", () => {
+test("AI food policy keeps private route priority and configured-provider buying", () => {
   const repoRoot = tempRepo();
   const cfg = config(repoRoot);
   const treasury = loadTreasury(repoRoot, cfg);
   const policy = aiFoodPolicy(cfg, treasury);
 
-  assert.deepEqual(policy.inferencePriority.map((provider) => provider.name), [
-    "freemodel",
-    "opengateway",
-    "openrouter"
+  assert.deepEqual(policy.inferencePriority.map((provider) => provider.route), [
+    "private-ai-route-1",
+    "private-ai-route-2",
+    "private-ai-route-3"
   ]);
-  assert.equal(policy.purchaseProvider, "openrouter");
-  assert.equal(policy.purchaseOnlyOnOpenRouter, true);
+  assert.equal(policy.purchaseProvider, "configured-ai-credit-provider");
+  assert.equal(policy.purchaseOnlyOnConfiguredProvider, true);
   assert.equal(policy.liveApiPurchase, false);
 });
 
-test("AI credit purchase rejects non-OpenRouter providers", () => {
-  assert.equal(assertOpenRouterPurchase("openrouter"), "openrouter");
-  assert.throws(() => assertOpenRouterPurchase("freemodel"), /OpenRouter/);
+test("AI credit purchase rejects non-configured providers", () => {
+  const cfg = config(tempRepo());
+
+  assert.equal(
+    assertConfiguredAiFoodPurchase(cfg, "configured-ai-credit-provider"),
+    "configured-ai-credit-provider"
+  );
+  assert.throws(
+    () => assertConfiguredAiFoodPurchase(cfg, "visitor-provider"),
+    /configured owner-approved credit provider/
+  );
 });
 
-test("builds OpenRouter refill spend request", () => {
+test("AI credit purchase accepts private configured provider but publishes generic alias", () => {
+  const cfg = {
+    ...config(tempRepo()),
+    aiFoodPurchaseProvider: "private-credit-vendor"
+  };
+
+  assert.equal(
+    assertConfiguredAiFoodPurchase(cfg, "private-credit-vendor"),
+    "configured-ai-credit-provider"
+  );
+
+  const request = buildAiFoodRefillRequest(cfg, loadTreasury(cfg.repoRoot, cfg), {
+    amountUsd: 5,
+    provider: "private-credit-vendor"
+  });
+
+  assert.equal(request.recipient, "configured-ai-credit-provider");
+  assert.doesNotMatch(JSON.stringify(request), /private-credit-vendor/);
+});
+
+test("builds configured-provider refill spend request", () => {
   const repoRoot = tempRepo();
   const cfg = config(repoRoot);
   const request = buildAiFoodRefillRequest(cfg, loadTreasury(repoRoot, cfg), {
@@ -80,22 +108,22 @@ test("builds OpenRouter refill spend request", () => {
   });
 
   assert.equal(request.category, "ai_food_refill");
-  assert.equal(request.recipient, "openrouter");
+  assert.equal(request.recipient, "configured-ai-credit-provider");
   assert.equal(request.amount, 12.5);
-  assert.match(request.url, /openrouter\.ai/);
-  assert.match(request.notes, /FreeModel/);
+  assert.equal(request.url, "");
+  assert.doesNotMatch(request.notes, /Route One|Route Two|Credit Route|model-one|model-two|credit-route-model/);
 });
 
-test("budget status exposes OpenRouter-only purchase policy", () => {
+test("budget status exposes configured-provider purchase policy", () => {
   const repoRoot = tempRepo();
   const cfg = config(repoRoot);
   const status = budgetStatus(cfg);
 
-  assert.equal(status.purchasePolicy.purchaseProvider, "openrouter");
-  assert.equal(status.purchasePolicy.purchaseOnlyOnOpenRouter, true);
+  assert.equal(status.purchasePolicy.purchaseProvider, "configured-ai-credit-provider");
+  assert.equal(status.purchasePolicy.purchaseOnlyOnConfiguredProvider, true);
 });
 
-test("request_ai_food_refill creates approval and pending OpenRouter top-up", async () => {
+test("request_ai_food_refill creates approval and pending configured-provider top-up", async () => {
   const repoRoot = tempRepo();
   const cfg = config(repoRoot);
   const createdIssues = [];
@@ -115,27 +143,27 @@ test("request_ai_food_refill creates approval and pending OpenRouter top-up", as
   });
 
   assert.equal(result.status, "blocked_pending_owner_approval");
-  assert.equal(result.purchaseProvider, "openrouter");
+  assert.equal(result.purchaseProvider, "configured-ai-credit-provider");
   assert.equal(createdIssues.length, 1);
-  assert.match(createdIssues[0].body, /openrouter/i);
+  assert.match(createdIssues[0].body, /configured-ai-credit-provider/);
 
   const treasury = loadTreasury(repoRoot, cfg);
   assert.equal(treasury.ai.pendingTopUps.length, 1);
-  assert.equal(treasury.ai.pendingTopUps[0].provider, "openrouter");
+  assert.equal(treasury.ai.pendingTopUps[0].provider, "configured-ai-credit-provider");
   assert.equal(treasury.ai.pendingTopUps[0].amountUsd, 20);
 });
 
-test("records completed OpenRouter credit refill without executing payment", () => {
+test("records completed AI-credit refill without executing payment", () => {
   const repoRoot = tempRepo();
   const cfg = config(repoRoot);
   const entry = recordAiCreditRefill(cfg, repoRoot, {
     amountUsd: 15,
     approvalId: "abc123",
-    proof: "owner bought credits on OpenRouter"
+    proof: "owner bought credits through configured provider"
   });
 
   const treasury = loadTreasury(repoRoot, cfg);
-  assert.equal(entry.provider, "openrouter");
+  assert.equal(entry.provider, "configured-ai-credit-provider");
   assert.equal(treasury.ai.refills.length, 1);
   assert.equal(treasury.ai.refills[0].amountUsd, 15);
 });
@@ -157,7 +185,7 @@ test("record_ai_food_refill tool blocks until owner approval exists", async () =
   const result = await executeTool(cfg, null, 1, "record_ai_food_refill", {
     amountUsd: 15,
     approvalId: "missing",
-    proof: "owner bought credits on OpenRouter"
+    proof: "owner bought credits through configured provider"
   });
 
   assert.equal(result.status, "blocked_pending_owner_approval");
@@ -180,7 +208,7 @@ test("record_ai_food_refill does not trust local approval without remote issue",
   const result = await executeTool(cfg, null, 1, "record_ai_food_refill", {
     amountUsd: 15,
     approvalId: "local-approved",
-    proof: "owner bought credits on OpenRouter"
+    proof: "owner bought credits through configured provider"
   });
 
   assert.equal(result.status, "blocked_pending_owner_approval");

@@ -54,25 +54,18 @@ npm run cycle
 With an AI key and a hosted GitHub repo:
 
 ```bash
-ORBIT_AI_PROVIDERS='[
-  {"name":"primary","apiKey":"...","apiBase":"https://provider.example/v1","model":"provider-model-id"},
-  {"name":"fallback","apiKey":"...","apiBase":"https://fallback.example/v1","model":"fallback-model-id"}
-]' \
+ORBIT_AI_PROVIDERS='[...]' \
 GITHUB_TOKEN=... \
 GITHUB_REPOSITORY=owner/repo \
 ORBIT_DRY_RUN=false \
 npm run cycle
 ```
 
-Provider routing can also live in `memory/ai-providers.json`. That file is public and should contain only provider names, API bases, models, paths, and `apiKeyRef` values. The default inference priority is FreeModel first, OpenGateway second, and OpenRouter last. Put the real keys in the GitHub Secret `ORBIT_AI_PROVIDER_KEYS`, shaped like:
+Live provider routing belongs in private environment variables or GitHub Secrets. The public `memory/ai-providers.json` file is only a placeholder and must not expose provider names, API bases, models, custom headers, billing routes, or keys.
 
-```json
-{"freemodel":"...","opengateway":"...","openrouter":"..."}
-```
+`ORBIT_AI_PROVIDERS` is a full ordered JSON route list. Orbit tries each configured route in order and falls back to the next one when a request fails. Additions, removals, reordering, model changes, and provider changes happen through JSON, not code.
 
-`ORBIT_AI_PROVIDERS` is still supported as a full ordered JSON override. Orbit tries each provider in order and falls back to the next one when a request fails. Additions, removals, reordering, model changes, and provider changes happen through JSON, not code. The current OpenGateway registry target is the Gitlawb host at `https://opengateway.gitlawb.com/v1/xiaomi-mimo` with `mimo-v2.5-pro`; it is configured as auth-optional, requests identity encoding, and summarizes tool results as user messages for MiMo compatibility.
-
-AI-credit purchases are separate from inference routing. Orbit may ask for an owner-approved AI-food refill, but the purchase target is restricted to OpenRouter credits. FreeModel and OpenGateway stay inference-only; they are not top-up destinations. The runtime records the approval and completion proof; it does not silently execute payment.
+AI-credit purchases are separate from inference routing. Orbit may ask for an owner-approved AI-food refill, but the purchase target is restricted to the configured owner-approved credit provider. The runtime records the approval and completion proof; it does not silently execute payment.
 
 ## Household Policy
 

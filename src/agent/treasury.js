@@ -1,11 +1,12 @@
 "use strict";
 
-const { aiFoodPolicy, OPENROUTER_CREDITS_URL } = require("./ai-food");
+const { aiFoodPolicy, publicPurchaseProviderName } = require("./ai-food");
 const { assertSafeTextForWrite, readSafeTextFile, writeSafeTextFile } = require("./safety");
 
 const TREASURY_PATH = "memory/treasury.json";
 const MAX_LEDGER_ENTRIES = 500;
 const MAX_REFILL_ENTRIES = 100;
+const CREDIT_PURCHASE_MODE = "owner_approved_manual_credit_top_up";
 
 function dayKey(date = new Date()) {
   return date.toISOString().slice(0, 10);
@@ -16,6 +17,7 @@ function monthKey(date = new Date()) {
 }
 
 function defaultTreasury(config) {
+  const purchaseProvider = publicPurchaseProviderName();
   return {
     ai: {
       dailyBudgetUsd: config.aiDailyBudgetUsd,
@@ -25,18 +27,18 @@ function defaultTreasury(config) {
       reserveUsd: 0,
       providerCredits: [
         {
-          provider: "openrouter",
-          creditsUrl: OPENROUTER_CREDITS_URL,
+          provider: purchaseProvider,
+          creditsUrl: "",
           balanceUsd: null,
           lastCheckedAt: null
         }
       ],
       purchasePolicy: {
-        provider: "openrouter",
-        creditsUrl: OPENROUTER_CREDITS_URL,
-        mode: "owner_approved_manual_openrouter",
+        provider: purchaseProvider,
+        creditsUrl: "",
+        mode: CREDIT_PURCHASE_MODE,
         liveApiPurchase: false,
-        notes: "Orbit may use FreeModel, OpenGateway, and OpenRouter for inference, but AI-credit purchase requests are restricted to OpenRouter."
+        notes: "Inference route order is private and separate from AI-credit purchases. Credit purchases are restricted to the configured owner-approved provider."
       },
       pendingTopUps: [],
       refills: [],
@@ -133,13 +135,13 @@ function budgetStatus(config, repoRoot = config.repoRoot) {
   };
 }
 
-function recordAiUsage(config, repoRoot, usage, model, note) {
+function recordAiUsage(config, repoRoot, usage, aiRoute, note) {
   const treasury = loadTreasury(repoRoot, config);
   const estimatedUsd = estimateUsageCostUsd(config, usage);
   treasury.ai.ledger = Array.isArray(treasury.ai.ledger) ? treasury.ai.ledger : [];
   treasury.ai.ledger.push({
     timestamp: new Date().toISOString(),
-    model,
+    aiRoute,
     note,
     promptTokens: Number(usage.prompt_tokens || usage.input_tokens || 0),
     completionTokens: Number(usage.completion_tokens || usage.output_tokens || 0),
@@ -151,15 +153,38 @@ function recordAiUsage(config, repoRoot, usage, model, note) {
   return { path: TREASURY_PATH, estimatedUsd };
 }
 
+function sanitizeAiLedger(ledger) {
+  return (Array.isArray(ledger) ? ledger : []).map((entry) => {
+    const { model, ...safeEntry } = entry || {};
+    return {
+      ...safeEntry,
+      aiRoute: safeEntry.aiRoute || "private-ai-route-1"
+    };
+  });
+}
+
+function sanitizeCreditEntries(entries, purchaseProvider) {
+  return (Array.isArray(entries) ? entries : []).map((entry) => ({
+    ...entry,
+    provider: purchaseProvider,
+    creditsUrl: ""
+  }));
+}
+
 function syncRevenuePolicy(config, repoRoot = config.repoRoot) {
   const treasury = loadTreasury(repoRoot, config);
+  const purchaseProvider = publicPurchaseProviderName();
+  treasury.ai.providerCredits = sanitizeCreditEntries(treasury.ai.providerCredits, purchaseProvider);
+  treasury.ai.pendingTopUps = sanitizeCreditEntries(treasury.ai.pendingTopUps, purchaseProvider);
+  treasury.ai.refills = sanitizeCreditEntries(treasury.ai.refills, purchaseProvider);
+  treasury.ai.ledger = sanitizeAiLedger(treasury.ai.ledger);
   treasury.ai.purchasePolicy = {
     ...(treasury.ai.purchasePolicy || {}),
-    provider: "openrouter",
-    creditsUrl: OPENROUTER_CREDITS_URL,
-    mode: (treasury.ai.purchasePolicy && treasury.ai.purchasePolicy.mode) || "owner_approved_manual_openrouter",
+    provider: purchaseProvider,
+    creditsUrl: "",
+    mode: CREDIT_PURCHASE_MODE,
     liveApiPurchase: false,
-    notes: "Orbit may use FreeModel, OpenGateway, and OpenRouter for inference, but AI-credit purchase requests are restricted to OpenRouter."
+    notes: "Inference route order is private and separate from AI-credit purchases. Credit purchases are restricted to the configured owner-approved provider."
   };
   treasury.revenue.operatorShareBps = config.operatorRevenueBps;
   treasury.revenue.treasuryShareBps = 10000 - config.operatorRevenueBps;
@@ -173,11 +198,12 @@ function syncRevenuePolicy(config, repoRoot = config.repoRoot) {
 
 function upsertPendingTopUp(config, repoRoot, topUp) {
   const treasury = loadTreasury(repoRoot, config);
+  const purchaseProvider = publicPurchaseProviderName();
   treasury.ai.pendingTopUps = Array.isArray(treasury.ai.pendingTopUps) ? treasury.ai.pendingTopUps : [];
   const existingIndex = treasury.ai.pendingTopUps.findIndex((item) => item.approvalId === topUp.approvalId);
   const entry = {
-    provider: "openrouter",
-    creditsUrl: OPENROUTER_CREDITS_URL,
+    provider: purchaseProvider,
+    creditsUrl: "",
     status: "pending_owner_approval",
     requestedAt: new Date().toISOString(),
     ...topUp,
@@ -211,10 +237,11 @@ function recordAiCreditRefill(config, repoRoot, refill) {
   treasury.ai.refills = Array.isArray(treasury.ai.refills) ? treasury.ai.refills : [];
   treasury.ai.providerCredits = Array.isArray(treasury.ai.providerCredits) ? treasury.ai.providerCredits : [];
   treasury.ai.pendingTopUps = Array.isArray(treasury.ai.pendingTopUps) ? treasury.ai.pendingTopUps : [];
+  const purchaseProvider = publicPurchaseProviderName();
 
   const entry = {
-    provider: "openrouter",
-    creditsUrl: OPENROUTER_CREDITS_URL,
+    provider: purchaseProvider,
+    creditsUrl: "",
     amountUsd: Number(amountUsd.toFixed(2)),
     approvalId: refill.approvalId || null,
     proof: refill.proof || "",
@@ -223,16 +250,16 @@ function recordAiCreditRefill(config, repoRoot, refill) {
   treasury.ai.refills.push(entry);
   treasury.ai.refills = treasury.ai.refills.slice(-MAX_REFILL_ENTRIES);
 
-  const creditIndex = treasury.ai.providerCredits.findIndex((item) => item.provider === "openrouter");
-  const current = creditIndex >= 0 ? treasury.ai.providerCredits[creditIndex] : { provider: "openrouter" };
+  const creditIndex = treasury.ai.providerCredits.findIndex((item) => item.provider === purchaseProvider);
+  const current = creditIndex >= 0 ? treasury.ai.providerCredits[creditIndex] : { provider: purchaseProvider };
   const currentBalance = Number(current.balanceUsd);
   const balanceUsd = Number.isFinite(currentBalance)
     ? Number((currentBalance + entry.amountUsd).toFixed(2))
     : null;
   const providerCredit = {
     ...current,
-    provider: "openrouter",
-    creditsUrl: OPENROUTER_CREDITS_URL,
+    provider: purchaseProvider,
+    creditsUrl: "",
     balanceUsd,
     lastRefillAt: entry.recordedAt
   };

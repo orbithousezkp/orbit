@@ -4,11 +4,7 @@ const fs = require("fs");
 const path = require("path");
 
 const AI_PROVIDERS_PATH = "memory/ai-providers.json";
-const REGISTRY_PROVIDER_DOMAINS = {
-  freemodel: ["freemodel.dev"],
-  opengateway: ["opengateway.ai", "opengateway.gitlawb.com"],
-  openrouter: ["openrouter.ai"]
-};
+const REGISTRY_PROVIDER_DOMAINS = {};
 
 function parseBool(value, fallback = false) {
   if (value === undefined || value === null || value === "") return fallback;
@@ -203,6 +199,10 @@ function loadConfig(env = process.env) {
     aiMonthlyBudgetUsd: parseNumberEnv(env.ORBIT_AI_MONTHLY_BUDGET_USD, 100),
     aiInputUsdPerMillion: parseNumberEnv(env.ORBIT_AI_INPUT_USD_PER_MILLION, 0.15),
     aiOutputUsdPerMillion: parseNumberEnv(env.ORBIT_AI_OUTPUT_USD_PER_MILLION, 0.6),
+    aiFoodPurchaseProvider: env.ORBIT_AI_FOOD_PURCHASE_PROVIDER || "configured-ai-credit-provider",
+    aiFoodPurchaseLabel: env.ORBIT_AI_FOOD_PURCHASE_LABEL || "configured AI-credit provider",
+    aiFoodPurchaseUrl: env.ORBIT_AI_FOOD_PURCHASE_URL || "",
+    aiFoodPurchaseMode: env.ORBIT_AI_FOOD_PURCHASE_MODE || "owner_approved_manual_credit_top_up",
     githubToken: env.GITHUB_TOKEN || env.GH_TOKEN || "",
     githubRepository: env.GITHUB_REPOSITORY || "",
     ownerUsername: env.ORBIT_OWNER_USERNAME || (env.GITHUB_REPOSITORY ? env.GITHUB_REPOSITORY.split("/")[0] : ""),

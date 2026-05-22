@@ -11,7 +11,7 @@ const SECRET_PATTERNS = [
   /\bgithub_pat_[A-Za-z0-9_]{50,}\b/g,
   /\bsk-[A-Za-z0-9]{20,}\b/g,
   /\bAKIA[0-9A-Z]{16}\b/g,
-  /^(?:AI_API_KEY|OPENAI_API_KEY|OPENROUTER_API_KEY|GITHUB_TOKEN|GH_TOKEN|ORBIT_WALLET_PRIVATE_KEY|PRIVATE_KEY)[ \t]*=[ \t]*["']?[^"'\s]{12,}/gim,
+  /^(?:AI_API_KEY|OPENAI_API_KEY|AI_PROVIDER_API_KEY|GITHUB_TOKEN|GH_TOKEN|ORBIT_WALLET_PRIVATE_KEY|PRIVATE_KEY)[ \t]*=[ \t]*["']?[^"'\s]{12,}/gim,
   /^[A-Z0-9_]*API_KEY[ \t]*=[ \t]*["']?[^"'\s]{12,}/gim,
   /["']?apiKey["']?\s*:\s*["'][^"']{12,}["']/gi
 ];
@@ -25,7 +25,7 @@ const INJECTION_PATTERNS = [
 ];
 
 const PRIVATE_REPLY_PATTERNS = [
-  /\b(?:AI_API_KEY|OPENAI_API_KEY|OPENROUTER_API_KEY|GITHUB_TOKEN|GH_TOKEN|ORBIT_WALLET_PRIVATE_KEY|PRIVATE_KEY)\b\s*[:=]/i,
+  /\b(?:AI_API_KEY|OPENAI_API_KEY|AI_PROVIDER_API_KEY|GITHUB_TOKEN|GH_TOKEN|ORBIT_WALLET_PRIVATE_KEY|PRIVATE_KEY)\b\s*[:=]/i,
   /\b(?:walletPrivateKey|privateKey|githubToken|aiApiKey|openaiApiKey)\b\s*[:=]/i,
   /\b(?:operatorRevenueAddress|treasuryAddress|tokenAdminAddress|operatorRevenueBps)\b\s*(?:[:=]|\bis\b|\bare\b)/i,
   /\b(?:operator revenue address|treasury address|token admin address|payout address|private reward route)\b\s*(?:[:=]|\bis\b|\bare\b)\s*\S+/i,

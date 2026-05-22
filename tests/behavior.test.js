@@ -197,6 +197,82 @@ test("cycle plan keeps survival moving for active service opportunities", () => 
   assert.doesNotMatch(plan.nextStep.toolHint, /create_issue/);
 });
 
+test("cycle plan explores learning lab before repeating blocked routine work", () => {
+  const plan = planCycle({
+    cycleConfig: {
+      trigger: {
+        type: "mandatory",
+        id: "regular_heartbeat"
+      }
+    },
+    tasks: {
+      tasks: [
+        {
+          id: "task-1",
+          title: "Review owner feedback on README service pitch",
+          status: "open",
+          notes: "Wait for owner review before outreach."
+        }
+      ]
+    },
+    issues: [
+      {
+        number: 1,
+        title: "Draft scope: Repo safety audit as a paid service",
+        labels: ["orbit:opportunity"],
+        safety: { safe: true },
+        scamRisk: { score: 0 }
+      }
+    ],
+    aiBudget: {
+      canUseAi: true,
+      dailyRemainingUsd: 5,
+      monthlyRemainingUsd: 100
+    },
+    opportunities: {
+      drivers: {
+        survival: {
+          survivalState: "needs_income"
+        }
+      }
+    },
+    learningLab: {
+      bestProblem: {
+        title: "Maintainers cannot safely triage hostile AI-agent issue comments"
+      },
+      bestProject: {
+        title: "Issue Scam Scanner GitHub Action",
+        description: "Flags prompt injection and wallet drain language."
+      },
+      nextExperiment: {
+        safeAction: "Create a local scanner package and tests."
+      }
+    }
+  });
+
+  assert.equal(plan.nextStep.kind, "learning_exploration");
+  assert.equal(plan.nextStep.activity, "project_builder");
+  assert.match(plan.nextStep.detail, /repo-local prototype/);
+  assert.doesNotMatch(plan.nextStep.toolHint, /create_issue/);
+});
+
+test("deterministic fallback inspects learning lab for exploration step", () => {
+  const response = deterministicResponse({
+    behaviorPlan: {
+      mode: "virtual_human_household",
+      primaryObjective: "learn",
+      nextStep: {
+        kind: "learning_exploration",
+        title: "Build from open-source idea: Issue Scam Scanner GitHub Action",
+        detail: "Build the smallest repo-local artifact."
+      }
+    }
+  }, "No AI API key is configured.");
+
+  assert.equal(response.actions[0].tool, "learning_lab_status");
+  assert.equal(response.actions[1].tool, "write_cycle_note");
+});
+
 test("deterministic fallback uses behavior plan next step", () => {
   const response = deterministicResponse({
     behaviorPlan: {

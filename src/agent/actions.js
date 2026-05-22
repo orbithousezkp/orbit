@@ -21,6 +21,14 @@ const {
   searchMemory
 } = require("./memory");
 const { omitUnsafeVisitorContent, scanSpendIntent, scanTextRisk } = require("./scam");
+const {
+  AGENT_SOURCES_PATH,
+  IDEA_INBOX_PATH,
+  PROBLEM_LAB_PATH,
+  PROJECT_IDEAS_PATH,
+  learningLabStatus,
+  quarantineExternalIdea
+} = require("./learning-lab");
 const { OPPORTUNITIES_PATH, opportunityStatus } = require("./opportunities");
 const {
   assertNoSymlinkPath,
@@ -30,7 +38,7 @@ const {
   redactSecrets,
   writeSafeTextFile
 } = require("./safety");
-const { aiFoodPolicy, assertOpenRouterPurchase, buildAiFoodRefillRequest } = require("./ai-food");
+const { aiFoodPolicy, assertConfiguredAiFoodPurchase, buildAiFoodRefillRequest } = require("./ai-food");
 const {
   TREASURY_PATH,
   budgetStatus,
@@ -344,7 +352,7 @@ async function executeTool(config, github, cycle, name, input) {
 
     case "request_ai_food_refill": {
       const treasury = syncRevenuePolicy(config);
-      assertOpenRouterPurchase(input.provider || "openrouter");
+      assertConfiguredAiFoodPurchase(config, input.provider);
       const spendRequest = buildAiFoodRefillRequest(config, treasury, input);
       const result = await requestOwnerApproval(config, github, spendRequest);
       if (result.approval) {
@@ -363,14 +371,14 @@ async function executeTool(config, github, cycle, name, input) {
       track(TREASURY_PATH);
       return {
         ...result,
-        purchaseProvider: "openrouter",
+        purchaseProvider: spendRequest.recipient,
         purchaseUrl: spendRequest.url,
-        message: "Orbit only buys AI-call food credits on OpenRouter. Owner approval records intent; the credits page/manual top-up is still required before recording completion."
+        message: "Orbit only requests AI-call food credits through the configured provider. Owner approval records intent; the manual top-up is still required before recording completion."
       };
     }
 
     case "record_ai_food_refill": {
-      assertOpenRouterPurchase(input.provider || "openrouter");
+      assertConfiguredAiFoodPurchase(config, input.provider);
       const amountUsd = Number(input.amountUsd);
       if (!Number.isFinite(amountUsd) || amountUsd <= 0) {
         throw new Error("amountUsd must be a positive number");
@@ -389,7 +397,7 @@ async function executeTool(config, github, cycle, name, input) {
           status: "blocked_pending_owner_approval",
           approval: approvalStatus.approval || null,
           approvalStatus,
-          message: "OpenRouter refill completion can only be recorded after the owner approval is approved."
+          message: "AI-credit refill completion can only be recorded after the owner approval is approved."
         };
       }
       const entry = recordAiCreditRefill(config, config.repoRoot, {
@@ -401,7 +409,7 @@ async function executeTool(config, github, cycle, name, input) {
       return {
         status: "recorded",
         entry,
-        message: "Recorded completed OpenRouter AI-credit purchase. This tool does not execute payment."
+        message: "Recorded completed AI-credit purchase. This tool does not execute payment."
       };
     }
 
@@ -462,6 +470,18 @@ async function executeTool(config, github, cycle, name, input) {
       return result;
     }
 
+    case "learning_lab_status": {
+      const result = learningLabStatus(config.repoRoot);
+      for (const path of result.changedPaths || []) track(path);
+      return result;
+    }
+
+    case "quarantine_external_idea": {
+      const result = quarantineExternalIdea(config.repoRoot, input);
+      track(IDEA_INBOX_PATH);
+      return result;
+    }
+
     case "feature_catalog": {
       return {
         summary: featureSummary(),
@@ -512,6 +532,10 @@ async function executeTool(config, github, cycle, name, input) {
 module.exports = {
   executeTool,
   filesChanged,
+  AGENT_SOURCES_PATH,
+  IDEA_INBOX_PATH,
+  PROBLEM_LAB_PATH,
+  PROJECT_IDEAS_PATH,
   runCommand,
   safeCommandEnv,
   writeFile

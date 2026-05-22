@@ -3,6 +3,7 @@
 const { planCycle } = require("./behavior");
 const { redactSecrets } = require("./safety");
 const { budgetStatus } = require("./treasury");
+const { privateAiRoute, privateProviderErrors } = require("./provider-privacy");
 
 function deterministicResponse(context, reason) {
   const plan = context.behaviorPlan || planCycle(context);
@@ -14,6 +15,13 @@ function deterministicResponse(context, reason) {
   if (plan.nextStep && plan.nextStep.kind === "survival_opportunity") {
     actions.push({
       tool: "income_opportunities",
+      input: {}
+    });
+  }
+
+  if (plan.nextStep && plan.nextStep.kind === "learning_exploration") {
+    actions.push({
+      tool: "learning_lab_status",
       input: {}
     });
   }
@@ -126,7 +134,7 @@ async function infer(config, messages, tools) {
   }));
   const providerErrors = [];
 
-  for (const provider of providers) {
+  for (const [index, provider] of providers.entries()) {
     const body = {
       model: provider.model,
       messages: apiMessages,
@@ -155,13 +163,7 @@ async function infer(config, messages, tools) {
 
       return {
         fallback: false,
-        provider: {
-          name: provider.name,
-          label: provider.label,
-          model: provider.model,
-          priority: provider.priority,
-          toolResultMode: provider.toolResultMode || "native"
-        },
+        provider: privateAiRoute(provider, index),
         providerErrors,
         content: choice.message.content || "",
         toolCalls: choice.message.tool_calls || [],
@@ -171,18 +173,14 @@ async function infer(config, messages, tools) {
       };
     } catch (error) {
       providerErrors.push({
-        name: provider.name,
-        label: provider.label,
-        model: provider.model,
-        priority: provider.priority,
-        error: redactSecrets(error.message)
+        ...privateAiRoute(provider, index),
+        error: "AI route failed"
       });
     }
   }
 
-  const names = providerErrors.map((item) => `${item.label || item.name} (${item.model})`).join(", ");
-  const fallback = deterministicResponse(context, `All AI providers failed: ${names}.`);
-  fallback.providerErrors = providerErrors;
+  const fallback = deterministicResponse(context, "All configured AI routes failed.");
+  fallback.providerErrors = privateProviderErrors(providerErrors);
   return fallback;
 }
 

@@ -5,6 +5,7 @@ const path = require("path");
 const { execFileSync } = require("child_process");
 const { planCycle } = require("./behavior");
 const { GitHubClient } = require("./github");
+const { learningLabStatus } = require("./learning-lab");
 const { listMemory } = require("./memory");
 const { opportunityStatus } = require("./opportunities");
 const { loadTasks } = require("./tasks");
@@ -15,6 +16,7 @@ const { normalizeTrigger, triggerPolicy } = require("./triggers");
 const { omitUnsafeVisitorContent, scanTextRisk } = require("./scam");
 const { budgetStatus, loadTreasury } = require("./treasury");
 const { readSafeTextFile, redactSecrets, scoreIssueSafety } = require("./safety");
+const { privateAiRoutes } = require("./provider-privacy");
 
 const CONTEXT_FILE_LIMIT = 120;
 
@@ -122,16 +124,11 @@ async function gatherContext(config) {
       commitChanges: config.commitChanges,
       pushChanges: config.pushChanges,
       maxSteps: config.maxSteps,
-      model: config.aiModel,
-      aiProviders: config.aiProviders.map((provider) => ({
-        name: provider.name,
-        label: provider.label,
-        model: provider.model,
-        apiBase: provider.apiBase,
-        chatPath: provider.chatPath,
-        toolResultMode: provider.toolResultMode,
-        priority: provider.priority
-      })),
+      aiRoute: {
+        configured: config.aiProviders.length > 0,
+        count: config.aiProviders.length,
+        routes: privateAiRoutes(config.aiProviders)
+      },
       githubConfigured: github.configured(),
       trigger: normalizeTrigger(config),
       triggerPolicy: triggerPolicy()
@@ -155,6 +152,7 @@ async function gatherContext(config) {
   };
 
   context.opportunities = opportunityStatus(config.repoRoot, context);
+  context.learningLab = learningLabStatus(config.repoRoot);
   context.behaviorPlan = planCycle(context);
   return context;
 }

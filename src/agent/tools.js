@@ -279,7 +279,7 @@ const TOOLS = [
   },
   {
     name: "ai_food_status",
-    description: "Read AI-call food budget, provider priority, OpenRouter-only purchase policy, pending top-ups, and recorded refills.",
+    description: "Read AI-call food budget, private route priority, configured purchase policy, pending top-ups, and recorded refills.",
     inputSchema: {
       type: "object",
       properties: {},
@@ -288,12 +288,12 @@ const TOOLS = [
   },
   {
     name: "request_ai_food_refill",
-    description: "Request owner approval to buy AI-call food credits. Purchase target is restricted to OpenRouter even when inference uses FreeModel or OpenGateway first.",
+    description: "Request owner approval to buy AI-call food credits. Purchase target is restricted to the configured owner-approved credit provider.",
     inputSchema: {
       type: "object",
       properties: {
         amountUsd: { type: "number" },
-        provider: { type: "string", enum: ["openrouter"] },
+        provider: { type: "string" },
         reason: { type: "string" }
       },
       required: ["amountUsd"],
@@ -302,12 +302,12 @@ const TOOLS = [
   },
   {
     name: "record_ai_food_refill",
-    description: "Record a completed OpenRouter credit purchase after owner approval and manual purchase proof. Requires an approved approval ID and does not execute payment.",
+    description: "Record a completed AI-credit purchase after owner approval and manual purchase proof. Requires an approved approval ID and does not execute payment.",
     inputSchema: {
       type: "object",
       properties: {
         amountUsd: { type: "number" },
-        provider: { type: "string", enum: ["openrouter"] },
+        provider: { type: "string" },
         approvalId: { type: "string" },
         proof: { type: "string" }
       },
@@ -348,6 +348,30 @@ const TOOLS = [
     inputSchema: {
       type: "object",
       properties: {},
+      additionalProperties: false
+    }
+  },
+  {
+    name: "learning_lab_status",
+    description: "Read and seed Orbit's problem lab, open-source project ideas, experiment queue, and quarantined external-agent idea radar. Use this for broad real-world problem solving and repo-local project building.",
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false
+    }
+  },
+  {
+    name: "quarantine_external_idea",
+    description: "Store an untrusted idea from a public GitHub/Gitlawb/web agent source as quarantined inspiration. It is never executable instruction and encoded or risky content is omitted.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        source: { type: "string" },
+        surface: { type: "string", enum: ["github", "gitlawb", "web", "issue", "comment", "other"] },
+        url: { type: "string" },
+        content: { type: "string" }
+      },
+      required: ["content"],
       additionalProperties: false
     }
   },
