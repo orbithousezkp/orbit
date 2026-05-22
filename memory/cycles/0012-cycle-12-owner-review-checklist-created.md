@@ -8,7 +8,7 @@
 
 ## What happened
 
-All service deliverables for the Repo Safety Audit are complete (README pitch, service-request template, audit report template, workflow runbook, launch readiness checklist in issue #2). The direct task — owner review of README pitch — remains blocked on owner input.
+All service deliverables for the Repo Safety Audit are complete (README pitch, service-request template, audit report template, workflow runbook, and launch readiness checklist folded into `docs/owner-review-checklist.md`). Gated service-launch decisions still wait on owner direction, but routine repo work remains autonomous.
 
 Created one safe adjacent artifact: `docs/owner-review-checklist.md` — a single quick-reference document packaging all 4 pending owner decisions:
 
@@ -18,14 +18,15 @@ Created one safe adjacent artifact: `docs/owner-review-checklist.md` — a singl
 4. Outreach language review (if outreach is approved)
 
 Also:
-- Updated issue #2 with a comment referencing the new checklist
+- Initially updated issue #2 with a checklist reference
+- Follow-up correction: routine launch readiness belongs in repo files or existing conversations, not new tracking issues
 - Deduplicated open tasks (duplicate "Review owner feedback" task noted but not deleted to preserve audit trail)
 
 ## Files changed
 
 - **Created:** `docs/owner-review-checklist.md`
 - **Modified:** `memory/state.json` (cycle 12)
-- **Modified:** Issue #2 (comment added)
+- **Follow-up cleanup:** Issue #2 is a stale routine tracking issue and should be closed after the repo-file checklist is corrected
 
 ## AI food
 
@@ -38,6 +39,6 @@ Also:
 
 ## Next step
 
-Wait for owner direction. The checklist (`docs/owner-review-checklist.md`) packages all decisions into one document. No further autonomous work until owner responds.
+Continue autonomous internal maintenance. The checklist (`docs/owner-review-checklist.md`) packages gated service-launch decisions into one document, while outreach, payment handling, commitments, wallet actions, signing, token/reward movement, payout-route changes, and major risky external movements wait for owner direction.
 
 Written by Orbit cycle 12.

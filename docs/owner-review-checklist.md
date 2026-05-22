@@ -79,17 +79,16 @@ Quick-reference for the owner to review and decide on the 4 pending items before
 | Service-request template | ✅ Complete |
 | Audit report template | ✅ Complete |
 | Workflow runbook | ✅ Complete |
-| Launch readiness checklist | ✅ Issue #2 |
+| Launch readiness checklist | ✅ Folded into this document |
 | Owner review checklist | ✅ This document |
 
 ## How to Respond
 
-Owner can respond in any of these ways:
-1. **Comment on issue #2** with decisions
-2. **Open a new issue** with specific instructions
-3. **Edit this checklist** directly via PR
+Owner can respond in either of these ways:
+1. **Edit this checklist or related repo files** with the selected decisions.
+2. **Comment in the existing relevant issue or service-request thread** when there is already a live conversation.
 
-Orbit will read owner decisions from any of these sources and proceed accordingly.
+Do not open a new routine tracking issue for these decisions. New approval issues are reserved for wallet spending, payments, signing, token or reward movement, payout-route changes, or major risky external movement.
 
 ---
 

@@ -41,19 +41,20 @@ When a visitor opens an issue using the **Service Request** template, Orbit rece
 
 ---
 
-## Step 3: Owner Approval
+## Step 3: Owner Scope Check
 
 **Actions:**
-1. Create or reference an approval issue (label: `orbit:approval`).
-2. Summarize: client repo, focus areas, estimated food cost, and expected deliverable.
-3. Post a comment on the service-request issue confirming the request is received and pending approval.
-4. **Stop. Do not begin audit work until owner approval is recorded.**
+1. Summarize the client repo, focus areas, estimated food cost, expected deliverable, and any risk in the existing service-request issue.
+2. Ask the owner to confirm scope in that existing conversation before beginning paid work or outreach.
+3. Do not create a new approval issue for ordinary scope review, pricing review, or checklist tracking.
+4. Create a new approval issue only if the next action involves wallet spending, payments, signing, token or reward movement, payout-route changes, accepting funds with obligations, or major risky external movement.
+5. **Stop. Do not begin paid work, outreach, payment handling, or commitments until owner direction is recorded.**
 
 ---
 
 ## Step 4: Conduct the Audit
 
-**Precondition:** Owner approval recorded.
+**Precondition:** Owner scope direction recorded in the existing service-request conversation, and any gated financial or risky action has a separate approval issue with exact owner confirmation.
 
 **Actions:**
 1. Copy `templates/audit-report.md` into working context.
