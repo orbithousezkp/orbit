@@ -1,6 +1,6 @@
 "use strict";
 
-const BEHAVIOR_VERSION = 1;
+const BEHAVIOR_VERSION = 2;
 
 const ACTIVITY_CONTRACT = [
   {
@@ -71,7 +71,9 @@ const HARD_LIMITS = [
 const PRIORITY_ORDER = [
   "safety_review",
   "owner_approval_check",
+  "blocked_task_unblock",
   "survival_opportunity",
+  "survival_backlog",
   "open_task",
   "safe_issue_triage",
   "budget_review",
@@ -86,6 +88,25 @@ function normalizeTasks(tasks) {
 
 function normalizeIssues(issues) {
   return Array.isArray(issues) ? issues : [];
+}
+
+function issueLabels(issue) {
+  return Array.isArray(issue && issue.labels) ? issue.labels.map((label) => String(label).toLowerCase()) : [];
+}
+
+function hasServiceOpportunityIssue(issues) {
+  return issues.some((issue) => (
+    issueLabels(issue).includes("orbit:opportunity") ||
+    String(issue && issue.title || "").toLowerCase().includes("repo safety audit")
+  ));
+}
+
+function taskLooksOwnerBlocked(task) {
+  const text = `${task.title || ""}\n${task.notes || ""}\n${task.source || ""}`.toLowerCase();
+  return text.includes("owner feedback") ||
+    text.includes("owner review") ||
+    text.includes("blocked on owner") ||
+    text.includes("wait for owner");
 }
 
 function issueRiskScore(issue) {
@@ -151,6 +172,20 @@ function makeStep(kind, activity, title, detail, toolHint, blocked = false) {
   };
 }
 
+function makeCycleFourStandardStep() {
+  return makeStep(
+    "survival_backlog",
+    "survival_market",
+    "Advance the next safe survival artifact",
+    [
+      "Do not stop at a quiet heartbeat while income is still unresolved.",
+      "If the current service pitch is awaiting review, prepare a low-risk supporting artifact such as a service-request issue template, intake checklist, audit report outline, pricing assumptions note, or proof-ledger checklist.",
+      "Do not do outreach, accept payment, spend money, sign anything, or make external commitments."
+    ].join(" "),
+    "read_file, write_file, append_task, create_issue, append_memory"
+  );
+}
+
 function planCycle(context = {}) {
   const openTasks = normalizeTasks(context.tasks);
   const issues = normalizeIssues(context.issues);
@@ -161,6 +196,8 @@ function planCycle(context = {}) {
   const approvals = pendingApprovals(context.governance);
   const budget = summarizeBudget(context.aiBudget);
   const opportunities = normalizeOpportunities(context.opportunities);
+  const ownerBlockedTasks = openTasks.filter(taskLooksOwnerBlocked);
+  const activeServiceOpportunity = hasServiceOpportunityIssue(issues);
   const steps = [];
 
   if (riskyIssues.length) {
@@ -211,6 +248,21 @@ function planCycle(context = {}) {
     ));
   }
 
+  if (ownerBlockedTasks.length && activeServiceOpportunity) {
+    const task = ownerBlockedTasks[0];
+    steps.push(makeStep(
+      "blocked_task_unblock",
+      "task_execution",
+      `Unblock adjacent work for: ${task.title}`,
+      [
+        "The direct task waits for owner review, but Orbit should still produce one safe adjacent artifact.",
+        "Useful choices: issue template, intake checklist, audit report outline, or owner-review checklist.",
+        "No outreach, payment handling, spend, signing, or commitments."
+      ].join(" "),
+      "read_file, write_file, append_task, create_issue, append_memory"
+    ));
+  }
+
   if (safeIssues.length) {
     const issue = safeIssues[0];
     steps.push(makeStep(
@@ -230,6 +282,14 @@ function planCycle(context = {}) {
       `Daily remaining $${budget.dailyRemainingUsd}; monthly remaining $${budget.monthlyRemainingUsd}.`,
       "treasury_status"
     ));
+  }
+
+  if (!steps.some((step) => (
+    step.kind === "survival_opportunity" ||
+    step.kind === "blocked_task_unblock" ||
+    step.kind === "open_task"
+  )) && activeServiceOpportunity) {
+    steps.push(makeCycleFourStandardStep());
   }
 
   if (!steps.some((step) => step.kind === "open_task" || step.kind === "safe_issue_triage")) {
@@ -259,7 +319,7 @@ function planCycle(context = {}) {
   return {
     version: BEHAVIOR_VERSION,
     mode: "virtual_human_household",
-    primaryObjective: "Live inside GitHub as a careful household whose members learn, earn, maintain the house, ration AI-call food, and leave a proof trail.",
+    primaryObjective: "Live inside GitHub as a careful household whose members learn, earn, maintain the house, ration AI-call food, and leave a proof trail. A quiet heartbeat must still create safe forward motion when income or household work is unresolved.",
     activities: ACTIVITY_CONTRACT,
     hardLimits: HARD_LIMITS,
     priorityOrder: PRIORITY_ORDER,

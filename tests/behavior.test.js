@@ -140,6 +140,60 @@ test("cycle plan can choose survival work from event trigger", () => {
   assert.match(plan.nextStep.detail, /event:front_door_activity/);
 });
 
+test("cycle plan unblocks adjacent survival work when owner review blocks a task", () => {
+  const plan = planCycle({
+    tasks: {
+      tasks: [
+        {
+          id: "task-1",
+          title: "Review owner feedback on README service pitch",
+          status: "open",
+          notes: "README pitch is drafted. Wait for owner review before outreach."
+        }
+      ]
+    },
+    issues: [
+      {
+        number: 1,
+        title: "Draft scope: Repo safety audit as a paid service",
+        labels: ["orbit:opportunity"],
+        safety: { safe: true },
+        scamRisk: { score: 0 }
+      }
+    ],
+    aiBudget: {
+      canUseAi: true,
+      dailyRemainingUsd: 5,
+      monthlyRemainingUsd: 100
+    }
+  });
+
+  assert.equal(plan.nextStep.kind, "blocked_task_unblock");
+  assert.match(plan.nextStep.detail, /safe adjacent artifact/);
+});
+
+test("cycle plan keeps survival moving for active service opportunities", () => {
+  const plan = planCycle({
+    issues: [
+      {
+        number: 1,
+        title: "Draft scope: Repo safety audit as a paid service",
+        labels: ["orbit:opportunity"],
+        safety: { safe: true },
+        scamRisk: { score: 0 }
+      }
+    ],
+    aiBudget: {
+      canUseAi: true,
+      dailyRemainingUsd: 5,
+      monthlyRemainingUsd: 100
+    }
+  });
+
+  assert.equal(plan.nextStep.kind, "survival_backlog");
+  assert.ok(plan.recommendedSteps.some((step) => step.kind === "survival_backlog"));
+});
+
 test("deterministic fallback uses behavior plan next step", () => {
   const response = deterministicResponse({
     behaviorPlan: {
