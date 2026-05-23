@@ -1,6 +1,6 @@
 "use strict";
 
-const { RISK_PATTERNS, SHORTENER_DOMAINS, SAFE_DOMAINS } = require("./rules");
+const { RISK_PATTERNS, SHORTENER_DOMAINS, SAFE_DOMAINS, ALLOW_PATTERNS } = require("./rules");
 
 /**
  * Extract all http(s) URLs from text.
@@ -96,11 +96,96 @@ function compileRule(rule) {
 }
 
 /**
+ * Validate an allow-list entry. Returns true if valid, or a string error message.
+ */
+function validateAllowEntry(entry, index) {
+  if (!entry || typeof entry !== "object") {
+    return `Allow entry at index ${index} is not an object.`;
+  }
+  if (!Array.isArray(entry.categories) || entry.categories.length === 0) {
+    return `Allow entry at index ${index} has missing or empty categories array.`;
+  }
+  for (const cat of entry.categories) {
+    if (typeof cat !== "string" || !cat.trim()) {
+      return `Allow entry at index ${index} has invalid category: ${JSON.stringify(cat)}.`;
+    }
+  }
+  if (!(entry.pattern instanceof RegExp)) {
+    if (typeof entry.pattern === "string") {
+      try {
+        new RegExp(entry.pattern, "i");
+      } catch (e) {
+        return `Allow entry at index ${index} has invalid regex pattern: ${e.message}`;
+      }
+    } else {
+      return `Allow entry at index ${index} has no pattern (expected RegExp or regex string).`;
+    }
+  }
+  if (typeof entry.message !== "string" || !entry.message.trim()) {
+    return `Allow entry at index ${index} has missing or empty message.`;
+  }
+  return true;
+}
+
+/**
+ * Compile an allow entry: if pattern is a string, convert to RegExp.
+ */
+function compileAllowEntry(entry) {
+  const compiled = { ...entry };
+  if (typeof compiled.pattern === "string") {
+    compiled.pattern = new RegExp(compiled.pattern, "i");
+  }
+  return compiled;
+}
+
+/**
+ * Apply allow-list filtering to flags based on the full input text.
+ * If the text matches an allow pattern, suppress the specified categories.
+ * A category of ["all"] in an allow entry suppresses all categories.
+ * Returns the filtered array of flags.
+ */
+function applyAllowList(text, flags, allowList) {
+  if (!Array.isArray(allowList) || allowList.length === 0) {
+    return flags;
+  }
+
+  // Collect all matching suppress-all patterns and specific suppress categories
+  const suppressAll = new Set();
+  const suppressCategories = new Set();
+
+  for (const entry of allowList) {
+    if (entry.pattern.test(text)) {
+      if (entry.categories.includes("all")) {
+        suppressAll.add(entry);
+      } else {
+        for (const cat of entry.categories) {
+          suppressCategories.add(cat);
+        }
+      }
+    }
+  }
+
+  // If any suppress-all pattern matched, remove all flags
+  if (suppressAll.size > 0) {
+    return [];
+  }
+
+  // Otherwise, remove flags whose category is in the suppress set
+  if (suppressCategories.size === 0) {
+    return flags;
+  }
+
+  return flags.filter((f) => !suppressCategories.has(f.category));
+}
+
+/**
  * Scan text for all risk patterns and URL risks.
  * Options:
  *   - customRules: Array of { severity, category, pattern, message } rules to merge
+ *   - customAllowList: Array of { pattern, categories, message } allow entries to merge
  *   - threshold: Minimum severity to include in flags and for safe/unsafe determination (default: 70)
- * Returns { safe, level, score, flags }.
+ *   - disableDefaultAllowList: If true, skip built-in allow patterns (only use custom)
+ * Returns { safe, level, score, flags, allowMatches }.
  */
 function scanText(text, options = {}) {
   const value = String(text || "");
@@ -141,20 +226,49 @@ function scanText(text, options = {}) {
   // Determine threshold (default 70 for backwards-compatible safety)
   const threshold = typeof options.threshold === "number" ? options.threshold : 70;
 
+  // Build the effective allow list
+  let allowList = options.disableDefaultAllowList ? [] : [...ALLOW_PATTERNS];
+  if (Array.isArray(options.customAllowList)) {
+    for (const entry of options.customAllowList) {
+      const valid = validateAllowEntry(entry, 0);
+      if (valid === true) {
+        allowList.push(compileAllowEntry(entry));
+      }
+    }
+  }
+
+  // Apply allow-list filtering
+  const filteredByAllow = applyAllowList(value, flags, allowList);
+  const suppressedCount = flags.length - filteredByAllow.length;
+
+  // Track allow matches for transparency
+  const allowMatches = [];
+  if (suppressedCount > 0) {
+    for (const entry of allowList) {
+      if (entry.pattern.test(value)) {
+        allowMatches.push({
+          categories: entry.categories,
+          message: entry.message
+        });
+      }
+    }
+  }
+
   // Filter flags for display/output by threshold
-  const filtered = flags.filter((f) => f.severity >= threshold);
+  const filtered = filteredByAllow.filter((f) => f.severity >= threshold);
 
-  // Score is the max severity across ALL flags (never decreases)
-  const score = flags.reduce((max, f) => Math.max(max, f.severity), 0);
+  // Score is the max severity across flags AFTER allow-list filtering
+  const score = filteredByAllow.reduce((max, f) => Math.max(max, f.severity), 0);
 
-  // Safe only when no flags meet the threshold
+  // Safe only when no flags meet the threshold (after allow filtering)
   const safe = filtered.length === 0;
 
   return {
     safe,
     level: riskLevel(score),
     score,
-    flags: filtered
+    flags: filtered,
+    ...(allowMatches.length > 0 ? { allowMatches } : {})
   };
 }
 
@@ -225,5 +339,8 @@ module.exports = {
   formatSummary,
   riskLevel,
   validateCustomRule,
-  compileRule
+  compileRule,
+  validateAllowEntry,
+  compileAllowEntry,
+  applyAllowList
 };

@@ -95,4 +95,42 @@ const SAFE_DOMAINS = new Set([
   "npmjs.com"
 ]);
 
-module.exports = { RISK_PATTERNS, SHORTENER_DOMAINS, SAFE_DOMAINS };
+/**
+ * Default allow patterns — suppress flags when text matches known-safe contexts.
+ * Each entry has:
+ *   - pattern: RegExp to match against the full input text
+ *   - categories: array of flag categories to suppress, or ["all"] for all
+ *   - message: human-readable explanation of why this context is safe
+ *
+ * These reduce false positives when scanning educational content, policy docs,
+ * security documentation, scanner development text, and safety checklists.
+ */
+const ALLOW_PATTERNS = [
+  {
+    categories: ["all"],
+    pattern: /\b(never reveal|never send|never share|do not reveal|do not send|do not share|must not reveal|must not send|must not share|hard rules?|safety (?:rules?|invariant|policy))\b/i,
+    message: "Safety policy language — content establishes protective rules, not attacks."
+  },
+  {
+    categories: ["all"],
+    pattern: /\b(what (?:it does not|is not|does NOT) include|no (?:signing|access to|smart contract|private keys?|deployment))\b/i,
+    message: "Scope exclusion language — content defines boundaries and prohibitions."
+  },
+  {
+    categories: ["secret_request", "credential_phish"],
+    pattern: /\b(security (?:review|audit|check|scan)|threat (?:model|scan|detection)|scam (?:scan|detection|pattern|flag)|detect(?:s|ion)? (?:prompt|wallet|seed|scam))\b/i,
+    message: "Security review context — mentions secrets in a detection or audit capacity."
+  },
+  {
+    categories: ["prompt_injection", "obfuscation"],
+    pattern: /\b(this scanner|the scanner|scanning engine|risk (?:patterns?|rules?|flags?)|threat categories|false positive|false negative)\b/i,
+    message: "Scanner development context — discusses detection patterns, not attacks."
+  },
+  {
+    categories: ["all"],
+    pattern: /\b(no outreach|no (?:payment|commitment|spend|signing|wallet action|treasury transfer|external commitment))\b/i,
+    message: "Boundary language — content explicitly states what will not happen."
+  }
+];
+
+module.exports = { RISK_PATTERNS, SHORTENER_DOMAINS, SAFE_DOMAINS, ALLOW_PATTERNS };
