@@ -42,6 +42,8 @@ test("cycle plan reviews risky issues before ordinary task work", () => {
 
   assert.equal(plan.nextStep.kind, "safety_review");
   assert.equal(plan.nextStep.blocked, true);
+  assert.equal(plan.directionPortfolio.mode, "single_guarded_priority");
+  assert.deepEqual(plan.directionPortfolio.directions.map((direction) => direction.kind), ["safety_review"]);
 });
 
 test("cycle plan checks pending owner approvals before open tasks", () => {
@@ -74,6 +76,100 @@ test("cycle plan checks pending owner approvals before open tasks", () => {
 
   assert.equal(plan.nextStep.kind, "owner_approval_check");
   assert.equal(plan.recommendedSteps[1].kind, "open_task");
+  assert.equal(plan.directionPortfolio.mode, "single_guarded_priority");
+});
+
+test("cycle plan exposes a multi-direction portfolio for ordinary safe cycles", () => {
+  const plan = planCycle({
+    cycleConfig: {
+      trigger: {
+        type: "mandatory",
+        id: "regular_heartbeat"
+      }
+    },
+    tasks: {
+      tasks: [
+        {
+          id: "task-1",
+          title: "Improve product docs",
+          status: "open"
+        }
+      ]
+    },
+    issues: [
+      {
+        number: 7,
+        title: "Can Orbit explain the roadmap?",
+        safety: { safe: true },
+        scamRisk: { score: 0 }
+      }
+    ],
+    roadmap: {
+      summary: {
+        activePhase: {
+          phaseId: "mission-control-roadmap",
+          status: "active",
+          checks: ["Frontend shows roadmap lanes."]
+        }
+      },
+      phaseChecks: []
+    },
+    aiBudget: {
+      canUseAi: true,
+      dailyRemainingUsd: 5,
+      monthlyRemainingUsd: 100
+    },
+    learningLab: {
+      bestProblem: {
+        title: "Maintainers need safer issue triage"
+      }
+    }
+  });
+
+  assert.equal(plan.directionPortfolio.mode, "multi_direction");
+  assert.ok(plan.directionPortfolio.directions.length >= 5);
+  assert.ok(plan.directionPortfolio.directions.some((direction) => direction.direction === "maintain"));
+  assert.ok(plan.directionPortfolio.directions.some((direction) => direction.direction === "respond"));
+  assert.ok(plan.directionPortfolio.directions.some((direction) => direction.direction === "grow"));
+  assert.ok(plan.directionPortfolio.directions.some((direction) => direction.direction === "explore"));
+  assert.ok(plan.directionPortfolio.directions.some((direction) => direction.direction === "remember"));
+  assert.equal(plan.directionPortfolio.choice.mode, "multi_direction");
+  assert.equal(plan.directionPortfolio.choice.mustCompareCount, 3);
+  assert.ok(plan.directionPortfolio.choice.considered.length >= 3);
+  assert.ok(plan.directionPortfolio.choice.selected);
+  assert.ok(Number.isFinite(plan.directionPortfolio.choice.selected.score));
+});
+
+test("cycle plan advances active roadmap phase before routine memory review", () => {
+  const plan = planCycle({
+    roadmap: {
+      currentLevel: {
+        id: "level-2",
+        name: "Mission Control Roadmap"
+      },
+      summary: {
+        currentLevel: {
+          id: "level-2",
+          name: "Mission Control Roadmap"
+        },
+        activePhase: {
+          phaseId: "mission-control-roadmap",
+          status: "active",
+          checks: ["Roadmap exists as tracked project memory."]
+        }
+      },
+      phaseChecks: []
+    },
+    aiBudget: {
+      canUseAi: true,
+      dailyRemainingUsd: 5,
+      monthlyRemainingUsd: 100
+    }
+  });
+
+  assert.equal(plan.nextStep.kind, "roadmap_growth");
+  assert.equal(plan.nextStep.activity, "mission_control");
+  assert.match(plan.nextStep.detail, /Roadmap exists/);
 });
 
 test("cycle plan can choose survival work from mandatory heartbeat", () => {
@@ -288,6 +384,70 @@ test("deterministic fallback uses behavior plan next step", () => {
   assert.equal(response.fallback, true);
   assert.match(response.content, /Continue task: Improve docs/);
   assert.match(response.actions[0].input.body, /Behavior mode: virtual_human_household/);
+  assert.match(response.actions[0].input.body, /Direction mode:/);
+});
+
+test("deterministic fallback writes multi-direction comparison when supplied", () => {
+  const response = deterministicResponse({
+    behaviorPlan: {
+      mode: "virtual_human_household",
+      primaryObjective: "Make one safe change.",
+      nextStep: {
+        kind: "roadmap_growth",
+        title: "Advance roadmap phase",
+        detail: "Find the next evidence-backed phase check."
+      },
+      directionPortfolio: {
+        mode: "multi_direction",
+        choice: {
+          mustCompareCount: 3,
+          rule: "Compare several safe directions.",
+          selected: {
+            direction: "maintain",
+            kind: "open_task",
+            title: "Continue task: Improve docs",
+            detail: "Open task from memory.",
+            score: 70,
+            signals: ["open_task_present"]
+          },
+          considered: [
+            {
+              direction: "maintain",
+              kind: "open_task",
+              title: "Continue task: Improve docs",
+              detail: "Open task from memory.",
+              score: 70,
+              signals: ["open_task_present"]
+            },
+            {
+              direction: "grow",
+              kind: "roadmap_growth",
+              title: "Advance roadmap phase",
+              detail: "Find the next evidence-backed phase check.",
+              score: 56,
+              signals: ["roadmap_evidence_work"]
+            },
+            {
+              direction: "remember",
+              kind: "memory_review",
+              title: "Refresh durable memory",
+              detail: "Look for stale notes.",
+              score: 48,
+              signals: ["memory_or_proof_work"]
+            }
+          ]
+        },
+        directions: []
+      }
+    }
+  }, "No AI API key is configured.");
+
+  assert.equal(response.fallback, true);
+  assert.match(response.content, /Continue task: Improve docs/);
+  assert.match(response.actions[0].input.body, /Selected direction: maintain/);
+  assert.match(response.actions[0].input.body, /Directions required for comparison: 3/);
+  assert.match(response.actions[0].input.body, /maintain: Continue task: Improve docs \[score 70\]/);
+  assert.doesNotMatch(response.actions[0].input.body, /Selected behavior step: Advance roadmap phase/);
 });
 
 test("first wake intro runs only on the first cycle", () => {

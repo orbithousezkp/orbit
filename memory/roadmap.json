@@ -1,0 +1,542 @@
+{
+  "version": 2,
+  "updatedAt": "2026-05-23T00:00:00.000Z",
+  "source": "Recovered from Codex session 019e52a1-7f90-7b70-868b-21b35587950a and merged with the earlier ZK proof discussion.",
+  "northStar": "Orbit grows from a guarded GitHub household into a complete autonomous software operator: visible, useful, revenue-aware, proof-driven, interoperable, and strict around money.",
+  "currentLevel": {
+    "id": "level-1",
+    "name": "Safe Autonomy",
+    "status": "active",
+    "summary": "Make every cycle measurable, pauseable, useful, and proof-backed before expanding crypto or execution power."
+  },
+  "operatingRules": [
+    "Roadmap progress must be backed by files, tests, proofs, or owner approval.",
+    "Open tasks, safe issue triage, safety review, survival work, and owner approval checks outrank roadmap growth.",
+    "Public Orbit may observe, propose, verify, and record; live signing and private execution stay outside the public tree.",
+    "Weekly operator revenue is calculated from that week's net distributable earnings, not lifetime treasury balance.",
+    "Visitors can inspect progress without seeing private keys, wallet routes, model routes, payout secrets, provider details, billing routes, or execution payloads.",
+    "ZK features ship as schemas, commitments, proof-bundle formats, and local-verifier tests first; no on-chain verifier or live wallet action ships until phase gates pass."
+  ],
+  "dayOneBuild": {
+    "summary": "Ship the safe autonomous foundation and visitor-facing mission control before expanding execution power.",
+    "ships": [
+      "Roadmap status memory and agent tool.",
+      "Frontend mission-control roadmap with lanes, level statuses, pass checks, and guardrails.",
+      "Cycle planner priority for evidence-backed roadmap growth.",
+      "Public weekly revenue formula based on the current week only.",
+      "ZK-ready attestation lane with commitment and proof-bundle scope, not live private wallet signing."
+    ],
+    "doesNotShip": [
+      "Live wallet signing.",
+      "Swaps, staking, yield, or token launch automation.",
+      "Direct funds movement from the public repo.",
+      "Private keys, seed phrases, wallet routes, payout secrets, provider routes, or execution payloads in source control.",
+      "Claims that Orbit passed a phase without evidence."
+    ]
+  },
+  "lanes": [
+    {
+      "id": "safe-autonomy",
+      "name": "Safe Autonomy",
+      "status": "active",
+      "mission": "Wake every cycle, choose useful low-risk work, avoid no-op churn, and write public proof."
+    },
+    {
+      "id": "mission-control",
+      "name": "Mission Control",
+      "status": "active",
+      "mission": "Show visitors what Orbit is building, what has passed, what is blocked, and what proof backs each claim."
+    },
+    {
+      "id": "proof-memory",
+      "name": "Proof And Memory",
+      "status": "planned",
+      "mission": "Make cycle proofs searchable, summarize changes, detect stale beliefs, and clean memory conflicts."
+    },
+    {
+      "id": "visitor-community",
+      "name": "Visitor And Community Layer",
+      "status": "planned",
+      "mission": "Handle issue intake, duplicate detection, safe commands, public Q&A, and human approval routing."
+    },
+    {
+      "id": "developer-autopilot",
+      "name": "Developer Autopilot",
+      "status": "planned",
+      "mission": "Maintain docs, tests, CI, screenshots, dependencies, releases, and frontend quality."
+    },
+    {
+      "id": "revenue-household",
+      "name": "Revenue Household",
+      "status": "planned",
+      "mission": "Track weekly earned revenue, costs, reserves, operator cut, treasury cut, and claim eligibility without public signing."
+    },
+    {
+      "id": "crypto-watchtower",
+      "name": "Crypto Watchtower",
+      "status": "planned",
+      "mission": "Watch configured public addresses, approvals, contracts, proposals, and risk without holding keys."
+    },
+    {
+      "id": "zk-trust",
+      "name": "ZK Trust Layer",
+      "status": "planned",
+      "mission": "Prove policy and reserve facts without exposing private wallet sets, balances, salts, or routes."
+    },
+    {
+      "id": "agent-identity",
+      "name": "Agent Identity",
+      "status": "research",
+      "mission": "Give Orbit a portable agent passport, capability registry, permission matrix, and reputation trail."
+    },
+    {
+      "id": "agent-network",
+      "name": "Agent Interoperability",
+      "status": "research",
+      "mission": "Expose safe tools, quarantine other-agent input, and prepare controlled handoff packets."
+    },
+    {
+      "id": "policy-execution",
+      "name": "Policy Execution Readiness",
+      "status": "later",
+      "mission": "Request tightly scoped private execution backed by approvals, rate limits, receipts, revocation, and proof."
+    }
+  ],
+  "phaseChecks": [
+    {
+      "phaseId": "safe-autonomy-core",
+      "status": "active",
+      "checks": [
+        "Emergency pause flag exists and is visible.",
+        "No-op cycles can be suppressed before creating commit noise.",
+        "Commit, issue, and AI budget limits are shown as runtime controls.",
+        "Routine repo work can proceed without opening approval issues.",
+        "Every cycle writes a safe public proof or verifiable sleep reason."
+      ],
+      "evidence": [
+        "memory/roadmap.json",
+        "src/agent/behavior.js",
+        "runtime/proofs/",
+        "tests/run.test.js",
+        "tests/config.test.js"
+      ]
+    },
+    {
+      "phaseId": "mission-control-roadmap",
+      "status": "active",
+      "checks": [
+        "Frontend shows lanes, phases, statuses, risks, blockers, and next actions.",
+        "Visitors can understand how Orbit levels up without reading source files.",
+        "Roadmap covers autonomy, proof, memory, visitor intake, developer work, revenue, crypto, ZK, identity, interoperability, and execution boundaries.",
+        "Agent context can read roadmap status without rereading Codex sessions."
+      ],
+      "evidence": [
+        "src/data/frontend.js",
+        "src/App.jsx",
+        "src/agent/roadmap.js",
+        "memory/roadmap.json",
+        "tests/roadmap.test.js"
+      ]
+    },
+    {
+      "phaseId": "proof-memory-upgrade",
+      "status": "planned",
+      "checks": [
+        "Proof viewer can summarize latest cycle.",
+        "Proof search can find phase evidence.",
+        "Memory conflict detector flags stale or contradictory durable facts.",
+        "Changelog can be derived from proof records."
+      ],
+      "evidence": [
+        "runtime/proofs/",
+        "memory/knowledge.json",
+        "tests/memory.test.js"
+      ]
+    },
+    {
+      "phaseId": "visitor-community-layer",
+      "status": "planned",
+      "checks": [
+        "Issue intake can classify visitor intent safely.",
+        "Duplicate issue detection exists.",
+        "Safe command parser rejects spend, signing, and secret requests.",
+        "Public Q&A can answer from repo memory without leaking private config."
+      ],
+      "evidence": [
+        "src/agent/scam.js",
+        "src/agent/github.js",
+        "tests/safety.test.js"
+      ]
+    },
+    {
+      "phaseId": "developer-autopilot",
+      "status": "planned",
+      "checks": [
+        "Docs truth auditor identifies stale docs.",
+        "Test gap finder produces safe repo-local tasks.",
+        "CI repair planner proposes minimal fixes.",
+        "Screenshot regression triage verifies frontend quality before marking UI work passed."
+      ],
+      "evidence": [
+        "tests/",
+        "docs/",
+        "src/"
+      ]
+    },
+    {
+      "phaseId": "weekly-revenue-epochs",
+      "status": "planned",
+      "checks": [
+        "Weekly gross revenue, refunds, reversals, direct costs, required reserve, net distributable, operator cut, and treasury cut are separated.",
+        "Claims use the current weekly epoch only.",
+        "Public proof records formula and status while private payment details stay hidden.",
+        "If Orbit earns zero during a week, operator cut is zero even if treasury has old funds."
+      ],
+      "evidence": [
+        "memory/treasury.json",
+        "src/agent/treasury.js",
+        "tests/treasury.test.js"
+      ]
+    },
+    {
+      "phaseId": "treasury-watchtower-proposal-gate",
+      "status": "planned",
+      "checks": [
+        "Read-only treasury watchtower tracks configured public addresses without holding keys.",
+        "Proposal gate hashes action intent before any approval-class movement.",
+        "Proof ledger records proposal hash, approval status, and execution boundary without exposing private routes.",
+        "Execution status remains private_executor_required for live money movement."
+      ],
+      "evidence": [
+        "memory/treasury.json",
+        "memory/governance.json",
+        "runtime/proofs/"
+      ]
+    },
+    {
+      "phaseId": "zk-treasury-attestation",
+      "status": "planned",
+      "checks": [
+        "Commitment schema exists for private treasury snapshots.",
+        "Proof bundle format exists for policy compliance statements.",
+        "Local verifier rejects tampered roots, wrong salts, stale weekly epochs, over-cap spends, and unapproved action hashes.",
+        "Public proof shows compliance statements without exposing wallet sets, balances, salts, provider routes, or payout routes."
+      ],
+      "evidence": [
+        "memory/roadmap.json",
+        "tests/"
+      ]
+    },
+    {
+      "phaseId": "agent-identity-interoperability",
+      "status": "research",
+      "checks": [
+        "Agent passport scope is documented.",
+        "Capability registry defines allowed and disallowed tool surfaces.",
+        "External agent input is quarantined before becoming memory or work.",
+        "Handoff packets do not grant execution authority."
+      ],
+      "evidence": [
+        "memory/agent-sources.json",
+        "memory/idea-inbox.json",
+        "src/agent/learning-lab.js"
+      ]
+    },
+    {
+      "phaseId": "policy-execution-readiness",
+      "status": "later",
+      "checks": [
+        "Smart-account policy design exists.",
+        "Session-key windows, spend caps, guardian recovery, and revoke paths are documented.",
+        "Private executor receipt format is defined.",
+        "Public repo never holds unrestricted signer power."
+      ],
+      "evidence": [
+        "memory/governance.json",
+        "memory/treasury.json"
+      ]
+    }
+  ],
+  "levels": [
+    {
+      "id": "level-1",
+      "name": "Safe Autonomy",
+      "status": "active",
+      "goal": "Orbit can wake on schedule, choose one useful safe action, avoid no-op churn, and prove what happened.",
+      "unlocks": [
+        "Autonomy control switch",
+        "No-op cycle suppression",
+        "Commit and issue rate limits",
+        "Proof-backed phase gates"
+      ]
+    },
+    {
+      "id": "level-2",
+      "name": "Mission Control",
+      "status": "active",
+      "goal": "Visitors can see what Orbit is, what it is building, what is blocked, and what proof supports each status.",
+      "unlocks": [
+        "Visitor-facing roadmap",
+        "Current mission panel",
+        "Phase checks",
+        "Proof timeline summaries"
+      ]
+    },
+    {
+      "id": "level-3",
+      "name": "Proof And Memory",
+      "status": "planned",
+      "goal": "Orbit turns proofs and memory into searchable evidence, changelogs, and stale-belief cleanup.",
+      "unlocks": [
+        "Proof viewer",
+        "Proof search",
+        "Cycle summaries",
+        "Memory conflict detector",
+        "Stale belief cleanup"
+      ]
+    },
+    {
+      "id": "level-4",
+      "name": "Visitor And Community Layer",
+      "status": "planned",
+      "goal": "Orbit handles visitors, issues, safe commands, duplicate reports, and public Q&A without leaking secrets.",
+      "unlocks": [
+        "Issue intake",
+        "Duplicate issue detection",
+        "Visitor trust scoring",
+        "Safe command parser",
+        "Human approval router"
+      ]
+    },
+    {
+      "id": "level-5",
+      "name": "Developer Autopilot",
+      "status": "planned",
+      "goal": "Orbit maintains docs, tests, CI, releases, dependencies, and frontend quality as recurring household work.",
+      "unlocks": [
+        "Docs truth auditor",
+        "Test gap cartographer",
+        "Dependency update planner",
+        "CI repair planner",
+        "Screenshot regression triage",
+        "Release commander"
+      ]
+    },
+    {
+      "id": "level-6",
+      "name": "Revenue Household",
+      "status": "planned",
+      "goal": "Orbit tracks weekly earned revenue, cost, reserve, operator cut, treasury cut, and payout eligibility without public signing.",
+      "unlocks": [
+        "Weekly revenue epochs",
+        "Revenue inbox",
+        "Expense ledger",
+        "Private executor receipt records",
+        "Operator cut calculation"
+      ]
+    },
+    {
+      "id": "level-7",
+      "name": "Crypto Watchtower",
+      "status": "planned",
+      "goal": "Orbit monitors configured public addresses, approvals, contracts, proposals, and risk without holding keys.",
+      "unlocks": [
+        "Read-only treasury watchtower",
+        "Crypto proposal gate",
+        "Approval-drain scanner",
+        "Contract risk cards",
+        "Private executor required status"
+      ]
+    },
+    {
+      "id": "level-8",
+      "name": "ZK Trust Layer",
+      "status": "planned",
+      "goal": "Orbit proves policy compliance and reserve facts without exposing private wallet sets, balances, salts, or routes.",
+      "unlocks": [
+        "Private treasury commitments",
+        "Reserve floor attestation",
+        "Weekly revenue attestation",
+        "Approved hidden wallet set proof",
+        "Local verifier and tamper tests"
+      ]
+    },
+    {
+      "id": "level-9",
+      "name": "Agent Identity",
+      "status": "research",
+      "goal": "Orbit becomes a portable agent identity with capabilities, reputation, permissions, and verifiable status.",
+      "unlocks": [
+        "Agent passport",
+        "Capability registry",
+        "Permission matrix",
+        "Reputation trail",
+        "Verifiable credentials style identity"
+      ]
+    },
+    {
+      "id": "level-10",
+      "name": "Agent Interoperability",
+      "status": "research",
+      "goal": "Orbit can expose tools and communicate with other agents while quarantining untrusted instructions.",
+      "unlocks": [
+        "MCP-compatible tool surface",
+        "Agent handoff packets",
+        "A2A-style message quarantine",
+        "Child-agent charters",
+        "Cross-repo contribution treaties"
+      ]
+    },
+    {
+      "id": "level-11",
+      "name": "Policy Execution Readiness",
+      "status": "later",
+      "goal": "Orbit can request tightly scoped private execution backed by approvals, rate limits, receipts, and proof, without becoming a public hot wallet.",
+      "unlocks": [
+        "Smart-account policy design",
+        "Session-key windows",
+        "Spend caps",
+        "Guardian recovery plan",
+        "Private executor integration"
+      ]
+    }
+  ],
+  "weeklyRevenueModel": {
+    "scope": "current_week_only",
+    "formula": "weeklyDistributableRevenue = weeklyGrossRevenue - refunds - reversals - directCosts - requiredReserveAllocation",
+    "operatorCut": "weeklyDistributableRevenue * ORBIT_OPERATOR_REVENUE_BPS / 10000",
+    "treasuryCut": "weeklyDistributableRevenue - operatorCut",
+    "rules": [
+      "If weeklyDistributableRevenue is zero, operator cut is zero.",
+      "Lifetime treasury balance is not the payout base.",
+      "Pending, failed, reversed, unverified, or promised revenue is excluded.",
+      "Public proof records formula and status; private route and payment details stay hidden."
+    ]
+  },
+  "zkProofsShipNow": [
+    {
+      "id": "private-treasury-commitment-ledger",
+      "name": "Private Treasury Commitment Ledger",
+      "status": "planned",
+      "summary": "Commit to private treasury facts with public hashes while keeping wallet sets, balances, salts, and routes hidden."
+    },
+    {
+      "id": "zk-policy-attestation",
+      "name": "ZK Policy Attestation",
+      "status": "planned",
+      "summary": "Prove that a proposed action satisfies Orbit policy, such as reserve floor and approval requirements, without revealing sensitive internals."
+    },
+    {
+      "id": "proof-gated-action-intent",
+      "name": "Proof-Gated Action Intent",
+      "status": "planned",
+      "summary": "Hash action type, recipient class, amount class, repo commit, issue id, nonce, and deadline before any approval-class action can proceed."
+    },
+    {
+      "id": "local-verifier",
+      "name": "Local Verifier And Tamper Tests",
+      "status": "planned",
+      "summary": "Verify proof bundles locally first and reject altered commitments, stale nonces, wrong roots, and missing approvals."
+    }
+  ],
+  "zkProofMvp": [
+    {
+      "id": "private-treasury-commitment-ledger",
+      "name": "Private Treasury Commitment Ledger",
+      "status": "planned",
+      "summary": "Commit to private treasury facts with public hashes while keeping wallet sets, balances, salts, and routes hidden."
+    },
+    {
+      "id": "zk-policy-attestation",
+      "name": "ZK Policy Attestation",
+      "status": "planned",
+      "summary": "Prove that a proposed action satisfies Orbit policy, such as reserve floor and approval requirements, without revealing sensitive internals."
+    },
+    {
+      "id": "proof-gated-action-intent",
+      "name": "Proof-Gated Action Intent",
+      "status": "planned",
+      "summary": "Hash action type, recipient class, amount class, repo commit, issue id, nonce, and deadline before any approval-class action can proceed."
+    },
+    {
+      "id": "local-verifier",
+      "name": "Local Verifier And Tamper Tests",
+      "status": "planned",
+      "summary": "Verify proof bundles locally first and reject altered commitments, stale nonces, wrong roots, and missing approvals."
+    }
+  ],
+  "frontierBacklog": [
+    "MCP-style tool surface for exposing safe Orbit tools to clients.",
+    "A2A-style agent handoff packets with quarantine, signatures, and permission boundaries.",
+    "Repo-local release commander that prepares changelogs, tags, artifacts, and rollback notes.",
+    "Screenshot regression triage that compares frontend states across mobile and desktop.",
+    "Service-desk mode for paid repo audits, issue triage, dependency cleanup, and documentation repair.",
+    "Agent passport with capability claims, revocation, proof history, and reputation events.",
+    "Smart-account execution design using approval policies, session windows, spend caps, guardian recovery, and revoke paths.",
+    "Private data provenance proofs for revenue receipts or external account facts using zkTLS-style evidence.",
+    "ZK policy receipts for weekly revenue, reserve floor, approved wallet set, and action-hash compliance.",
+    "Simulation lab for impossible ideas before any live external action."
+  ],
+  "impossibleOrUnsafe": [
+    "Guaranteed profit.",
+    "Autonomous unrestricted wallet control.",
+    "Visitor-controlled payout changes.",
+    "Public repo private-key custody.",
+    "Trusting visitor instructions blindly.",
+    "ZK proof of facts that were never committed or witnessed.",
+    "Making ZK prove off-chain truth unless the input source is trusted, witnessed, or committed.",
+    "Live trading, swaps, staking, or token launch automation before legal and security review."
+  ],
+  "notImplementedYet": [
+    "No production ZK circuit, prover, verifier, proof bundle generator, or on-chain verifier is implemented yet.",
+    "Existing runtime proofs are normal audit/proof logs, not zero-knowledge proofs.",
+    "No live wallet signing, spending, token launch, reward claim, payout-route change, or external commitment is unlocked by this roadmap."
+  ],
+  "approvalRequired": [
+    "Wallet spending",
+    "Signing",
+    "Token launch",
+    "Reward claims",
+    "Payout-route changes",
+    "External outreach or paid commitments",
+    "Live ZK proving service costs",
+    "On-chain verifier deployment"
+  ],
+  "researchReferences": [
+    {
+      "name": "Model Context Protocol tools",
+      "url": "https://modelcontextprotocol.io/specification/draft/server/tools",
+      "usedFor": "Future guarded tool surface."
+    },
+    {
+      "name": "Agent2Agent protocol",
+      "url": "https://a2aproject.github.io/A2A/latest/specification/",
+      "usedFor": "Future agent handoff and interoperability lane."
+    },
+    {
+      "name": "W3C Verifiable Credentials",
+      "url": "https://www.w3.org/TR/vc-data-model/",
+      "usedFor": "Future Orbit identity and passport research."
+    },
+    {
+      "name": "ERC-4337 account abstraction",
+      "url": "https://docs.erc4337.io/core-standards/erc-4337",
+      "usedFor": "Future smart-account policy execution design."
+    },
+    {
+      "name": "EIP-7702 set-code transactions",
+      "url": "https://eips.ethereum.org/EIPS/eip-7702",
+      "usedFor": "Future execution-readiness risk and revocation review."
+    },
+    {
+      "name": "Noir zero-knowledge programs",
+      "url": "https://noir-lang.org/docs/",
+      "usedFor": "Future ZK circuit implementation research."
+    },
+    {
+      "name": "TLSNotary private data provenance",
+      "url": "https://tlsnotary.org/docs/intro",
+      "usedFor": "Future private receipt and web-data attestation research."
+    }
+  ]
+}

@@ -1,13 +1,26 @@
 import {
+  Activity,
   ArrowRight,
+  BadgeCheck,
   Bot,
   CheckCircle2,
+  CircleDollarSign,
+  CircleDot,
+  FileLock2,
+  Fingerprint,
   GitBranch,
   HeartPulse,
   House,
+  Link2,
   Menu,
+  Milestone,
   NotebookTabs,
+  ReceiptText,
+  Rocket,
+  ShieldAlert,
+  Target,
   X,
+  Zap,
 } from 'lucide-react';
 import { useState } from 'react';
 import {
@@ -23,6 +36,16 @@ import {
   houseMembers,
   humanStack,
   identityStats,
+  roadmapApprovalRequired,
+  roadmapDayOneBuild,
+  roadmapFrontierBacklog,
+  roadmapImpossibleOrUnsafe,
+  roadmapLanes,
+  roadmapNotImplementedYet,
+  roadmapResearchReferences,
+  roadmapShipNow,
+  roadmapSummary,
+  roadmapWeeklyRevenueModel,
   navItems,
 } from './data/frontend.js';
 
@@ -332,13 +355,83 @@ function HouseholdLedger() {
   );
 }
 
+const ROADMAP_STATUS_STYLES = {
+  active: 'border-emerald-200 bg-emerald-50 text-emerald-700',
+  planned: 'border-indigo-200 bg-indigo-50 text-indigo-700',
+  research: 'border-amber-200 bg-amber-50 text-amber-700',
+  later: 'border-slate-200 bg-slate-100 text-slate-600',
+  blocked: 'border-rose-200 bg-rose-50 text-rose-700',
+};
+
+function RoadmapMetric({ metric }) {
+  const Icon = metric.icon;
+
+  return (
+    <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+      <div className="flex items-center gap-2 text-slate-500">
+        <Icon size={14} />
+        <div className="text-[10px] font-bold uppercase tracking-widest">{metric.label}</div>
+      </div>
+      <div className="mt-2 text-[20px] font-bold text-slate-950">{metric.value}</div>
+      <p className="mt-1 text-[11px] leading-4 text-slate-600">{metric.detail}</p>
+    </div>
+  );
+}
+
+function RoadmapPanel({ eyebrow, title, icon: Icon, children }) {
+  return (
+    <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="mb-4 flex items-center gap-2">
+        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#4f5bbd]/10 text-[#4f5bbd]">
+          <Icon size={17} />
+        </span>
+        <div>
+          <div className="text-[11px] font-bold uppercase tracking-widest text-slate-500">
+            {eyebrow}
+          </div>
+          <div className="text-[14px] font-bold text-slate-950">{title}</div>
+        </div>
+      </div>
+      {children}
+    </article>
+  );
+}
+
+function RoadmapLane({ lane }) {
+  const Icon = lane.icon || CircleDot;
+  const statusClass = ROADMAP_STATUS_STYLES[lane.status] || ROADMAP_STATUS_STYLES.planned;
+
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start gap-3">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#4f5bbd]/10 text-[#4f5bbd]">
+            <Icon size={18} />
+          </span>
+          <div>
+            <div className="text-[14px] font-bold leading-5 text-slate-950">{lane.title}</div>
+            <p className="mt-1 text-[11px] font-mono uppercase tracking-widest text-slate-500">
+              {lane.status}
+            </p>
+          </div>
+        </div>
+        <div className={`rounded-full border px-2.5 py-1 font-mono text-[10px] font-bold uppercase ${statusClass}`}>
+          {lane.status}
+        </div>
+      </div>
+      <p className="mt-3 text-[12px] leading-5 text-slate-600">{lane.detail}</p>
+    </div>
+  );
+}
+
 export default function App() {
   return (
-    <div id="top" className="min-h-screen bg-[#f7f9fc] text-slate-950">
+    <div id="top" className="sky-theme relative isolate min-h-screen overflow-x-hidden bg-transparent text-slate-950">
+      <div aria-hidden="true" className="frontpage-sky pointer-events-none absolute inset-0 -z-10" />
       <Header />
 
       <main>
-        <section id="house" className="relative overflow-hidden border-b border-slate-200 bg-white">
+        <section id="house" className="relative overflow-hidden border-b border-slate-200/70 bg-white/78 backdrop-blur-sm">
           <div className="absolute inset-0 hero-mesh" />
           <div className="relative mx-auto grid max-w-[1180px] gap-10 px-4 pb-16 pt-12 sm:px-6 sm:pt-16 lg:grid-cols-[0.9fr_1.1fr] lg:px-8 lg:pb-20">
             <div className="flex flex-col justify-center">
@@ -522,6 +615,220 @@ sleep: proof saved`}
               {boundaries.map((item) => (
                 <SystemCard key={item.title} item={item} />
               ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="roadmap" className="mx-auto max-w-[1180px] px-4 py-12 sm:px-6 lg:px-8">
+          <SectionIntro kicker="Roadmap" title="Orbit grows by passing visible phase gates">
+            The recovered roadmap is now a product surface: autonomy, proof, visitors, developer
+            work, revenue, crypto watch, ZK trust, identity, interoperability, and execution
+            readiness all advance only when evidence exists.
+          </SectionIntro>
+
+          <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              {
+                label: 'lanes',
+                value: roadmapSummary.counts.lanes,
+                detail: 'growth tracks',
+                icon: Target,
+              },
+              {
+                label: 'levels',
+                value: roadmapSummary.counts.levels,
+                detail: 'staged unlocks',
+                icon: Milestone,
+              },
+              {
+                label: 'phase checks',
+                value: roadmapSummary.counts.phases,
+                detail: 'evidence gates',
+                icon: BadgeCheck,
+              },
+              {
+                label: 'ZK first ship',
+                value: roadmapSummary.counts.zkShipNow,
+                detail: 'planned items',
+                icon: Fingerprint,
+              },
+            ].map((metric) => (
+              <RoadmapMetric key={metric.label} metric={metric} />
+            ))}
+          </div>
+
+          <div className="mt-7 grid gap-6 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
+            <div className="space-y-4">
+              <RoadmapPanel eyebrow="Current gate" title={roadmapSummary.currentLevel} icon={CircleDot}>
+                <p className="text-[13px] leading-6 text-slate-600">{roadmapDayOneBuild.summary}</p>
+                <div className="mt-4 space-y-3">
+                  {roadmapSummary.activeChecks.map((check) => (
+                    <div key={check} className="flex gap-3">
+                      <CheckCircle2 size={18} className="mt-0.5 shrink-0 text-emerald-600" />
+                      <p className="text-[12px] leading-5 text-slate-600">{check}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-5 rounded-xl border border-indigo-100 bg-indigo-50 p-4">
+                  <div className="text-[11px] font-bold uppercase tracking-widest text-indigo-700">
+                    Next level
+                  </div>
+                  <p className="mt-2 text-[13px] leading-6 text-slate-700">
+                    {roadmapSummary.nextLevel} stays locked until lower layers are backed by
+                    files, tests, proofs, or owner approval.
+                  </p>
+                </div>
+              </RoadmapPanel>
+
+              <RoadmapPanel eyebrow="Day-one build" title="Ships now, without pretending" icon={Rocket}>
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+                  <div>
+                    <div className="mb-2 text-[11px] font-bold uppercase tracking-widest text-emerald-700">
+                      Ships
+                    </div>
+                    <div className="space-y-2">
+                      {roadmapDayOneBuild.ships.map((item) => (
+                        <div key={item} className="flex gap-2 text-[12px] leading-5 text-slate-600">
+                          <CheckCircle2 size={15} className="mt-0.5 shrink-0 text-emerald-600" />
+                          <span>{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="mb-2 text-[11px] font-bold uppercase tracking-widest text-rose-700">
+                      Does not ship
+                    </div>
+                    <div className="space-y-2">
+                      {roadmapDayOneBuild.doesNotShip.map((item) => (
+                        <div key={item} className="flex gap-2 text-[12px] leading-5 text-slate-600">
+                          <ShieldAlert size={15} className="mt-0.5 shrink-0 text-rose-600" />
+                          <span>{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </RoadmapPanel>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              {roadmapLanes.map((lane) => (
+                <RoadmapLane key={lane.title} lane={lane} />
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-6 grid gap-5 lg:grid-cols-3 lg:items-start">
+            <RoadmapPanel eyebrow="ZK proof lane" title="Planned first proof bundle" icon={Fingerprint}>
+              <p className="text-[13px] leading-6 text-slate-600">{roadmapSummary.zkStage}</p>
+              <div className="mt-4 space-y-3">
+                {roadmapShipNow.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <div key={item.title} className="border-b border-slate-100 pb-3 last:border-b-0 last:pb-0">
+                      <div className="flex items-center gap-2">
+                        <Icon size={16} className="text-[#4f5bbd]" />
+                        <div className="text-[12px] font-bold text-slate-950">{item.title}</div>
+                      </div>
+                      <p className="mt-2 text-[12px] leading-5 text-slate-600">{item.detail}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </RoadmapPanel>
+
+            <RoadmapPanel eyebrow="Revenue model" title="Current week only" icon={CircleDollarSign}>
+              <div className="rounded-xl bg-slate-950 p-4 font-mono text-[11px] leading-5 text-slate-200">
+                {roadmapWeeklyRevenueModel.formula}
+              </div>
+              <div className="mt-4 space-y-2">
+                {roadmapWeeklyRevenueModel.rules.map((rule) => (
+                  <div key={rule} className="flex gap-2 text-[12px] leading-5 text-slate-600">
+                    <ReceiptText size={15} className="mt-0.5 shrink-0 text-[#4f5bbd]" />
+                    <span>{rule}</span>
+                  </div>
+                ))}
+              </div>
+            </RoadmapPanel>
+
+            <RoadmapPanel eyebrow="Truth boundary" title="Not implemented yet" icon={FileLock2}>
+              <div className="space-y-3">
+                {roadmapNotImplementedYet.map((item) => (
+                  <div key={item} className="flex gap-2 text-[12px] leading-5 text-slate-600">
+                    <ShieldAlert size={15} className="mt-0.5 shrink-0 text-rose-600" />
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 rounded-xl border border-rose-100 bg-rose-50 p-3">
+                <div className="text-[11px] font-bold uppercase tracking-widest text-rose-700">
+                  Approval required
+                </div>
+                <p className="mt-2 text-[12px] leading-5 text-slate-700">
+                  {roadmapApprovalRequired.join(', ')}.
+                </p>
+              </div>
+            </RoadmapPanel>
+          </div>
+
+          <div className="mt-6 grid gap-5 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
+            <RoadmapPanel eyebrow="Frontier backlog" title="Possible, but gated" icon={Zap}>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {roadmapFrontierBacklog.map((item) => (
+                  <div key={item} className="flex gap-2 border-b border-slate-100 pb-3 text-[12px] leading-5 text-slate-600 last:border-b-0 last:pb-0">
+                    <Activity size={15} className="mt-0.5 shrink-0 text-[#4f5bbd]" />
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+            </RoadmapPanel>
+
+            <RoadmapPanel eyebrow="Impossible or unsafe" title="Never public hot-wallet autonomy" icon={ShieldAlert}>
+              <div className="space-y-3">
+                {roadmapImpossibleOrUnsafe.map((item) => (
+                  <div key={item} className="flex gap-2 text-[12px] leading-5 text-slate-600">
+                    <ShieldAlert size={15} className="mt-0.5 shrink-0 text-rose-600" />
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+            </RoadmapPanel>
+          </div>
+
+          <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="mb-4 flex items-center gap-2">
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#4f5bbd]/10 text-[#4f5bbd]">
+                <Link2 size={17} />
+              </span>
+              <div>
+                <div className="text-[11px] font-bold uppercase tracking-widest text-slate-500">
+                  Research spine
+                </div>
+                <div className="text-[14px] font-bold text-slate-950">
+                  Standards Orbit is tracking
+                </div>
+              </div>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {roadmapResearchReferences.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <a
+                    key={item.name}
+                    href={item.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="rounded-xl border border-slate-200 bg-slate-50 p-3 transition-colors hover:border-[#4f5bbd]/40 hover:bg-white"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Icon size={16} className="text-[#4f5bbd]" />
+                      <div className="text-[12px] font-bold text-slate-950">{item.name}</div>
+                    </div>
+                    <p className="mt-2 text-[12px] leading-5 text-slate-600">{item.usedFor}</p>
+                  </a>
+                );
+              })}
             </div>
           </div>
         </section>

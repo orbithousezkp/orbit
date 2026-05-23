@@ -7,23 +7,61 @@ const { privateAiRoute, privateProviderErrors } = require("./provider-privacy");
 
 const DEFAULT_AI_REQUEST_MAX_BYTES = 2_500_000;
 
+function selectedPlanDirection(plan) {
+  const portfolio = plan.directionPortfolio && Array.isArray(plan.directionPortfolio.directions)
+    ? plan.directionPortfolio
+    : null;
+  return portfolio && portfolio.choice && portfolio.choice.selected
+    ? portfolio.choice.selected
+    : plan.nextStep;
+}
+
+function directionLine(direction) {
+  const score = Number.isFinite(direction.score) ? ` [score ${direction.score}]` : "";
+  const signals = Array.isArray(direction.signals) && direction.signals.length
+    ? ` (${direction.signals.join(", ")})`
+    : "";
+  return `${direction.direction}: ${direction.title}${score}${signals}`;
+}
+
 function deterministicResponse(context, reason) {
   const plan = context.behaviorPlan || planCycle(context);
-  const nextAction = plan.nextStep
-    ? `${plan.nextStep.title}: ${plan.nextStep.detail}`
+  const portfolio = plan.directionPortfolio && Array.isArray(plan.directionPortfolio.directions)
+    ? plan.directionPortfolio
+    : null;
+  const choice = portfolio && portfolio.choice ? portfolio.choice : null;
+  const selected = selectedPlanDirection(plan);
+  const directionsForSummary = choice && Array.isArray(choice.considered) && choice.considered.length
+    ? choice.considered
+    : (portfolio && Array.isArray(portfolio.directions) ? portfolio.directions : []);
+  const directionSummary = directionsForSummary.length
+    ? directionsForSummary
+        .slice(0, 5)
+        .map(directionLine)
+        .join("\n")
+    : "No alternate safe directions were available.";
+  const nextAction = selected
+    ? `${selected.title}: ${selected.detail}`
     : "Refresh project memory and look for small documentation or test improvements.";
   const actions = [];
 
-  if (plan.nextStep && plan.nextStep.kind === "survival_opportunity") {
+  if (selected && ["survival_opportunity", "survival_backlog", "earning_branch"].includes(selected.kind)) {
     actions.push({
       tool: "income_opportunities",
       input: {}
     });
   }
 
-  if (plan.nextStep && plan.nextStep.kind === "learning_exploration") {
+  if (selected && ["learning_exploration", "learning_branch"].includes(selected.kind)) {
     actions.push({
       tool: "learning_lab_status",
+      input: {}
+    });
+  }
+
+  if (selected && ["roadmap_growth", "roadmap_branch"].includes(selected.kind)) {
+    actions.push({
+      tool: "roadmap_status",
       input: {}
     });
   }
@@ -35,7 +73,14 @@ function deterministicResponse(context, reason) {
       body: [
         "Orbit ran without an AI provider.",
         "",
+        `Selected direction: ${selected && selected.direction ? selected.direction : "step"}`,
         `Selected behavior step: ${nextAction}`,
+        "",
+        `Direction mode: ${portfolio ? portfolio.mode : "single_step"}`,
+        choice ? `Decision rule: ${choice.rule}` : "",
+        choice ? `Directions required for comparison: ${choice.mustCompareCount}` : "",
+        "Available directions:",
+        directionSummary,
         "",
         `Behavior mode: ${plan.mode}`,
         `Primary objective: ${plan.primaryObjective}`

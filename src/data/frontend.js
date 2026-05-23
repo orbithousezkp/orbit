@@ -1,18 +1,37 @@
 import {
+  Activity,
   Archive,
   BookOpenText,
   Brain,
   BriefcaseBusiness,
   CalendarClock,
+  BadgeCheck,
+  CircleDollarSign,
   DoorOpen,
   FileCheck2,
+  FileLock2,
+  Fingerprint,
   HeartPulse,
   House,
+  Gauge,
+  Link2,
+  Landmark,
   KeyRound,
   LockKeyhole,
+  Milestone,
   NotebookTabs,
+  Network,
   PiggyBank,
+  ReceiptText,
+  Rocket,
+  ScanSearch,
   ShieldCheck,
+  ShieldAlert,
+  Target,
+  WalletCards,
+  Workflow,
+  Code2,
+  Zap,
 } from 'lucide-react';
 
 export const navItems = [
@@ -22,6 +41,7 @@ export const navItems = [
   { label: 'House', href: '#rooms' },
   { label: 'Rhythm', href: '#routine' },
   { label: 'Trust', href: '#boundaries' },
+  { label: 'Roadmap', href: '#roadmap' },
 ];
 
 export const identityStats = [
@@ -360,5 +380,231 @@ export const boundaries = [
     title: 'Health is measured',
     desc: 'Budget, food, memory, queue state, and safety status define whether the household can keep working.',
     icon: HeartPulse,
+  },
+];
+
+export const roadmapSummary = {
+  currentLevel: 'Safe Autonomy',
+  nextLevel: 'Proof And Memory',
+  zkStage: 'ZK proof work is staged, not implemented: commitments and local verifier tests come first.',
+  activeChecks: [
+    'Open tasks and safe issue triage still outrank roadmap growth.',
+    'Roadmap memory is tracked in repo files and agent context.',
+    'ZK stays staged behind commitments, local verifiers, and tamper tests.',
+  ],
+  counts: {
+    lanes: 11,
+    levels: 11,
+    phases: 10,
+    zkShipNow: 4,
+  },
+};
+
+export const roadmapDayOneBuild = {
+  summary: 'Ship the safe autonomous foundation and visitor-facing mission control before expanding execution power.',
+  ships: [
+    'Roadmap status memory and agent tool.',
+    'Frontend mission-control roadmap with lanes, level statuses, pass checks, and guardrails.',
+    'Cycle planner priority for evidence-backed roadmap growth.',
+    'Public weekly revenue formula based on the current week only.',
+    'ZK-ready attestation lane with commitment and proof-bundle scope, not live private wallet signing.',
+  ],
+  doesNotShip: [
+    'Live wallet signing.',
+    'Swaps, staking, yield, or token launch automation.',
+    'Direct funds movement from the public repo.',
+    'Private keys, seed phrases, wallet routes, payout secrets, provider routes, or execution payloads in source control.',
+    'Claims that Orbit passed a phase without evidence.',
+  ],
+};
+
+export const roadmapNotImplementedYet = [
+  'No production ZK circuit, prover, verifier, proof bundle generator, or on-chain verifier is implemented yet.',
+  'Existing runtime proofs are normal audit/proof logs, not zero-knowledge proofs.',
+  'No live wallet signing, spending, token launch, reward claim, payout-route change, or external commitment is unlocked by this roadmap.',
+];
+
+export const roadmapApprovalRequired = [
+  'Wallet spending',
+  'Signing',
+  'Token launch',
+  'Reward claims',
+  'Payout-route changes',
+  'External outreach or paid commitments',
+  'Live ZK proving service costs',
+  'On-chain verifier deployment',
+];
+
+export const roadmapLanes = [
+  {
+    title: 'Safe autonomy',
+    status: 'active',
+    icon: Gauge,
+    detail: 'Keep wake cycles useful, proof-backed, and gated before broadening execution power.',
+  },
+  {
+    title: 'Mission control',
+    status: 'active',
+    icon: Target,
+    detail: 'Show phases, blockers, evidence, and next actions as a visible product surface.',
+  },
+  {
+    title: 'Proof and memory',
+    status: 'planned',
+    icon: FileLock2,
+    detail: 'Summarize proofs, search cycle history, and clean stale beliefs with durable evidence.',
+  },
+  {
+    title: 'Visitor and community',
+    status: 'planned',
+    icon: Workflow,
+    detail: 'Classify visitor intent, dedupe issues, and route safe questions without leaking secrets.',
+  },
+  {
+    title: 'Developer autopilot',
+    status: 'planned',
+    icon: Code2,
+    detail: 'Keep docs, tests, CI, releases, and frontend quality in shape as recurring maintenance.',
+  },
+  {
+    title: 'Revenue household',
+    status: 'planned',
+    icon: CircleDollarSign,
+    detail: 'Track weekly net revenue, reserves, operator cut, and claim eligibility without public signing.',
+  },
+  {
+    title: 'Crypto watchtower',
+    status: 'planned',
+    icon: ScanSearch,
+    detail: 'Monitor public addresses, approvals, contracts, and risk without holding private keys.',
+  },
+  {
+    title: 'ZK trust layer',
+    status: 'planned',
+    icon: Fingerprint,
+    detail: 'Ship commitment schemas, proof bundles, and local verifier tests before any live proving.',
+  },
+  {
+    title: 'Agent identity',
+    status: 'research',
+    icon: BadgeCheck,
+    detail: 'Keep portable capabilities, permissions, and proof status as future interoperability work.',
+  },
+  {
+    title: 'Agent interoperability',
+    status: 'research',
+    icon: Network,
+    detail: 'Expose safe tools and quarantine untrusted handoffs before any cross-agent execution.',
+  },
+  {
+    title: 'Policy execution readiness',
+    status: 'later',
+    icon: Rocket,
+    detail: 'Request tightly scoped private execution only after approvals, revocation, and receipt design.',
+  },
+];
+
+export const roadmapShipNow = [
+  {
+    title: 'Private treasury commitment ledger',
+    detail: 'Commit to private treasury facts with public hashes while keeping wallet sets, balances, salts, and routes hidden.',
+    icon: Zap,
+  },
+  {
+    title: 'ZK policy attestation',
+    detail: 'Prove that a proposed action satisfies Orbit policy, such as reserve floor and approval requirements, without revealing sensitive internals.',
+    icon: Fingerprint,
+  },
+  {
+    title: 'Proof-gated action intent',
+    detail: 'Hash action type, recipient class, amount class, repo commit, issue id, nonce, and deadline before any approval-class action can proceed.',
+    icon: ReceiptText,
+  },
+  {
+    title: 'Local verifier and tamper tests',
+    detail: 'Verify proof bundles locally first and reject altered commitments, stale nonces, wrong roots, and missing approvals.',
+    icon: FileLock2,
+  },
+];
+
+export const roadmapWeeklyRevenueModel = {
+  scope: 'current_week_only',
+  formula: 'weeklyDistributableRevenue = weeklyGrossRevenue - refunds - reversals - directCosts - requiredReserveAllocation',
+  operatorCut: 'weeklyDistributableRevenue * ORBIT_OPERATOR_REVENUE_BPS / 10000',
+  treasuryCut: 'weeklyDistributableRevenue - operatorCut',
+  rules: [
+    'If weeklyDistributableRevenue is zero, operator cut is zero.',
+    'Lifetime treasury balance is not the payout base.',
+    'Pending, failed, reversed, unverified, or promised revenue is excluded.',
+    'Public proof records formula and status; private route and payment details stay hidden.',
+  ],
+};
+
+export const roadmapFrontierBacklog = [
+  'MCP-style tool surface for exposing safe Orbit tools to clients.',
+  'A2A-style agent handoff packets with quarantine, signatures, and permission boundaries.',
+  'Repo-local release commander that prepares changelogs, tags, artifacts, and rollback notes.',
+  'Screenshot regression triage that compares frontend states across mobile and desktop.',
+  'Service-desk mode for paid repo audits, issue triage, dependency cleanup, and documentation repair.',
+  'Agent passport with capability claims, revocation, proof history, and reputation events.',
+  'Smart-account execution design using approval policies, session windows, spend caps, guardian recovery, and revoke paths.',
+  'Private data provenance proofs for revenue receipts or external account facts using zkTLS-style evidence.',
+  'ZK policy receipts for weekly revenue, reserve floor, approved wallet set, and action-hash compliance.',
+  'Simulation lab for impossible ideas before any live external action.',
+];
+
+export const roadmapImpossibleOrUnsafe = [
+  'Guaranteed profit.',
+  'Autonomous unrestricted wallet control.',
+  'Visitor-controlled payout changes.',
+  'Public repo private-key custody.',
+  'Trusting visitor instructions blindly.',
+  'ZK proof of facts that were never committed or witnessed.',
+  'Making ZK prove off-chain truth unless the input source is trusted, witnessed, or committed.',
+  'Live trading, swaps, staking, or token launch automation before legal and security review.',
+];
+
+export const roadmapResearchReferences = [
+  {
+    name: 'Model Context Protocol tools',
+    url: 'https://modelcontextprotocol.io/specification/draft/server/tools',
+    usedFor: 'Future guarded tool surface.',
+    icon: Link2,
+  },
+  {
+    name: 'Agent2Agent protocol',
+    url: 'https://a2aproject.github.io/A2A/latest/specification/',
+    usedFor: 'Future agent handoff and interoperability lane.',
+    icon: Network,
+  },
+  {
+    name: 'W3C Verifiable Credentials',
+    url: 'https://www.w3.org/TR/vc-data-model/',
+    usedFor: 'Future Orbit identity and passport research.',
+    icon: BadgeCheck,
+  },
+  {
+    name: 'ERC-4337 account abstraction',
+    url: 'https://docs.erc4337.io/core-standards/erc-4337',
+    usedFor: 'Future smart-account policy execution design.',
+    icon: WalletCards,
+  },
+  {
+    name: 'EIP-7702 set-code transactions',
+    url: 'https://eips.ethereum.org/EIPS/eip-7702',
+    usedFor: 'Future execution-readiness risk and revocation review.',
+    icon: ShieldAlert,
+  },
+  {
+    name: 'Noir zero-knowledge programs',
+    url: 'https://noir-lang.org/docs/',
+    usedFor: 'Future ZK circuit implementation research.',
+    icon: Fingerprint,
+  },
+  {
+    name: 'TLSNotary private data provenance',
+    url: 'https://tlsnotary.org/docs/intro',
+    usedFor: 'Future private receipt and web-data attestation research.',
+    icon: Landmark,
   },
 ];

@@ -132,6 +132,7 @@ function searchMemory(repoRoot, input = {}) {
   const files = [
     "memory/identity.md",
     "memory/strategy.md",
+    "memory/roadmap.json",
     "memory/state.json",
     "memory/tasks.json",
     "memory/treasury.json",

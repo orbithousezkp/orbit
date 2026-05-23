@@ -1,6 +1,6 @@
 "use strict";
 
-const BEHAVIOR_VERSION = 2;
+const BEHAVIOR_VERSION = 3;
 
 const ACTIVITY_CONTRACT = [
   {
@@ -67,6 +67,11 @@ const ACTIVITY_CONTRACT = [
     id: "proofs",
     title: "Proof And Diary Trail",
     description: "Write cycle proofs, cycle summaries, changed file lists, and commit/push only when configured."
+  },
+  {
+    id: "mission_control",
+    title: "Mission Control Roadmap",
+    description: "Advance public roadmap levels with evidence-backed phase checks, visitor-facing status, blockers, and next growth targets."
   }
 ];
 
@@ -95,6 +100,7 @@ const PRIORITY_ORDER = [
   "survival_backlog",
   "open_task",
   "safe_issue_triage",
+  "roadmap_growth",
   "budget_review",
   "memory_review",
   "health_check"
@@ -184,6 +190,31 @@ function normalizeLearningLab(learningLab) {
   };
 }
 
+function normalizeRoadmap(roadmap) {
+  if (!roadmap || typeof roadmap !== "object") {
+    return { summary: null, activePhase: null, currentLevel: null, firstCheck: "" };
+  }
+
+  const summary = roadmap.summary && typeof roadmap.summary === "object" ? roadmap.summary : null;
+  const phaseChecks = Array.isArray(roadmap.phaseChecks) ? roadmap.phaseChecks : [];
+  const activePhase = summary && summary.activePhase
+    ? summary.activePhase
+    : phaseChecks.find((phase) => phase.status === "active") ||
+      phaseChecks.find((phase) => ["planned", "research", "later"].includes(phase.status)) ||
+      null;
+  const currentLevel = summary && summary.currentLevel
+    ? summary.currentLevel
+    : roadmap.currentLevel || null;
+  const checks = activePhase && Array.isArray(activePhase.checks) ? activePhase.checks : [];
+
+  return {
+    summary,
+    activePhase,
+    currentLevel,
+    firstCheck: checks[0] || ""
+  };
+}
+
 function shouldPursueSurvivalOpportunity(opportunities) {
   const driver = opportunities.selectedDriver;
   if (!opportunities.best || !driver) return false;
@@ -230,6 +261,243 @@ function makeCycleFourStandardStep() {
   );
 }
 
+function directionFromStep(step) {
+  const directionByActivity = {
+    intake: "protect",
+    conversation: "respond",
+    task_execution: "maintain",
+    memory: "remember",
+    governance: "govern",
+    treasury: "sustain",
+    survival_market: "earn",
+    problem_lab: "explore",
+    project_builder: "build",
+    agent_radar: "research",
+    token_operations: "prepare",
+    research: "research",
+    proofs: "prove",
+    mission_control: "grow"
+  };
+
+  return {
+    direction: directionByActivity[step.activity] || step.activity || step.kind,
+    kind: step.kind,
+    activity: step.activity,
+    title: step.title,
+    detail: step.detail,
+    toolHint: step.toolHint,
+    blocked: Boolean(step.blocked)
+  };
+}
+
+function directionDecisionSignals(direction, signals = {}) {
+  const markers = [];
+  if (direction.blocked) markers.push("guarded_blocker");
+  if (direction.kind === "open_task" && signals.openTasks && signals.openTasks.length) {
+    markers.push("open_task_present");
+  }
+  if ((direction.kind === "safe_issue_triage" || direction.kind === "visitor_response") &&
+      signals.safeIssues && signals.safeIssues.length) {
+    markers.push("safe_issue_present");
+  }
+  if (direction.kind === "blocked_task_unblock") markers.push("owner_blocked_adjacent_work");
+  if (direction.kind === "survival_opportunity" || direction.kind === "survival_backlog" || direction.kind === "earning_branch") {
+    markers.push("survival_or_income_work");
+  }
+  if (direction.kind === "learning_exploration" || direction.kind === "learning_branch") {
+    markers.push("learning_or_prototype_work");
+  }
+  if (direction.kind === "roadmap_growth" || direction.kind === "roadmap_branch") {
+    markers.push("roadmap_evidence_work");
+  }
+  if (direction.kind === "memory_review" || direction.kind === "proof_memory_cleanup") {
+    markers.push("memory_or_proof_work");
+  }
+  if (direction.kind === "frontend_polish") markers.push("frontend_clarity_work");
+  if (direction.kind === "health_check") markers.push("verification_work");
+  return markers;
+}
+
+function scoreDirection(direction, index, signals = {}) {
+  const urgencyByKind = {
+    safety_review: 1000,
+    owner_approval_check: 950,
+    budget_review: 900,
+    blocked_task_unblock: 72,
+    learning_exploration: 68,
+    survival_opportunity: 66,
+    survival_backlog: 64,
+    open_task: 62,
+    safe_issue_triage: 60,
+    roadmap_growth: 56,
+    memory_review: 48,
+    health_check: 42,
+    visitor_response: 38,
+    task_alternative: 36,
+    learning_branch: 34,
+    earning_branch: 32,
+    roadmap_branch: 30,
+    proof_memory_cleanup: 28,
+    frontend_polish: 26
+  };
+  let score = urgencyByKind[direction.kind] || 20;
+
+  if (direction.blocked) score += 200;
+  if (direction.kind === "open_task" && signals.openTasks && signals.openTasks.length) score += 8;
+  if ((direction.kind === "safe_issue_triage" || direction.kind === "visitor_response") &&
+      signals.safeIssues && signals.safeIssues.length) score += 8;
+  if (direction.kind === "roadmap_growth" && (!signals.openTasks || !signals.openTasks.length) &&
+      (!signals.safeIssues || !signals.safeIssues.length)) {
+    score += 10;
+  }
+  if ((direction.kind === "roadmap_growth" || direction.kind === "roadmap_branch") &&
+      ((signals.openTasks && signals.openTasks.length) || (signals.safeIssues && signals.safeIssues.length))) {
+    score -= 8;
+  }
+  if (direction.kind === "health_check" && signals.onlyRoutineWork) score += 6;
+
+  return {
+    ...direction,
+    score: Math.max(0, score - index),
+    signals: directionDecisionSignals(direction, signals)
+  };
+}
+
+function directionChoice(mode, directions, signals = {}) {
+  const scored = directions.map((direction, index) => scoreDirection(direction, index, signals));
+  const selected = scored
+    .slice()
+    .sort((left, right) => right.score - left.score)[0] || null;
+
+  return {
+    mode,
+    mustCompareCount: mode === "multi_direction" ? Math.min(3, scored.length) : 1,
+    selected,
+    considered: scored.slice(0, mode === "multi_direction" ? 5 : 1),
+    rule: mode === "multi_direction"
+      ? "Compare several safe directions, prefer live repo obligations, then choose one small auditable action."
+      : "Handle the guarded priority before branching."
+  };
+}
+
+function uniqueDirections(steps) {
+  const seen = new Set();
+  const directions = [];
+  for (const step of steps) {
+    const direction = directionFromStep(step);
+    const key = `${direction.direction}:${direction.kind}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    directions.push(direction);
+  }
+  return directions;
+}
+
+function fallbackDirection(kind, activity, title, detail, toolHint) {
+  return directionFromStep(makeStep(kind, activity, title, detail, toolHint));
+}
+
+function directionPortfolio(context, orderedSteps, signals = {}) {
+  const urgentKinds = new Set(["safety_review", "owner_approval_check", "budget_review"]);
+  const urgentSteps = orderedSteps.filter((step) => urgentKinds.has(step.kind));
+  if (urgentSteps.length) {
+    const directions = uniqueDirections(urgentSteps);
+    return {
+      mode: "single_guarded_priority",
+      reason: "Safety, approval, or budget pressure is active; branch only after the blocker is handled.",
+      directions,
+      choice: directionChoice("single_guarded_priority", directions, signals)
+    };
+  }
+
+  const directions = uniqueDirections(orderedSteps);
+  const taskTitle = signals.openTasks && signals.openTasks[0] && signals.openTasks[0].title;
+  const safeIssue = signals.safeIssues && signals.safeIssues[0];
+  const roadmap = signals.roadmap || {};
+  const learningLab = signals.learningLab || {};
+  const activeServiceOpportunity = signals.activeServiceOpportunity;
+
+  const extras = [
+    fallbackDirection(
+      "frontend_polish",
+      "task_execution",
+      "Improve visitor-facing product surface",
+      "Look for a small frontend, copy, accessibility, or layout improvement that makes Orbit easier to understand without adding private details.",
+      "read_file, write_file"
+    ),
+    fallbackDirection(
+      "proof_memory_cleanup",
+      "memory",
+      "Improve proof and memory clarity",
+      "Find one stale, missing, or confusing durable record and make it easier for future cycles to use.",
+      "search_memory, list_memory, append_memory, read_file, write_file"
+    )
+  ];
+
+  if (taskTitle) {
+    extras.push(fallbackDirection(
+      "task_alternative",
+      "task_execution",
+      `Find a second safe angle for: ${taskTitle}`,
+      "If the direct task is blocked, create adjacent repo-local support work such as a checklist, template, test, doc, or UI note.",
+      "read_file, write_file, append_task, append_memory"
+    ));
+  }
+
+  if (safeIssue) {
+    extras.push(fallbackDirection(
+      "visitor_response",
+      "conversation",
+      `Consider a public reply for issue #${safeIssue.number}`,
+      "If a useful, safe, secret-free reply is possible, answer or route the visitor. Otherwise convert it into a task.",
+      "get_issue, scan_risk, append_task, label_issue, comment_issue"
+    ));
+  }
+
+  if (roadmap.activePhase) {
+    extras.push(fallbackDirection(
+      "roadmap_branch",
+      "mission_control",
+      "Advance a roadmap-adjacent artifact",
+      "Choose a small evidence-backed roadmap artifact that does not jump ahead of open tasks or issue triage.",
+      "roadmap_status, read_file, write_file, append_memory"
+    ));
+  }
+
+  if (learningLab.bestProblem || learningLab.bestProject) {
+    extras.push(fallbackDirection(
+      "learning_branch",
+      learningLab.bestProject ? "project_builder" : "problem_lab",
+      "Explore an alternate safe problem or prototype angle",
+      "Compare the current best problem/project with at least one adjacent repo-local experiment before choosing work.",
+      "learning_lab_status, github_search, web_search, write_file, append_task, append_memory"
+    ));
+  }
+
+  if (activeServiceOpportunity) {
+    extras.push(fallbackDirection(
+      "earning_branch",
+      "survival_market",
+      "Develop a service-supporting artifact",
+      "Prepare safe internal material for future earning without outreach, payment handling, spend, signing, or commitments.",
+      "read_file, write_file, append_task, append_memory"
+    ));
+  }
+
+  const portfolioDirections = uniqueDirections([...directions, ...extras]).slice(0, 8);
+  const decisionSignals = {
+    ...signals,
+    onlyRoutineWork: !orderedSteps.some((step) => !["memory_review", "health_check"].includes(step.kind))
+  };
+
+  return {
+    mode: "multi_direction",
+    reason: "No urgent blocker is active; compare several safe directions before selecting one auditable action.",
+    directions: portfolioDirections,
+    choice: directionChoice("multi_direction", portfolioDirections, decisionSignals)
+  };
+}
+
 function planCycle(context = {}) {
   const openTasks = normalizeTasks(context.tasks);
   const issues = normalizeIssues(context.issues);
@@ -241,6 +509,7 @@ function planCycle(context = {}) {
   const budget = summarizeBudget(context.aiBudget);
   const opportunities = normalizeOpportunities(context.opportunities);
   const learningLab = normalizeLearningLab(context.learningLab);
+  const roadmap = normalizeRoadmap(context.roadmap);
   const ownerBlockedTasks = openTasks.filter(taskLooksOwnerBlocked);
   const activeServiceOpportunity = hasServiceOpportunityIssue(issues);
   const steps = [];
@@ -264,6 +533,24 @@ function planCycle(context = {}) {
       `Check owner approval ${approvals[0].id}`,
       "Resume or keep blocking a pending spend request.",
       "check_owner_approval"
+    ));
+  }
+
+  if (!riskyIssues.length && !approvals.length && roadmap.activePhase) {
+    const phase = roadmap.activePhase;
+    const level = roadmap.currentLevel;
+    steps.push(makeStep(
+      "roadmap_growth",
+      "mission_control",
+      `Advance roadmap phase: ${phase.phaseId || phase.id || "active phase"}`,
+      [
+        level ? `Current level: ${level.name || level.id}.` : "",
+        phase.status ? `Phase status: ${phase.status}.` : "",
+        roadmap.firstCheck ? `Next check: ${roadmap.firstCheck}` : "Find the next evidence-backed phase check.",
+        "Use files, tests, proofs, or owner approval as evidence.",
+        "Do not mark a phase passed without proof."
+      ].filter(Boolean).join(" "),
+      "roadmap_status, read_file, write_file, run_command, append_task, append_memory"
     ));
   }
 
@@ -387,12 +674,19 @@ function planCycle(context = {}) {
   return {
     version: BEHAVIOR_VERSION,
     mode: "virtual_human_household",
-    primaryObjective: "Live inside GitHub as a careful household whose members learn, earn, maintain the code and frontend, scout broad real-world problems, build open-source prototypes, ration AI-call food, and leave a proof trail. Routine repo work and repo-local prototypes are autonomous; wallet spending, signing, token movement, payout-route changes, outreach, publishing with obligations, and major risky external moves require owner approval. A quiet heartbeat must still create safe forward motion when income, problem discovery, project building, or household work is unresolved.",
+    primaryObjective: "Live inside GitHub as a careful household whose members learn, earn, maintain the code and frontend, scout broad real-world problems, build open-source prototypes, ration AI-call food, advance the evidence-backed roadmap, and leave a proof trail. Routine repo work and repo-local prototypes are autonomous; wallet spending, signing, token movement, payout-route changes, outreach, publishing with obligations, and major risky external moves require owner approval. A quiet heartbeat must still create safe forward motion when income, problem discovery, project building, roadmap growth, or household work is unresolved. When no urgent safety, approval, or budget blocker exists, think across multiple safe directions before choosing one small action.",
     activities: ACTIVITY_CONTRACT,
     hardLimits: HARD_LIMITS,
     priorityOrder: PRIORITY_ORDER,
     drivers: opportunities.drivers,
     recommendedSteps: ordered.slice(0, 6),
+    directionPortfolio: directionPortfolio(context, ordered, {
+      openTasks,
+      safeIssues,
+      roadmap,
+      learningLab,
+      activeServiceOpportunity
+    }),
     nextStep: ordered[0] || null
   };
 }

@@ -11,6 +11,15 @@ const TOOLS = [
     }
   },
   {
+    name: "roadmap_status",
+    description: "Read Orbit's roadmap levels, phase checks, ZK proof MVP scope, blockers, and approval gates.",
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false
+    }
+  },
+  {
     name: "read_file",
     description: "Read a repository text file by relative path. Binary/frontend assets such as PNG, JPG, WebP, GIF, ICO, MP4, PDF, and WebM return metadata only; reference their repo paths instead of embedding bytes.",
     inputSchema: {

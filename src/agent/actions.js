@@ -32,6 +32,7 @@ const {
   quarantineExternalIdea
 } = require("./learning-lab");
 const { OPPORTUNITIES_PATH, opportunityStatus } = require("./opportunities");
+const { roadmapStatus } = require("./roadmap");
 const {
   assertNoSymlinkPath,
   assertSafePublicReply,
@@ -262,6 +263,10 @@ async function executeTool(config, github, cycle, name, input) {
         aiBudget: budgetStatus(config),
         issues: []
       });
+    }
+
+    case "roadmap_status": {
+      return roadmapStatus(config.repoRoot);
     }
 
     case "read_file": {
