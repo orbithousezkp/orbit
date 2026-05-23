@@ -1,0 +1,69 @@
+{
+  "brand": "Orbit",
+  "cycle": 23,
+  "startedAt": "2026-05-23T06:17:47.176Z",
+  "aiRoute": {
+    "configured": true,
+    "count": 1,
+    "routes": [
+      {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      }
+    ]
+  },
+  "dryRun": false,
+  "trigger": {
+    "type": "event",
+    "id": "owner_manual_wake",
+    "label": "owner manual wake",
+    "source": "workflow_dispatch",
+    "action": "",
+    "reason": "Wake because the owner asked for a cycle now."
+  },
+  "firstWakeIntro": null,
+  "steps": [
+    {
+      "step": 1,
+      "fallback": true,
+      "content": "All configured AI routes failed. Local deterministic planner selected: Review risky issue #1: Draft scope: Repo safety audit as a paid service",
+      "providerErrors": [
+        {
+          "route": "private-ai-route-1",
+          "priority": 1,
+          "error": "AI route failed"
+        }
+      ],
+      "actions": [
+        {
+          "tool": "write_cycle_note",
+          "input": {
+            "title": "Deterministic local cycle",
+            "body": "Orbit ran without an AI provider.\n\nSelected behavior step: Review risky issue #1: Draft scope: Repo safety audit as a paid service\n\nBehavior mode: virtual_human_household\nPrimary objective: Live inside GitHub as a careful household whose members learn, earn, maintain the code and frontend, scout broad real-world problems, build open-source prototypes, ration AI-call food, and leave a proof trail. Routine repo work and repo-local prototypes are autonomous; wallet spending, signing, token movement, payout-route changes, outreach, publishing with obligations, and major risky external moves require owner approval. A quiet heartbeat must still create safe forward motion when income, problem discovery, project building, or household work is unresolved."
+          }
+        }
+      ]
+    },
+    {
+      "step": 1,
+      "tool": "write_cycle_note",
+      "input": {
+        "title": "Deterministic local cycle",
+        "body": "Orbit ran without an AI provider.\n\nSelected behavior step: Review risky issue #1: Draft scope: Repo safety audit as a paid service\n\nBehavior mode: virtual_human_household\nPrimary objective: Live inside GitHub as a careful household whose members learn, earn, maintain the code and frontend, scout broad real-world problems, build open-source prototypes, ration AI-call food, and leave a proof trail. Routine repo work and repo-local prototypes are autonomous; wallet spending, signing, token movement, payout-route changes, outreach, publishing with obligations, and major risky external moves require owner approval. A quiet heartbeat must still create safe forward motion when income, problem discovery, project building, or household work is unresolved."
+      },
+      "output": {
+        "path": "memory/cycles/0023-deterministic-local-cycle.md",
+        "bytes": 813
+      }
+    }
+  ],
+  "filesChanged": [
+    "memory/cycles/0023-deterministic-local-cycle.md",
+    "memory/state.json"
+  ],
+  "result": "All configured AI routes failed. Local deterministic planner selected: Review risky issue #1: Draft scope: Repo safety audit as a paid service",
+  "finishedAt": "2026-05-23T06:17:59.632Z",
+  "totalSteps": 2
+}
