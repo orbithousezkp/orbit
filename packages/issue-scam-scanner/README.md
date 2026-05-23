@@ -57,6 +57,8 @@ jobs:
           # Add your handling logic here: label, close, alert, quarantine, etc.
 ```
 
+See [`examples/basic-issue-scan.yml`](examples/basic-issue-scan.yml) for a full copy-paste workflow with auto-labeling and critical-level blocking.
+
 ### As a CLI
 
 ```bash

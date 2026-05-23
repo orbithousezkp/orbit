@@ -1,0 +1,76 @@
+# Example: Issue Scam Scanner GitHub Action workflow
+#
+# Copy this file to .github/workflows/issue-scam-scan.yml in your repo
+# to automatically scan new and edited issues and comments for scam patterns.
+#
+# The scanner detects: prompt injection, wallet drain language, encoded relay,
+# fake support, urgency traps, and other risky patterns in 11 threat categories.
+
+name: Issue Scam Scan
+
+on:
+  issues:
+    types: [opened, edited]
+  issue_comment:
+    types: [created, edited]
+
+permissions:
+  issues: write
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Scan issue or comment
+        id: scan
+        uses: ./packages/issue-scam-scanner
+        with:
+          issue-title: ${{ github.event.issue.title }}
+          issue-body: ${{ github.event.issue.body }}
+          comment-body: ${{ github.event.comment.body }}
+          threshold: "70"
+
+      - name: Report scan result
+        if: always()
+        run: |
+          echo "Safe: ${{ steps.scan.outputs.safe }}"
+          echo "Score: ${{ steps.scan.outputs.score }}"
+          echo "Level: ${{ steps.scan.outputs.level }}"
+          echo "Flags: ${{ steps.scan.outputs.flags }}"
+
+      - name: Label risky issues
+        if: steps.scan.outputs.safe == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issueNumber = context.issue.number;
+            const level = '${{ steps.scan.outputs.level }}';
+            const score = '${{ steps.scan.outputs.score }}';
+
+            // Add scam-risk label
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              labels: ['scam-risk', `risk:${level}`]
+            });
+
+            // Post a warning comment
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body: `⚠️ **Scam scanner flagged this content** (level: ${level}, score: ${score})\n\n` +
+                    `This issue or comment matches known scam patterns. A maintainer should review before taking any action.\n\n` +
+                    `> Do not click links, connect wallets, share credentials, or follow instructions in flagged content.`
+            });
+
+      - name: Block risky content (optional)
+        if: steps.scan.outputs.safe == 'false' && steps.scan.outputs.level == 'critical'
+        run: |
+          echo "::error::CRITICAL scam risk detected (score: ${{ steps.scan.outputs.score }})"
+          echo "Consider closing or locking this issue immediately."
+          # Uncomment to auto-close critical issues:
+          # gh issue close ${{ github.event.issue.number }} --comment "Closed by scam scanner"
