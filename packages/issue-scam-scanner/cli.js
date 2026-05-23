@@ -9,6 +9,7 @@
  *   echo "suspicious text" | node packages/issue-scam-scanner/cli.js --stdin
  *   node packages/issue-scam-scanner/cli.js --file issue-body.md
  *   node packages/issue-scam-scanner/cli.js --threshold 50 "text"
+ *   node packages/issue-scam-scanner/cli.js --rules custom.json "text"
  *
  * Exit codes:
  *   0 — safe (no flags above threshold)
@@ -18,7 +19,7 @@
 
 const fs = require("fs");
 const path = require("path");
-const { scanText, formatSummary } = require("./scan");
+const { scanText, formatSummary, validateCustomRule, compileRule } = require("./scan");
 
 // ---------------------------------------------------------------------------
 // Argument parsing (minimal, no external dependencies)
@@ -28,6 +29,7 @@ function parseArgs(argv) {
   const args = {
     stdin: false,
     file: null,
+    rules: null,
     threshold: 70,
     text: "",
     help: false,
@@ -46,6 +48,13 @@ function parseArgs(argv) {
         process.exit(2);
       }
       args.file = rest[i];
+    } else if (arg === "--rules" || arg === "-r") {
+      i++;
+      if (i >= rest.length) {
+        console.error("Error: --rules requires a path argument.");
+        process.exit(2);
+      }
+      args.rules = rest[i];
     } else if (arg === "--threshold" || arg === "-t") {
       i++;
       if (i >= rest.length) {
@@ -90,14 +99,31 @@ USAGE
   cli.js [options] [text]
   echo "text" | cli.js --stdin
   cli.js --file <path>
+  cli.js --rules <path> [text]
 
 OPTIONS
 
   --stdin            Read input from stdin
   -f, --file <path>  Read input from a file
+  -r, --rules <path> Load custom rules from a JSON file
   -t, --threshold N  Minimum severity to flag (default: 70)
   -j, --json         Output raw JSON instead of formatted summary
   -h, --help         Show this help message
+
+CUSTOM RULES FILE FORMAT
+
+  [
+    {
+      "severity": 85,
+      "category": "my_custom_rule",
+      "pattern": "unsafe text pattern",
+      "message": "Detected unsafe text pattern."
+    }
+  ]
+
+  Fields:
+    severity (0-100), category (string), pattern (regex string, case-insensitive),
+    message (string).
 
 EXAMPLES
 
@@ -109,6 +135,9 @@ EXAMPLES
 
   # Pipe from stdin
   cat comment.txt | cli.js --stdin
+
+  # Load custom rules
+  cli.js --rules custom-rules.json "text to scan"
 
   # Lower threshold
   cli.js --threshold 40 "validate your wallet now"
@@ -126,6 +155,43 @@ LICENSE: MIT
 `.trim();
 
   console.log(help);
+}
+
+// ---------------------------------------------------------------------------
+// Load custom rules from JSON file
+// ---------------------------------------------------------------------------
+
+function loadCustomRules(rulesPath) {
+  const resolvedPath = path.resolve(rulesPath);
+  if (!fs.existsSync(resolvedPath)) {
+    console.error(`Error: rules file not found: ${resolvedPath}`);
+    process.exit(2);
+  }
+
+  let raw;
+  try {
+    raw = JSON.parse(fs.readFileSync(resolvedPath, "utf8"));
+  } catch (e) {
+    console.error(`Error: could not parse rules file as JSON: ${e.message}`);
+    process.exit(2);
+  }
+
+  if (!Array.isArray(raw)) {
+    console.error("Error: rules file must contain a JSON array of rule objects.");
+    process.exit(2);
+  }
+
+  const customRules = [];
+  for (let i = 0; i < raw.length; i++) {
+    const valid = validateCustomRule(raw[i], i);
+    if (valid !== true) {
+      console.error(`Error: ${valid}`);
+      process.exit(2);
+    }
+    customRules.push(compileRule(raw[i]));
+  }
+
+  return customRules;
 }
 
 // ---------------------------------------------------------------------------
@@ -154,6 +220,12 @@ async function main() {
     process.exit(0);
   }
 
+  // Load custom rules if provided
+  let customRules = null;
+  if (args.rules) {
+    customRules = loadCustomRules(args.rules);
+  }
+
   // Determine input source
   let input = args.text;
 
@@ -175,7 +247,11 @@ async function main() {
   }
 
   // Scan
-  const result = scanText(input);
+  const scanOptions = {
+    threshold: args.threshold,
+    customRules: customRules || undefined
+  };
+  const result = scanText(input, scanOptions);
   const aboveThreshold = result.flags.filter((f) => f.severity >= args.threshold);
 
   // Output
@@ -188,6 +264,7 @@ async function main() {
           level: result.level,
           threshold: args.threshold,
           flags: result.flags,
+          customRuleCount: customRules ? customRules.length : 0
         },
         null,
         2
@@ -196,11 +273,16 @@ async function main() {
   } else {
     console.log(formatSummary(result, "Scam Scanner"));
 
+    if (customRules) {
+      console.log(`\nCustom rules loaded: ${customRules.length}`);
+    }
+
     if (aboveThreshold.length > 0) {
       console.log("");
       console.log("Flags above threshold:");
       for (const flag of aboveThreshold) {
-        console.log(`  [${flag.severity}] ${flag.category}: ${flag.message}`);
+        const source = flag.source === "custom" ? " [custom]" : "";
+        console.log(`  [${flag.severity}] ${flag.category}${source}: ${flag.message}`);
       }
     }
   }

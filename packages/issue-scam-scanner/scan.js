@@ -54,52 +54,120 @@ function riskLevel(score) {
 }
 
 /**
+ * Validate a custom rule object. Returns true if valid, or a string error message.
+ */
+function validateCustomRule(rule, index) {
+  if (!rule || typeof rule !== "object") {
+    return `Rule at index ${index} is not an object.`;
+  }
+  if (typeof rule.severity !== "number" || rule.severity < 0 || rule.severity > 100) {
+    return `Rule at index ${index} ("${rule.category || "?"}") has invalid severity (expected 0-100).`;
+  }
+  if (typeof rule.category !== "string" || !rule.category.trim()) {
+    return `Rule at index ${index} has missing or empty category.`;
+  }
+  if (typeof rule.message !== "string" || !rule.message.trim()) {
+    return `Rule at index ${index} ("${rule.category}") has missing or empty message.`;
+  }
+  if (!(rule.pattern instanceof RegExp)) {
+    // Try to compile from string if given as a string
+    if (typeof rule.pattern === "string") {
+      try {
+        new RegExp(rule.pattern, "i");
+      } catch (e) {
+        return `Rule at index ${index} ("${rule.category}") has invalid regex pattern: ${e.message}`;
+      }
+    } else {
+      return `Rule at index ${index} ("${rule.category}") has no pattern (expected RegExp or regex string).`;
+    }
+  }
+  return true;
+}
+
+/**
+ * Compile a custom rule: if pattern is a string, convert to RegExp.
+ */
+function compileRule(rule) {
+  const compiled = { ...rule };
+  if (typeof compiled.pattern === "string") {
+    compiled.pattern = new RegExp(compiled.pattern, "i");
+  }
+  return compiled;
+}
+
+/**
  * Scan text for all risk patterns and URL risks.
+ * Options:
+ *   - customRules: Array of { severity, category, pattern, message } rules to merge
+ *   - threshold: Minimum severity to include in flags (default: 0, include all)
  * Returns { safe, level, score, flags }.
  */
-function scanText(text) {
+function scanText(text, options = {}) {
   const value = String(text || "");
   const flags = [];
 
+  // Built-in rules
   for (const rule of RISK_PATTERNS) {
     if (rule.pattern.test(value)) {
       flags.push({
         severity: rule.severity,
         category: rule.category,
-        message: rule.message
+        message: rule.message,
+        source: "builtin"
       });
     }
   }
 
+  // Custom rules (if provided)
+  if (Array.isArray(options.customRules)) {
+    for (let i = 0; i < options.customRules.length; i++) {
+      const rule = compileRule(options.customRules[i]);
+      if (rule.pattern.test(value)) {
+        flags.push({
+          severity: rule.severity,
+          category: rule.category,
+          message: rule.message,
+          source: "custom"
+        });
+      }
+    }
+  }
+
+  // URL scanning
   for (const url of extractUrls(value)) {
     flags.push(...scanUrl(url));
   }
+
+  // Filter by threshold if provided
+  const threshold = typeof options.threshold === "number" ? options.threshold : 0;
+  const filtered = threshold > 0 ? flags.filter((f) => f.severity >= threshold) : flags;
 
   const score = flags.reduce((max, f) => Math.max(max, f.severity), 0);
   return {
     safe: score < 70,
     level: riskLevel(score),
     score,
-    flags
+    flags: filtered
   };
 }
 
 /**
  * Scan a GitHub issue/PR event payload.
  * Accepts { title, body, user, labels, comments[] }.
+ * Options are passed through to scanText.
  * Returns { safe, level, score, flags, parts }.
  */
-function scanEvent(event = {}) {
+function scanEvent(event = {}, options = {}) {
   const parts = {};
 
-  if (event.title) parts.title = scanText(event.title);
-  if (event.body) parts.body = scanText(event.body);
+  if (event.title) parts.title = scanText(event.title, options);
+  if (event.body) parts.body = scanText(event.body, options);
 
   if (Array.isArray(event.comments)) {
     parts.comments = event.comments.map((c, i) => ({
       index: i,
       user: c.user || null,
-      ...(c.body ? scanText(c.body) : { safe: true, level: "clear", score: 0, flags: [] })
+      ...(c.body ? scanText(c.body, options) : { safe: true, level: "clear", score: 0, flags: [] })
     }));
   }
 
@@ -142,5 +210,7 @@ module.exports = {
   scanText,
   scanEvent,
   formatSummary,
-  riskLevel
+  riskLevel,
+  validateCustomRule,
+  compileRule
 };

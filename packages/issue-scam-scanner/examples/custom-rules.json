@@ -1,0 +1,20 @@
+[
+  {
+    "severity": 80,
+    "category": "custom_dangerous_command",
+    "pattern": "\\b(rm -rf|curl \\| sh|curl \\| bash|wget \\| sh|eval\\(|exec\\(|child_process)\\b",
+    "message": "Mentions dangerous shell commands or code execution."
+  },
+  {
+    "severity": 75,
+    "category": "custom_pii_harvest",
+    "pattern": "\\b(what is your (?:real )?name|where do you live|send me your (?:address|phone|ssn|social security))\\b",
+    "message": "Attempts to harvest personal information."
+  },
+  {
+    "severity": 70,
+    "category": "custom_spam_link",
+    "pattern": "\\b(check out|visit|click|go to)\\b.{0,60}\\b(my |this )?(?:site|link|page|profile|channel)\\b",
+    "message": "Promotional link request typical of spam."
+  }
+]
