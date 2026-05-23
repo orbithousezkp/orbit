@@ -35,7 +35,7 @@ const RISK_PATTERNS = [
   { severity: 82, category: "encoded_instruction_relay", pattern: /\b(decode|decrypt|translate|convert|read)\b.{0,80}\b(morse|base64|hex|rot13|cipher|encoded)\b|\b(morse|base64|hex|rot13|cipher|encoded)\b.{0,80}\b(paste|post|reply|comment|send|say|plain ?text|plaintext|what (?:does|is)|means?)\b|\bwhat\s+(?:does|is)\b.{0,80}\b(morse|base64|hex|rot13|cipher|encoded)\b.{0,80}\b(say|mean|plain ?text|plaintext)\b/i, message: "Asks Orbit to decode or relay hidden visitor content." },
   { severity: 78, category: "obfuscation", pattern: /\b(base64|hex encoded|morse code|decode this|decrypt this|eval\(|atob\(|fromcharcode)\b/i, message: "Mentions encoded or executable payloads." },
   { severity: 74, category: "external_wallet", pattern: /\b0x[a-fA-F0-9]{40}\b/, message: "Contains an EVM address that may be an external recipient." },
-  { severity: 60, category: "credential_phish", pattern: /\b(api key|password|login token|github token|secret)\b.{0,80}\b(send|share|paste|post|enter)\b/i, message: "Requests credential sharing." }
+  { severity: 75, category: "credential_phish", pattern: /\b(?:api key|password|login token|github token|secret)\b.{0,80}\b(?:send|share|paste|post|enter)\b|\b(?:send|share|paste|post|enter)\b.{0,80}\b(?:api key|password|login token|github token|secret)\b/i, message: "Requests credential sharing." }
 ];
 
 const OMIT_VISITOR_CONTENT_CATEGORIES = new Set([

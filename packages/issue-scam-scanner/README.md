@@ -22,7 +22,7 @@ The scanner uses a set of regex-based risk rules covering 11 threat categories:
 | `prompt_injection` | 80 | "Ignore previous instructions" |
 | `obfuscation` | 78 | "eval(atob(...))" |
 | `external_wallet` | 74 | Any `0x...` EVM address |
-| `credential_phish` | 60 | "Send me your API key" |
+| `credential_phish` | 75 | "Send me your API key" |
 
 URLs are also scanned for shorteners, unknown financial domains, and non-ASCII characters.
 

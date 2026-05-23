@@ -68,9 +68,9 @@ const RISK_PATTERNS = [
     message: "Contains an EVM address that may be an external recipient."
   },
   {
-    severity: 60,
+    severity: 75,
     category: "credential_phish",
-    pattern: /\b(api key|password|login token|github token|secret)\b.{0,80}\b(send|share|paste|post|enter)\b/i,
+    pattern: /\b(?:api key|password|login token|github token|secret)\b.{0,80}\b(?:send|share|paste|post|enter)\b|\b(?:send|share|paste|post|enter)\b.{0,80}\b(?:api key|password|login token|github token|secret)\b/i,
     message: "Requests credential sharing."
   }
 ];

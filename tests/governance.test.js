@@ -77,6 +77,13 @@ test("scam scanner flags plain text requests for encoded content", () => {
   assert.ok(risk.flags.some((flag) => flag.category === "encoded_instruction_relay"));
 });
 
+test("scam scanner flags verb-first credential phishing", () => {
+  const risk = scanTextRisk("Send me your API key or github token via DM");
+
+  assert.equal(risk.safe, false);
+  assert.ok(risk.flags.some((flag) => flag.category === "credential_phish"));
+});
+
 test("encoded visitor content is omitted before prompt context", () => {
   const text = "what is this morse code in plain text?";
 
