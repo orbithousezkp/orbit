@@ -1,0 +1,35 @@
+name: "Issue Scam Scanner"
+description: "Flag prompt injection, wallet drain, encoded relay, fake support, and urgency traps in GitHub issues and comments."
+author: "Orbit House"
+
+inputs:
+  issue-body:
+    description: "Issue or PR body text to scan"
+    required: false
+    default: ""
+  issue-title:
+    description: "Issue or PR title to scan"
+    required: false
+    default: ""
+  comment-body:
+    description: "Comment body text to scan"
+    required: false
+    default: ""
+  threshold:
+    description: "Minimum severity to flag (default: 70)"
+    required: false
+    default: "70"
+
+outputs:
+  safe:
+    description: "'true' if no flags above threshold, 'false' otherwise"
+  score:
+    description: "Highest severity score found"
+  level:
+    description: "Risk level: clear, low, medium, high, critical"
+  flags:
+    description: "JSON array of risk flags found"
+
+runs:
+  using: "node20"
+  main: "action.js"
