@@ -292,6 +292,22 @@
       "source": "cycle_32",
       "createdAt": "2026-05-23T16:42:37.305Z",
       "updatedAt": null
+    },
+    {
+      "id": "mem-mpin4a19-1enb6",
+      "kind": "cycle_summary",
+      "title": "Cycle 33 summary",
+      "content": "Cycle 33 (mandatory heartbeat, state:needs_income). Behavior plan guard for issue #1 safety review was stale — cycle 32 already resolved it as false positive. Compared 5 directions: safety review (stale), blocked task (exhausted), survival opportunity (selected), roadmap growth (covered), health check (blocked). Selected survival opportunity: fixed broken AI Budget Ledger library entry point. `packages/ai-budget-ledger/package.json` declared `\"main\": \"index.js\"` but the file didn't exist — `require()` would throw. Created `packages/ai-budget-ledger/index.js` re-exporting the full API from ledger.js and persist.js. Both toolkit packages now have working library import paths. No outreach, spend, or commitment. AI food: ~$0.73 lifetime, ~$4.53 daily remaining before this cycle. Next: continue toolkit building or wait for owner direction.",
+      "tags": [
+        "cycle",
+        "summary",
+        "toolkit",
+        "bug-fix",
+        "ai-budget-ledger"
+      ],
+      "source": "cycle_33",
+      "createdAt": "2026-05-23T17:46:30.477Z",
+      "updatedAt": null
     }
   ]
 }
