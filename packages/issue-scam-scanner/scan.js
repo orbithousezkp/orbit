@@ -99,7 +99,7 @@ function compileRule(rule) {
  * Scan text for all risk patterns and URL risks.
  * Options:
  *   - customRules: Array of { severity, category, pattern, message } rules to merge
- *   - threshold: Minimum severity to include in flags (default: 0, include all)
+ *   - threshold: Minimum severity to include in flags and for safe/unsafe determination (default: 70)
  * Returns { safe, level, score, flags }.
  */
 function scanText(text, options = {}) {
@@ -138,13 +138,20 @@ function scanText(text, options = {}) {
     flags.push(...scanUrl(url));
   }
 
-  // Filter by threshold if provided
-  const threshold = typeof options.threshold === "number" ? options.threshold : 0;
-  const filtered = threshold > 0 ? flags.filter((f) => f.severity >= threshold) : flags;
+  // Determine threshold (default 70 for backwards-compatible safety)
+  const threshold = typeof options.threshold === "number" ? options.threshold : 70;
 
+  // Filter flags for display/output by threshold
+  const filtered = flags.filter((f) => f.severity >= threshold);
+
+  // Score is the max severity across ALL flags (never decreases)
   const score = flags.reduce((max, f) => Math.max(max, f.severity), 0);
+
+  // Safe only when no flags meet the threshold
+  const safe = filtered.length === 0;
+
   return {
-    safe: score < 70,
+    safe,
     level: riskLevel(score),
     score,
     flags: filtered
@@ -154,7 +161,7 @@ function scanText(text, options = {}) {
 /**
  * Scan a GitHub issue/PR event payload.
  * Accepts { title, body, user, labels, comments[] }.
- * Options are passed through to scanText.
+ * Options are passed through to scanText (including threshold).
  * Returns { safe, level, score, flags, parts }.
  */
 function scanEvent(event = {}, options = {}) {
@@ -178,15 +185,21 @@ function scanEvent(event = {}, options = {}) {
   ];
   const score = Math.max(...allScores);
 
+  // Aggregate all flags from all parts
+  const allFlags = [
+    ...(parts.title?.flags || []),
+    ...(parts.body?.flags || []),
+    ...((parts.comments || []).flatMap((c) => c.flags || []))
+  ];
+
+  // Safe only when no part has flagged content
+  const safe = allFlags.length === 0;
+
   return {
-    safe: score < 70,
+    safe,
     level: riskLevel(score),
     score,
-    flags: [
-      ...(parts.title?.flags || []),
-      ...(parts.body?.flags || []),
-      ...((parts.comments || []).flatMap((c) => c.flags || []))
-    ],
+    flags: allFlags,
     parts
   };
 }

@@ -34,15 +34,15 @@ async function run() {
     return;
   }
 
-  const result = scanText(combined);
-  const aboveThreshold = result.flags.filter((f) => f.severity >= threshold);
+  // Pass threshold through so safe/unsafe respects the configured level
+  const result = scanText(combined, { threshold });
 
-  core.setOutput("safe", aboveThreshold.length === 0 ? "true" : "false");
+  core.setOutput("safe", result.safe ? "true" : "false");
   core.setOutput("score", String(result.score));
   core.setOutput("level", result.level);
   core.setOutput("flags", JSON.stringify(result.flags));
 
-  if (aboveThreshold.length > 0) {
+  if (!result.safe) {
     core.warning(formatSummary(result, "Issue Scam Scanner"));
   } else {
     core.info(formatSummary(result, "Issue Scam Scanner"));
