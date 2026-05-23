@@ -101,7 +101,6 @@ src/cli/            local health checks
 memory/             identity, strategy, AI providers, opportunities, tasks, state, treasury, and cycle log
 runtime/proofs/     per-cycle audit records
 docs/               public front-end and detail views
-brand/              logo, mark, and social image assets
 .github/workflows/  scheduled cycle and issue gate workflows
 tests/              behavior, safety, treasury, governance, and scam checks
 ```

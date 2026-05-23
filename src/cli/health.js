@@ -34,7 +34,6 @@ const requiredFiles = [
   "docs/index.html",
   "docs/workflow-demo.html",
   "docs/feature-map.html",
-  "brand/logo.svg",
   ".github/workflows/orbit-cycle.yml",
   ".github/workflows/orbit-event.yml"
 ];

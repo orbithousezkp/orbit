@@ -294,6 +294,57 @@ test("Orbit tools cannot write approval stores or apply approval decision labels
   );
 });
 
+test("read_file omits binary frontend image bytes from model context", async () => {
+  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), "orbit-image-read-"));
+  fs.mkdirSync(path.join(repoRoot, "docs", "assets"), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, "docs", "assets", "landing.png"), Buffer.alloc(100_000, 7));
+
+  const result = await executeTool({ repoRoot }, null, 1, "read_file", {
+    path: "docs/assets/landing.png"
+  });
+
+  assert.equal(result.path, "docs/assets/landing.png");
+  assert.equal(result.content, undefined);
+  assert.equal(result.contentOmitted, true);
+  assert.equal(result.binaryAsset, true);
+  assert.equal(result.frontendAsset, true);
+  assert.equal(result.sizeBytes, 100_000);
+});
+
+test("read_file omits oversized SVG frontend asset content", async () => {
+  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), "orbit-svg-read-"));
+  fs.mkdirSync(path.join(repoRoot, "docs", "assets"), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, "docs", "assets", "hero.svg"), `<svg>${"a".repeat(25_000)}</svg>`);
+
+  const result = await executeTool({ repoRoot }, null, 1, "read_file", {
+    path: "docs/assets/hero.svg"
+  });
+
+  assert.equal(result.path, "docs/assets/hero.svg");
+  assert.equal(result.content, undefined);
+  assert.equal(result.contentOmitted, true);
+  assert.equal(result.frontendAsset, true);
+  assert.equal(result.sizeBytes > 20_000, true);
+});
+
+test("write_file rejects large inline image payloads", async () => {
+  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), "orbit-image-write-"));
+
+  await assert.rejects(() => executeTool({ repoRoot }, null, 1, "write_file", {
+    path: "src/example.js",
+    content: `const img = "data:image/png;base64,${"a".repeat(40_000)}";`
+  }), /large inline image/);
+});
+
+test("write_file rejects binary image asset paths", async () => {
+  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), "orbit-binary-write-"));
+
+  await assert.rejects(() => executeTool({ repoRoot }, null, 1, "write_file", {
+    path: "assets/landing.png",
+    content: "not really an image"
+  }), /text only/);
+});
+
 test("generic issue creation rejects routine review or task issues", async () => {
   const repoRoot = tempRepo();
   const orbitConfig = cfg(repoRoot);

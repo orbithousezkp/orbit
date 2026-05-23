@@ -12,7 +12,7 @@ const TOOLS = [
   },
   {
     name: "read_file",
-    description: "Read a repository file by relative path.",
+    description: "Read a repository text file by relative path. Binary/frontend assets such as PNG, JPG, WebP, GIF, ICO, MP4, PDF, and WebM return metadata only; reference their repo paths instead of embedding bytes.",
     inputSchema: {
       type: "object",
       properties: {
@@ -24,7 +24,7 @@ const TOOLS = [
   },
   {
     name: "write_file",
-    description: "Write a repository file by relative path. Refuses unsafe paths and secret-like content.",
+    description: "Write a repository text file by relative path. Refuses unsafe paths, secret-like content, binary asset paths, oversized text, and large inline image/data URLs; keep frontend images as assets and reference their paths.",
     inputSchema: {
       type: "object",
       properties: {

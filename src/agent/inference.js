@@ -5,6 +5,8 @@ const { redactSecrets } = require("./safety");
 const { budgetStatus } = require("./treasury");
 const { privateAiRoute, privateProviderErrors } = require("./provider-privacy");
 
+const DEFAULT_AI_REQUEST_MAX_BYTES = 2_500_000;
+
 function deterministicResponse(context, reason) {
   const plan = context.behaviorPlan || planCycle(context);
   const nextAction = plan.nextStep
@@ -88,6 +90,11 @@ function providerHeaders(config, provider) {
   return headers;
 }
 
+function requestMaxBytes(config = {}, provider = {}) {
+  const configured = Number(provider.requestMaxBytes || config.aiRequestMaxBytes || DEFAULT_AI_REQUEST_MAX_BYTES);
+  return Number.isFinite(configured) && configured > 0 ? configured : DEFAULT_AI_REQUEST_MAX_BYTES;
+}
+
 async function infer(config, messages, tools) {
   const contextMessage = messages.find((message) => message.role === "user");
   const context = contextMessage && contextMessage.context ? contextMessage.context : {};
@@ -143,11 +150,18 @@ async function infer(config, messages, tools) {
     };
 
     try {
+      const serialized = JSON.stringify(body);
+      const bodyBytes = Buffer.byteLength(serialized);
+      const maxBytes = requestMaxBytes(config, provider);
+      if (bodyBytes > maxBytes) {
+        throw new Error(`AI request body ${bodyBytes} bytes exceeds configured maximum ${maxBytes} bytes`);
+      }
+
       const chatPath = provider.chatPath || "/chat/completions";
       const response = await fetch(`${provider.apiBase}${chatPath.startsWith("/") ? chatPath : `/${chatPath}`}`, {
         method: "POST",
         headers: providerHeaders(config, provider),
-        body: JSON.stringify(body)
+        body: serialized
       });
 
       if (!response.ok) {
@@ -189,5 +203,6 @@ module.exports = {
   deterministicResponse,
   authHeaders,
   providerHeaders,
+  requestMaxBytes,
   safeExtraHeaders
 };

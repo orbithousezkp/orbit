@@ -19,6 +19,8 @@ const { privateAiRouteId, privateAiRoutes, privateProviderErrors } = require("./
 
 const REDACTED_PRIVATE_CONFIG = "[REDACTED_PRIVATE_CONFIG]";
 const REDACTED_ADDRESS = "[REDACTED_ADDRESS]";
+const OMITTED_LARGE_ARGUMENT = "[OMITTED_LARGE_TOOL_ARGUMENT]";
+const OMITTED_LARGE_CONTENT = "[OMITTED_LARGE_TOOL_CONTENT]";
 const PRIVATE_PROOF_KEYS = new Set([
   "acceptEncoding",
   "apiBase",
@@ -134,6 +136,80 @@ function parseToolInput(toolCall) {
   }
 }
 
+function maxToolArgumentBytes(config = {}) {
+  const configured = Number(config.aiToolArgumentMaxBytes || 16_000);
+  return Number.isFinite(configured) && configured > 0 ? configured : 16_000;
+}
+
+function compactToolArguments(argumentsText, toolName = "", maxBytes = 16_000) {
+  const raw = String(argumentsText || "");
+  if (Buffer.byteLength(raw) <= maxBytes) return redactSecrets(raw);
+
+  try {
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+      const compacted = { ...parsed };
+      if (typeof compacted.content === "string") {
+        compacted.contentBytes = Buffer.byteLength(compacted.content);
+        compacted.content = OMITTED_LARGE_CONTENT;
+      }
+      if (typeof compacted.body === "string" && Buffer.byteLength(compacted.body) > maxBytes) {
+        compacted.bodyBytes = Buffer.byteLength(compacted.body);
+        compacted.body = OMITTED_LARGE_CONTENT;
+      }
+      compacted.argumentsCompacted = true;
+      compacted.tool = toolName;
+      const serialized = redactSecrets(JSON.stringify(compacted));
+      if (Buffer.byteLength(serialized) <= maxBytes) return serialized;
+    }
+  } catch {
+    // Fall through to a generic compact representation.
+  }
+
+  return genericCompactedToolArguments(raw, toolName, maxBytes);
+}
+
+function genericCompactedToolArguments(raw, toolName, maxBytes) {
+  const originalBytes = Buffer.byteLength(raw);
+  let preview = redactSecrets(raw).slice(0, Math.min(maxBytes, 2000));
+  const build = (previewText) => JSON.stringify({
+    argumentsCompacted: true,
+    tool: toolName,
+    originalBytes,
+    preview: previewText,
+    omitted: OMITTED_LARGE_ARGUMENT
+  });
+
+  let serialized = build(preview);
+  while (Buffer.byteLength(serialized) > maxBytes && preview.length > 0) {
+    const overage = Buffer.byteLength(serialized) - maxBytes;
+    preview = preview.slice(0, Math.max(0, preview.length - overage - 16));
+    serialized = build(preview);
+  }
+  if (Buffer.byteLength(serialized) <= maxBytes) return serialized;
+
+  return JSON.stringify({
+    argumentsCompacted: true,
+    tool: toolName,
+    originalBytes,
+    omitted: OMITTED_LARGE_ARGUMENT
+  });
+}
+
+function compactToolCallsForHistory(toolCalls = [], config = {}) {
+  const maxBytes = maxToolArgumentBytes(config);
+  return (Array.isArray(toolCalls) ? toolCalls : []).map((call) => {
+    const name = call.function && call.function.name;
+    return {
+      ...call,
+      function: {
+        ...(call.function || {}),
+        arguments: compactToolArguments(call.function && call.function.arguments, name, maxBytes)
+      }
+    };
+  });
+}
+
 async function main() {
   const config = loadConfig();
   const state = readJson(config.repoRoot, "memory/state.json", {
@@ -235,14 +311,18 @@ async function main() {
       toolCalls: result.toolCalls.map((call) => ({
         id: call.id,
         name: call.function && call.function.name,
-        arguments: redactSecrets(call.function && call.function.arguments)
+        arguments: compactToolArguments(
+          call.function && call.function.arguments,
+          call.function && call.function.name,
+          maxToolArgumentBytes(config)
+        )
       }))
     });
 
     const toolResultMode = result.provider && result.provider.toolResultMode === "user_summary"
       ? "user_summary"
       : "native";
-    messages.push(assistantMessageForResult(result, toolResultMode));
+    messages.push(assistantMessageForResult(result, toolResultMode, config));
 
     if (!result.toolCalls.length) {
       proof.result = redactSecrets(result.content || "Cycle finished without tool calls.");
@@ -363,13 +443,13 @@ function sanitizePublicArtifact(value, key = "") {
   return sanitizePublicString(value);
 }
 
-function assistantMessageForResult(result, toolResultMode = "native") {
+function assistantMessageForResult(result, toolResultMode = "native", config = {}) {
   const message = {
     role: "assistant",
     content: result.content || ""
   };
   if (toolResultMode === "native" && result.toolCalls && result.toolCalls.length) {
-    message.tool_calls = result.toolCalls;
+    message.tool_calls = compactToolCallsForHistory(result.toolCalls, config);
   }
   return message;
 }
@@ -417,6 +497,8 @@ module.exports = {
   addToolResultMessage,
   assistantMessageForResult,
   commitIfNeeded,
+  compactToolArguments,
+  compactToolCallsForHistory,
   main,
   parseToolInput,
   sanitizeProofInput,

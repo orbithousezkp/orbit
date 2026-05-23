@@ -341,3 +341,46 @@ test("provider headers can request identity encoding for gateways with bad gzip 
     global.fetch = originalFetch;
   }
 });
+
+test("oversized AI requests fall back before hitting the provider", async () => {
+  const originalFetch = global.fetch;
+  let fetchCalled = false;
+
+  global.fetch = async () => {
+    fetchCalled = true;
+    throw new Error("should not call provider");
+  };
+
+  try {
+    const result = await infer(config({
+      aiRequestMaxBytes: 500,
+      aiProviders: [
+        {
+          name: "only",
+          label: "Only",
+          apiKey: "only-key",
+          apiBase: "https://only.example/v1",
+          model: "only-model",
+          chatPath: "/chat/completions",
+          priority: 1
+        }
+      ]
+    }), [
+      { role: "user", content: "x".repeat(2_000), context: {} }
+    ], []);
+
+    assert.equal(result.fallback, true);
+    assert.equal(fetchCalled, false);
+    assert.equal(result.providerErrors[0].error, "AI route failed");
+  } finally {
+    global.fetch = originalFetch;
+  }
+});
+
+test("request byte limit defaults to a provider-safe cap", () => {
+  const { requestMaxBytes } = require("../src/agent/inference");
+
+  assert.equal(requestMaxBytes({}, {}), 2_500_000);
+  assert.equal(requestMaxBytes({ aiRequestMaxBytes: 123 }, {}), 123);
+  assert.equal(requestMaxBytes({ aiRequestMaxBytes: 123 }, { requestMaxBytes: 456 }), 456);
+});

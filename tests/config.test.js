@@ -91,6 +91,16 @@ test("revenue claim cadence and performance gates are configurable", () => {
   assert.equal(config.revenueMinProductiveRatio, 0.6);
 });
 
+test("AI request and tool argument byte limits are configurable", () => {
+  const config = loadConfig({
+    ORBIT_AI_REQUEST_MAX_BYTES: "123456",
+    ORBIT_AI_TOOL_ARGUMENT_MAX_BYTES: "7890"
+  });
+
+  assert.equal(config.aiRequestMaxBytes, 123456);
+  assert.equal(config.aiToolArgumentMaxBytes, 7890);
+});
+
 test("invalid provider JSON leaves Orbit without an AI provider", () => {
   const config = loadConfig({
     ORBIT_AI_PROVIDERS: "not-json"

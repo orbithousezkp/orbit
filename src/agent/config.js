@@ -204,6 +204,8 @@ function loadConfig(env = process.env) {
     aiMonthlyBudgetUsd: parseNumberEnv(env.ORBIT_AI_MONTHLY_BUDGET_USD, 100),
     aiInputUsdPerMillion: parseNumberEnv(env.ORBIT_AI_INPUT_USD_PER_MILLION, 0.15),
     aiOutputUsdPerMillion: parseNumberEnv(env.ORBIT_AI_OUTPUT_USD_PER_MILLION, 0.6),
+    aiRequestMaxBytes: parseIntEnv(env.ORBIT_AI_REQUEST_MAX_BYTES, 2_500_000),
+    aiToolArgumentMaxBytes: parseIntEnv(env.ORBIT_AI_TOOL_ARGUMENT_MAX_BYTES, 16_000),
     aiFoodPurchaseProvider: env.ORBIT_AI_FOOD_PURCHASE_PROVIDER || "configured-ai-credit-provider",
     aiFoodPurchaseLabel: env.ORBIT_AI_FOOD_PURCHASE_LABEL || "configured AI-credit provider",
     aiFoodPurchaseUrl: env.ORBIT_AI_FOOD_PURCHASE_URL || "",

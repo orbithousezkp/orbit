@@ -1,5 +1,7 @@
 "use strict";
 
+const fs = require("fs");
+const path = require("path");
 const { execFileSync } = require("child_process");
 const { behaviorStatus } = require("./behavior");
 const { addTask, completeTask, loadTasks, TASKS_PATH } = require("./tasks");
@@ -70,13 +72,79 @@ const APPROVAL_ISSUE_LABEL = "orbit:approval";
 const APPROVAL_ISSUE_PATTERNS = [
   /\b(owner approval|approval required|approval issue|external spend|wallet spend|send money|transfer funds|token launch|reward claim|change payout|payout route|operator revenue|treasury recipient|sign transaction|major movement|risky movement)\b/i
 ];
+const BINARY_ASSET_EXTENSIONS = new Set([
+  ".avif",
+  ".gif",
+  ".ico",
+  ".jpeg",
+  ".jpg",
+  ".mp4",
+  ".pdf",
+  ".png",
+  ".webm",
+  ".webp"
+]);
+const TEXT_IMAGE_EXTENSIONS = new Set([
+  ".svg"
+]);
+const MAX_INLINE_ASSET_BYTES = 32_000;
+const MAX_INLINE_TEXT_ASSET_BYTES = 20_000;
+const MAX_TEXT_WRITE_BYTES = 500_000;
 
 function track(relativePath) {
   filesChanged.add(relativePath.replace(/\\/g, "/"));
 }
 
-function readFile(config, relativePath) {
-  return readSafeTextFile(config.repoRoot, relativePath);
+function isBinaryAssetPath(relativePath) {
+  return BINARY_ASSET_EXTENSIONS.has(path.extname(String(relativePath || "")).toLowerCase());
+}
+
+function isTextImageAssetPath(relativePath) {
+  return TEXT_IMAGE_EXTENSIONS.has(path.extname(String(relativePath || "")).toLowerCase());
+}
+
+function readFileForTool(config, relativePath) {
+  const { normalized, resolved } = assertNoSymlinkPath(config.repoRoot, relativePath);
+  const stats = fs.statSync(resolved);
+  if (isBinaryAssetPath(normalized) || (isTextImageAssetPath(normalized) && stats.size > MAX_INLINE_TEXT_ASSET_BYTES)) {
+    return {
+      path: normalized,
+      contentOmitted: true,
+      binaryAsset: isBinaryAssetPath(normalized),
+      frontendAsset: true,
+      sizeBytes: stats.size,
+      reason: "Large frontend asset bytes are omitted from AI context. Reference this repository path from frontend code instead of reading or embedding the asset."
+    };
+  }
+
+  return {
+    path: normalized,
+    content: redactSecrets(readSafeTextFile(config.repoRoot, normalized)).slice(0, 20_000),
+    truncated: stats.size > 20_000
+  };
+}
+
+function embeddedImageBytes(content) {
+  const value = String(content || "");
+  const matches = value.match(/data:image\/[a-z0-9.+-]+;base64,[A-Za-z0-9+/=\r\n]+/gi) || [];
+  return matches.reduce((total, match) => total + Buffer.byteLength(match), 0);
+}
+
+function assertNoLargeInlineAssets(content) {
+  const inlineBytes = embeddedImageBytes(content);
+  if (inlineBytes > MAX_INLINE_ASSET_BYTES) {
+    throw new Error("refusing to write large inline image data; keep frontend images as repository assets and reference their paths");
+  }
+}
+
+function assertTextWriteSize(relativePath, content) {
+  const bytes = Buffer.byteLength(String(content || ""));
+  if (isBinaryAssetPath(relativePath)) {
+    throw new Error("write_file writes text only; keep binary frontend images as assets and reference their paths");
+  }
+  if (bytes > MAX_TEXT_WRITE_BYTES) {
+    throw new Error(`refusing to write oversized text payload (${bytes} bytes) through write_file`);
+  }
 }
 
 function writeFile(config, relativePath, content) {
@@ -84,10 +152,12 @@ function writeFile(config, relativePath, content) {
   if (PROTECTED_WRITE_PATHS.has(normalized)) {
     throw new Error(`direct writes to ${normalized} are not allowed`);
   }
+  assertTextWriteSize(normalized, content);
+  assertNoLargeInlineAssets(content);
   assertSafeTextForWrite(content);
   writeSafeTextFile(config.repoRoot, normalized, content);
   track(normalized);
-  return { path: normalized, bytes: Buffer.byteLength(content) };
+  return { path: normalized, bytes: Buffer.byteLength(String(content || "")) };
 }
 
 function safeCommandEnv(env = process.env) {
@@ -195,10 +265,7 @@ async function executeTool(config, github, cycle, name, input) {
     }
 
     case "read_file": {
-      return {
-        path: input.path,
-        content: redactSecrets(readFile(config, input.path)).slice(0, 20_000)
-      };
+      return readFileForTool(config, input.path);
     }
 
     case "write_file": {
@@ -538,5 +605,6 @@ module.exports = {
   PROJECT_IDEAS_PATH,
   runCommand,
   safeCommandEnv,
+  readFileForTool,
   writeFile
 };

@@ -10,7 +10,6 @@ import {
   X,
 } from 'lucide-react';
 import { useState } from 'react';
-import operationsImage from '../assets/orbit-control-room.png';
 import {
   boundaries,
   commandExamples,
@@ -113,12 +112,7 @@ function SectionIntro({ kicker, title, children }) {
 function HouseVisual() {
   return (
     <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_24px_90px_rgba(15,23,42,0.12)]">
-      <div
-        className="min-h-[440px] bg-cover bg-center"
-        style={{
-          backgroundImage: `linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.94)), url(${operationsImage})`,
-        }}
-      />
+      <div className="house-scene min-h-[440px]" />
       <div className="absolute inset-0 dot-grid opacity-40" />
 
       <div className="absolute inset-x-4 top-4 rounded-xl border border-white/70 bg-white/85 p-4 backdrop-blur">

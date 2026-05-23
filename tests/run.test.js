@@ -11,6 +11,8 @@ const {
   addToolResultMessage,
   assistantMessageForResult,
   changedPathsForCommit,
+  compactToolArguments,
+  compactToolCallsForHistory,
   sanitizeProofOutput,
   stageChangedPaths,
   toolResultsUserMessage
@@ -151,6 +153,58 @@ test("user summary tool result mode avoids native tool messages", () => {
   assert.equal(userMessage.role, "user");
   assert.match(userMessage.content, /Tool results/);
   assert.match(userMessage.content, /list_memory/);
+});
+
+test("large tool arguments are compacted before re-entering model history", () => {
+  const compacted = compactToolArguments(JSON.stringify({
+    path: "src/App.jsx",
+    content: "data:image/png;base64," + "a".repeat(40_000)
+  }), "write_file", 2_000);
+  const parsed = JSON.parse(compacted);
+
+  assert.equal(Buffer.byteLength(compacted) <= 2_000, true);
+  assert.equal(parsed.argumentsCompacted, true);
+  assert.equal(parsed.tool, "write_file");
+  assert.equal(parsed.content, "[OMITTED_LARGE_TOOL_CONTENT]");
+  assert.equal(parsed.contentBytes > 40_000, true);
+});
+
+test("assistant history compacts oversized native tool call arguments", () => {
+  const message = assistantMessageForResult({
+    content: "checking",
+    toolCalls: [
+      {
+        id: "call_1",
+        function: {
+          name: "write_file",
+          arguments: JSON.stringify({
+            path: "src/App.jsx",
+            content: "x".repeat(40_000)
+          })
+        }
+      }
+    ]
+  }, "native", { aiToolArgumentMaxBytes: 2_000 });
+
+  const args = message.tool_calls[0].function.arguments;
+  assert.equal(Buffer.byteLength(args) <= 2_000, true);
+  assert.match(args, /OMITTED_LARGE_TOOL_CONTENT/);
+});
+
+test("tool argument compaction keeps unusual large fields under the byte limit", () => {
+  const calls = compactToolCallsForHistory([
+    {
+      id: "call_1",
+      function: {
+        name: "unknown_tool",
+        arguments: "x".repeat(40_000)
+      }
+    }
+  ], { aiToolArgumentMaxBytes: 600 });
+
+  const args = calls[0].function.arguments;
+  assert.equal(Buffer.byteLength(args) <= 600, true);
+  assert.match(args, /OMITTED_LARGE_TOOL_ARGUMENT/);
 });
 
 test("proof sanitizer redacts private routes, token configs, and addresses", () => {

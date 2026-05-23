@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Orbit Feature Map</title>
     <meta name="description" content="Orbit's unique feature surface, governance model, scam scanner, and token economy in one view.">
-    <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
     <style>
       :root {
         color-scheme: dark;
@@ -24,7 +23,11 @@
 
       body {
         margin: 0;
-        background: linear-gradient(180deg, rgba(7, 16, 29, .94), rgba(7, 16, 29, 1)), url("assets/orbit-control-room.png") top right / cover no-repeat, var(--bg);
+        background:
+          linear-gradient(180deg, rgba(7, 16, 29, .94), rgba(7, 16, 29, 1)),
+          radial-gradient(circle at 82% 8%, rgba(0, 212, 255, .16), transparent 26%),
+          radial-gradient(circle at 12% 24%, rgba(61, 220, 151, .1), transparent 22%),
+          var(--bg);
         color: var(--ink);
       }
 
@@ -50,9 +53,19 @@
         font-weight: 850;
       }
 
-      .brand img {
+      .brand-mark {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         width: 36px;
         height: 36px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--blue), var(--green));
+        color: #07101d;
+        font-size: 13px;
+        font-weight: 850;
+        letter-spacing: .08em;
+        text-indent: .08em;
       }
 
       nav {
@@ -235,7 +248,7 @@
     <div class="shell">
       <div class="top">
         <a class="brand" href="index.html">
-          <img src="assets/mark.svg" alt="">
+          <span class="brand-mark" aria-hidden="true">OR</span>
           <span>Orbit Feature Map</span>
         </a>
         <nav>
