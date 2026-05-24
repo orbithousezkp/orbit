@@ -1,6 +1,18 @@
 "use strict";
 
-const { scanText, scanEvent, formatSummary, extractUrls, domainOf, scanUrl, riskLevel, validateCustomRule, compileRule } = require("./scan");
+const {
+  buildReport,
+  scanText,
+  scanEvent,
+  formatSummary,
+  extractUrls,
+  domainOf,
+  scanUrl,
+  recommendedAction,
+  riskLevel,
+  validateCustomRule,
+  compileRule
+} = require("./scan");
 const { RISK_PATTERNS, SHORTENER_DOMAINS, SAFE_DOMAINS } = require("./rules");
 
 module.exports = {
@@ -8,9 +20,11 @@ module.exports = {
   scanText,
   scanEvent,
   scanUrl,
+  buildReport,
 
   // Formatting
   formatSummary,
+  recommendedAction,
   riskLevel,
 
   // Utilities

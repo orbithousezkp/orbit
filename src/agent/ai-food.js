@@ -81,7 +81,7 @@ function buildAiFoodRefillRequest(config, treasury, input = {}) {
 
   return {
     category: "ai_food_refill",
-    purpose: `Buy $${amountUsd.toFixed(2)} of Orbit AI-call food credits through the configured provider`,
+    purpose: `Buy $${amountUsd.toFixed(2)} of Orbit AI-call budget credits through the configured provider`,
     asset: "USD credits",
     amount: amountUsd,
     recipient: provider,

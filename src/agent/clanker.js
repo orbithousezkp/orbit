@@ -138,7 +138,15 @@ async function makeClanker(config) {
   };
 }
 
-async function launchNativeToken(config, cycle = 0) {
+async function launchNativeToken(config, cycle = 0, state = {}) {
+  if (state.preLaunchVerified !== true) {
+    return {
+      status: "blocked",
+      ok: false,
+      blocked: true,
+      reason: "state.preLaunchVerified is not true (D-018 pre-launch gate)"
+    };
+  }
   const treasury = syncRevenuePolicy(config);
   if (treasury.token.launchStatus === "launched" && treasury.token.address) {
     return {
@@ -187,7 +195,15 @@ async function launchNativeToken(config, cycle = 0) {
   };
 }
 
-async function runRevenueCycle(config) {
+async function runRevenueCycle(config, state = {}) {
+  if (state.preLaunchVerified !== true) {
+    return {
+      status: "blocked",
+      ok: false,
+      blocked: true,
+      reason: "state.preLaunchVerified is not true (D-018 pre-launch gate)"
+    };
+  }
   const treasury = loadTreasury(config.repoRoot, config);
   const token = treasury.token.address;
   const operatorRecipient = config.operatorRevenueAddress;

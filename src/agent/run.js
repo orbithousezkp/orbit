@@ -16,6 +16,11 @@ const { executeTool, filesChanged, writeFile } = require("./actions");
 const { appendSafeTextFile, assertNoSymlinkPath, readSafeTextFile, redactSecrets } = require("./safety");
 const { TREASURY_PATH, recordAiUsage } = require("./treasury");
 const { privateAiRouteId, privateAiRoutes, privateProviderErrors } = require("./provider-privacy");
+const { assertSignerMatches, signProof } = require("./proof-signing");
+const { exportBundle, projectForDashboard } = require("../../packages/orbit-sdk");
+
+const DASHBOARD_PATH = "public/dashboard.json";
+const DASHBOARD_MAX_BYTES = 60_000;
 
 const REDACTED_PRIVATE_CONFIG = "[REDACTED_PRIVATE_CONFIG]";
 const REDACTED_ADDRESS = "[REDACTED_ADDRESS]";
@@ -83,6 +88,34 @@ function gitAvailable(repoRoot) {
 
 function git(repoRoot, args) {
   return execFileSync("git", args, { cwd: repoRoot, encoding: "utf-8" }).trim();
+}
+
+function shortGitCommit(repoRoot) {
+  try {
+    if (!gitAvailable(repoRoot)) return null;
+    return git(repoRoot, ["rev-parse", "--short", "HEAD"]) || null;
+  } catch {
+    return null;
+  }
+}
+
+function writeDashboardSnapshot(config) {
+  const bundle = exportBundle(config.repoRoot, undefined, { receiptLimit: 10, includeMemory: false });
+  const gitCommit = shortGitCommit(config.repoRoot);
+  let slim = projectForDashboard(bundle, { gitCommit });
+  let json = JSON.stringify(slim, null, 2);
+
+  if (Buffer.byteLength(json) > DASHBOARD_MAX_BYTES) {
+    slim = projectForDashboard(bundle, { gitCommit, receiptLimit: 5 });
+    json = JSON.stringify(slim, null, 2);
+  }
+  if (Buffer.byteLength(json) > DASHBOARD_MAX_BYTES) {
+    log(`dashboard snapshot ${Buffer.byteLength(json)}B exceeds ${DASHBOARD_MAX_BYTES}B cap; skipping`);
+    return { written: false, bytes: Buffer.byteLength(json), path: DASHBOARD_PATH };
+  }
+
+  writeFile({ repoRoot: config.repoRoot }, DASHBOARD_PATH, `${json}\n`);
+  return { written: true, bytes: Buffer.byteLength(json), path: DASHBOARD_PATH };
 }
 
 function changedPathsForCommit(config) {
@@ -212,6 +245,12 @@ function compactToolCallsForHistory(toolCalls = [], config = {}) {
 
 async function main() {
   const config = loadConfig();
+  if (config.agentSigner && !config.walletPrivateKey) {
+    throw new Error("ORBIT_AGENT_SIGNER set but ORBIT_WALLET_PRIVATE_KEY missing");
+  }
+  if (config.walletPrivateKey && config.agentSigner) {
+    assertSignerMatches(config.walletPrivateKey, config.agentSigner);
+  }
   const state = readJson(config.repoRoot, "memory/state.json", {
     cycle: 0,
     born: null,
@@ -373,7 +412,6 @@ async function main() {
     state.firstWakeIntroComplete = true;
     state.firstWakeIntroAt = firstWakeIntro.timestamp;
   }
-  writeJson(config.repoRoot, "memory/state.json", state);
 
   const finishedAt = new Date().toISOString();
   proof.finishedAt = finishedAt;
@@ -383,6 +421,17 @@ async function main() {
   const date = finishedAt.slice(0, 10);
   const stamp = finishedAt.replace(/[:.]/g, "-");
   const proofPath = `${config.proofDir}/${date}/${stamp}.json`;
+
+  if (config.walletPrivateKey && config.agentSigner) {
+    try {
+      Object.assign(proof, await signProof(proof, config.walletPrivateKey));
+      state.firstSignedCycle = state.firstSignedCycle || state.cycle;
+    } catch (error) {
+      proof.signError = redactSecrets(`sign_failed:${error.message}`);
+    }
+  }
+
+  writeJson(config.repoRoot, "memory/state.json", state);
   writeJson(config.repoRoot, proofPath, proof);
 
   appendLine(config.repoRoot, "memory/cycles.jsonl", {
@@ -393,6 +442,24 @@ async function main() {
     filesChanged: proof.filesChanged,
     result: redactSecrets(String(proof.result || "")).slice(0, 240)
   });
+
+  try {
+    writeDashboardSnapshot(config);
+  } catch (error) {
+    log(`dashboard snapshot skipped: ${redactSecrets(error.message)}`);
+  }
+
+  try {
+    const { postCycleCast, summarizeCycleForCast } = require("./farcaster");
+    const cycleSummary = summarizeCycleForCast(proof, context, config);
+    const cast = await postCycleCast(config, cycleSummary, proof);
+    proof.cast = cast;
+    if (cast && cast.ledgerPath) filesChanged.add(cast.ledgerPath);
+    writeJson(config.repoRoot, proofPath, proof);
+  } catch (error) {
+    proof.cast = { ok: false, error: redactSecrets(`cast_failed:${error.message}`) };
+    writeJson(config.repoRoot, proofPath, proof);
+  }
 
   let commitResult;
   try {
@@ -480,7 +547,7 @@ function toolResultsUserMessage(summarizedToolResults) {
     content: [
       "Tool results from the previous assistant-requested actions:",
       JSON.stringify(summarizedToolResults).slice(0, 12_000),
-      "Use these safe tool results to choose the next small household action. If enough work is done, finish without more tool calls."
+      "Use these safe tool results to choose the next small repository action. If enough work is done, finish without more tool calls."
     ].join("\n")
   };
 }
@@ -505,5 +572,6 @@ module.exports = {
   sanitizeProofOutput,
   sanitizePublicArtifact,
   stageChangedPaths,
-  toolResultsUserMessage
+  toolResultsUserMessage,
+  writeDashboardSnapshot
 };

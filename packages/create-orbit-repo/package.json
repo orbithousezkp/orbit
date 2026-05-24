@@ -1,0 +1,35 @@
+{
+  "name": "create-orbit-repo",
+  "version": "0.1.0",
+  "description": "Scaffolder for new Orbit repos. Adds workflows, memory files, governance, and SDK dependency.",
+  "bin": {
+    "create-orbit-repo": "./bin.js"
+  },
+  "main": "./src/index.js",
+  "files": [
+    "bin.js",
+    "src/",
+    "templates/",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test ../../tests/create-orbit-repo-*.test.js"
+  },
+  "keywords": [
+    "orbit",
+    "scaffolder",
+    "create",
+    "agent",
+    "github-actions"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/candyburst/orbit",
+    "directory": "packages/create-orbit-repo"
+  }
+}

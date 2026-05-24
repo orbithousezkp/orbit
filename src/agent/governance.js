@@ -375,16 +375,137 @@ function governanceStatus(config) {
   };
 }
 
+const ACTION_TIER_MAP = {
+  buyback: "high",
+  "merkle-anchor": "medium",
+  handoff: "critical",
+  "federation-trust": "high",
+  "treasury-deploy": "high"
+};
+
+function actionTier(actionType) {
+  if (!actionType) return "medium";
+  const key = String(actionType).toLowerCase();
+  return ACTION_TIER_MAP[key] || "medium";
+}
+
+function normalizeActionToken(actionType) {
+  return String(actionType || "")
+    .toUpperCase()
+    .replace(/[^A-Z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function parseQuorumComments(comments, idemKey, maintainers) {
+  const approvals = new Set();
+  const rejections = new Set();
+  let lastActivity = null;
+  const allowed = new Set((Array.isArray(maintainers) ? maintainers : []).map((m) => String(m || "").toLowerCase()));
+  const idem = String(idemKey || "").trim();
+  if (!idem || !Array.isArray(comments)) {
+    return { approvals, rejections, lastActivity };
+  }
+
+  for (const comment of comments) {
+    if (!comment) continue;
+    const author = String(comment.author || comment.user || "").toLowerCase();
+    if (!author || !allowed.has(author)) continue;
+    const body = String(comment.body || "");
+    const lines = body.split(/\r?\n/).map((line) => line.trim());
+    let voted = false;
+    for (const line of lines) {
+      const approveMatch = line.match(/^APPROVE\s+ORBIT-([A-Z0-9-]+)\s+(\S+)$/);
+      const rejectMatch = line.match(/^REJECT\s+ORBIT-([A-Z0-9-]+)\s+(\S+)$/);
+      if (approveMatch && approveMatch[2] === idem) {
+        approvals.add(author);
+        voted = true;
+      }
+      if (rejectMatch && rejectMatch[2] === idem) {
+        rejections.add(author);
+        voted = true;
+      }
+    }
+    if (voted) {
+      const created = comment.createdAt || comment.created_at || comment.timestamp || null;
+      if (created && (!lastActivity || String(created) > String(lastActivity))) {
+        lastActivity = created;
+      }
+    }
+  }
+
+  return { approvals, rejections, lastActivity };
+}
+
+function evaluateQuorum({ comments, idemKey, actionTier: tier, quorum } = {}) {
+  if (!quorum || quorum.enabled !== true) {
+    return { status: "disabled" };
+  }
+  const maintainers = Array.isArray(quorum.maintainers) ? quorum.maintainers : [];
+  const total = maintainers.length;
+  const tierKey = tier || "medium";
+  const thresholds = quorum.thresholds || {};
+  const threshold = Math.max(1, Math.min(total, Number(thresholds[tierKey]) || 1));
+
+  const { approvals, rejections, lastActivity } = parseQuorumComments(comments, idemKey, maintainers);
+
+  if (rejections.size > 0) {
+    const rejector = Array.from(rejections)[0];
+    return {
+      status: "rejected",
+      rejector,
+      reason: "maintainer-reject",
+      approvals,
+      rejections,
+      lastActivity
+    };
+  }
+
+  if (approvals.size >= threshold) {
+    return {
+      status: "approved",
+      approvals,
+      threshold,
+      total,
+      lastActivity
+    };
+  }
+
+  return {
+    status: "pending",
+    approvals,
+    rejections,
+    needed: Math.max(0, threshold - approvals.size),
+    threshold,
+    total,
+    lastActivity
+  };
+}
+
+function requiresQuorum(actionType, quorum) {
+  if (!quorum || quorum.enabled !== true) return false;
+  const tier = actionTier(actionType);
+  if (tier === "low") return false;
+  const maintainers = Array.isArray(quorum.maintainers) ? quorum.maintainers : [];
+  if (maintainers.length <= 1) return false;
+  return true;
+}
+
 module.exports = {
+  ACTION_TIER_MAP,
   APPROVALS_PATH,
   GOVERNANCE_PATH,
+  actionTier,
   checkOwnerApproval,
   classifySpend,
+  evaluateQuorum,
   governanceStatus,
   guardSpend,
   loadApprovals,
   loadGovernance,
+  normalizeActionToken,
+  parseQuorumComments,
   requestOwnerApproval,
+  requiresQuorum,
   saveApprovals,
   saveGovernance,
   scanTextRisk,

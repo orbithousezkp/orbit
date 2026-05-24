@@ -1,6 +1,6 @@
-name: "Issue Scam Scanner"
-description: "Flag prompt injection, wallet drain, encoded relay, fake support, and urgency traps in GitHub issues and comments."
-author: "Orbit House"
+name: "Orbit Intake Guardrail"
+description: "Flag prompt injection, wallet drain, encoded relay, fake support, and urgency traps before repo agents act on GitHub issues and comments."
+author: "Orbit"
 
 inputs:
   issue-body:
@@ -19,16 +19,32 @@ inputs:
     description: "Minimum severity to flag (default: 70)"
     required: false
     default: "70"
+  quarantine-threshold:
+    description: "Minimum severity that should quarantine or require human review"
+    required: false
+    default: "70"
+  block-threshold:
+    description: "Minimum severity that should hard-block the workflow"
+    required: false
+    default: "90"
+  rules-file:
+    description: "Optional path to a JSON array of custom scanner rules"
+    required: false
+    default: ""
 
 outputs:
   safe:
     description: "'true' if no flags above threshold, 'false' otherwise"
+  action:
+    description: "Recommended policy action: allow, warn, quarantine, or block"
   score:
     description: "Highest severity score found"
   level:
     description: "Risk level: clear, low, medium, high, critical"
   flags:
     description: "JSON array of risk flags found"
+  report:
+    description: "Full Orbit Intake Guardrail report as JSON"
 
 runs:
   using: "node20"

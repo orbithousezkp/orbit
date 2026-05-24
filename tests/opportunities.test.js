@@ -66,7 +66,7 @@ test("summarizes low food as critical survival state", () => {
   assert.equal(result.survivalState, "food_low");
 });
 
-test("mandatory heartbeat is selected when the house is otherwise stable", () => {
+test("mandatory heartbeat is selected when the control plane is otherwise stable", () => {
   const result = deriveDrivers({
     cycleConfig: {
       trigger: {
@@ -119,7 +119,7 @@ test("state driver outranks event and mandatory drivers", () => {
 test("deterministic fallback inspects income opportunities for survival step", () => {
   const response = deterministicResponse({
     behaviorPlan: {
-      mode: "virtual_human_household",
+      mode: "virtual_repo_control_plane",
       primaryObjective: "survive",
       nextStep: {
         kind: "survival_opportunity",

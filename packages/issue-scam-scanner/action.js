@@ -1,6 +1,22 @@
 "use strict";
 
-const { scanText, formatSummary } = require("./scan");
+const fs = require("fs");
+const path = require("path");
+const { buildReport, compileRule, scanText, formatSummary, validateCustomRule } = require("./scan");
+
+function loadRulesFile(rulesPath) {
+  if (!rulesPath) return [];
+  const resolved = path.resolve(rulesPath);
+  const parsed = JSON.parse(fs.readFileSync(resolved, "utf8"));
+  if (!Array.isArray(parsed)) {
+    throw new Error("rules-file must contain a JSON array of rule objects");
+  }
+  return parsed.map((rule, index) => {
+    const valid = validateCustomRule(rule, index);
+    if (valid !== true) throw new Error(valid);
+    return compileRule(rule);
+  });
+}
 
 // GitHub Actions runtime: read from process.env or core
 // This is a minimal entrypoint for the action
@@ -23,6 +39,9 @@ async function run() {
   const body = core.getInput("issue-body") || "";
   const comment = core.getInput("comment-body") || "";
   const threshold = parseInt(core.getInput("threshold") || "70", 10);
+  const quarantineThreshold = parseInt(core.getInput("quarantine-threshold") || String(threshold), 10);
+  const blockThreshold = parseInt(core.getInput("block-threshold") || "90", 10);
+  const rulesFile = core.getInput("rules-file") || "";
 
   const combined = [title, body, comment].filter(Boolean).join("\n\n");
   if (!combined.trim()) {
@@ -34,18 +53,28 @@ async function run() {
     return;
   }
 
-  // Pass threshold through so safe/unsafe respects the configured level
-  const result = scanText(combined, { threshold });
+  const customRules = loadRulesFile(rulesFile);
+  const options = {
+    threshold,
+    quarantineThreshold,
+    blockThreshold,
+    customRules: customRules.length ? customRules : undefined
+  };
+  const result = scanText(combined, options);
+  const report = buildReport(combined, options);
+  const aboveThreshold = result.flags.filter((f) => f.severity >= threshold);
 
-  core.setOutput("safe", result.safe ? "true" : "false");
+  core.setOutput("safe", aboveThreshold.length === 0 ? "true" : "false");
+  core.setOutput("action", report.action);
   core.setOutput("score", String(result.score));
   core.setOutput("level", result.level);
   core.setOutput("flags", JSON.stringify(result.flags));
+  core.setOutput("report", JSON.stringify(report));
 
-  if (!result.safe) {
-    core.warning(formatSummary(result, "Issue Scam Scanner"));
+  if (aboveThreshold.length > 0) {
+    core.warning(formatSummary(result, "Orbit Intake Guardrail"));
   } else {
-    core.info(formatSummary(result, "Issue Scam Scanner"));
+    core.info(formatSummary(result, "Orbit Intake Guardrail"));
   }
 }
 

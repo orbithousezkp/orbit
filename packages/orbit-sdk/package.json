@@ -1,0 +1,36 @@
+{
+  "name": "@orbit-house/sdk",
+  "version": "0.1.0",
+  "description": "Read-only SDK for Orbit repository infrastructure: passport, capabilities, lifecycle, receipts, memory, permissions, dashboard projection, and adoption checks.",
+  "main": "index.js",
+  "bin": {
+    "orbit-sdk": "./cli.js"
+  },
+  "files": [
+    "index.js",
+    "cli.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test ../../tests/orbit-sdk.test.js ../../tests/dashboard-projection.test.js"
+  },
+  "keywords": [
+    "orbit",
+    "agent-infrastructure",
+    "github-actions",
+    "agent-memory",
+    "proof-receipts",
+    "dashboard",
+    "repository-control-plane"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/candyburst/orbit",
+    "directory": "packages/orbit-sdk"
+  }
+}

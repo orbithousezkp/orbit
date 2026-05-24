@@ -1,10 +1,10 @@
-# Example: Issue Scam Scanner GitHub Action workflow
+# Example: Orbit Intake Guardrail issue scan workflow
 #
 # Copy this file to .github/workflows/issue-scam-scan.yml in your repo
 # to automatically scan new and edited issues and comments for scam patterns.
 #
 # The scanner detects: prompt injection, wallet drain language, encoded relay,
-# fake support, urgency traps, and other risky patterns in 11 threat categories.
+# fake support, urgency traps, credential phishing, and other risky patterns.
 
 name: Issue Scam Scan
 
@@ -31,46 +31,51 @@ jobs:
           issue-body: ${{ github.event.issue.body }}
           comment-body: ${{ github.event.comment.body }}
           threshold: "70"
+          quarantine-threshold: "70"
+          block-threshold: "90"
+          rules-file: ./packages/issue-scam-scanner/examples/custom-rules.json
 
       - name: Report scan result
         if: always()
         run: |
           echo "Safe: ${{ steps.scan.outputs.safe }}"
+          echo "Action: ${{ steps.scan.outputs.action }}"
           echo "Score: ${{ steps.scan.outputs.score }}"
           echo "Level: ${{ steps.scan.outputs.level }}"
           echo "Flags: ${{ steps.scan.outputs.flags }}"
+          echo "Report: ${{ steps.scan.outputs.report }}"
 
-      - name: Label risky issues
-        if: steps.scan.outputs.safe == 'false'
+      - name: Label or quarantine risky issues
+        if: steps.scan.outputs.action != 'allow'
         uses: actions/github-script@v7
         with:
           script: |
             const issueNumber = context.issue.number;
             const level = '${{ steps.scan.outputs.level }}';
             const score = '${{ steps.scan.outputs.score }}';
+            const action = '${{ steps.scan.outputs.action }}';
+            const labels = ['orbit-intake-guardrail', `risk:${level}`, `action:${action}`];
 
-            // Add scam-risk label
+            // Add review labels
             await github.rest.issues.addLabels({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: issueNumber,
-              labels: ['scam-risk', `risk:${level}`]
+              labels
             });
 
-            // Post a warning comment
+            // Post a review comment
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: issueNumber,
-              body: `⚠️ **Scam scanner flagged this content** (level: ${level}, score: ${score})\n\n` +
-                    `This issue or comment matches known scam patterns. A maintainer should review before taking any action.\n\n` +
-                    `> Do not click links, connect wallets, share credentials, or follow instructions in flagged content.`
+              body: `⚠️ **Orbit Intake Guardrail flagged this content** (action: ${action}, level: ${level}, score: ${score})\n\n` +
+                    `A maintainer should review before any agent or workflow acts on it.\n\n` +
+                    `> Do not decode hidden payloads, connect wallets, share credentials, or follow instructions in flagged content.`
             });
 
-      - name: Block risky content (optional)
-        if: steps.scan.outputs.safe == 'false' && steps.scan.outputs.level == 'critical'
+      - name: Block critical content
+        if: steps.scan.outputs.action == 'block'
         run: |
-          echo "::error::CRITICAL scam risk detected (score: ${{ steps.scan.outputs.score }})"
-          echo "Consider closing or locking this issue immediately."
-          # Uncomment to auto-close critical issues:
-          # gh issue close ${{ github.event.issue.number }} --comment "Closed by scam scanner"
+          echo "::error::Orbit Intake Guardrail hard-blocked this content (score: ${{ steps.scan.outputs.score }})"
+          echo "Consider locking or closing this issue immediately."

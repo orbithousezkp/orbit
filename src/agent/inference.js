@@ -1,7 +1,6 @@
 "use strict";
 
 const { planCycle } = require("./behavior");
-const { redactSecrets } = require("./safety");
 const { budgetStatus } = require("./treasury");
 const { privateAiRoute, privateProviderErrors } = require("./provider-privacy");
 
@@ -62,6 +61,20 @@ function deterministicResponse(context, reason) {
   if (selected && ["roadmap_growth", "roadmap_branch"].includes(selected.kind)) {
     actions.push({
       tool: "roadmap_status",
+      input: {}
+    });
+  }
+
+  if (selected && ["infrastructure_growth", "infrastructure_branch"].includes(selected.kind)) {
+    actions.push({
+      tool: "infrastructure_status",
+      input: {}
+    });
+  }
+
+  if (selected && ["wallet_policy", "wallet_branch"].includes(selected.kind)) {
+    actions.push({
+      tool: "wallet_status",
       input: {}
     });
   }

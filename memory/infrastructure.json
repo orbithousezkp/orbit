@@ -1,0 +1,286 @@
+{
+  "version": 1,
+  "updatedAt": "2026-05-23T00:00:00.000Z",
+  "product": {
+    "name": "Orbit",
+    "category": "GitHub-native agent infrastructure",
+    "problem": "AI agents can write code, but most projects still lack a durable operating layer for identity, permissions, memory, receipts, budget, lifecycle, and human approval.",
+    "solution": "Orbit turns a repository into an agent control plane: the repo stores the agent passport, capability registry, command surface, memory, proof receipts, lifecycle state, and policy gates.",
+    "positioning": "Security checks are guardrails. The product is the infrastructure that lets an autonomous software operator run, prove work, and stay governable."
+  },
+  "activePhase": {
+    "id": "foundation-control-plane",
+    "name": "Foundation Control Plane",
+    "status": "active",
+    "goal": "Make Orbit understandable as infrastructure before expanding execution power."
+  },
+  "layers": [
+    {
+      "id": "github-intake",
+      "name": "GitHub Intake",
+      "status": "active",
+      "description": "Issues and comments are the public command and approval intake for Orbit."
+    },
+    {
+      "id": "repo-memory",
+      "name": "Repo Memory",
+      "status": "active",
+      "description": "Memory files hold identity, tasks, knowledge, roadmap, opportunities, and durable state."
+    },
+    {
+      "id": "agent-lifecycle",
+      "name": "Agent Lifecycle",
+      "status": "active",
+      "description": "GitHub Actions and deterministic fallback keep Orbit waking, working, and sleeping in cycles."
+    },
+    {
+      "id": "permissions",
+      "name": "Permissions And Approvals",
+      "status": "active",
+      "description": "Owner approval gates protect spend, signing, token actions, and risky external movement."
+    },
+    {
+      "id": "proof-receipts",
+      "name": "Proof Receipts",
+      "status": "active",
+      "description": "Cycle notes and runtime proofs record what Orbit saw, did, refused, and learned."
+    },
+    {
+      "id": "wallet-policy",
+      "name": "Wallet Policy",
+      "status": "active",
+      "description": "Read-only wallet state exposes approval labels, revenue cadence, and blocked live actions."
+    },
+    {
+      "id": "sdk-cli-access",
+      "name": "SDK And CLI Access",
+      "status": "planned",
+      "description": "Local read-only entry points for other repos, agents, and dashboards come last."
+    }
+  ],
+  "surfaces": [
+    {
+      "id": "repo-control-plane",
+      "name": "Repository Control Plane",
+      "status": "active",
+      "path": "memory/",
+      "description": "Machine-readable state for identity, roadmap, tasks, treasury policy, opportunities, infrastructure, and durable knowledge."
+    },
+    {
+      "id": "lifecycle-runtime",
+      "name": "Lifecycle Runtime",
+      "status": "active",
+      "path": ".github/workflows/",
+      "description": "Scheduled and event-driven wake cycles with deterministic fallback, budget gates, proofs, and optional commits."
+    },
+    {
+      "id": "capability-registry",
+      "name": "Capability Registry",
+      "status": "active",
+      "path": "src/agent/tools.js",
+      "description": "A declared tool surface with schemas, permission boundaries, and blocked actions."
+    },
+    {
+      "id": "command-router",
+      "name": "Issue Command Router",
+      "status": "active",
+      "path": "src/agent/github.js",
+      "description": "GitHub issues and comments act as the public command and approval interface."
+    },
+    {
+      "id": "receipt-ledger",
+      "name": "Receipt Ledger",
+      "status": "active",
+      "path": "runtime/proofs/",
+      "description": "Every cycle writes reviewable proof records with actions, file changes, route privacy, and result summaries."
+    },
+    {
+      "id": "agent-passport",
+      "name": "Agent Passport",
+      "status": "planned",
+      "path": "memory/infrastructure.json",
+      "description": "Portable identity bundle for mission, permissions, capability claims, proof roots, and revocation status."
+    },
+    {
+      "id": "sdk-cli",
+      "name": "SDK And CLI Surface",
+      "status": "planned",
+      "path": "src/cli/",
+      "description": "Local commands and future client helpers for reading Orbit status, receipts, capabilities, and installation checks."
+    },
+    {
+      "id": "integration-adapters",
+      "name": "Integration Adapters",
+      "status": "research",
+      "path": "src/agent/",
+      "description": "Replaceable adapters for GitHub, model providers, search, treasury observation, and future external protocols."
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "identity",
+      "name": "Identity And Mission",
+      "status": "active",
+      "mode": "repo_public",
+      "evidence": [
+        "memory/identity.md",
+        "README.md"
+      ]
+    },
+    {
+      "id": "lifecycle",
+      "name": "Wake/Sleep Lifecycle",
+      "status": "active",
+      "mode": "github_actions",
+      "evidence": [
+        ".github/workflows/orbit-cycle.yml",
+        ".github/workflows/orbit-event.yml",
+        "src/agent/run.js"
+      ]
+    },
+    {
+      "id": "memory",
+      "name": "Durable Memory",
+      "status": "active",
+      "mode": "repo_files",
+      "evidence": [
+        "memory/knowledge.json",
+        "memory/tasks.json",
+        "src/agent/memory.js"
+      ]
+    },
+    {
+      "id": "proofs",
+      "name": "Proof Receipts",
+      "status": "active",
+      "mode": "public_audit_files",
+      "evidence": [
+        "runtime/proofs/",
+        "memory/cycles.jsonl",
+        "src/agent/run.js"
+      ]
+    },
+    {
+      "id": "permissions",
+      "name": "Permission Gates",
+      "status": "active",
+      "mode": "owner_approval_required",
+      "evidence": [
+        "memory/governance.json",
+        "src/agent/governance.js",
+        "tests/governance.test.js"
+      ]
+    },
+    {
+      "id": "budget",
+      "name": "AI Food Budget",
+      "status": "active",
+      "mode": "spend_limited",
+      "evidence": [
+        "memory/treasury.json",
+        "src/agent/treasury.js",
+        "tests/treasury.test.js"
+      ]
+    },
+    {
+      "id": "intake-guardrails",
+      "name": "Intake Guardrails",
+      "status": "active",
+      "mode": "input_filtering",
+      "evidence": [
+        "src/agent/scam.js",
+        "packages/issue-scam-scanner/",
+        "tests/issue-scam-scanner.test.js"
+      ]
+    },
+    {
+      "id": "zk-receipts",
+      "name": "ZK Policy Receipts",
+      "status": "planned",
+      "mode": "commitments_first",
+      "evidence": [
+        "memory/roadmap.json"
+      ]
+    }
+  ],
+  "commands": [
+    {
+      "name": "@orbit status",
+      "status": "planned",
+      "description": "Summarize lifecycle, active phase, budget state, open blockers, and latest receipt."
+    },
+    {
+      "name": "@orbit capabilities",
+      "status": "planned",
+      "description": "Return the current capability registry and permission boundaries."
+    },
+    {
+      "name": "@orbit receipt <cycle>",
+      "status": "planned",
+      "description": "Find the proof record for a cycle and explain the result."
+    },
+    {
+      "name": "@orbit propose <work>",
+      "status": "planned",
+      "description": "Convert a safe public request into scoped repo work or an approval request."
+    }
+  ],
+  "access": [
+    {
+      "id": "cli",
+      "name": "CLI",
+      "status": "active",
+      "description": "Local commands for inspecting infrastructure, health, and lifecycle state."
+    },
+    {
+      "id": "github-actions",
+      "name": "GitHub Actions",
+      "status": "active",
+      "description": "Scheduled and event-driven lifecycle runtime for wake/sleep cycles."
+    },
+    {
+      "id": "sdk",
+      "name": "SDK",
+      "status": "planned",
+      "description": "Read-only client access for other repos, agents, and dashboards after the product shape is stable."
+    },
+    {
+      "id": "future-mcp-http",
+      "name": "MCP And HTTP Bridge",
+      "status": "research",
+      "description": "Future client bridge for external tools after permission and receipt rules are complete."
+    }
+  ],
+  "wallet": {
+    "approvalMode": "owner_approval_required",
+    "publicViewOnly": true,
+    "noPrivateKeys": true,
+    "blockedLiveActions": [
+      "wallet spending",
+      "external payments",
+      "signing",
+      "token launch",
+      "reward claims",
+      "payout-route changes"
+    ],
+    "notes": "Orbit exposes wallet policy and budget state without private keys or live signing authority."
+  },
+  "receipts": {
+    "current": "runtime/proofs/",
+    "planned": [
+      "proof hash index",
+      "receipt search",
+      "phase evidence links",
+      "portable agent passport digest"
+    ]
+  },
+  "blockedUntilApproved": [
+    "Live wallet signing",
+    "Token launch",
+    "Reward claims",
+    "External payment",
+    "Payout-route changes",
+    "External hosting or publishing that creates obligations",
+    "Cross-agent delegation with shared access"
+  ]
+}

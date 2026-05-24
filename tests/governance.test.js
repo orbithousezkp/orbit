@@ -11,6 +11,7 @@ const {
   checkOwnerApproval,
   classifySpend,
   governanceStatus,
+  guardSpend,
   requestOwnerApproval,
   stableFingerprint
 } = require("../src/agent/governance");
@@ -124,7 +125,7 @@ test("repeated spend approval requests reuse one approval despite timestamp drif
   const orbitConfig = cfg(repoRoot);
   const request = {
     category: "external_spend",
-    purpose: "buy AI-call food credits",
+    purpose: "buy AI-call budget credits",
     asset: "USD credits",
     amount: 10,
     recipient: "configured-ai-credit-provider"
@@ -406,7 +407,7 @@ test("governance approval path still creates spend approval issue", async () => 
 
   const result = await requestOwnerApproval(orbitConfig, github, {
     category: "external_spend",
-    purpose: "buy AI-call food credits",
+    purpose: "buy AI-call budget credits",
     asset: "USD credits",
     amount: 25,
     recipient: "configured-ai-credit-provider"
@@ -452,4 +453,121 @@ test("reward claim spend intent is still risky when it asks for a new recipient"
   });
 
   assert.equal(risk.safe, false);
+});
+
+test("guardSpend allows a routine gas spend that has no external recipient", async () => {
+  const orbitConfig = cfg(tempRepo());
+  const result = await guardSpend(orbitConfig, null, {
+    category: "gas",
+    purpose: "pay network gas for an internal action",
+    asset: "ETH",
+    amount: 0.001,
+    recipient: ""
+  });
+
+  assert.equal(result.allowed, true);
+  assert.equal(result.status, "allowed");
+  assert.equal(result.classification.requiresOwnerApproval, false);
+  assert.equal(result.approval, undefined);
+});
+
+test("guardSpend blocks external spend when no owner approval has been issued", async () => {
+  const repoRoot = tempRepo();
+  const orbitConfig = cfg(repoRoot);
+  const createdIssues = [];
+  const github = {
+    async createIssue(issue) {
+      createdIssues.push(issue);
+      return { number: 42, url: "https://github.com/owner/orbit/issues/42" };
+    },
+    async listIssues() {
+      // Mirror the issue created above so checkOwnerApproval can find it.
+      return [{ number: 42, labels: [] }];
+    },
+    async listIssueComments() {
+      // No owner comment yet — must remain pending and therefore blocked.
+      return [];
+    }
+  };
+
+  const result = await guardSpend(orbitConfig, github, {
+    category: "external_spend",
+    purpose: "buy AI-call budget credits",
+    asset: "USD credits",
+    amount: 25,
+    recipient: "configured-ai-credit-provider"
+  });
+
+  assert.equal(result.allowed, false);
+  assert.notEqual(result.status, "approved");
+  assert.notEqual(result.status, "allowed");
+  assert.ok(result.approval, "blocked guardSpend returns the pending approval record");
+  assert.equal(createdIssues.length, 1, "an approval issue is created for the external spend");
+});
+
+test("guardSpend rejects when the owner comments a REJECT line on the approval issue", async () => {
+  const repoRoot = tempRepo();
+  const orbitConfig = cfg(repoRoot);
+  const github = {
+    async createIssue() {
+      return { number: 51, url: "https://github.com/owner/orbit/issues/51" };
+    },
+    async listIssues() {
+      return [{ number: 51, labels: [] }];
+    },
+    async listIssueComments() {
+      // checkOwnerApproval looks up the approval by id at runtime, so we
+      // honour any approval id by emitting REJECT for whichever id Orbit
+      // computed for this spend request.
+      const store = JSON.parse(
+        fs.readFileSync(path.join(repoRoot, "memory", "approvals.json"), "utf-8")
+      );
+      const id = store.approvals[0] && store.approvals[0].id;
+      return [{ author: "owner", body: `REJECT ORBIT-SPEND ${id}` }];
+    }
+  };
+
+  const result = await guardSpend(orbitConfig, github, {
+    category: "external_spend",
+    purpose: "wire funds to a new external wallet",
+    asset: "ETH",
+    amount: 0.5,
+    recipient: "0x6666666666666666666666666666666666666666"
+  });
+
+  assert.equal(result.allowed, false);
+  assert.equal(result.status, "rejected");
+  assert.equal(result.approval.status, "rejected");
+});
+
+test("guardSpend approves when the configured owner comments APPROVE on the approval issue", async () => {
+  const repoRoot = tempRepo();
+  const orbitConfig = cfg(repoRoot);
+  const github = {
+    async createIssue() {
+      return { number: 99, url: "https://github.com/owner/orbit/issues/99" };
+    },
+    async listIssues() {
+      return [{ number: 99, labels: [] }];
+    },
+    async listIssueComments() {
+      const store = JSON.parse(
+        fs.readFileSync(path.join(repoRoot, "memory", "approvals.json"), "utf-8")
+      );
+      const id = store.approvals[0] && store.approvals[0].id;
+      return [{ author: "owner", body: `APPROVE ORBIT-SPEND ${id}` }];
+    }
+  };
+
+  const result = await guardSpend(orbitConfig, github, {
+    category: "external_spend",
+    purpose: "buy approved external service credits",
+    asset: "USD",
+    amount: 10,
+    recipient: "approved-service-provider"
+  });
+
+  assert.equal(result.allowed, true);
+  assert.equal(result.status, "approved");
+  assert.equal(result.approval.status, "approved");
 });

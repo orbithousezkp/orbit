@@ -79,13 +79,13 @@ function Header() {
             className="inline-flex h-9 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-semibold text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50"
           >
             <HeartPulse size={15} />
-            Rhythm
+            Runtime
           </a>
           <a
             href="#house"
             className="inline-flex h-9 items-center gap-2 rounded-lg bg-[#4f5bbd] px-3 text-[13px] font-semibold text-white shadow-sm shadow-[#4f5bbd]/20 transition-opacity hover:opacity-90"
           >
-            Enter Orbit
+            Open Orbit
             <ArrowRight size={15} />
           </a>
         </div>
@@ -145,21 +145,21 @@ function HouseVisual() {
               <House size={18} />
             </span>
             <div>
-              <div className="text-[13px] font-bold text-slate-950">Orbit House</div>
+              <div className="text-[13px] font-bold text-slate-950">Orbit Control Plane</div>
               <div className="font-mono text-[11px] text-slate-500">github.com/asuran/orbit</div>
             </div>
           </div>
           <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 text-[11px] font-bold text-emerald-700">
-            Awake
+            Active
           </span>
         </div>
       </div>
 
       <div className="absolute bottom-4 left-4 right-4 grid gap-3 sm:grid-cols-3">
         {[
-          ['front door', 'issues', '3 visitors waiting'],
-          ['workbench', 'actions', 'cycle running'],
-          ['diary', 'proofs', 'last entry saved'],
+          ['intake', 'issues', '3 signals waiting'],
+          ['runtime', 'actions', 'cycle running'],
+          ['receipts', 'proofs', 'last entry saved'],
         ].map(([room, path, state]) => (
           <div key={room} className="rounded-xl border border-slate-200 bg-white/90 p-3 backdrop-blur">
             <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500">{room}</div>
@@ -298,8 +298,8 @@ function CommandThread() {
     <div className="rounded-2xl border border-slate-200 bg-[#07111f] p-4 text-white shadow-sm">
       <div className="mb-4 flex items-center justify-between border-b border-white/10 pb-3">
         <div>
-          <div className="text-[13px] font-bold">Front door comments</div>
-          <div className="font-mono text-[11px] text-slate-400">issues are visitors at the house</div>
+          <div className="text-[13px] font-bold">GitHub intake comments</div>
+          <div className="font-mono text-[11px] text-slate-400">issues are control-plane signals</div>
         </div>
         <GitBranch size={18} className="text-slate-400" />
       </div>
@@ -335,7 +335,7 @@ function HouseholdLedger() {
           <NotebookTabs size={17} />
         </span>
         <div>
-          <div className="text-[13px] font-bold text-slate-950">Household ledger</div>
+          <div className="text-[13px] font-bold text-slate-950">Control-plane ledger</div>
           <div className="font-mono text-[11px] text-slate-500">everything lives in GitHub</div>
         </div>
       </div>
@@ -438,7 +438,7 @@ export default function App() {
               <div className="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 shadow-sm">
                 <span className="h-2 w-2 rounded-full bg-emerald-500" />
                 <span className="text-[12px] font-semibold text-slate-700">
-                  The GitHub-native digital household
+                  The GitHub-native infrastructure layer
                 </span>
               </div>
 
@@ -446,12 +446,12 @@ export default function App() {
                 Orbit
               </h1>
               <p className="mt-5 max-w-[600px] text-2xl font-bold leading-tight text-slate-950 sm:text-3xl">
-                A living repository that learns, works, and survives.
+                A GitHub repo control plane for agents, proofs, permissions, and wallet policy.
               </p>
               <p className="mt-5 max-w-[620px] text-[16px] leading-8 text-slate-600">
-                Orbit turns a GitHub repo into a self-maintaining software household. It reads
-                visitors, improves its own code and frontend, budgets AI-call food, protects
-                treasury actions, and leaves proof after every cycle.
+                Orbit turns a GitHub repo into a reusable operating layer. It coordinates agents,
+                memory, proof receipts, permissions, lifecycle state, and wallet policy while
+                keeping live signing and external movement gated.
               </p>
 
               <div className="mt-7 flex flex-col gap-3 sm:flex-row">
@@ -459,7 +459,7 @@ export default function App() {
                   href="#rooms"
                   className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-[#4f5bbd] px-5 text-sm font-semibold text-white shadow-sm shadow-[#4f5bbd]/20 transition-opacity hover:opacity-90"
                 >
-                  Explore the product
+                  Explore the control plane
                   <ArrowRight size={16} />
                 </a>
                 <a
@@ -467,7 +467,7 @@ export default function App() {
                   className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-800 shadow-sm transition-colors hover:bg-slate-50"
                 >
                   <HeartPulse size={16} />
-                  See the rhythm
+                  See the runtime
                 </a>
               </div>
             </div>
@@ -481,10 +481,10 @@ export default function App() {
         </section>
 
         <section id="life" className="mx-auto max-w-[1180px] px-4 py-12 sm:px-6 lg:px-8">
-          <SectionIntro kicker="Product" title="Software that behaves like a living operation">
+          <SectionIntro kicker="Product" title="Software that behaves like infrastructure">
             Orbit is not a dashboard wrapped around automation. It is a product model for an
-            autonomous repository: identity, memory, work, money, trust, and proof all live in
-            one GitHub-native household.
+            autonomous repository: identity, memory, work, permissions, wallet policy, and proof
+            all live in one GitHub-native infrastructure layer.
           </SectionIntro>
           <div className="mt-9">
             <HumanStack />
@@ -492,9 +492,9 @@ export default function App() {
         </section>
 
         <section id="members" className="mx-auto max-w-[1180px] px-4 py-12 sm:px-6 lg:px-8">
-          <SectionIntro kicker="Members" title="A product with an inner life">
-            Orbit presents one name to the world, while its internal members handle attention,
-            memory, treasury, care, safety, and proof like a coordinated household.
+          <SectionIntro kicker="Modules" title="A product with coordinated layers">
+            Orbit presents one name to the world, while its internal modules handle attention,
+            memory, policy, runtime, safety, and proof like a coordinated control plane.
           </SectionIntro>
           <div className="mt-9 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {houseMembers.map((member) => (
@@ -504,9 +504,10 @@ export default function App() {
         </section>
 
         <section className="mx-auto max-w-[1180px] px-4 py-12 sm:px-6 lg:px-8">
-          <SectionIntro kicker="Survival" title="The business model is part of the life model">
-            Orbit treats AI calls as food and treasury policy as survival. It can search for useful
-            work, prepare earning routes, and maintain strict approval gates around money movement.
+          <SectionIntro kicker="Policy" title="Wallet policy is part of the product">
+            Orbit treats AI calls as runtime budget and wallet policy as governance. It can search
+            for useful work, prepare earning routes, and maintain strict approval gates around
+            money movement.
           </SectionIntro>
           <div className="mt-9">
             <NeedsGrid />
@@ -514,9 +515,9 @@ export default function App() {
         </section>
 
         <section id="rooms" className="mx-auto max-w-[1180px] px-4 py-12 sm:px-6 lg:px-8">
-          <SectionIntro kicker="House" title="The repository is the operating surface">
-            Each GitHub surface becomes part of the product: issues as the front door, Actions as
-            rhythm, memory as mind, treasury as money, proofs as diary, and policy as locks.
+          <SectionIntro kicker="Surfaces" title="The repository is the operating surface">
+            Each GitHub surface becomes part of the product: issues as intake, Actions as runtime,
+            memory as state, treasury as policy, proofs as receipts, and governance as permissions.
           </SectionIntro>
 
           <div className="mt-9 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -529,9 +530,9 @@ export default function App() {
         <section id="routine" className="mx-auto max-w-[1180px] px-4 py-12 sm:px-6 lg:px-8">
           <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
             <div>
-              <SectionIntro kicker="Routine" title="The household has a day, not a job queue">
+              <SectionIntro kicker="Runtime" title="The control plane has a cycle, not a job queue">
                 A wake cycle can wake from state, event, or mandatory pressure. The mandatory
-                heartbeat runs every 30 minutes, even when the house is quiet.
+                heartbeat runs every 30 minutes, even when the repo is quiet.
               </SectionIntro>
               <div className="mt-6 grid gap-3 sm:grid-cols-2">
                 {cycleDrivers.map((item) => (
@@ -546,9 +547,9 @@ export default function App() {
         <section className="mx-auto max-w-[1180px] px-4 py-12 sm:px-6 lg:px-8">
           <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
             <div>
-              <SectionIntro kicker="Life Layer" title="The autonomous layer is the household rhythm">
-                Orbit’s life layer gives the product attention, appetite, conscience, memory, and
-                rhythm. That is what makes it feel like an entity instead of a queue runner.
+              <SectionIntro kicker="Runtime Layer" title="The autonomous layer is the repository rhythm">
+                Orbit’s runtime layer gives the product attention, appetite, conscience, memory,
+                and rhythm. That is what makes it feel like an operating layer instead of a queue runner.
               </SectionIntro>
               <div className="mt-6 grid gap-3 sm:grid-cols-2">
                 {[...lifeSystems, ...householdSystems].map((item) => (
@@ -564,7 +565,7 @@ export default function App() {
           <div className="grid gap-8 lg:grid-cols-2 lg:items-start">
             <CommandThread />
             <div>
-              <SectionIntro kicker="Visitors" title="People talk to Orbit at the front door">
+              <SectionIntro kicker="Intake" title="People talk to Orbit through GitHub">
                 Conversations become product intake. Visitors can ask questions, suggest work, or
                 request repairs, while spending and risky moves remain locked behind owner approval.
               </SectionIntro>
@@ -590,19 +591,19 @@ export default function App() {
         <section id="boundaries" className="mx-auto max-w-[1180px] px-4 py-12 sm:px-6 lg:px-8">
           <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
             <div>
-              <SectionIntro kicker="Boundaries" title="A real household needs house rules">
-                If Orbit is going to feel like a real household, it still needs strict limits. The
-                members can learn and earn, but keys, money, live signing, and unsafe paths stay behind locks.
+              <SectionIntro kicker="Boundaries" title="A real control plane needs hard policy">
+                If Orbit is going to be a real product, it still needs strict limits. The runtime
+                can learn and earn, but keys, money, live signing, and unsafe paths stay behind gates.
               </SectionIntro>
               <div className="mt-7 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <div className="mb-4 flex items-center gap-2">
                   <NotebookTabs size={17} className="text-[#4f5bbd]" />
-                  <div className="text-[13px] font-bold text-slate-950">Diary entry</div>
+                  <div className="text-[13px] font-bold text-slate-950">Receipt entry</div>
                 </div>
                 <pre className="overflow-x-auto rounded-xl bg-slate-950 p-4 font-mono text-[12px] leading-6 text-slate-200">
 {`cycle: 184
-home: github.com/asuran/orbit
-visitors: 3 issues
+repo: github.com/asuran/orbit
+intake: 3 issues
 chores: memory refresh, proof write
 earnings: dry-run only
 refused: external spend without approval
@@ -621,9 +622,9 @@ sleep: proof saved`}
 
         <section id="roadmap" className="mx-auto max-w-[1180px] px-4 py-12 sm:px-6 lg:px-8">
           <SectionIntro kicker="Roadmap" title="Orbit grows by passing visible phase gates">
-            The recovered roadmap is now a product surface: autonomy, proof, visitors, developer
-            work, revenue, crypto watch, ZK trust, identity, interoperability, and execution
-            readiness all advance only when evidence exists.
+            The recovered roadmap is now a product surface: control-plane foundation, proof,
+            intake, developer work, wallet policy, treasury observation, ZK trust, identity,
+            interoperability, and execution readiness all advance only when evidence exists.
           </SectionIntro>
 
           <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -784,7 +785,7 @@ sleep: proof saved`}
               </div>
             </RoadmapPanel>
 
-            <RoadmapPanel eyebrow="Impossible or unsafe" title="Never public hot-wallet autonomy" icon={ShieldAlert}>
+            <RoadmapPanel eyebrow="Impossible or unsafe" title="Never public signing authority" icon={ShieldAlert}>
               <div className="space-y-3">
                 {roadmapImpossibleOrUnsafe.map((item) => (
                   <div key={item} className="flex gap-2 text-[12px] leading-5 text-slate-600">
@@ -838,28 +839,29 @@ sleep: proof saved`}
             <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[1fr_360px] lg:p-10">
               <div>
                 <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-cyan-200">
-                  Life layer
+                  Infrastructure layer
                 </p>
                 <h2 className="max-w-[720px] text-3xl font-bold sm:text-4xl">
-                  Your repository, alive.
+                  Your repository, governed.
                 </h2>
                 <p className="mt-4 max-w-[650px] text-[15px] leading-7 text-slate-300">
-                  Orbit is the product expression of autonomous software life inside GitHub:
-                  practical work, guarded money, durable memory, and proof that can be inspected.
+                  Orbit is the product expression of autonomous software infrastructure inside
+                  GitHub: practical work, gated wallet policy, durable memory, and proof that can
+                  be inspected.
                 </p>
                 <div className="mt-7 flex flex-col gap-3 sm:flex-row">
                   <a
                     href="#house"
                     className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-white px-5 text-sm font-semibold text-slate-950 transition-opacity hover:opacity-90"
                   >
-                    Return home
+                    Return to Orbit
                     <ArrowRight size={16} />
                   </a>
                   <a
                     href="#boundaries"
                     className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-white/15 px-5 text-sm font-semibold text-white transition-colors hover:bg-white/10"
                   >
-                    Review house rules
+                    Review policy
                   </a>
                 </div>
               </div>
@@ -867,16 +869,16 @@ sleep: proof saved`}
               <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5">
                 <div className="mb-4 flex items-center gap-2">
                   <Bot size={17} className="text-cyan-200" />
-                  <span className="text-[13px] font-bold">Household stack</span>
+                  <span className="text-[13px] font-bold">Infrastructure stack</span>
                 </div>
                 <div className="space-y-3">
                   {[
-                    ['House', 'GitHub repository'],
-                    ['Members', 'living systems'],
-                    ['Food', 'AI calls'],
+                    ['Repo', 'GitHub repository'],
+                    ['Layers', 'control plane modules'],
+                    ['Budget', 'AI calls'],
                     ['Work', 'guarded tools'],
-                    ['Money', 'treasury policy'],
-                    ['Diary', 'proof ledger'],
+                    ['Wallet', 'treasury policy'],
+                    ['Receipts', 'proof ledger'],
                   ].map(([label, value]) => (
                     <div key={label} className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-[12px]">
                       <span className="text-slate-400">{label}</span>
@@ -892,8 +894,8 @@ sleep: proof saved`}
 
       <footer className="border-t border-slate-200 bg-white">
         <div className="mx-auto flex max-w-[1180px] flex-col gap-3 px-4 py-6 text-[12px] text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
-          <span>Orbit, a living household inside GitHub</span>
-          <span className="font-mono">house / members / food / work / money / diary / locks</span>
+          <span>Orbit, a GitHub-native infrastructure layer</span>
+          <span className="font-mono">intake / state / runtime / policy / receipts / wallet</span>
         </div>
       </footer>
     </div>

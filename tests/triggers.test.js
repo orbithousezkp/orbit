@@ -31,7 +31,7 @@ test("trigger policy defines state, event, and mandatory cycles", () => {
   const policy = triggerPolicy();
 
   assert.equal(policy.mandatoryIntervalMinutes, MANDATORY_INTERVAL_MINUTES);
-  assert.match(policy.definitions.state, /Internal household condition/);
+  assert.match(policy.definitions.state, /Internal control-plane condition/);
   assert.match(policy.definitions.event, /External GitHub activity/);
   assert.match(policy.definitions.mandatory, /30 minutes/);
 });

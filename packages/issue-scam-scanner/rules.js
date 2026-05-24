@@ -3,7 +3,7 @@
 /**
  * Risk patterns for scanning issue/PR/comment text.
  * Each rule has: severity (0-100), category, regex, and a human-readable message.
- * Derived from Orbit's household scam scanner (src/agent/scam.js).
+ * Derived from Orbit's repository intake guardrail (src/agent/scam.js).
  */
 
 const RISK_PATTERNS = [

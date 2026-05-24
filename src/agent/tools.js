@@ -3,7 +3,7 @@
 const TOOLS = [
   {
     name: "behavior_status",
-    description: "Read Orbit's virtual-human household behavior contract and wake-cycle plan.",
+    description: "Read Orbit's repository control-plane behavior contract and wake-cycle plan.",
     inputSchema: {
       type: "object",
       properties: {},
@@ -13,6 +13,24 @@ const TOOLS = [
   {
     name: "roadmap_status",
     description: "Read Orbit's roadmap levels, phase checks, ZK proof MVP scope, blockers, and approval gates.",
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false
+    }
+  },
+  {
+    name: "infrastructure_status",
+    description: "Read Orbit's reusable repository infrastructure layer: product registry, control-plane surfaces, capabilities, commands, receipts, and blocked live actions.",
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false
+    }
+  },
+  {
+    name: "wallet_status",
+    description: "Read Orbit's read-only wallet policy view: approval labels, allowed self routes, AI-call budget, weekly revenue cadence, token state, and blocked live wallet actions.",
     inputSchema: {
       type: "object",
       properties: {},
@@ -253,6 +271,48 @@ const TOOLS = [
     }
   },
   {
+    name: "list_pull_requests",
+    description: "List open or closed pull requests for this repository. Returns titles, authors, branches, and counters only; no diffs.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        state: { type: "string", enum: ["open", "closed", "all"] },
+        perPage: { type: "number" }
+      },
+      additionalProperties: false
+    }
+  },
+  {
+    name: "get_pull_request",
+    description: "Read one pull request: title, body, branches, line counts, and changed file list (filename + status + line counts). Does not return file contents or raw diffs.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        pullNumber: { type: "number" },
+        includeFiles: { type: "boolean" }
+      },
+      required: ["pullNumber"],
+      additionalProperties: false
+    }
+  },
+  {
+    name: "review_pull_request",
+    description: "Post a structured review comment on a pull request. Use only after reading the PR with get_pull_request. The comment renders as: summary, scope, security, tests, recommendation. All four review fields are public-safe text; secret-like content is refused.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        pullNumber: { type: "number" },
+        summary: { type: "string" },
+        scope: { type: "string" },
+        security: { type: "string" },
+        tests: { type: "string" },
+        recommendation: { type: "string", enum: ["approve", "request_changes", "comment"] }
+      },
+      required: ["pullNumber", "summary", "scope", "security", "tests", "recommendation"],
+      additionalProperties: false
+    }
+  },
+  {
     name: "run_command",
     description: "Run an allowlisted local command and return output.",
     inputSchema: {
@@ -288,7 +348,7 @@ const TOOLS = [
   },
   {
     name: "ai_food_status",
-    description: "Read AI-call food budget, private route priority, configured purchase policy, pending top-ups, and recorded refills.",
+    description: "Read AI-call budget, private route priority, configured purchase policy, pending top-ups, and recorded refills.",
     inputSchema: {
       type: "object",
       properties: {},
@@ -297,7 +357,7 @@ const TOOLS = [
   },
   {
     name: "request_ai_food_refill",
-    description: "Request owner approval to buy AI-call food credits. Purchase target is restricted to the configured owner-approved credit provider.",
+    description: "Request owner approval to buy AI-call budget credits. Purchase target is restricted to the configured owner-approved credit provider.",
     inputSchema: {
       type: "object",
       properties: {
@@ -474,6 +534,68 @@ const TOOLS = [
         approvalId: { type: "string" }
       },
       required: ["approvalId"],
+      additionalProperties: false
+    }
+  },
+  {
+    name: "cast_to_farcaster",
+    description: "Post Orbit's end-of-cycle Farcaster summary now. Uses the deterministic cycle-summary template — accepts only a template hint. Refuses arbitrary text. Idempotent per cycle. Dry-run in non-Actions environments.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        templateHint: { type: "string", enum: ["routine", "refusal", "approval-pending", "milestone", "buyback", "mistake"] },
+        noteForReceipt: { type: "string", maxLength: 240 }
+      },
+      additionalProperties: false
+    }
+  },
+  {
+    name: "propose_buyback",
+    description: "Propose a weekly $ORBIT buyback funded from the Treasury Safe's WETH. Creates a public owner-approval issue and writes a ledger entry. Refuses if ORBIT_ENABLE_BUYBACK is false, pre-launch is not verified, the token address is unset, or the router is not configured. Default is DRY_RUN.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        wethAmount: { type: "string", pattern: "^\\d+(\\.\\d{1,4})?$" },
+        rationale: { type: "string", maxLength: 280 }
+      },
+      required: ["wethAmount", "rationale"],
+      additionalProperties: false
+    }
+  },
+  {
+    name: "execute_buyback",
+    description: "Execute a previously-approved buyback. Refuses unless the linked proposal issue carries the orbit:approved label AND the configured owner has posted the exact APPROVE ORBIT-BUYBACK comment. In DRY_RUN (default) simulates the swap and writes a synthetic txHash. Live execution is currently disabled until the wallet helper lands.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        proposalIssueNumber: { type: "integer", minimum: 1 },
+        slippageBpsOverride: { type: "integer", minimum: 1, maximum: 500 }
+      },
+      required: ["proposalIssueNumber"],
+      additionalProperties: false
+    }
+  },
+  {
+    name: "propose_merkle_anchor",
+    description: "Propose a daily Merkle anchor of cycle proofs (D-012). Collects signed cycle proofs in a configurable trailing window (default 24h), computes a Merkle root, and creates a public owner-approval issue. Refuses if ORBIT_ENABLE_MERKLE_ANCHOR is false, pre-launch is not verified, or the anchor contract address is not set. Default mode is DRY_RUN. Handler output never exposes leaf bodies.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        windowEndIso: { type: "string" },
+        rationale: { type: "string", maxLength: 240 }
+      },
+      additionalProperties: false
+    }
+  },
+  {
+    name: "execute_merkle_anchor",
+    description: "Execute a previously-approved Merkle anchor. Refuses unless the linked proposal issue carries the orbit:approved label AND the configured owner has posted the exact APPROVE ORBIT-MERKLE-ANCHOR comment. In DRY_RUN (default) writes a synthetic txHash and never touches the chain. Live execution is blocked until the wallet helper lands.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        proposalIssueNumber: { type: "integer", minimum: 1 }
+      },
+      required: ["proposalIssueNumber"],
       additionalProperties: false
     }
   }

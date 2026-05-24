@@ -175,6 +175,79 @@ class GitHubClient {
     });
   }
 
+  async listPullRequests({ state = "open", perPage = 20 } = {}) {
+    if (!this.configured()) return [];
+    const repoPath = this.repoPath();
+    const capped = Math.min(Number.parseInt(perPage, 10) || 20, 100);
+    const allowedState = ["open", "closed", "all"].includes(state) ? state : "open";
+    const pulls = await this.request(
+      `/repos/${repoPath}/pulls?state=${encodeURIComponent(allowedState)}&per_page=${capped}`
+    );
+    return pulls.map((pr) => ({
+      number: pr.number,
+      title: pr.title,
+      body: pr.body || "",
+      labels: (pr.labels || []).map((label) => label.name),
+      author: pr.user ? pr.user.login : "unknown",
+      state: pr.state,
+      draft: Boolean(pr.draft),
+      headRef: pr.head ? pr.head.ref : "",
+      baseRef: pr.base ? pr.base.ref : "",
+      createdAt: pr.created_at,
+      updatedAt: pr.updated_at,
+      url: pr.html_url,
+      commentsCount: typeof pr.comments === "number" ? pr.comments : 0,
+      reviewCommentsCount: typeof pr.review_comments === "number" ? pr.review_comments : 0
+    }));
+  }
+
+  async getPullRequest(pullNumber) {
+    if (!this.configured()) return null;
+    const repoPath = this.repoPath();
+    const number = this.issueNumber(pullNumber);
+    const pr = await this.request(`/repos/${repoPath}/pulls/${number}`);
+    return {
+      number: pr.number,
+      title: pr.title,
+      body: pr.body || "",
+      labels: (pr.labels || []).map((label) => label.name),
+      author: pr.user ? pr.user.login : "unknown",
+      state: pr.state,
+      draft: Boolean(pr.draft),
+      merged: Boolean(pr.merged),
+      mergeable: pr.mergeable,
+      headRef: pr.head ? pr.head.ref : "",
+      headSha: pr.head ? pr.head.sha : "",
+      baseRef: pr.base ? pr.base.ref : "",
+      createdAt: pr.created_at,
+      updatedAt: pr.updated_at,
+      url: pr.html_url,
+      additions: typeof pr.additions === "number" ? pr.additions : 0,
+      deletions: typeof pr.deletions === "number" ? pr.deletions : 0,
+      changedFiles: typeof pr.changed_files === "number" ? pr.changed_files : 0,
+      commentsCount: typeof pr.comments === "number" ? pr.comments : 0,
+      reviewCommentsCount: typeof pr.review_comments === "number" ? pr.review_comments : 0
+    };
+  }
+
+  async getPullRequestFiles(pullNumber, { perPage = 100 } = {}) {
+    if (!this.configured()) return [];
+    const repoPath = this.repoPath();
+    const number = this.issueNumber(pullNumber);
+    const capped = Math.min(Number.parseInt(perPage, 10) || 100, 100);
+    const files = await this.request(
+      `/repos/${repoPath}/pulls/${number}/files?per_page=${capped}`
+    );
+    return files.map((file) => ({
+      filename: file.filename,
+      status: file.status,
+      additions: typeof file.additions === "number" ? file.additions : 0,
+      deletions: typeof file.deletions === "number" ? file.deletions : 0,
+      changes: typeof file.changes === "number" ? file.changes : 0,
+      previousFilename: file.previous_filename || null
+    }));
+  }
+
   async search({ type, query, perPage = 10 }) {
     if (!this.configured()) return { configured: false, results: [] };
     const normalizedType = ["repositories", "issues", "code"].includes(type) ? type : "repositories";

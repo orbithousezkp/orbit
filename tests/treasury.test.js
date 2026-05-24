@@ -133,7 +133,7 @@ test("native token launch is skipped once a launched token is recorded", async (
   treasury.token.txHash = "0xabc";
   saveTreasury(cfg.repoRoot, treasury);
 
-  const result = await launchNativeToken(cfg, 9);
+  const result = await launchNativeToken(cfg, 9, { preLaunchVerified: true });
 
   assert.equal(result.status, "already_launched");
   assert.equal(result.address, "0x4444444444444444444444444444444444444444");
@@ -225,7 +225,7 @@ test("revenue claim dry run only queues after weekly and performance gates pass"
   treasury.revenue.lastClaimSentAt = new Date(Date.now() - (8 * 86_400_000)).toISOString();
   saveTreasury(cfg.repoRoot, treasury);
 
-  const result = await runRevenueCycle(cfg);
+  const result = await runRevenueCycle(cfg, { preLaunchVerified: true });
 
   assert.equal(result.status, "dry_run");
   assert.equal(result.claimStatus.canClaim, true);

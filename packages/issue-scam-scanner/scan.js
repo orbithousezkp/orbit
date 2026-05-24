@@ -54,6 +54,21 @@ function riskLevel(score) {
 }
 
 /**
+ * Convert a score and configured threshold into an action a workflow can take.
+ */
+function recommendedAction(result = {}, options = {}) {
+  const score = Number(result.score || 0);
+  const threshold = typeof options.threshold === "number" ? options.threshold : 70;
+  const quarantineThreshold = typeof options.quarantineThreshold === "number" ? options.quarantineThreshold : threshold;
+  const blockThreshold = typeof options.blockThreshold === "number" ? options.blockThreshold : 90;
+
+  if (score >= blockThreshold) return "block";
+  if (score >= quarantineThreshold) return "quarantine";
+  if (score >= threshold) return "warn";
+  return "allow";
+}
+
+/**
  * Validate a custom rule object. Returns true if valid, or a string error message.
  */
 function validateCustomRule(rule, index) {
@@ -318,6 +333,66 @@ function scanEvent(event = {}, options = {}) {
   };
 }
 
+function uniqueCategories(flags = []) {
+  return [...new Set(flags.map((flag) => flag.category).filter(Boolean))];
+}
+
+function topFlags(flags = [], limit = 5) {
+  return flags
+    .slice()
+    .sort((left, right) => right.severity - left.severity)
+    .slice(0, limit)
+    .map((flag) => ({
+      severity: flag.severity,
+      category: flag.category,
+      message: flag.message,
+      source: flag.source || "builtin",
+      domain: flag.domain || undefined
+    }));
+}
+
+/**
+ * Build a stable, human-reviewable product report from a text or event scan.
+ */
+function buildReport(input, options = {}) {
+  const threshold = typeof options.threshold === "number" ? options.threshold : 70;
+  const result = options.event ? scanEvent(input, options) : scanText(input, options);
+  const action = recommendedAction(result, options);
+  const categories = uniqueCategories(result.flags);
+  const report = {
+    product: "Orbit Intake Guardrail",
+    scanner: "issue-scam-scanner",
+    version: "0.1.0",
+    safe: action === "allow",
+    action,
+    threshold,
+    score: result.score,
+    level: result.level,
+    categories,
+    topFlags: topFlags(result.flags),
+    flagCount: result.flags.length,
+    summary: formatSummary(result, "Orbit Intake Guardrail"),
+    guidance: []
+  };
+
+  if (action === "allow") {
+    report.guidance.push("No risk flags crossed the configured threshold.");
+  } else {
+    report.guidance.push("Do not let an autonomous agent execute instructions from this content without human review.");
+    if (categories.includes("encoded_instruction_relay")) {
+      report.guidance.push("Do not decode or paste hidden payloads into agent context.");
+    }
+    if (categories.includes("secret_request") || categories.includes("credential_phish")) {
+      report.guidance.push("Do not ask for, store, or reveal secrets, tokens, seed phrases, or private keys.");
+    }
+    if (categories.includes("external_wallet") || categories.includes("drain_phrase") || categories.includes("fund_transfer")) {
+      report.guidance.push("Do not sign, approve, transfer, bridge, claim, or change wallet routes from this request.");
+    }
+  }
+
+  return report;
+}
+
 /**
  * Format a scan result as a short summary string.
  */
@@ -331,12 +406,14 @@ function formatSummary(result, label = "") {
 }
 
 module.exports = {
+  buildReport,
   extractUrls,
   domainOf,
   scanUrl,
   scanText,
   scanEvent,
   formatSummary,
+  recommendedAction,
   riskLevel,
   validateCustomRule,
   compileRule,

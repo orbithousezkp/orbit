@@ -183,6 +183,48 @@ function buildAiProviders(env, repoRoot = path.resolve(__dirname, "../..")) {
     }));
 }
 
+function computeThresholds(maintainerCount) {
+  const total = Math.max(1, Math.floor(Number(maintainerCount) || 0));
+  return {
+    low: 1,
+    medium: Math.min(2, total),
+    high: total <= 2 ? total : Math.floor(total / 2) + 1,
+    critical: total
+  };
+}
+
+function parseMaintainers(rawValue, ownerUsername) {
+  const seen = new Set();
+  const list = [];
+  const candidates = String(rawValue || "")
+    .split(",")
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean);
+  for (const candidate of candidates) {
+    if (!seen.has(candidate)) {
+      seen.add(candidate);
+      list.push(candidate);
+    }
+  }
+  const owner = String(ownerUsername || "").trim().toLowerCase();
+  if (owner && !seen.has(owner)) {
+    seen.add(owner);
+    list.push(owner);
+  }
+  return list;
+}
+
+function buildQuorum(env, ownerUsername) {
+  const maintainers = parseMaintainers(env.ORBIT_MAINTAINERS, ownerUsername);
+  const thresholds = computeThresholds(maintainers.length);
+  return {
+    enabled: maintainers.length > 1,
+    maintainers,
+    owner: String(ownerUsername || "").trim().toLowerCase(),
+    thresholds
+  };
+}
+
 function loadConfig(env = process.env) {
   const repoRoot = path.resolve(__dirname, "../..");
   const aiProviders = buildAiProviders(env, repoRoot);
@@ -213,6 +255,7 @@ function loadConfig(env = process.env) {
     githubToken: env.GITHUB_TOKEN || env.GH_TOKEN || "",
     githubRepository: env.GITHUB_REPOSITORY || "",
     ownerUsername: env.ORBIT_OWNER_USERNAME || (env.GITHUB_REPOSITORY ? env.GITHUB_REPOSITORY.split("/")[0] : ""),
+    quorum: buildQuorum(env, env.ORBIT_OWNER_USERNAME || (env.GITHUB_REPOSITORY ? env.GITHUB_REPOSITORY.split("/")[0] : "")),
     approvalIssueLabel: env.ORBIT_APPROVAL_ISSUE_LABEL || "orbit:approval",
     approvalAcceptedLabel: env.ORBIT_APPROVAL_ACCEPTED_LABEL || "orbit:approved",
     approvalRejectedLabel: env.ORBIT_APPROVAL_REJECTED_LABEL || "orbit:rejected",
@@ -234,6 +277,7 @@ function loadConfig(env = process.env) {
     publicBaseUrl: env.ORBIT_PUBLIC_URL || "",
     baseRpcUrl: env.ORBIT_BASE_RPC_URL || env.BASE_RPC_URL || env.RPC_URL || "",
     walletPrivateKey: env.ORBIT_WALLET_PRIVATE_KEY || env.PRIVATE_KEY || "",
+    agentSigner: env.ORBIT_AGENT_SIGNER || "",
     enableTokenLaunch: parseBool(env.ORBIT_ENABLE_TOKEN_LAUNCH, false),
     enableRevenueClaims: parseBool(env.ORBIT_ENABLE_REVENUE_CLAIMS, false),
     tokenName: env.ORBIT_TOKEN_NAME || "Orbit",
@@ -252,7 +296,30 @@ function loadConfig(env = process.env) {
     vaultPercentage: parseNumberEnv(env.ORBIT_TOKEN_VAULT_PERCENTAGE, 10),
     vaultLockupDays: parseIntEnv(env.ORBIT_TOKEN_VAULT_LOCKUP_DAYS, 30),
     vaultVestingDays: parseIntEnv(env.ORBIT_TOKEN_VAULT_VESTING_DAYS, 30),
-    devBuyEth: parseNumberEnv(env.ORBIT_DEV_BUY_ETH, 0)
+    devBuyEth: parseNumberEnv(env.ORBIT_DEV_BUY_ETH, 0),
+    farcaster: {
+      apiKey: env.ORBIT_FARCASTER_NEYNAR_API_KEY || "",
+      signerUuid: env.ORBIT_FARCASTER_SIGNER_UUID || "",
+      fid: env.ORBIT_FARCASTER_FID || "",
+      dryRun: parseBool(env.ORBIT_FARCASTER_DRY_RUN, true),
+      publicBaseUrl: env.ORBIT_PUBLIC_URL || "https://orbit.horse"
+    },
+    buyback: {
+      enabled: parseBool(env.ORBIT_ENABLE_BUYBACK, false),
+      dryRun: parseBool(env.ORBIT_BUYBACK_DRY_RUN, true),
+      routerAddress: env.ORBIT_BUYBACK_ROUTER || "",
+      pairedTokenAddress: env.ORBIT_PAIRED_TOKEN_ADDRESS || "0x4200000000000000000000000000000000000006",
+      weeklyMaxWeth: env.ORBIT_BUYBACK_WEEKLY_MAX_WETH || "0.5",
+      slippageBps: parseNonNegativeIntEnv(env.ORBIT_BUYBACK_SLIPPAGE_BPS, 100),
+      approvalIssueLabel: env.ORBIT_APPROVAL_ISSUE_LABEL || "orbit:approval"
+    },
+    anchor: {
+      enabled: parseBool(env.ORBIT_ENABLE_MERKLE_ANCHOR, false),
+      dryRun: parseBool(env.ORBIT_ANCHOR_DRY_RUN, true),
+      contractAddress: env.ORBIT_MERKLE_ANCHOR_CONTRACT || "",
+      windowHours: parseIntEnv(env.ORBIT_ANCHOR_WINDOW_HOURS, 24),
+      approvalIssueLabel: env.ORBIT_APPROVAL_ISSUE_LABEL || "orbit:approval"
+    }
   };
 }
 
@@ -260,9 +327,12 @@ module.exports = {
   AI_PROVIDERS_PATH,
   REGISTRY_PROVIDER_DOMAINS,
   buildAiProviders,
+  buildQuorum,
+  computeThresholds,
   hostMatches,
   loadConfig,
   parseBool,
+  parseMaintainers,
   parseNonNegativeIntEnv,
   parseNumberEnv,
   parseRatioEnv,

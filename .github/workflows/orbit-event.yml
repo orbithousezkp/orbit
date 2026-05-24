@@ -20,7 +20,18 @@ concurrency:
 
 jobs:
   cycle:
-    if: github.actor != 'github-actions[bot]'
+    # C-2 actor allowlist: only the configured owner or a comma-separated
+    # maintainer in vars.ORBIT_MAINTAINERS may trigger this workflow. Anyone
+    # else (including external commenters) is rejected at the workflow level
+    # BEFORE secrets are loaded into the runner.
+    # The format(',{0},', ...) wrapping prevents substring collisions
+    # (e.g., 'ja' matching 'jack').
+    if: >-
+      github.actor != 'github-actions[bot]' &&
+      (
+        github.actor == vars.ORBIT_OWNER_USERNAME ||
+        contains(format(',{0},', vars.ORBIT_MAINTAINERS), format(',{0},', github.actor))
+      )
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -62,5 +73,12 @@ jobs:
           ORBIT_COMMIT_CHANGES: "true"
           ORBIT_PUSH_CHANGES: "true"
           ORBIT_ALLOW_COMMANDS: "false"
+          ORBIT_WALLET_PRIVATE_KEY: ${{ secrets.ORBIT_WALLET_PRIVATE_KEY }}
+          ORBIT_AGENT_SIGNER: ${{ vars.ORBIT_AGENT_SIGNER }}
           ORBIT_ENABLE_TOKEN_LAUNCH: "false"
           ORBIT_ENABLE_REVENUE_CLAIMS: "false"
+          ORBIT_FARCASTER_NEYNAR_API_KEY: ${{ secrets.ORBIT_FARCASTER_NEYNAR_API_KEY }}
+          ORBIT_FARCASTER_SIGNER_UUID: ${{ secrets.ORBIT_FARCASTER_SIGNER_UUID }}
+          ORBIT_FARCASTER_FID: ${{ vars.ORBIT_FARCASTER_FID }}
+          ORBIT_FARCASTER_DRY_RUN: ${{ vars.ORBIT_FARCASTER_DRY_RUN }}
+          ORBIT_PUBLIC_URL: ${{ vars.ORBIT_PUBLIC_URL }}

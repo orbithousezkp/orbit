@@ -14,7 +14,7 @@ function normalizeTrigger(config = {}) {
       intervalMinutes: MANDATORY_INTERVAL_MINUTES,
       source: eventName,
       action: eventAction,
-      reason: "Wake on the fixed household rhythm even when nobody knocks."
+      reason: "Wake on the fixed repository control-plane rhythm even when no event fires."
     };
   }
 
@@ -25,7 +25,7 @@ function normalizeTrigger(config = {}) {
       label: eventAction ? `${eventName}.${eventAction}` : eventName,
       source: eventName,
       action: eventAction,
-      reason: "Wake because something happened at the GitHub house."
+      reason: "Wake because something happened on GitHub."
     };
   }
 
@@ -55,9 +55,9 @@ function triggerPolicy() {
     mode: "state_event_mandatory",
     mandatoryIntervalMinutes: MANDATORY_INTERVAL_MINUTES,
     definitions: {
-      state: "Internal household condition: food low, no income, pending approvals, open chores, or stale memory.",
-      event: "External GitHub activity: issues, comments, manual owner wake, labels, or other visitors at the house.",
-      mandatory: `Regular heartbeat every ${MANDATORY_INTERVAL_MINUTES} minutes to check survival, locks, proofs, and next work.`
+      state: "Internal control-plane condition: AI budget low, no income, pending approvals, open tasks, or stale memory.",
+      event: "External GitHub activity: issues, comments, manual owner wake, labels, or repository changes.",
+      mandatory: `Regular heartbeat every ${MANDATORY_INTERVAL_MINUTES} minutes to check survival, gates, proofs, and next work.`
     }
   };
 }

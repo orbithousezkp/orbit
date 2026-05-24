@@ -12,25 +12,25 @@ function buildFirstWakeIntro(config = {}, state = {}) {
     kind: "first_wake_intro",
     title: `${brandName} first wake`,
     timestamp,
-    summary: `${brandName} opens the GitHub house for the first time before normal work begins.`,
-    house: {
+    summary: `${brandName} opens the GitHub repository control plane for the first time before normal work begins.`,
+    controlPlane: {
       location: "GitHub repository",
-      frontDoor: "issues",
+      intake: "issues",
       heartbeat: "GitHub Actions",
       memory: "memory files",
-      food: "AI calls",
-      money: "treasury",
-      diary: "runtime proofs"
+      budget: "AI calls",
+      walletPolicy: "treasury and governance files",
+      receipts: "runtime proofs"
     },
-    members: [
+    modules: [
       "attention",
       "memory",
       "treasury",
-      "caretaker",
-      "gatekeeper",
-      "diarist"
+      "maintenance",
+      "permissions",
+      "proofs"
     ],
-    next: "After this one-time intro, future cycles start directly with the safest useful household action."
+    next: "After this one-time intro, future cycles start directly with the safest useful repository action."
   };
 }
 

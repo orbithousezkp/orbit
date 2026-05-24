@@ -1,17 +1,17 @@
 "use strict";
 
 const FEATURES = Object.freeze([
-  { id: "github-house-model", category: "Living System", status: "available", name: "GitHub House Model", description: "Treats the repository as Orbit's house with rooms for visitors, memory, work, wallet, diary, and locks." },
-  { id: "virtual-household-identity", category: "Living System", status: "available", name: "Virtual Household Identity", description: "Defines Orbit as a living GitHub household rather than a detached dashboard or script." },
-  { id: "household-attention-layer", category: "Living System", status: "available", name: "Household Attention Layer", description: "Gives the wake cycle a priority sense for unsafe visitors, urgent repairs, budget pressure, and routine chores." },
-  { id: "household-memory", category: "Living System", status: "available", name: "Household Memory", description: "Turns rules, habits, lessons, preferences, warnings, and chores into durable repository memory." },
-  { id: "household-wallet", category: "Living System", status: "available", name: "Household Wallet", description: "Treats AI budget, revenue routes, token prep, and spend requests as household money under locks." },
-  { id: "ai-call-food", category: "Living System", status: "available", name: "AI Call Food", description: "Treats model calls as food that the household must ration to think, work, and survive." },
-  { id: "front-door-visitors", category: "Living System", status: "available", name: "Front Door Visitors", description: "Frames issues and comments as visitors who can ask, report, approve, or attempt unsafe requests." },
-  { id: "diary-proof-life", category: "Living System", status: "available", name: "Diary Proof Life", description: "Makes every cycle write what Orbit saw, did, learned, refused, and will remember next." },
-  { id: "household-chores", category: "Living System", status: "available", name: "Household Chores", description: "Turns tasks, maintenance, repairs, docs, tests, approvals, and follow-ups into visible chores around the repo house." },
-  { id: "conscience-locks", category: "Living System", status: "available", name: "Conscience Locks", description: "Connects safety gates to Orbit's inner rule system so secrets, scams, unsafe paths, and unlocked spend are refused." },
-  { id: "wake-sleep-rhythm", category: "Living System", status: "available", name: "Wake Sleep Rhythm", description: "Uses GitHub Actions as a heartbeat that wakes Orbit, lets him work, writes the diary, and lets him sleep." },
+  { id: "github-control-plane-model", category: "Infrastructure", status: "available", name: "GitHub Control Plane Model", description: "Treats the repository as Orbit's operating surface for intake, memory, work, wallet policy, receipts, and permissions." },
+  { id: "repo-agent-identity", category: "Infrastructure", status: "available", name: "Repository Agent Identity", description: "Defines Orbit as a GitHub-native repository control plane rather than a detached dashboard or script." },
+  { id: "control-plane-attention-layer", category: "Infrastructure", status: "available", name: "Control Plane Attention Layer", description: "Gives the wake cycle a priority sense for unsafe intake, urgent repairs, budget pressure, and routine repo tasks." },
+  { id: "repo-memory-layer", category: "Infrastructure", status: "available", name: "Repo Memory Layer", description: "Turns rules, habits, lessons, preferences, warnings, and tasks into durable repository memory." },
+  { id: "wallet-policy-layer", category: "Infrastructure", status: "available", name: "Wallet Policy Layer", description: "Treats AI budget, revenue routes, token prep, and spend requests as wallet policy under approval gates." },
+  { id: "ai-call-budget", category: "Infrastructure", status: "available", name: "AI Call Budget", description: "Treats model calls as budgeted runtime capacity that Orbit must ration to think and work." },
+  { id: "github-intake", category: "Infrastructure", status: "available", name: "GitHub Intake", description: "Frames issues and comments as intake that can ask, report, approve, or attempt unsafe requests." },
+  { id: "proof-receipt-ledger", category: "Infrastructure", status: "available", name: "Proof Receipt Ledger", description: "Makes every cycle write what Orbit saw, did, learned, refused, and will remember next." },
+  { id: "repo-task-layer", category: "Infrastructure", status: "available", name: "Repo Task Layer", description: "Turns maintenance, repairs, docs, tests, approvals, and follow-ups into visible repository work." },
+  { id: "policy-gates", category: "Infrastructure", status: "available", name: "Policy Gates", description: "Connects safety gates to Orbit's rule system so secrets, scams, unsafe paths, and unlocked spend are refused." },
+  { id: "wake-sleep-runtime", category: "Infrastructure", status: "available", name: "Wake Sleep Runtime", description: "Uses GitHub Actions as a heartbeat that wakes Orbit, lets it work, writes receipts, and lets it sleep." },
 
   { id: "cycle-proof-ledger", category: "Autonomy Core", status: "available", name: "Cycle Proof Ledger", description: "Every run writes an auditable proof file before committing work." },
   { id: "deterministic-fallback", category: "Autonomy Core", status: "available", name: "Deterministic Fallback Planner", description: "Runs a local planner when AI keys or budgets are unavailable." },
@@ -120,7 +120,7 @@ const FEATURES = Object.freeze([
   { id: "owner-acceptance-flow", category: "Public Trust", status: "available", name: "Owner Acceptance Flow", description: "Requires owner acceptance before external spend can execute." },
   { id: "independent-architecture-surface", category: "Public Trust", status: "available", name: "Independent Architecture Surface", description: "Defines Orbit through repo operations, proof ledgers, safety gates, and agent OS controls." },
   { id: "survival-policy", category: "Public Trust", status: "available", name: "Private Route Policy", description: "Keeps reward-route governance explicit without publishing private values." },
-  { id: "self-funding-narrative", category: "Public Trust", status: "available", name: "Self Funding Narrative", description: "Positions Orbit as a self-sustaining GitHub household, not just a maintenance script." },
+  { id: "self-funding-narrative", category: "Public Trust", status: "available", name: "Self Funding Narrative", description: "Positions Orbit as self-sustaining GitHub infrastructure, not just a maintenance script." },
 
   { id: "repo-radar", category: "Frontier Agentics", status: "planned", name: "Repo Radar", description: "Continuously ranks every issue, PR, failing check, and stale file into one action queue." },
   { id: "maintainer-intent-graph", category: "Frontier Agentics", status: "planned", name: "Maintainer Intent Graph", description: "Learns owner preferences from merged decisions and turns them into review-time policy hints." },

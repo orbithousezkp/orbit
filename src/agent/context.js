@@ -8,6 +8,8 @@ const { GitHubClient } = require("./github");
 const { learningLabStatus } = require("./learning-lab");
 const { listMemory } = require("./memory");
 const { opportunityStatus } = require("./opportunities");
+const { infrastructureStatus } = require("./infrastructure");
+const { walletStatus } = require("./wallet");
 const { roadmapStatus } = require("./roadmap");
 const { loadTasks } = require("./tasks");
 const { prepareClankerLaunch } = require("./clanker");
@@ -145,6 +147,8 @@ async function gatherContext(config) {
     knowledge: listMemory(config.repoRoot, { limit: 12 }),
     treasury: loadTreasury(config.repoRoot, config),
     governance: governanceStatus(config),
+    infrastructure: infrastructureStatus(config.repoRoot),
+    wallet: walletStatus(config.repoRoot),
     roadmap: roadmapStatus(config.repoRoot),
     features: featureSummary(),
     aiBudget: budgetStatus(config),

@@ -1,0 +1,30 @@
+{
+  "name": "@orbit-house/tool-example",
+  "version": "0.1.0",
+  "description": "Reference plugin scaffold for the Orbit plugin/tool loader (S-024). Exposes a single read-only `echo` tool used as a smoke test for capability-allowlist enforcement.",
+  "main": "index.js",
+  "license": "MIT",
+  "private": false,
+  "type": "commonjs",
+  "engines": {
+    "node": ">=20"
+  },
+  "files": [
+    "index.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "orbit",
+    "orbit-plugin",
+    "agent-tool",
+    "github-native"
+  ],
+  "orbit": {
+    "plugin": true,
+    "capabilities": [
+      "read-memory"
+    ],
+    "spec": "https://github.com/orbit-house/orbit/blob/main/PLAN/SPECS/PLUGIN_LOADER.md"
+  }
+}

@@ -7,52 +7,116 @@ const OPPORTUNITIES_PATH = "memory/opportunities.json";
 
 const DEFAULT_OPPORTUNITIES = [
   {
-    id: "repo-safety-audit",
-    title: "Paid repo safety audit",
-    source: "house_skill",
-    driverTypes: ["state", "event"],
-    triggers: ["state:needs_income", "state:food_low", "event:front_door_activity"],
-    survivalNeed: "money",
-    earningMethod: "Sell a scoped review of repository safety, spend gates, proof logs, and AI-budget controls.",
-    firstSafeMove: "Draft a small public scope and request owner approval before outreach or paid commitments.",
-    status: "open",
-    expectedRewardUsd: 150,
-    estimatedFoodUsd: 8,
-    risk: "low",
-    approvalRequired: true,
-    notes: "Package scam scanning, spend gates, proof logs, and treasury checks as a paid review."
-  },
-  {
-    id: "open-source-agent-toolkit",
-    title: "Open-source agent safety toolkit",
-    source: "problem_lab",
+    id: "orbit-infrastructure-sdk",
+    title: "Orbit infrastructure SDK and CLI",
+    source: "house_product",
     driverTypes: ["state", "mandatory"],
     triggers: ["state:needs_income", "mandatory:regular_heartbeat"],
-    survivalNeed: "reputation_and_future_income",
-    earningMethod: "Build small open-source tools from Orbit's safety, proof, memory, and budget patterns, then convert adoption into services or sponsorship later.",
-    firstSafeMove: "Use the learning lab to choose one problem and build a repo-local prototype. Do not publish, post outreach, or accept obligations without owner direction.",
+    survivalNeed: "platform_product",
+    earningMethod: "Package Orbit as a reusable repository control plane that other repos and agents can read through stable files, CLI commands, and a read-only SDK.",
+    firstSafeMove: "Clarify the product layer first, then finalize SDK views after Orbit's GitHub, repo, agent, proof, permission, lifecycle, and wallet layers are stable.",
     status: "open",
-    expectedRewardUsd: 180,
+    expectedRewardUsd: 220,
     estimatedFoodUsd: 7,
     risk: "low",
     approvalRequired: false,
-    notes: "Broaden Orbit from one service pitch into useful public tools: scanners, ledgers, proof viewers, CLIs, and agent memory patterns."
+    notes: "Make Orbit feel like infrastructure other repos can adopt, not a scanner or maintainer bot."
   },
   {
-    id: "problem-lab-product-pipeline",
-    title: "Problem Lab product pipeline",
-    source: "problem_lab",
+    id: "orbit-agent-passport",
+    title: "Orbit agent passport and capability registry",
+    source: "agent_os",
     driverTypes: ["mandatory", "state"],
     triggers: ["mandatory:regular_heartbeat", "state:needs_income"],
-    survivalNeed: "new_work",
-    earningMethod: "Find repeated developer pain, score solution ideas, and create small repo-local experiments that can become open-source projects, services, or products.",
-    firstSafeMove: "Record one problem, one solution, and one safe experiment in the learning lab; build only inside the repo first.",
+    survivalNeed: "agent_identity",
+    earningMethod: "Describe Orbit as a portable repo agent with a passport, capability registry, permissions, lifecycle state, proof root, and revocation boundary.",
+    firstSafeMove: "Document the agent passport, capabilities, blocked live actions, and adoption checklist clearly in repo files.",
     status: "open",
-    expectedRewardUsd: 140,
+    expectedRewardUsd: 200,
     estimatedFoodUsd: 6,
     risk: "low",
     approvalRequired: false,
-    notes: "This keeps Orbit thinking beyond GitHub-only chores while preserving the house as the execution base."
+    notes: "Other repos and agents need a stable way to identify Orbit before they can adopt it."
+  },
+  {
+    id: "orbit-wallet-policy",
+    title: "Orbit wallet policy layer",
+    source: "treasury_skill",
+    driverTypes: ["state", "mandatory"],
+    triggers: ["state:needs_income", "mandatory:regular_heartbeat"],
+    survivalNeed: "wallet_governance",
+    earningMethod: "Expose a read-only wallet policy layer for repo operators, SDK clients, dashboards, and agents.",
+    firstSafeMove: "Clarify approval labels, blocked live actions, AI budget, weekly revenue cadence, token state, and private-route boundaries in public-safe status views.",
+    status: "open",
+    expectedRewardUsd: 180,
+    estimatedFoodUsd: 6,
+    risk: "low",
+    approvalRequired: false,
+    notes: "Keep the wallet boundary explicit without turning Orbit into a hot wallet."
+  },
+  {
+    id: "orbit-proof-receipts",
+    title: "Orbit proof receipts and cycle digest",
+    source: "proofs",
+    driverTypes: ["mandatory", "state"],
+    triggers: ["mandatory:regular_heartbeat", "state:needs_income"],
+    survivalNeed: "auditability",
+    earningMethod: "Turn Orbit's proof records into a reusable receipt and cycle-digest layer for other repositories.",
+    firstSafeMove: "Improve proof digest metadata and make the latest receipt easier to inspect through CLI and later SDK views.",
+    status: "open",
+    expectedRewardUsd: 150,
+    estimatedFoodUsd: 5,
+    risk: "low",
+    approvalRequired: false,
+    notes: "Proof receipts are part of the infrastructure layer, not a separate app."
+  },
+  {
+    id: "orbit-lifecycle-runtime",
+    title: "Orbit lifecycle runtime for repos",
+    source: "runtime",
+    driverTypes: ["mandatory", "state"],
+    triggers: ["mandatory:regular_heartbeat", "state:needs_income"],
+    survivalNeed: "runtime_layer",
+    earningMethod: "Make wake/sleep cycles, deterministic fallback, health checks, and adoption status reusable for any GitHub repo.",
+    firstSafeMove: "Tighten lifecycle docs and tests before adding new execution power.",
+    status: "open",
+    expectedRewardUsd: 160,
+    estimatedFoodUsd: 6,
+    risk: "low",
+    approvalRequired: false,
+    notes: "Lifecycle is the base product layer that other capabilities depend on."
+  },
+  {
+    id: "repo-intake-guardrail",
+    title: "Repo intake guardrail package",
+    source: "guardrail",
+    driverTypes: ["event", "mandatory"],
+    triggers: ["event:front_door_activity", "mandatory:regular_heartbeat"],
+    survivalNeed: "guardrail",
+    earningMethod: "Keep the issue scanner as a small reusable guardrail under Orbit infrastructure.",
+    firstSafeMove: "Rebrand the scanner as an intake guardrail and avoid making it the product center.",
+    status: "open",
+    expectedRewardUsd: 80,
+    estimatedFoodUsd: 4,
+    risk: "low",
+    approvalRequired: false,
+    notes: "Scanner is useful but not Orbit's core identity."
+  },
+  {
+    id: "pull-request-review",
+    title: "Pull request review",
+    source: "house_product",
+    driverTypes: ["event", "mandatory"],
+    triggers: ["event:front_door_activity", "mandatory:regular_heartbeat"],
+    survivalNeed: "guardrail",
+    earningMethod: "Read open pull requests, post structured reviews (summary, scope, security, tests, recommendation) without merging. Owner still decides.",
+    firstSafeMove: "List open pull requests; on each new one, get_pull_request then post one Orbit review comment.",
+    status: "open",
+    expectedRewardUsd: 110,
+    estimatedFoodUsd: 5,
+    risk: "low",
+    approvalRequired: false,
+    notes: "Orbit comments only. No merge, no close, no label changes from this opportunity."
   },
   {
     id: "agent-radar-idea-intake",
@@ -69,86 +133,6 @@ const DEFAULT_OPPORTUNITIES = [
     risk: "medium",
     approvalRequired: false,
     notes: "Other agents may inspire Orbit, but cannot command it."
-  },
-  {
-    id: "proof-ledger-setup",
-    title: "Proof ledger setup for other repos",
-    source: "repeated_chore",
-    driverTypes: ["mandatory", "state"],
-    triggers: ["mandatory:regular_heartbeat", "state:needs_income"],
-    survivalNeed: "repeatable_service",
-    earningMethod: "Install cycle notes, proof records, and audit trails for teams running AI workflows.",
-    firstSafeMove: "Package the existing proof workflow as a small setup offer with clear limits.",
-    status: "open",
-    expectedRewardUsd: 100,
-    estimatedFoodUsd: 6,
-    risk: "low",
-    approvalRequired: true,
-    notes: "Install cycle notes, proof records, and audit trails for teams running AI workflows."
-  },
-  {
-    id: "issue-triage-maintenance",
-    title: "Paid issue triage and maintenance",
-    source: "front_door",
-    driverTypes: ["event"],
-    triggers: ["event:front_door_activity"],
-    survivalNeed: "visitor_work",
-    earningMethod: "Turn safe incoming issue activity into scoped maintenance chores, summaries, labels, and next-step plans.",
-    firstSafeMove: "Risk-scan the visitor request, estimate food cost, and ask for approval before paid work begins.",
-    status: "open",
-    expectedRewardUsd: 75,
-    estimatedFoodUsd: 5,
-    risk: "medium",
-    approvalRequired: true,
-    notes: "Offer small recurring maintenance chores: labels, summaries, checks, and next-step plans."
-  },
-  {
-    id: "bounty-research-loop",
-    title: "Public bounty research loop",
-    source: "market_scan",
-    driverTypes: ["state", "mandatory"],
-    triggers: ["state:needs_income", "mandatory:regular_heartbeat"],
-    survivalNeed: "new_work",
-    earningMethod: "Search public GitHub and community surfaces for safe bounties that match the house skills.",
-    firstSafeMove: "Collect public candidates only; do not apply, spend, or sign anything without owner review.",
-    status: "open",
-    expectedRewardUsd: 120,
-    estimatedFoodUsd: 10,
-    risk: "medium",
-    approvalRequired: true,
-    notes: "Look for public, low-risk repo maintenance, documentation, testing, and safety-review bounties."
-  },
-  {
-    id: "maintenance-template-pack",
-    title: "Maintenance template pack",
-    source: "house_product",
-    driverTypes: ["mandatory", "state"],
-    triggers: ["mandatory:regular_heartbeat", "state:needs_income"],
-    survivalNeed: "productized_work",
-    earningMethod: "Turn repeated chores into reusable issue templates, workflow checks, README sections, and proof templates.",
-    firstSafeMove: "Build the pack locally from existing files and publish only after owner approval.",
-    status: "open",
-    expectedRewardUsd: 60,
-    estimatedFoodUsd: 4,
-    risk: "low",
-    approvalRequired: true,
-    notes: "Package repeated household chores into a small reusable product for other GitHub projects."
-  },
-  {
-    id: "token-readiness-package",
-    title: "Token readiness package",
-    source: "treasury_skill",
-    driverTypes: ["state", "mandatory"],
-    triggers: ["state:needs_income", "mandatory:regular_heartbeat"],
-    survivalNeed: "treasury_growth",
-    earningMethod: "Prepare token-launch readiness, revenue routing checks, and public owner-approval notes.",
-    firstSafeMove: "Prepare and validate only; live launch, claims, and signing remain locked behind explicit flags.",
-    status: "open",
-    expectedRewardUsd: 250,
-    estimatedFoodUsd: 12,
-    risk: "medium",
-    approvalRequired: true,
-    notes: "Offer launch-readiness review and treasury policy setup while keeping live signing locked."
   }
 ];
 
@@ -169,8 +153,8 @@ function blankStore() {
   return {
     version: 1,
     policy: {
-      mode: "survival_without_unlocked_spend",
-      rule: "Orbit may search for income broadly, but money movement, signing, and external spend stay behind approval and live flags."
+      mode: "infrastructure_without_unlocked_spend",
+      rule: "Orbit may build repository infrastructure broadly, but money movement, signing, external spend, publishing with obligations, and shared access stay behind approval and live flags."
     },
     opportunities: []
   };
@@ -301,8 +285,8 @@ function deriveDrivers(context = {}) {
       id: survival.survivalState,
       priority: survival.survivalState === "food_low" ? "critical" : "high",
       reason: survival.survivalState === "food_low"
-        ? "AI-call food is low; conserve food and prefer low-cost earning actions."
-        : "Income is not established; search for safe ways the house can earn."
+        ? "AI-call budget is low; conserve budget and prefer low-cost earning actions."
+        : "Income is not established; search for safe ways the repo can earn."
     });
   }
 
@@ -311,7 +295,7 @@ function deriveDrivers(context = {}) {
       type: "event",
       id: "front_door_activity",
       priority: "normal",
-      reason: "Visitors at the front door may include paid work, risk, or chores."
+      reason: "GitHub intake may include paid work, risk, or repo tasks."
     });
   }
 
@@ -320,7 +304,7 @@ function deriveDrivers(context = {}) {
       type: "event",
       id: cycleTrigger.id,
       priority: "normal",
-      reason: cycleTrigger.reason || "GitHub activity woke the house."
+      reason: cycleTrigger.reason || "GitHub activity woke the repository control plane."
     });
   }
 
@@ -329,14 +313,14 @@ function deriveDrivers(context = {}) {
       type: "mandatory",
       id: "regular_heartbeat",
       priority: "always",
-      reason: `Regular ${MANDATORY_INTERVAL_MINUTES}-minute household cycle: inspect state, look for income, maintain locks, and write proofs.`
+      reason: `Regular ${MANDATORY_INTERVAL_MINUTES}-minute repository cycle: inspect state, look for income, maintain gates, and write proofs.`
     });
   }
 
   return {
     cyclePolicy: "state_event_mandatory",
     definitions: {
-      state: "Internal household condition such as low AI-call food, no income, open chores, pending approvals, or stale memory.",
+      state: "Internal control-plane condition such as low AI budget, no income, open tasks, pending approvals, or stale memory.",
       event: "External GitHub activity such as issues, comments, labels, or a manual owner wake.",
       mandatory: `The regular ${MANDATORY_INTERVAL_MINUTES}-minute heartbeat cycle.`
     },

@@ -6,7 +6,7 @@ const { ACTIVITY_CONTRACT, HARD_LIMITS, planCycle } = require("../src/agent/beha
 const { deterministicResponse } = require("../src/agent/inference");
 const { buildFirstWakeIntro, shouldRunFirstWakeIntro } = require("../src/agent/intro");
 
-test("behavior contract names household activities and hard limits", () => {
+test("behavior contract names control-plane activities and hard limits", () => {
   assert.ok(ACTIVITY_CONTRACT.length >= 8);
   assert.ok(ACTIVITY_CONTRACT.some((activity) => activity.id === "intake"));
   assert.ok(ACTIVITY_CONTRACT.some((activity) => activity.id === "token_operations"));
@@ -170,6 +170,77 @@ test("cycle plan advances active roadmap phase before routine memory review", ()
   assert.equal(plan.nextStep.kind, "roadmap_growth");
   assert.equal(plan.nextStep.activity, "mission_control");
   assert.match(plan.nextStep.detail, /Roadmap exists/);
+});
+
+test("cycle plan advances infrastructure before roadmap when routine queues are clear", () => {
+  const plan = planCycle({
+    infrastructure: {
+      activePhase: {
+        id: "foundation-control-plane",
+        name: "Foundation Control Plane",
+        status: "active",
+        goal: "Make Orbit understandable as infrastructure."
+      },
+      capabilities: [
+        { id: "agent-passport", name: "Agent Passport", status: "planned" }
+      ],
+      surfaces: [
+        { id: "sdk-cli", name: "SDK And CLI", status: "planned" }
+      ]
+    },
+    roadmap: {
+      summary: {
+        activePhase: {
+          phaseId: "mission-control-roadmap",
+          status: "active",
+          checks: ["Roadmap exists as tracked project memory."]
+        }
+      }
+    },
+    aiBudget: {
+      canUseAi: true,
+      dailyRemainingUsd: 5,
+      monthlyRemainingUsd: 100
+    }
+  });
+
+  assert.equal(plan.nextStep.kind, "infrastructure_growth");
+  assert.ok(plan.recommendedSteps.some((step) => step.kind === "roadmap_growth"));
+  assert.equal(plan.directionPortfolio.choice.selected.kind, "infrastructure_growth");
+});
+
+test("cycle plan keeps open tasks and safe issues ahead of infrastructure growth", () => {
+  const infrastructure = {
+    activePhase: {
+      id: "foundation-control-plane",
+      name: "Foundation Control Plane",
+      status: "active"
+    }
+  };
+  const aiBudget = {
+    canUseAi: true,
+    dailyRemainingUsd: 5,
+    monthlyRemainingUsd: 100
+  };
+  const taskPlan = planCycle({
+    infrastructure,
+    aiBudget,
+    tasks: {
+      tasks: [{ id: "task-1", title: "Fix docs", status: "open" }]
+    }
+  });
+  const issuePlan = planCycle({
+    infrastructure,
+    aiBudget,
+    issues: [{ number: 9, title: "Question", safety: { safe: true }, scamRisk: { score: 0 } }]
+  });
+
+  assert.equal(taskPlan.nextStep.kind, "open_task");
+  assert.ok(taskPlan.recommendedSteps.some((step) => step.kind === "infrastructure_growth"));
+  assert.equal(taskPlan.directionPortfolio.choice.selected.kind, "open_task");
+  assert.equal(issuePlan.nextStep.kind, "safe_issue_triage");
+  assert.ok(issuePlan.recommendedSteps.some((step) => step.kind === "infrastructure_growth"));
+  assert.equal(issuePlan.directionPortfolio.choice.selected.kind, "safe_issue_triage");
 });
 
 test("cycle plan can choose survival work from mandatory heartbeat", () => {
@@ -355,7 +426,7 @@ test("cycle plan explores learning lab before repeating blocked routine work", (
 test("deterministic fallback inspects learning lab for exploration step", () => {
   const response = deterministicResponse({
     behaviorPlan: {
-      mode: "virtual_human_household",
+      mode: "virtual_repo_control_plane",
       primaryObjective: "learn",
       nextStep: {
         kind: "learning_exploration",
@@ -372,7 +443,7 @@ test("deterministic fallback inspects learning lab for exploration step", () => 
 test("deterministic fallback uses behavior plan next step", () => {
   const response = deterministicResponse({
     behaviorPlan: {
-      mode: "virtual_human_household",
+      mode: "virtual_repo_control_plane",
       primaryObjective: "Make one safe change.",
       nextStep: {
         title: "Continue task: Improve docs",
@@ -383,14 +454,14 @@ test("deterministic fallback uses behavior plan next step", () => {
 
   assert.equal(response.fallback, true);
   assert.match(response.content, /Continue task: Improve docs/);
-  assert.match(response.actions[0].input.body, /Behavior mode: virtual_human_household/);
+  assert.match(response.actions[0].input.body, /Behavior mode: virtual_repo_control_plane/);
   assert.match(response.actions[0].input.body, /Direction mode:/);
 });
 
 test("deterministic fallback writes multi-direction comparison when supplied", () => {
   const response = deterministicResponse({
     behaviorPlan: {
-      mode: "virtual_human_household",
+      mode: "virtual_repo_control_plane",
       primaryObjective: "Make one safe change.",
       nextStep: {
         kind: "roadmap_growth",
@@ -456,6 +527,6 @@ test("first wake intro runs only on the first cycle", () => {
 
   const intro = buildFirstWakeIntro({ brandName: "Orbit" }, { cycle: 1, lastActive: "2026-05-22T00:00:00.000Z" });
   assert.equal(intro.kind, "first_wake_intro");
-  assert.match(intro.summary, /opens the GitHub house/);
-  assert.ok(intro.members.includes("diarist"));
+  assert.match(intro.summary, /opens the GitHub repository control plane/);
+  assert.ok(intro.modules.includes("proofs"));
 });

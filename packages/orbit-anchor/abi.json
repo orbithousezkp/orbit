@@ -1,0 +1,64 @@
+[
+  { "type": "constructor", "inputs": [], "stateMutability": "nonpayable" },
+  { "type": "error", "name": "NotOwner", "inputs": [] },
+  { "type": "error", "name": "AlreadyAnchored", "inputs": [] },
+  { "type": "error", "name": "ZeroRoot", "inputs": [] },
+  { "type": "error", "name": "ZeroOwner", "inputs": [] },
+  {
+    "type": "event",
+    "name": "RootAnchored",
+    "anonymous": false,
+    "inputs": [
+      { "name": "windowEnd", "type": "uint64", "indexed": true, "internalType": "uint64" },
+      { "name": "root", "type": "bytes32", "indexed": false, "internalType": "bytes32" },
+      { "name": "leafCount", "type": "uint32", "indexed": false, "internalType": "uint32" },
+      { "name": "anchorer", "type": "address", "indexed": true, "internalType": "address" }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "OwnershipTransferred",
+    "anonymous": false,
+    "inputs": [
+      { "name": "previousOwner", "type": "address", "indexed": true, "internalType": "address" },
+      { "name": "newOwner", "type": "address", "indexed": true, "internalType": "address" }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "owner",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "address", "internalType": "address" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "anchorRoot",
+    "inputs": [
+      { "name": "windowEnd", "type": "uint64", "internalType": "uint64" },
+      { "name": "root", "type": "bytes32", "internalType": "bytes32" },
+      { "name": "leafCount", "type": "uint32", "internalType": "uint32" }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "rootForWindow",
+    "inputs": [{ "name": "windowEnd", "type": "uint64", "internalType": "uint64" }],
+    "outputs": [
+      { "name": "root", "type": "bytes32", "internalType": "bytes32" },
+      { "name": "leafCount", "type": "uint32", "internalType": "uint32" },
+      { "name": "anchorer", "type": "address", "internalType": "address" },
+      { "name": "anchoredAt", "type": "uint64", "internalType": "uint64" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "transferOwnership",
+    "inputs": [{ "name": "newOwner", "type": "address", "internalType": "address" }],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  }
+]

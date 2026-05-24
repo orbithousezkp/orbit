@@ -2,7 +2,7 @@
   "name": "orbit",
   "version": "0.1.0",
   "private": true,
-  "description": "A GitHub-native digital household that learns, works, protects treasury actions, and records proof.",
+  "description": "A GitHub-native infrastructure control plane for repos, agents, proofs, permissions, lifecycle, and wallet policy.",
   "type": "commonjs",
   "engines": {
     "node": ">=20"
@@ -14,24 +14,27 @@
     "cycle": "node src/agent/run.js",
     "demo:cycles": "node src/cli/demo-cycles.js",
     "health": "node src/cli/health.js",
+    "infrastructure": "node src/cli/infrastructure.js",
+    "sdk": "node packages/orbit-sdk/cli.js",
     "lint": "node --check src/agent/*.js && node --check src/cli/*.js",
     "test": "node --test tests/*.test.js",
     "audit": "npm audit --omit=dev"
   },
   "keywords": [
     "github-actions",
-    "digital-household",
-    "living-repository",
+    "agent-infrastructure",
+    "repository-control-plane",
     "github-native",
-    "ai-maintainer",
+    "agent-sdk",
+    "proof-receipts",
+    "wallet-policy",
     "automation",
-    "treasury-governance",
-    "token"
+    "permissions",
+    "lifecycle"
   ],
   "license": "MIT",
   "dependencies": {
     "clanker-sdk": "^4.2.16",
-    "framer-motion": "^12.40.0",
     "lucide-react": "^1.16.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

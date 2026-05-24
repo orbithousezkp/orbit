@@ -1,0 +1,70 @@
+name: Orbit Event Cycle
+
+on:
+  issues:
+    types: [opened, edited, reopened]
+  issue_comment:
+    types: [created, edited]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+concurrency:
+  group: orbit-cycle
+  cancel-in-progress: false
+
+jobs:
+  cycle:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: "{{NODE_VERSION}}"
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Orbit event cycle
+        run: npm run cycle
+        env:
+          ORBIT_AI_PROVIDERS: ${{ secrets.ORBIT_AI_PROVIDERS }}
+          ORBIT_AI_PROVIDER_KEYS: ${{ secrets.ORBIT_AI_PROVIDER_KEYS }}
+          ORBIT_AI_DAILY_BUDGET_USD: ${{ vars.ORBIT_AI_DAILY_BUDGET_USD }}
+          ORBIT_AI_MONTHLY_BUDGET_USD: ${{ vars.ORBIT_AI_MONTHLY_BUDGET_USD }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          ORBIT_CYCLE_TRIGGER: ${{ github.event_name }}
+          ORBIT_CYCLE_TRIGGER_ACTION: ${{ github.event.action }}
+          ORBIT_OWNER_USERNAME: ${{ vars.ORBIT_OWNER_USERNAME }}
+          ORBIT_APPROVAL_ISSUE_LABEL: ${{ vars.ORBIT_APPROVAL_ISSUE_LABEL }}
+          ORBIT_APPROVAL_ACCEPTED_LABEL: ${{ vars.ORBIT_APPROVAL_ACCEPTED_LABEL }}
+          ORBIT_APPROVAL_REJECTED_LABEL: ${{ vars.ORBIT_APPROVAL_REJECTED_LABEL }}
+          ORBIT_DRY_RUN: ${{ vars.ORBIT_DRY_RUN }}
+          ORBIT_COMMIT_CHANGES: "true"
+          ORBIT_PUSH_CHANGES: "true"
+          ORBIT_ALLOW_COMMANDS: "false"
+          ORBIT_WALLET_PRIVATE_KEY: ${{ secrets.ORBIT_WALLET_PRIVATE_KEY }}
+          ORBIT_AGENT_SIGNER: ${{ vars.ORBIT_AGENT_SIGNER }}
+          ORBIT_ENABLE_TOKEN_LAUNCH: "false"
+          ORBIT_ENABLE_REVENUE_CLAIMS: "false"
+          ORBIT_FARCASTER_NEYNAR_API_KEY: ${{ secrets.ORBIT_FARCASTER_NEYNAR_API_KEY }}
+          ORBIT_FARCASTER_SIGNER_UUID: ${{ secrets.ORBIT_FARCASTER_SIGNER_UUID }}
+          ORBIT_FARCASTER_FID: ${{ vars.ORBIT_FARCASTER_FID }}
+          ORBIT_FARCASTER_DRY_RUN: ${{ vars.ORBIT_FARCASTER_DRY_RUN }}
+          ORBIT_PUBLIC_URL: ${{ vars.ORBIT_PUBLIC_URL }}

@@ -38,17 +38,17 @@ export const navItems = [
   { label: 'Orbit', href: '#house' },
   { label: 'Product', href: '#life' },
   { label: 'Members', href: '#members' },
-  { label: 'House', href: '#rooms' },
-  { label: 'Rhythm', href: '#routine' },
-  { label: 'Trust', href: '#boundaries' },
+  { label: 'Surfaces', href: '#rooms' },
+  { label: 'Runtime', href: '#routine' },
+  { label: 'Policy', href: '#boundaries' },
   { label: 'Roadmap', href: '#roadmap' },
 ];
 
 export const identityStats = [
   {
-    label: 'House',
+    label: 'Repo',
     value: 'GitHub',
-    detail: 'The repository is the product surface where Orbit lives, works, and records proof.',
+    detail: 'The repository is the control plane where Orbit lives, works, and records proof.',
   },
   {
     label: 'Food',
@@ -56,47 +56,47 @@ export const identityStats = [
     detail: 'Every thought has a cost, so Orbit budgets attention before spending it.',
   },
   {
-    label: 'Survival',
-    value: 'Treasury',
-    detail: 'Earning routes, reserves, and approvals keep live money movement controlled.',
+    label: 'Authority',
+    value: 'Wallet policy',
+    detail: 'Approval labels, blocked live actions, and private-route boundaries keep money movement controlled.',
   },
 ];
 
 export const houseMembers = [
   {
-    name: 'Pulse',
-    role: 'Autonomous life layer',
-    desc: 'Notices what matters, wakes Orbit, chooses safe work, and keeps rhythm.',
+    name: 'Control Plane',
+    role: 'Repository operating layer',
+    desc: 'Coordinates identity, memory, permissions, proofs, and lifecycle state.',
     icon: HeartPulse,
   },
   {
-    name: 'Memory Keeper',
-    role: 'Mind of the house',
-    desc: 'Stores rules, lessons, preferences, warnings, and household history.',
+    name: 'Memory Registry',
+    role: 'Durable state',
+    desc: 'Stores mission, tasks, lessons, policies, and adoption notes between cycles.',
     icon: Brain,
   },
   {
-    name: 'Treasurer',
-    role: 'Survival money',
-    desc: 'Budgets AI food, prepares income paths, and blocks unsafe external spend.',
+    name: 'Wallet Policy',
+    role: 'Read-only finance layer',
+    desc: 'Exposes approval labels, revenue cadence, token state, and blocked live actions.',
     icon: PiggyBank,
   },
   {
-    name: 'Caretaker',
-    role: 'House maintenance',
-    desc: 'Turns issues into chores, repairs files, runs checks, and keeps rooms clean.',
+    name: 'Lifecycle Runtime',
+    role: 'Wake and sleep',
+    desc: 'Turns GitHub Actions into predictable cycles with proofs and fallback behavior.',
     icon: BriefcaseBusiness,
   },
   {
-    name: 'Gatekeeper',
-    role: 'House locks',
-    desc: 'Refuses secrets, scams, unsafe paths, wallet drains, and unlocked live actions.',
+    name: 'Permission Matrix',
+    role: 'Approval gates',
+    desc: 'Refuses secrets, scams, unsafe paths, live signing, and unlocked execution authority.',
     icon: ShieldCheck,
   },
   {
-    name: 'Diarist',
-    role: 'Public record',
-    desc: 'Writes proofs so every cycle leaves a reviewable public record.',
+    name: 'Proof Ledger',
+    role: 'Audit trail',
+    desc: 'Writes receipts so every cycle leaves a reviewable public record.',
     icon: NotebookTabs,
   },
 ];
@@ -108,98 +108,98 @@ export const householdNeeds = [
     desc: 'Members think by spending model calls. Food is limited, so they must ration attention.',
   },
   {
-    label: 'Shelter',
+    label: 'Surface',
     value: 'GitHub repo',
-    desc: 'The house exists as files, issues, Actions, memory, proofs, commits, and settings.',
+    desc: 'The control plane exists as files, issues, Actions, memory, proofs, commits, and settings.',
   },
   {
     label: 'Work',
-    value: 'chores',
-    desc: 'Maintenance, docs, tests, triage, cleanup, and repairs keep the home livable.',
+    value: 'repo work',
+    desc: 'Maintenance, docs, tests, triage, cleanup, and repairs keep the product usable.',
   },
   {
     label: 'Money',
-    value: 'treasury',
-    desc: 'The household earns and budgets so it can survive, improve, and pay for food.',
+    value: 'wallet policy',
+    desc: 'Budget, revenue cadence, and blocked live actions keep the control plane governed.',
   },
   {
     label: 'Rules',
-    value: 'locks',
-    desc: 'Approval gates and safety checks protect the household from theft or bad decisions.',
+    value: 'permissions',
+    desc: 'Approval gates and safety checks protect the repository from unsafe or irreversible actions.',
   },
   {
     label: 'Memory',
-    value: 'diary',
-    desc: 'Lessons and proofs let the household continue from yesterday instead of restarting.',
+    value: 'proofs',
+    desc: 'Lessons and receipts let Orbit continue from yesterday instead of restarting.',
   },
 ];
 
 export const humanStack = [
   {
-    label: 'House',
+    label: 'Repo',
     value: 'GitHub repository',
     desc: 'The place where Orbit exists: code, issues, memory, proofs, schedules, and public history.',
   },
   {
-    label: 'Members',
-    value: 'living systems',
-    desc: 'Pulse, memory, treasury, caretaker, gatekeeper, and diarist act like a household inside the repo.',
+    label: 'Layers',
+    value: 'control plane modules',
+    desc: 'Identity, memory, lifecycle, permissions, proofs, and wallet policy work as a coordinated control plane.',
   },
   {
     label: 'Food',
     value: 'AI calls',
-    desc: 'Every thought costs food, so budget and attention decide how long the household can keep working.',
+    desc: 'Every thought costs budget, so attention decides how long the control plane can keep working.',
   },
   {
     label: 'Work',
-    value: 'chores',
-    desc: 'Members maintain rooms, answer visitors, repair code, clean memory, and run checks.',
+    value: 'repo chores',
+    desc: 'The runtime maintains code, docs, memory, proofs, and checks.',
   },
   {
-    label: 'Income',
-    value: 'treasury policy',
-    desc: 'Earning routes, token preparation, approvals, and locked live actions support controlled survival.',
+    label: 'Policy',
+    value: 'wallet gates',
+    desc: 'Revenue routes, approval labels, and blocked live actions support controlled execution.',
   },
   {
     label: 'Diary',
     value: 'proof ledger',
-    desc: 'Every wake cycle records what the household saw, did, learned, refused, and needs next.',
+    desc: 'Every wake cycle records what Orbit saw, did, learned, refused, and needs next.',
   },
 ];
 
 export const houseRooms = [
   {
-    name: 'Front Door',
+    name: 'Intake',
     path: 'issues/',
-    detail: 'People knock by opening issues, comments, requests, and approvals.',
+    detail: 'Issues and comments are the command and approval intake for Orbit.',
     icon: DoorOpen,
   },
   {
-    name: 'Memory Room',
+    name: 'Memory',
     path: 'memory/',
-    detail: 'The members store facts, habits, strategy, tasks, and lessons between wake cycles.',
+    detail: 'The repo stores identity, tasks, roadmap, opportunities, and durable notes here.',
     icon: Brain,
   },
   {
-    name: 'Workbench',
+    name: 'Runtime',
     path: 'src/agent/',
-    detail: 'Tools for triage, research, risk scanning, treasury policy, and GitHub work.',
+    detail: 'Planner, tools, memory, and execution adapters live here.',
     icon: BriefcaseBusiness,
   },
   {
-    name: 'Wallet Drawer',
+    name: 'Wallet Policy',
     path: 'treasury.json',
-    detail: 'Budget caps, food limits, revenue policy, token preparation, and spend proposals live here.',
+    detail: 'Budget caps, revenue policy, token preparation, and spend proposals live here.',
     icon: PiggyBank,
   },
   {
-    name: 'Diary',
+    name: 'Proof Ledger',
     path: 'runtime/proofs/',
-    detail: 'Each cycle leaves a proof of what the household saw, decided, changed, and refused.',
+    detail: 'Each cycle leaves a proof of what Orbit saw, decided, changed, and refused.',
     icon: NotebookTabs,
   },
   {
-    name: 'Locks',
+    name: 'Permissions',
     path: 'governance/',
     detail: 'Owner approvals, dry-run flags, path rules, and secret checks define boundaries.',
     icon: ShieldCheck,
@@ -209,27 +209,27 @@ export const houseRooms = [
 export const dailyRoutine = [
   {
     time: 'Wake',
-    title: 'Opens his eyes',
-    desc: 'Checks visitors, memory, budget, safety locks, and the last diary entry before touching anything.',
+    title: 'Reads the control plane',
+    desc: 'Checks issues, memory, budget, permissions, and the latest receipt before touching anything.',
   },
   {
     time: 'Notice',
-    title: 'Reads the room',
-    desc: 'Turns comments, issues, alerts, and failed checks into household signals instead of raw queue items.',
+    title: 'Reads signals',
+    desc: 'Turns comments, issues, alerts, and failed checks into control-plane signals instead of raw queue items.',
   },
   {
     time: 'Think',
     title: 'Chooses safe work',
-    desc: 'Classifies chores, checks risk, remembers standing rules, and asks for approval when money is involved.',
+    desc: 'Classifies repo chores, checks risk, remembers policy, and asks for approval when money is involved.',
   },
   {
     time: 'Earn',
-    title: 'Protects income paths',
-    desc: 'Tracks AI costs, prepares earning work, and keeps live transfers behind explicit locks.',
+    title: 'Protects wallet paths',
+    desc: 'Tracks AI costs, prepares earning work, and keeps live transfers behind explicit gates.',
   },
   {
     time: 'Sleep',
-    title: 'Writes the diary',
+    title: 'Writes the receipt',
     desc: 'Saves a proof, updates durable state, and leaves the repository ready for the next wake cycle.',
   },
 ];
@@ -237,17 +237,17 @@ export const dailyRoutine = [
 export const cycleDrivers = [
   {
     title: 'State',
-    desc: 'Internal household pressure: low AI-call food, no income, pending approvals, open chores, stale memory, or failed checks.',
+    desc: 'Internal control-plane pressure: low AI budget, no income, pending approvals, open tasks, stale memory, or failed checks.',
     icon: HeartPulse,
   },
   {
     title: 'Event',
-    desc: 'External activity at the GitHub house: issues, comments, labels, manual owner wakes, visitors, or repository changes.',
+    desc: 'External repository activity: issues, comments, labels, manual owner wakes, or repository changes.',
     icon: DoorOpen,
   },
   {
     title: 'Mandatory',
-    desc: 'The scheduled 30-minute heartbeat. It fires regularly even when the house is quiet, then checks survival, locks, proofs, and next work.',
+    desc: 'The scheduled 30-minute heartbeat. It fires regularly even when the repo is quiet, then checks survival, gates, proofs, and next work.',
     icon: CalendarClock,
   },
 ];
@@ -265,7 +265,7 @@ export const householdSystems = [
   },
   {
     title: 'Manages',
-    desc: 'Orbit keeps chores, bills, repair work, approvals, visitors, and routines organized inside GitHub.',
+    desc: 'Orbit keeps tasks, approvals, runtime work, and policy organized inside GitHub.',
     icon: House,
   },
   {
@@ -300,59 +300,59 @@ export const lifeSystems = [
 
 export const householdLedger = [
   {
-    label: 'Visitors',
+    label: 'Issues',
     path: 'issues/',
-    detail: 'Every request enters through the front door where it can be inspected, answered, labeled, or refused.',
+    detail: 'Every request enters through the intake surface where it can be inspected, answered, labeled, or refused.',
   },
   {
     label: 'Lessons',
     path: 'memory/',
-    detail: 'Rules and discoveries become durable household knowledge for later wake cycles.',
+    detail: 'Rules and discoveries become durable control-plane knowledge for later wake cycles.',
   },
   {
     label: 'Chores',
     path: 'tasks.json',
-    detail: 'Repairs, improvements, follow-ups, and reminders stay visible as work around the house.',
+    detail: 'Repairs, improvements, follow-ups, and reminders stay visible as work around the repo.',
   },
   {
-    label: 'Income',
+    label: 'Wallet',
     path: 'treasury.json',
-    detail: 'AI budget, reward routes, token preparation, and approval gates are managed as household money.',
+    detail: 'AI budget, reward routes, token preparation, and approval gates are managed as wallet policy.',
   },
   {
     label: 'Proofs',
     path: 'runtime/proofs/',
-    detail: 'The diary records decisions, actions, refusals, and the next state before Orbit sleeps.',
+    detail: 'The receipt ledger records decisions, actions, refusals, and the next state before Orbit sleeps.',
   },
 ];
 
 export const commandExamples = [
   {
-    command: '@orbit what happened in the house while I was away?',
-    response: 'Reads visitors, chores, spend state, lessons, and diary entries since the last wake cycle.',
+    command: '@orbit what happened in the control plane while I was away?',
+    response: 'Reads issues, tasks, wallet state, lessons, and proof entries since the last wake cycle.',
   },
   {
-    command: '@orbit can we talk through this idea first?',
-    response: 'Converse safely, ask clarifying questions, and turn useful public context into chores.',
+    command: '@orbit compare safe directions for this repo problem',
+    response: 'Converse safely, ask clarifying questions, and turn useful public context into repo work.',
   },
   {
     command: '@orbit learn this rule: never pay external wallets without approval',
-    response: 'Stores the rule as household memory and applies it to future earning or spend decisions.',
+    response: 'Stores the rule as durable memory and applies it to future earning or spend decisions.',
   },
   {
     command: '@orbit assign this repair to @alice with 80 USDC',
-    response: 'Creates a household spend request, waits at the door, and does not move money until approved.',
+    response: 'Creates a wallet-policy request, waits at the intake surface, and does not move money until approved.',
   },
 ];
 
 export const boundaries = [
   {
-    title: 'House keys stay private',
+    title: 'Private keys stay private',
     desc: 'Secrets, private keys, and unsafe paths are rejected before they enter memory or tools.',
     icon: KeyRound,
   },
   {
-    title: 'Money has locks',
+    title: 'Money has gates',
     desc: 'External spend, live claims, and token launches require explicit flags or public approval. Revenue sending is weekly and performance-gated.',
     icon: LockKeyhole,
   },
@@ -362,13 +362,13 @@ export const boundaries = [
     icon: DoorOpen,
   },
   {
-    title: 'Every day leaves paperwork',
-    desc: 'He writes proof records so his work, refusals, and next state can be inspected later.',
+    title: 'Every cycle leaves paperwork',
+    desc: 'Orbit writes proof records so work, refusals, and next state can be inspected later.',
     icon: FileCheck2,
   },
   {
     title: 'Routines are scheduled',
-    desc: 'GitHub Actions give him a wake/sleep rhythm without a separate server or hidden queue.',
+    desc: 'GitHub Actions give Orbit a wake/sleep rhythm without a separate server or hidden queue.',
     icon: CalendarClock,
   },
   {
@@ -378,13 +378,13 @@ export const boundaries = [
   },
   {
     title: 'Health is measured',
-    desc: 'Budget, food, memory, queue state, and safety status define whether the household can keep working.',
+    desc: 'Budget, memory, queue state, and safety status define whether the control plane can keep working.',
     icon: HeartPulse,
   },
 ];
 
 export const roadmapSummary = {
-  currentLevel: 'Safe Autonomy',
+  currentLevel: 'Control Plane Foundation',
   nextLevel: 'Proof And Memory',
   zkStage: 'ZK proof work is staged, not implemented: commitments and local verifier tests come first.',
   activeChecks: [
@@ -401,7 +401,7 @@ export const roadmapSummary = {
 };
 
 export const roadmapDayOneBuild = {
-  summary: 'Ship the safe autonomous foundation and visitor-facing mission control before expanding execution power.',
+  summary: 'Ship the control-plane foundation and visitor-facing mission control before expanding execution power.',
   ships: [
     'Roadmap status memory and agent tool.',
     'Frontend mission-control roadmap with lanes, level statuses, pass checks, and guardrails.',
@@ -437,7 +437,7 @@ export const roadmapApprovalRequired = [
 
 export const roadmapLanes = [
   {
-    title: 'Safe autonomy',
+    title: 'Control plane foundation',
     status: 'active',
     icon: Gauge,
     detail: 'Keep wake cycles useful, proof-backed, and gated before broadening execution power.',
@@ -467,13 +467,13 @@ export const roadmapLanes = [
     detail: 'Keep docs, tests, CI, releases, and frontend quality in shape as recurring maintenance.',
   },
   {
-    title: 'Revenue household',
+    title: 'Wallet policy layer',
     status: 'planned',
     icon: CircleDollarSign,
     detail: 'Track weekly net revenue, reserves, operator cut, and claim eligibility without public signing.',
   },
   {
-    title: 'Crypto watchtower',
+    title: 'Treasury observer',
     status: 'planned',
     icon: ScanSearch,
     detail: 'Monitor public addresses, approvals, contracts, and risk without holding private keys.',

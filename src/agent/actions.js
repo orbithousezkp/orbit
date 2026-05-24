@@ -32,6 +32,8 @@ const {
   quarantineExternalIdea
 } = require("./learning-lab");
 const { OPPORTUNITIES_PATH, opportunityStatus } = require("./opportunities");
+const { infrastructureStatus } = require("./infrastructure");
+const { walletStatus } = require("./wallet");
 const { roadmapStatus } = require("./roadmap");
 const {
   assertNoSymlinkPath,
@@ -42,6 +44,16 @@ const {
   writeSafeTextFile
 } = require("./safety");
 const { aiFoodPolicy, assertConfiguredAiFoodPurchase, buildAiFoodRefillRequest } = require("./ai-food");
+const {
+  BUYBACK_LEDGER_PATH,
+  executeBuyback,
+  proposeBuyback
+} = require("./buyback");
+const {
+  ANCHOR_LEDGER_PATH,
+  executeAnchor,
+  proposeAnchor
+} = require("./merkle-anchor");
 const {
   TREASURY_PATH,
   budgetStatus,
@@ -269,6 +281,14 @@ async function executeTool(config, github, cycle, name, input) {
       return roadmapStatus(config.repoRoot);
     }
 
+    case "infrastructure_status": {
+      return infrastructureStatus(config.repoRoot);
+    }
+
+    case "wallet_status": {
+      return walletStatus(config.repoRoot);
+    }
+
     case "read_file": {
       return readFileForTool(config, input.path);
     }
@@ -382,6 +402,83 @@ async function executeTool(config, github, cycle, name, input) {
       });
     }
 
+    case "list_pull_requests": {
+      const pulls = await github.listPullRequests({
+        state: input.state || "open",
+        perPage: input.perPage || 20
+      });
+      return pulls.map((pr) => ({
+        ...pr,
+        title: omitUnsafeVisitorContent(redactSecrets(pr.title || "")),
+        body: omitUnsafeVisitorContent(redactSecrets(pr.body || "")).slice(0, 2_000),
+        headRef: redactSecrets(String(pr.headRef || "")).slice(0, 200),
+        baseRef: redactSecrets(String(pr.baseRef || "")).slice(0, 200)
+      }));
+    }
+
+    case "get_pull_request": {
+      const pr = await github.getPullRequest(input.pullNumber);
+      if (!pr) return null;
+      const result = {
+        ...pr,
+        title: omitUnsafeVisitorContent(redactSecrets(pr.title || "")),
+        body: omitUnsafeVisitorContent(redactSecrets(pr.body || "")).slice(0, 8_000),
+        headRef: redactSecrets(String(pr.headRef || "")).slice(0, 200),
+        baseRef: redactSecrets(String(pr.baseRef || "")).slice(0, 200)
+      };
+      if (input.includeFiles) {
+        const files = await github.getPullRequestFiles(input.pullNumber);
+        result.files = files.map((file) => ({
+          ...file,
+          filename: redactSecrets(String(file.filename || "")).slice(0, 500),
+          previousFilename: file.previousFilename
+            ? redactSecrets(String(file.previousFilename)).slice(0, 500)
+            : null
+        }));
+      }
+      return result;
+    }
+
+    case "review_pull_request": {
+      const sections = ["summary", "scope", "security", "tests"];
+      for (const key of sections) {
+        if (typeof input[key] !== "string" || input[key].trim().length === 0) {
+          throw new Error(`review_pull_request requires non-empty ${key}`);
+        }
+        assertSafePublicReply(input[key]);
+      }
+      const recommendation = input.recommendation;
+      if (!["approve", "request_changes", "comment"].includes(recommendation)) {
+        throw new Error("review_pull_request recommendation must be approve, request_changes, or comment");
+      }
+      const recommendationLabel = {
+        approve: "Approve",
+        request_changes: "Request changes",
+        comment: "Comment only"
+      }[recommendation];
+      const body = [
+        "## Orbit review",
+        "",
+        `**Recommendation:** ${recommendationLabel}`,
+        "",
+        "### Summary",
+        input.summary.trim(),
+        "",
+        "### Scope",
+        input.scope.trim(),
+        "",
+        "### Security",
+        input.security.trim(),
+        "",
+        "### Tests",
+        input.tests.trim(),
+        "",
+        "_Posted by Orbit cycle. Owner approval still gates any merge or follow-up action._"
+      ].join("\n");
+      assertSafePublicReply(body);
+      return github.commentIssue(input.pullNumber, body);
+    }
+
     case "run_command": {
       return {
         command: input.command,
@@ -445,7 +542,7 @@ async function executeTool(config, github, cycle, name, input) {
         ...result,
         purchaseProvider: spendRequest.recipient,
         purchaseUrl: spendRequest.url,
-        message: "Orbit only requests AI-call food credits through the configured provider. Owner approval records intent; the manual top-up is still required before recording completion."
+        message: "Orbit only requests AI-call budget credits through the configured provider. Owner approval records intent; the manual top-up is still required before recording completion."
       };
     }
 
@@ -506,7 +603,11 @@ async function executeTool(config, github, cycle, name, input) {
       track(APPROVALS_PATH);
       track(GOVERNANCE_PATH);
       if (!guard.allowed) return guard;
-      const result = await launchNativeToken(config, cycle);
+      const stateForLaunch = (() => {
+        try { return JSON.parse(readSafeTextFile(config.repoRoot, "memory/state.json")); }
+        catch { return { cycle }; }
+      })();
+      const result = await launchNativeToken(config, cycle, stateForLaunch);
       track(TREASURY_PATH);
       return result;
     }
@@ -523,7 +624,11 @@ async function executeTool(config, github, cycle, name, input) {
       track(APPROVALS_PATH);
       track(GOVERNANCE_PATH);
       if (!guard.allowed) return guard;
-      const result = await runRevenueCycle(config);
+      const stateForRevenue = (() => {
+        try { return JSON.parse(readSafeTextFile(config.repoRoot, "memory/state.json")); }
+        catch { return { cycle }; }
+      })();
+      const result = await runRevenueCycle(config, stateForRevenue);
       track(TREASURY_PATH);
       return {
         treasury: loadTreasury(config.repoRoot, config),
@@ -594,6 +699,140 @@ async function executeTool(config, github, cycle, name, input) {
       const result = await checkOwnerApproval(config, github, input.approvalId);
       track(APPROVALS_PATH);
       return result;
+    }
+
+    case "propose_buyback": {
+      const stateNow = (() => {
+        try { return JSON.parse(readSafeTextFile(config.repoRoot, "memory/state.json")); }
+        catch { return { cycle }; }
+      })();
+      const result = await proposeBuyback(config, {
+        cycle,
+        state: stateNow,
+        github
+      }, input || {});
+      track(BUYBACK_LEDGER_PATH);
+      return {
+        kind: "buyback",
+        action: "propose",
+        ok: Boolean(result.ok),
+        dryRun: Boolean(result.dryRun),
+        blocked: Boolean(result.blocked),
+        proposalIssueUrl: result.proposalIssueUrl || null,
+        proposalIssueNumber: result.proposalIssueNumber || null,
+        idem: result.idem || null,
+        idempotent: Boolean(result.idempotent),
+        status: result.status || (result.ok ? "proposed" : "blocked"),
+        reason: result.reason || null
+      };
+    }
+
+    case "execute_buyback": {
+      const stateNow = (() => {
+        try { return JSON.parse(readSafeTextFile(config.repoRoot, "memory/state.json")); }
+        catch { return { cycle }; }
+      })();
+      const result = await executeBuyback(config, {
+        cycle,
+        state: stateNow,
+        github
+      }, input || {});
+      track(BUYBACK_LEDGER_PATH);
+      return {
+        kind: "buyback",
+        action: "execute",
+        ok: Boolean(result.ok),
+        dryRun: Boolean(result.dryRun),
+        blocked: Boolean(result.blocked),
+        txHash: result.txHash || null,
+        wethSpent: result.wethSpent || null,
+        orbitReceived: result.orbitReceived || null,
+        slippageBps: result.slippageBps || null,
+        idem: result.idem || null,
+        status: result.status || (result.ok ? "executed" : "blocked"),
+        reason: result.reason || null
+      };
+    }
+
+    case "propose_merkle_anchor": {
+      const stateNow = (() => {
+        try { return JSON.parse(readSafeTextFile(config.repoRoot, "memory/state.json")); }
+        catch { return { cycle }; }
+      })();
+      const result = await proposeAnchor(config, {
+        cycle,
+        state: stateNow,
+        github
+      }, input || {});
+      track(ANCHOR_LEDGER_PATH);
+      return {
+        kind: "merkle_anchor",
+        action: "propose",
+        ok: Boolean(result.ok),
+        dryRun: Boolean(result.dryRun),
+        blocked: Boolean(result.blocked),
+        root: result.root || null,
+        leafCount: result.leafCount == null ? null : result.leafCount,
+        proposalIssueUrl: result.proposalIssueUrl || null,
+        proposalIssueNumber: result.proposalIssueNumber || null,
+        idem: result.idem || null,
+        idempotent: Boolean(result.idempotent),
+        status: result.status || (result.ok ? "proposed" : "blocked"),
+        reason: result.reason || null
+      };
+    }
+
+    case "execute_merkle_anchor": {
+      const stateNow = (() => {
+        try { return JSON.parse(readSafeTextFile(config.repoRoot, "memory/state.json")); }
+        catch { return { cycle }; }
+      })();
+      const result = await executeAnchor(config, {
+        cycle,
+        state: stateNow,
+        github
+      }, input || {});
+      track(ANCHOR_LEDGER_PATH);
+      return {
+        kind: "merkle_anchor",
+        action: "execute",
+        ok: Boolean(result.ok),
+        dryRun: Boolean(result.dryRun),
+        blocked: Boolean(result.blocked),
+        root: result.root || null,
+        leafCount: result.leafCount == null ? null : result.leafCount,
+        txHash: result.txHash || null,
+        idem: result.idem || null,
+        status: result.status || (result.ok ? "executed" : "blocked"),
+        reason: result.reason || null
+      };
+    }
+
+    case "cast_to_farcaster": {
+      const { postCycleCast, summarizeCycleForCast } = require("./farcaster");
+      const stateNow = (() => {
+        try { return JSON.parse(readSafeTextFile(config.repoRoot, "memory/state.json")); }
+        catch { return { cycle }; }
+      })();
+      const partialProof = {
+        cycle: stateNow.cycle || cycle,
+        finishedAt: new Date().toISOString(),
+        steps: [],
+        filesChanged: [...filesChanged]
+      };
+      const summary = summarizeCycleForCast(partialProof, {}, config);
+      if (input && input.templateHint) summary.templateHint = input.templateHint;
+      const result = await postCycleCast(config, summary, partialProof);
+      if (result && result.ledgerPath) track(result.ledgerPath);
+      return {
+        kind: result.kind,
+        hash: result.hash,
+        dryRun: Boolean(result.dryRun),
+        idempotent: Boolean(result.idempotent),
+        blocked: Boolean(result.blocked),
+        error: result.error || null,
+        status: result.status
+      };
     }
 
     default:

@@ -5,33 +5,33 @@ const BEHAVIOR_VERSION = 3;
 const ACTIVITY_CONTRACT = [
   {
     id: "intake",
-    title: "Household Intake",
-    description: "Read visitors at the front door, score risk, convert safe requests into chores, and route unsafe content to human review."
+    title: "Repository Intake",
+    description: "Read issues and comments at the intake surface, score risk, convert safe requests into repo work, and route unsafe content to human review."
   },
   {
     id: "conversation",
-    title: "Front Door Conversation",
+    title: "Public Intake Conversation",
     description: "Converse with visitors in public issues and comments when the reply is useful, secret-free, and does not promise spend or unlocked financial action."
   },
   {
     id: "task_execution",
-    title: "Household Work",
-    description: "Autonomously work one small chore at a time, favoring code, frontend, docs, tests, health checks, memory, templates, and low-risk maintenance."
+    title: "Repository Work",
+    description: "Autonomously work one small repo task at a time, favoring code, frontend, docs, tests, health checks, memory, templates, and low-risk maintenance."
   },
   {
     id: "memory",
-    title: "Memory And Diary",
+    title: "Memory And Receipts",
     description: "Persist stable facts, policies, decisions, lessons, and proof records while removing obsolete or unsafe memory."
   },
   {
     id: "governance",
-    title: "Household Governance",
+    title: "Permission Governance",
     description: "Classify spend and major risky movements, block external recipients, create public approval issues only for approval-class risk, and stop until owner approval is recorded."
   },
   {
     id: "treasury",
-    title: "Food, Wallet, And Budget",
-    description: "Record AI-call food usage, enforce daily and monthly budgets, keep configured refill policy, and keep token/revenue settings synchronized with household policy."
+    title: "Budget And Wallet Policy",
+    description: "Record AI-call budget usage, enforce daily and monthly budgets, keep configured refill policy, and keep token/revenue settings synchronized with wallet policy."
   },
   {
     id: "survival_market",
@@ -47,6 +47,11 @@ const ACTIVITY_CONTRACT = [
     id: "project_builder",
     title: "Open Source Project Builder",
     description: "Autonomously build repo-local prototypes, libraries, CLIs, actions, dashboards, templates, and demos before any external launch."
+  },
+  {
+    id: "infrastructure",
+    title: "Infrastructure Layer",
+    description: "Build a reusable repository control plane with identity, lifecycle, capabilities, receipts, budgets, and approval gates."
   },
   {
     id: "agent_radar",
@@ -65,7 +70,7 @@ const ACTIVITY_CONTRACT = [
   },
   {
     id: "proofs",
-    title: "Proof And Diary Trail",
+    title: "Proof Receipt Trail",
     description: "Write cycle proofs, cycle summaries, changed file lists, and commit/push only when configured."
   },
   {
@@ -100,6 +105,8 @@ const PRIORITY_ORDER = [
   "survival_backlog",
   "open_task",
   "safe_issue_triage",
+  "infrastructure_growth",
+  "wallet_policy",
   "roadmap_growth",
   "budget_review",
   "memory_review",
@@ -122,7 +129,8 @@ function issueLabels(issue) {
 function hasServiceOpportunityIssue(issues) {
   return issues.some((issue) => (
     issueLabels(issue).includes("orbit:opportunity") ||
-    String(issue && issue.title || "").toLowerCase().includes("repo safety audit")
+    String(issue && issue.title || "").toLowerCase().includes("repo safety audit") ||
+    String(issue && issue.title || "").toLowerCase().includes("orbit infrastructure")
   ));
 }
 
@@ -215,6 +223,55 @@ function normalizeRoadmap(roadmap) {
   };
 }
 
+function normalizeInfrastructure(infrastructure) {
+  if (!infrastructure || typeof infrastructure !== "object") {
+    return { summary: null, activePhase: null, nextCapability: null, nextSurface: null };
+  }
+
+  const summary = infrastructure.summary && typeof infrastructure.summary === "object"
+    ? infrastructure.summary
+    : null;
+  const capabilities = Array.isArray(infrastructure.capabilities) ? infrastructure.capabilities : [];
+  const surfaces = Array.isArray(infrastructure.surfaces) ? infrastructure.surfaces : [];
+  const activePhase = infrastructure.activePhase ||
+    (summary && summary.activePhase) ||
+    null;
+  const nextCapability = summary && summary.nextCapability
+    ? summary.nextCapability
+    : capabilities.find((capability) => ["planned", "research", "later"].includes(capability.status)) ||
+      null;
+  const nextSurface = summary && summary.nextSurface
+    ? summary.nextSurface
+    : surfaces.find((surface) => ["planned", "research", "later"].includes(surface.status)) ||
+      null;
+
+  return {
+    summary,
+    activePhase,
+    nextCapability,
+    nextSurface
+  };
+}
+
+function normalizeWallet(wallet) {
+  const source = wallet && wallet.summary ? wallet.summary : wallet;
+  if (!source || typeof source !== "object") {
+    return {
+      approvalMode: null,
+      tokenStatus: null,
+      revenueCadence: null,
+      blockedLiveActions: []
+    };
+  }
+
+  return {
+    approvalMode: source.approvalMode || null,
+    tokenStatus: source.token && source.token.launchStatus || null,
+    revenueCadence: source.revenue && source.revenue.cadence || null,
+    blockedLiveActions: Array.isArray(source.blockedLiveActions) ? source.blockedLiveActions : []
+  };
+}
+
 function shouldPursueSurvivalOpportunity(opportunities) {
   const driver = opportunities.selectedDriver;
   if (!opportunities.best || !driver) return false;
@@ -272,6 +329,7 @@ function directionFromStep(step) {
     survival_market: "earn",
     problem_lab: "explore",
     project_builder: "build",
+    infrastructure: "infrastructure",
     agent_radar: "research",
     token_operations: "prepare",
     research: "research",
@@ -310,6 +368,12 @@ function directionDecisionSignals(direction, signals = {}) {
   if (direction.kind === "roadmap_growth" || direction.kind === "roadmap_branch") {
     markers.push("roadmap_evidence_work");
   }
+  if (direction.kind === "infrastructure_growth" || direction.kind === "infrastructure_branch") {
+    markers.push("infrastructure_control_plane_work");
+  }
+  if (direction.kind === "wallet_policy" || direction.kind === "wallet_branch") {
+    markers.push("wallet_policy_work");
+  }
   if (direction.kind === "memory_review" || direction.kind === "proof_memory_cleanup") {
     markers.push("memory_or_proof_work");
   }
@@ -329,6 +393,8 @@ function scoreDirection(direction, index, signals = {}) {
     survival_backlog: 64,
     open_task: 62,
     safe_issue_triage: 60,
+    infrastructure_growth: 58,
+    wallet_policy: 57,
     roadmap_growth: 56,
     memory_review: 48,
     health_check: 42,
@@ -336,6 +402,8 @@ function scoreDirection(direction, index, signals = {}) {
     task_alternative: 36,
     learning_branch: 34,
     earning_branch: 32,
+    infrastructure_branch: 31,
+    wallet_branch: 31,
     roadmap_branch: 30,
     proof_memory_cleanup: 28,
     frontend_polish: 26
@@ -350,7 +418,17 @@ function scoreDirection(direction, index, signals = {}) {
       (!signals.safeIssues || !signals.safeIssues.length)) {
     score += 10;
   }
+  if ((direction.kind === "infrastructure_growth" || direction.kind === "wallet_policy") &&
+      (!signals.openTasks || !signals.openTasks.length) &&
+      (!signals.safeIssues || !signals.safeIssues.length)) {
+    score += 10;
+  }
   if ((direction.kind === "roadmap_growth" || direction.kind === "roadmap_branch") &&
+      ((signals.openTasks && signals.openTasks.length) || (signals.safeIssues && signals.safeIssues.length))) {
+    score -= 8;
+  }
+  if ((direction.kind === "infrastructure_growth" || direction.kind === "infrastructure_branch" ||
+      direction.kind === "wallet_policy" || direction.kind === "wallet_branch") &&
       ((signals.openTasks && signals.openTasks.length) || (signals.safeIssues && signals.safeIssues.length))) {
     score -= 8;
   }
@@ -414,6 +492,8 @@ function directionPortfolio(context, orderedSteps, signals = {}) {
   const taskTitle = signals.openTasks && signals.openTasks[0] && signals.openTasks[0].title;
   const safeIssue = signals.safeIssues && signals.safeIssues[0];
   const roadmap = signals.roadmap || {};
+  const infrastructure = signals.infrastructure || {};
+  const wallet = signals.wallet || {};
   const learningLab = signals.learningLab || {};
   const activeServiceOpportunity = signals.activeServiceOpportunity;
 
@@ -464,6 +544,26 @@ function directionPortfolio(context, orderedSteps, signals = {}) {
     ));
   }
 
+  if (infrastructure.activePhase) {
+    extras.push(fallbackDirection(
+      "infrastructure_branch",
+      "infrastructure",
+      "Improve the repository control plane",
+      "Choose a small SDK, CLI, docs, capability, adoption, receipt, lifecycle, memory, or permission artifact that makes Orbit easier for other repos and agents to use.",
+      "infrastructure_status, read_file, write_file, run_command, append_memory"
+    ));
+  }
+
+  if (wallet.approvalMode || wallet.revenueCadence || wallet.tokenStatus) {
+    extras.push(fallbackDirection(
+      "wallet_branch",
+      "treasury",
+      "Clarify wallet policy infrastructure",
+      "Improve read-only wallet policy visibility without exposing secrets, private routes, signing payloads, or live wallet authority.",
+      "wallet_status, treasury_status, read_file, write_file, append_memory"
+    ));
+  }
+
   if (learningLab.bestProblem || learningLab.bestProject) {
     extras.push(fallbackDirection(
       "learning_branch",
@@ -510,6 +610,8 @@ function planCycle(context = {}) {
   const opportunities = normalizeOpportunities(context.opportunities);
   const learningLab = normalizeLearningLab(context.learningLab);
   const roadmap = normalizeRoadmap(context.roadmap);
+  const infrastructure = normalizeInfrastructure(context.infrastructure);
+  const wallet = normalizeWallet(context.wallet || (context.infrastructure && context.infrastructure.wallet));
   const ownerBlockedTasks = openTasks.filter(taskLooksOwnerBlocked);
   const activeServiceOpportunity = hasServiceOpportunityIssue(issues);
   const steps = [];
@@ -551,6 +653,42 @@ function planCycle(context = {}) {
         "Do not mark a phase passed without proof."
       ].filter(Boolean).join(" "),
       "roadmap_status, read_file, write_file, run_command, append_task, append_memory"
+    ));
+  }
+
+  if (!riskyIssues.length && !approvals.length && infrastructure.activePhase) {
+    const phase = infrastructure.activePhase;
+    const nextCapability = infrastructure.nextCapability;
+    const nextSurface = infrastructure.nextSurface;
+    steps.push(makeStep(
+      "infrastructure_growth",
+      "infrastructure",
+      `Advance infrastructure phase: ${phase.name || phase.id || "control plane"}`,
+      [
+        phase.status ? `Phase status: ${phase.status}.` : "",
+        phase.goal ? `Goal: ${phase.goal}` : "Make Orbit easier for other repos and agents to adopt.",
+        nextCapability ? `Next capability: ${nextCapability.name || nextCapability.id}.` : "",
+        nextSurface ? `Next surface: ${nextSurface.name || nextSurface.id}.` : "",
+        "Prefer SDK, CLI, docs, lifecycle, memory, proof receipts, permissions, or adoption artifacts.",
+        "Do not unlock live signing, external spend, token movement, or cross-agent execution."
+      ].filter(Boolean).join(" "),
+      "infrastructure_status, read_file, write_file, run_command, append_task, append_memory"
+    ));
+  }
+
+  if (!riskyIssues.length && !approvals.length && (wallet.approvalMode || wallet.revenueCadence || wallet.tokenStatus)) {
+    steps.push(makeStep(
+      "wallet_policy",
+      "treasury",
+      "Refresh wallet policy infrastructure",
+      [
+        wallet.approvalMode ? `Approval mode: ${wallet.approvalMode}.` : "",
+        wallet.revenueCadence ? `Revenue cadence: ${wallet.revenueCadence}.` : "",
+        wallet.tokenStatus ? `Token status: ${wallet.tokenStatus}.` : "",
+        wallet.blockedLiveActions.length ? `Blocked live actions: ${wallet.blockedLiveActions.join(", ")}.` : "",
+        "Improve read-only wallet policy, approval, revenue, or token visibility without exposing private routes or signing authority."
+      ].filter(Boolean).join(" "),
+      "wallet_status, treasury_status, read_file, write_file, append_memory"
     ));
   }
 
@@ -673,8 +811,8 @@ function planCycle(context = {}) {
 
   return {
     version: BEHAVIOR_VERSION,
-    mode: "virtual_human_household",
-    primaryObjective: "Live inside GitHub as a careful household whose members learn, earn, maintain the code and frontend, scout broad real-world problems, build open-source prototypes, ration AI-call food, advance the evidence-backed roadmap, and leave a proof trail. Routine repo work and repo-local prototypes are autonomous; wallet spending, signing, token movement, payout-route changes, outreach, publishing with obligations, and major risky external moves require owner approval. A quiet heartbeat must still create safe forward motion when income, problem discovery, project building, roadmap growth, or household work is unresolved. When no urgent safety, approval, or budget blocker exists, think across multiple safe directions before choosing one small action.",
+    mode: "virtual_repo_control_plane",
+    primaryObjective: "Operate inside GitHub as a careful repository control plane whose modules learn, earn, maintain the code and frontend, scout broad real-world problems, build open-source prototypes, ration AI-call budget, advance the evidence-backed roadmap, and leave a proof trail. Routine repo work and repo-local prototypes are autonomous; wallet spending, signing, token movement, payout-route changes, outreach, publishing with obligations, and major risky external moves require owner approval. A quiet heartbeat must still create safe forward motion when income, problem discovery, project building, roadmap growth, or repository work is unresolved. When no urgent safety, approval, or budget blocker exists, think across multiple safe directions before choosing one small action.",
     activities: ACTIVITY_CONTRACT,
     hardLimits: HARD_LIMITS,
     priorityOrder: PRIORITY_ORDER,
@@ -684,6 +822,8 @@ function planCycle(context = {}) {
       openTasks,
       safeIssues,
       roadmap,
+      infrastructure,
+      wallet,
       learningLab,
       activeServiceOpportunity
     }),
@@ -695,7 +835,7 @@ function behaviorStatus(context = {}) {
   return {
     contract: {
       version: BEHAVIOR_VERSION,
-      mode: "virtual_human_household",
+      mode: "virtual_repo_control_plane",
       activities: ACTIVITY_CONTRACT,
       hardLimits: HARD_LIMITS,
       priorityOrder: PRIORITY_ORDER

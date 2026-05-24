@@ -2,7 +2,7 @@ import { Wallet } from 'lucide-react';
 
 const rows = [
   ['Daily cap', '$5.00', 'AI-call spend limit'],
-  ['Monthly cap', '$100.00', 'Household food budget'],
+  ['Monthly cap', '$100.00', 'AI-call budget'],
   ['AI routes', 'Private', 'Configured route order'],
   ['AI buys', 'Gated', 'Owner-approved credits'],
   ['Revenue', 'Weekly', 'Performance-gated'],
