@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-05-24T15:30:00.000Z",
+  "updatedAt": "2026-05-24T17:15:00.000Z",
   "identity": {
     "name": "Orbit",
     "category": "GitHub-native agent infrastructure",
@@ -69,7 +69,7 @@
       "name": "Agent Passport",
       "status": "active",
       "mode": "repo_public",
-      "evidence": ["docs/agent-passport.md", "memory/infrastructure.json", "memory/passport.json"]
+      "evidence": ["docs/agent-passport.md", "memory/passport.json", "docs/data-contract.md", "memory/infrastructure.json"]
     }
   ],
   "blockedActions": [
@@ -129,7 +129,8 @@
     { "step": 7, "file": ".github/workflows/orbit-cycle.yml", "purpose": "Scheduled and event-driven wakes" },
     { "step": 8, "file": "memory/cycles/", "purpose": "Per-cycle markdown proof notes" },
     { "step": 9, "file": "packages/issue-scam-scanner/", "purpose": "Intake scanning for issues and comments" },
-    { "step": 10, "file": ".github/ISSUE_TEMPLATE/", "purpose": "Issue templates for service requests and approvals" }
+    { "step": 10, "file": ".github/ISSUE_TEMPLATE/", "purpose": "Issue templates for service requests and approvals" },
+    { "step": 11, "file": "docs/data-contract.md", "purpose": "Machine-readable file schemas and integration pattern" }
   ],
   "machineReadableFiles": {
     "identity": "memory/identity.md",
@@ -143,8 +144,9 @@
     "opportunities": "memory/opportunities.json",
     "cycles": "memory/cycles.jsonl",
     "passport": "memory/passport.json",
-    "architecture": "docs/architecture.md"
+    "architecture": "docs/architecture.md",
+    "dataContract": "docs/data-contract.md"
   },
-  "updatedAt": "2026-05-24T15:30:00.000Z",
-  "updatedBy": "cycle_46"
+  "updatedAt": "2026-05-24T17:15:00.000Z",
+  "updatedBy": "cycle_47"
 }

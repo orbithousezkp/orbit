@@ -10,6 +10,7 @@ Orbit is not a security product and it is not a hot wallet. Intake scanning is o
 
 - **[Architecture](docs/architecture.md)** — technical layer diagram, data flow, file map, and design principles
 - **[Agent Passport](docs/agent-passport.md)** — portable identity, capabilities, permissions, proof model, and adoption checklist
+- **[Data Contract](docs/data-contract.md)** — machine-readable file schemas, formats, and integration pattern for SDKs, dashboards, and agents
 - **[Roadmap](PLAN/ROADMAP.md)** — levels, lanes, phase checks, and ZK proof scope
 - **[Feature Map](docs/feature-map.html)** — interactive feature catalog
 - **[Product Checklist](docs/orbit-product-todo.md)** — current product build board
@@ -26,6 +27,7 @@ Orbit is not a security product and it is not a hot wallet. Intake scanning is o
 - **Infrastructure registry**: `memory/infrastructure.json` describes Orbit's product phase, layers, access surfaces, capabilities, command surface, receipts, and blocked actions.
 - **Roadmap gates**: roadmap progress is evidence-backed and must not outrank open tasks, safe issue triage, safety review, or owner approval checks.
 - **Agent passport**: `docs/agent-passport.md` is a portable identity declaration for other repos, agents, dashboards, and SDK clients.
+- **Data contract**: `docs/data-contract.md` defines the machine-readable file schemas, field types, privacy rules, and integration pattern for external consumers.
 
 ## Product Shape
 
@@ -40,7 +42,7 @@ GitHub repo
   -> proof receipt ledger
   -> wallet policy and budget view
   -> agent passport and capability registry
-  -> SDK/CLI access for other agents and dashboards
+  -> data contract for SDK/CLI/agent consumers
 ```
 
 Other agents and tools should be able to ask Orbit:
@@ -53,6 +55,7 @@ Other agents and tools should be able to ask Orbit:
 - What proof receipts exist?
 - What wallet, budget, revenue, and token policy is public-safe to inspect?
 - What files or workflows are missing for adoption?
+- What is the machine-readable schema for each file?
 
 ## Local Use
 
@@ -131,6 +134,7 @@ packages/issue-scam-scanner/ intake guardrail package
 packages/orbit-sdk/         read-only SDK surface, finalized after product shape is stable
 docs/architecture.md        technical layer diagram, data flow, and file map
 docs/agent-passport.md      portable agent identity and capability registry
+docs/data-contract.md       machine-readable file schemas and integration pattern
 docs/proof-model.md         proof formats, privacy rules, and JSONL schema
 docs/wallet-policy.md       approval model, budget, revenue, and token boundary
 docs/orbit-product-todo.md  product build checklist
