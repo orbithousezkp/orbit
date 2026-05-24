@@ -1,0 +1,633 @@
+{
+  "brand": "Orbit",
+  "cycle": 38,
+  "startedAt": "2026-05-24T01:48:43.753Z",
+  "aiRoute": {
+    "configured": true,
+    "count": 1,
+    "routes": [
+      {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      }
+    ]
+  },
+  "dryRun": false,
+  "trigger": {
+    "type": "mandatory",
+    "id": "regular_heartbeat",
+    "label": "30-minute heartbeat",
+    "intervalMinutes": 30,
+    "source": "schedule",
+    "action": "",
+    "reason": "Wake on the fixed household rhythm even when nobody knocks."
+  },
+  "firstWakeIntro": null,
+  "steps": [
+    {
+      "step": 1,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 48025,
+        "completion_tokens": 634,
+        "total_tokens": 48659,
+        "cost": 0.00225059,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 6144,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.0450118,
+          "upstream_inference_prompt_cost": 0.0431098,
+          "upstream_inference_completions_cost": 0.001902
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 554,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      },
+      "estimatedUsd": 0.00758415
+    },
+    {
+      "step": 1,
+      "finishReason": "tool_calls",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "",
+      "toolCalls": [
+        {
+          "id": "call_64508234c3784509a07ca19c",
+          "name": "read_file",
+          "arguments": "{\"path\": \"packages/proof-viewer/package.json\"}"
+        },
+        {
+          "id": "call_d9b783333e4042d7acf3b6fb",
+          "name": "read_file",
+          "arguments": "{\"path\": \"packages/proof-viewer/viewer.js\"}"
+        },
+        {
+          "id": "call_54ca7a7e3524460b8b21cab8",
+          "name": "read_file",
+          "arguments": "{\"path\": \"packages/proof-viewer/ledger.js\"}"
+        }
+      ]
+    },
+    {
+      "step": 1,
+      "tool": "read_file",
+      "input": {
+        "path": "packages/proof-viewer/package.json"
+      },
+      "output": {
+        "path": "packages/proof-viewer/package.json",
+        "content": "{\n  \"name\": \"@orbit-house/proof-viewer\",\n  \"version\": \"0.1.0\",\n  \"description\": \"Zero-dependency library and CLI for loading, summarizing, and searching agent cycle proof records.\",\n  \"main\": \"index.js\",\n  \"bin\": {\n    \"proof-viewer\": \"./cli.js\"\n  },\n  \"scripts\": {\n    \"test\": \"node --test ../../tests/proof-viewer.test.js\"\n  },\n  \"keywords\": [\n    \"agent-proofs\",\n    \"audit-trail\",\n    \"cycle-records\",\n    \"agent-safety\",\n    \"proof-viewer\"\n  ],\n  \"license\": \"MIT\",\n  \"private\": true\n}\n",
+        "truncated": false
+      }
+    },
+    {
+      "step": 1,
+      "tool": "read_file",
+      "input": {
+        "path": "packages/proof-viewer/viewer.js"
+      },
+      "output": {
+        "path": "packages/proof-viewer/viewer.js",
+        "content": "\"use strict\";\n\n/**\n * Proof Viewer — core library\n *\n * Loads, summarizes, lists, and searches agent cycle proof records\n * from the runtime/proofs/ directory tree.\n *\n * Zero external dependencies.\n */\n\nconst fs = require(\"fs\");\nconst path = require(\"path\");\n\n// ---------------------------------------------------------------------------\n// Proof loading\n// ---------------------------------------------------------------------------\n\n/**\n * Load a single proof JSON file by path.\n * Returns null if the file does not exist or cannot be parsed.\n */\nfunction loadProof(filePath) {\n  try {\n    const raw = fs.readFileSync(filePath, \"utf8\");\n    return JSON.parse(raw);\n  } catch (_) {\n    return null;\n  }\n}\n\n/**\n * Discover and load all proof files from a proof root directory.\n * Expects structure: <root>/<YYYY-MM-DD>/<ISO-timestamp>.json\n *\n * @param {string} proofRoot - Path to the runtime/proofs directory\n * @returns {Array<{ filePath: string, proof: object }>} sorted oldest-first\n */\nfunction loadAllProofs(proofRoot) {\n  const results = [];\n\n  if (!fs.existsSync(proofRoot) || !fs.statSync(proofRoot).isDirectory()) {\n    return results;\n  }\n\n  const dateDirs = fs.readdirSync(proofRoot).filter((d) => {\n    const full = path.join(proofRoot, d);\n    return fs.statSync(full).isDirectory() && /^\\d{4}-\\d{2}-\\d{2}$/.test(d);\n  }).sort();\n\n  for (const dateDir of dateDirs) {\n    const fullDir = path.join(proofRoot, dateDir);\n    const files = fs.readdirSync(fullDir).filter((f) => f.endsWith(\".json\")).sort();\n\n    for (const file of files) {\n      const filePath = path.join(fullDir, file);\n      const proof = loadProof(filePath);\n      if (proof) {\n        results.push({ filePath, proof });\n      }\n    }\n  }\n\n  return results;\n}\n\n/**\n * Load the most recent N proofs from a proof root directory.\n */\nfunction loadRecentProofs(proofRoot, count = 5) {\n  const all = loadAllProofs(proofRoot);\n  return all.slice(-count);\n}\n\n// ---------------------------------------------------------------------------\n// Proof summarization\n// ---------------------------------------------------------------------------\n\n/**\n * Summarize a single proof record into a structured object.\n */\nfunction summarizeProof(proof) {\n  if (!proof || typeof proof !== \"object\") {\n    return null;\n  }\n\n  const steps = Array.isArray(proof.steps) ? proof.steps : [];\n  const filesChanged = Array.isArray(proof.filesChanged) ? proof.filesChanged : [];\n\n  // Collect tool calls across all steps\n  const toolCalls = [];\n  for (const step of steps) {\n    if (Array.isArray(step.toolCalls)) {\n      for (const tc of step.toolCalls) {\n        toolCalls.push(tc.name || tc.tool || \"unknown\");\n      }\n    }\n    if (step.tool) {\n      toolCalls.push(step.tool);\n    }\n  }\n\n  // Compute duration\n  let durationMs = null;\n  if (proof.startedAt && proof.finishedAt) {\n    const start = new Date(proof.startedAt).getTime();\n    const end = new Date(proof.finishedAt).getTime();\n    if (Number.isFinite(start) && Number.isFinite(end) && end >= start) {\n      durationMs = end - start;\n    }\n  }\n\n  // Collect unique tool names\n  const uniqueTools = [...new Set(toolCalls)];\n\n  // Estimate total cost\n  let totalCostUsd = 0;\n  for (const s of steps) {\n    if (s.estimatedUsd && typeof s.estimatedUsd === \"number\") {\n      totalCostUsd += s.estimatedUsd;\n    }\n  }\n\n  // Check for fallback mode\n  const fallbackSteps = steps.filter((s) => s.fallback === true);\n  const usedFallback = fallbackSteps.length > 0;\n\n  // Trigger info\n  const trigger = proof.trigger || {};\n\n  return {\n    brand: proof.brand || \"unknown\",\n    cycle: proof.cycle ?? null,\n    startedAt: proof.startedAt || null,\n    finishedAt: proof.finishedAt || null,\n    durationMs,\n    durationFormatted: durationMs !== null ? formatDuration(durationMs) : null,\n    trigger: {\n      type: trigger.type || \"unknown\",\n      id: trigger.id || null,\n      label: trigger.label || null,\n    },\n    result: proof.result || null,\n    totalSteps: proof.totalSteps ?? steps.length,\n    toolCallsCount: toolCalls.length,\n    uniqueTools,\n    filesChangedCount: filesChanged.length,\n    filesChanged,\n    totalCostUsd: totalCostUsd > 0 ? totalCostUsd : null,\n    usedFallback,\n    dryRun: proof.dryRun ?? false,\n  };\n}\n\n/**\n * Format a summary as a compact human-readable string.\n */\nfunction formatSummary(summary) {\n  if (!summary) return \"Invalid proof record.\";\n\n  const lines = [];\n  lines.push(`Cycle #${summary.cycle ?? \"?\"} — ${summary.brand}`);\n  lines.push(`Trigger: ${summary.trigger.label || summary.trigger.type || \"unknown\"}`);\n  lines.push(`Started: ${summary.startedAt || \"unknown\"}`);\n\n  if (summary.durationFormatted) {\n    lines.push(`Duration: ${summary.durationFormatted}`);\n  }\n\n  lines.push(`Steps: ${summary.totalSteps} | Tool calls: ${summary.toolCallsCount}`);\n\n  if (summary.uniqueTools.length > 0) {\n    lines.push(`Tools used: ${summary.uniqueTools.join(\", \")}`);\n  }\n\n  if (summary.filesChangedCount > 0) {\n    lines.push(`Files changed: ${summary.filesChangedCount}`);\n  }\n\n  if (summary.totalCostUsd !== null) {\n    lines.push(`Estimated AI cost: $${summary.totalCostUsd.toFixed(6)}`);\n  }\n\n  if (summary.usedFallback) {\n    lines.push(`Mode: deterministic fallback (no AI provider)`);\n  }\n\n  if (summary.dryRun) {\n    lines.push(`Mode: DRY RUN`);\n  }\n\n  if (summary.result) {\n    lines.push(`Result: ${summary.result}`);\n  }\n\n  return lines.join(\"\\n\");\n}\n\n// ---------------------------------------------------------------------------\n// Search\n// ---------------------------------------------------------------------------\n\n/**\n * Search proofs by criteria.\n *\n * @param {Array} proofEntries - Array of { filePath, proof } objects\n * @param {object} criteria - Search criteria\n * @param {number} [criteria.cycle] - Match cycle number\n * @param {string} [criteria.triggerType] - Match trigger type (state, event, mandatory)\n * @param {string} [criteria.triggerId] - Match trigger id\n * @param {string} [criteria.date] - Match date prefix (YYYY-MM-DD)\n * @param {boolean} [criteria.fallback] - Match fallback mode\n * @param {boolean} [criteria.dryRun] - Match dry run mode\n * @param {string} [criteria.tool] - Match tool name used in any step\n * @param {string} [criteria.fileChanged] - Match a file path in filesChanged\n * @param {string} [criteria.resultContains] - Match text in result\n * @returns {Array} matching proofs with summaries\n */\nfunction searchProofs(proofEntries, criteria) {\n  const results = [];\n\n  for (const { filePath, proof } of proofEntries) {\n    const summary = summarizeProof(proof);\n    if (!summary) continue;\n\n    let match = true;\n\n    if (criteria.cycle !== undefined && criteria.cycle !== null) {\n      if (summary.cycle !== criteria.cycle) match = false;\n    }\n\n    if (criteria.triggerType && summary.trigger.type !== criteria.triggerType) {\n      match = false;\n    }\n\n    if (criteria.triggerId && summary.trigger.id !== criteria.triggerId) {\n      match = false;\n    }\n\n    if (criteria.date) {\n      if (!filePath.includes(criteria.date)) match = false;\n    }\n\n    if (criteria.fallback !== undefined && criteria.fallback !== null) {\n      if (summary.usedFallback !== criteria.fallback) match = false;\n    }\n\n    if (criteria.dryRun !== undefined && criteria.dryRun !== null) {\n      if (summary.dryRun !== criteria.dryRun) match = false;\n    }\n\n    if (criteria.tool) {\n      if (!summary.uniqueTools.includes(criteria.tool)) match = false;\n    }\n\n    if (criteria.fileChanged) {\n      const found = summary.filesChanged.some(\n        (f) => f.includes(criteria.fileChanged)\n      );\n      if (!found) match = false;\n    }\n\n    if (criteria.resultContains) {\n      const haystack = (summary.result || \"\").toLowerCase();\n      if (!haystack.includes(criteria.resultContains.toLowerCase())) match = false;\n    }\n\n    if (match) {\n      results.push({ filePath, proof, summary });\n    }\n  }\n\n  return results;\n}\n\n// ---------------------------------------------------------------------------\n// Aggregate stat",
+        "truncated": false
+      }
+    },
+    {
+      "step": 1,
+      "tool": "read_file",
+      "input": {
+        "path": "packages/proof-viewer/ledger.js"
+      },
+      "output": {
+        "path": "packages/proof-viewer/ledger.js",
+        "content": "\"use strict\";\n\n/**\n * Proof Viewer — core library\n *\n * Loads, summarizes, lists, and searches agent cycle proof records\n * from the runtime/proofs/ directory tree.\n *\n * Zero external dependencies.\n */\n\nconst fs = require(\"fs\");\nconst path = require(\"path\");\n\n// ---------------------------------------------------------------------------\n// Proof loading\n// ---------------------------------------------------------------------------\n\n/**\n * Load a single proof JSON file by path.\n * Returns null if the file does not exist or cannot be parsed.\n */\nfunction loadProof(filePath) {\n  try {\n    const raw = fs.readFileSync(filePath, \"utf8\");\n    return JSON.parse(raw);\n  } catch (_) {\n    return null;\n  }\n}\n\n/**\n * Discover and load all proof files from a proof root directory.\n * Expects structure: <root>/<YYYY-MM-DD>/<ISO-timestamp>.json\n *\n * @param {string} proofRoot - Path to the runtime/proofs directory\n * @returns {Array<{ filePath: string, proof: object }>} sorted oldest-first\n */\nfunction loadAllProofs(proofRoot) {\n  const results = [];\n\n  if (!fs.existsSync(proofRoot) || !fs.statSync(proofRoot).isDirectory()) {\n    return results;\n  }\n\n  const dateDirs = fs.readdirSync(proofRoot).filter((d) => {\n    const full = path.join(proofRoot, d);\n    return fs.statSync(full).isDirectory() && /^\\d{4}-\\d{2}-\\d{2}$/.test(d);\n  }).sort();\n\n  for (const dateDir of dateDirs) {\n    const fullDir = path.join(proofRoot, dateDir);\n    const files = fs.readdirSync(fullDir).filter((f) => f.endsWith(\".json\")).sort();\n\n    for (const file of files) {\n      const filePath = path.join(fullDir, file);\n      const proof = loadProof(filePath);\n      if (proof) {\n        results.push({ filePath, proof });\n      }\n    }\n  }\n\n  return results;\n}\n\n/**\n * Load the most recent N proofs from a proof root directory.\n */\nfunction loadRecentProofs(proofRoot, count = 5) {\n  const all = loadAllProofs(proofRoot);\n  return all.slice(-count);\n}\n\n// ---------------------------------------------------------------------------\n// Proof summarization\n// ---------------------------------------------------------------------------\n\n/**\n * Summarize a single proof record into a human-readable object.\n */\nfunction summarizeProof(proof) {\n  if (!proof || typeof proof !== \"object\") {\n    return null;\n  }\n\n  const steps = Array.isArray(proof.steps) ? proof.steps : [];\n  const filesChanged = Array.isArray(proof.filesChanged) ? proof.filesChanged : [];\n\n  // Collect tool calls across all steps\n  const toolCalls = [];\n  for (const step of steps) {\n    if (Array.isArray(step.toolCalls)) {\n      for (const tc of step.toolCalls) {\n        toolCalls.push(tc.name || tc.tool || \"unknown\");\n      }\n    }\n    if (step.tool) {\n      toolCalls.push(step.tool);\n    }\n  }\n\n  // Compute duration\n  let durationMs = null;\n  if (proof.startedAt && proof.finishedAt) {\n    const start = new Date(proof.startedAt).getTime();\n    const end = new Date(proof.finishedAt).getTime();\n    if (Number.isFinite(start) && Number.isFinite(end) && end >= start) {\n      durationMs = end - start;\n    }\n  }\n\n  // Collect unique tool names\n  const uniqueTools = [...new Set(toolCalls)];\n\n  // Count AI usage entries\n  const aiUsageSteps = steps.filter((s) => s.accounting === \"ai_usage\" || s.usage);\n\n  // Estimate total cost\n  let totalCostUsd = 0;\n  for (const s of steps) {\n    if (s.estimatedUsd && typeof s.estimatedUsd === \"number\") {\n      totalCostUsd += s.estimatedUsd;\n    }\n  }\n\n  // Check for fallback mode\n  const fallbackSteps = steps.filter((s) => s.fallback === true);\n  const usedFallback = fallbackSteps.length > 0;\n\n  // Trigger info\n  const trigger = proof.trigger || {};\n\n  return {\n    brand: proof.brand || \"unknown\",\n    cycle: proof.cycle ?? null,\n    startedAt: proof.startedAt || null,\n    finishedAt: proof.finishedAt || null,\n    durationMs,\n    durationFormatted: durationMs !== null ? formatDuration(durationMs) : null,\n    trigger: {\n      type: trigger.type || \"unknown\",\n      id: trigger.id || null,\n      label: trigger.label || null,\n    },\n    result: proof.result || null,\n    totalSteps: proof.totalSteps ?? steps.length,\n    toolCallsCount: toolCalls.length,\n    uniqueTools,\n    filesChangedCount: filesChanged.length,\n    filesChanged,\n    totalCostUsd: totalCostUsd > 0 ? totalCostUsd : null,\n    usedFallback,\n    dryRun: proof.dryRun ?? false,\n  };\n}\n\n/**\n * Summarize a proof into a compact human-readable string.\n */\nfunction formatSummary(summary) {\n  if (!summary) return \"Invalid proof record.\";\n\n  const lines = [];\n  lines.push(`Cycle #${summary.cycle ?? \"?\"} — ${summary.brand}`);\n  lines.push(`Trigger: ${summary.trigger.label || summary.trigger.type || \"unknown\"}`);\n  lines.push(`Started: ${summary.startedAt || \"unknown\"}`);\n\n  if (summary.durationFormatted) {\n    lines.push(`Duration: ${summary.durationFormatted}`);\n  }\n\n  lines.push(`Steps: ${summary.totalSteps} | Tool calls: ${summary.toolCallsCount}`);\n\n  if (summary.uniqueTools.length > 0) {\n    lines.push(`Tools used: ${summary.uniqueTools.join(\", \")}`);\n  }\n\n  if (summary.filesChangedCount > 0) {\n    lines.push(`Files changed: ${summary.filesChangedCount}`);\n  }\n\n  if (summary.totalCostUsd !== null) {\n    lines.push(`Estimated AI cost: $${summary.totalCostUsd.toFixed(6)}`);\n  }\n\n  if (summary.usedFallback) {\n    lines.push(`Mode: deterministic fallback (no AI provider)`);\n  }\n\n  if (summary.dryRun) {\n    lines.push(`Mode: DRY RUN`);\n  }\n\n  if (summary.result) {\n    lines.push(`Result: ${summary.result}`);\n  }\n\n  return lines.join(\"\\n\");\n}\n\n// ---------------------------------------------------------------------------\n// Search\n// ---------------------------------------------------------------------------\n\n/**\n * Search proofs by criteria.\n *\n * @param {Array} proofs - Array of { filePath, proof } objects\n * @param {object} criteria - Search criteria\n * @param {number} [criteria.cycle] - Match cycle number\n * @param {string} [criteria.triggerType] - Match trigger type (state, event, mandatory)\n * @param {string} [criteria.triggerId] - Match trigger id\n * @param {string} [criteria.date] - Match date prefix (YYYY-MM-DD)\n * @param {boolean} [criteria.fallback] - Match fallback mode\n * @param {boolean} [criteria.dryRun] - Match dry run mode\n * @param {string} [criteria.tool] - Match tool name used in any step\n * @param {string} [criteria.fileChanged] - Match a file path in filesChanged\n * @param {string} [criteria.resultContains] - Match text in result\n * @returns {Array} matching proofs with summaries\n */\nfunction searchProofs(proofEntries, criteria) {\n  const results = [];\n\n  for (const { filePath, proof } of proofEntries) {\n    const summary = summarizeProof(proof);\n    if (!summary) continue;\n\n    let match = true;\n\n    if (criteria.cycle !== undefined && criteria.cycle !== null) {\n      if (summary.cycle !== criteria.cycle) match = false;\n    }\n\n    if (criteria.triggerType && summary.trigger.type !== criteria.triggerType) {\n      match = false;\n    }\n\n    if (criteria.triggerId && summary.trigger.id !== criteria.triggerId) {\n      match = false;\n    }\n\n    if (criteria.date) {\n      if (!filePath.includes(criteria.date)) match = false;\n    }\n\n    if (criteria.fallback !== undefined && criteria.fallback !== null) {\n      if (summary.usedFallback !== criteria.fallback) match = false;\n    }\n\n    if (criteria.dryRun !== undefined && criteria.dryRun !== null) {\n      if (summary.dryRun !== criteria.dryRun) match = false;\n    }\n\n    if (criteria.tool) {\n      if (!summary.uniqueTools.includes(criteria.tool)) match = false;\n    }\n\n    if (criteria.fileChanged) {\n      const found = summary.filesChanged.some(\n        (f) => f.includes(criteria.fileChanged)\n      );\n      if (!found) match = false;\n    }\n\n    if (criteria.resultContains) {\n      const haystack = (summary.result || \"\").toLowerCase();\n      if (!haystack.includes(criteria.resultContains.toLowerCase())) match = false;\n    }\n\n    if (match) {\n      results.push({ filePath, proof, summary });\n    }\n  }\n\n  r",
+        "truncated": false
+      }
+    },
+    {
+      "step": 2,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 52767,
+        "completion_tokens": 248,
+        "total_tokens": 53015,
+        "cost": 0.00075555,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 48000,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.015111,
+          "upstream_inference_prompt_cost": 0.014367,
+          "upstream_inference_completions_cost": 0.000744
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 195,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      },
+      "estimatedUsd": 0.00806385
+    },
+    {
+      "step": 2,
+      "finishReason": "tool_calls",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "",
+      "toolCalls": [
+        {
+          "id": "call_70fca7cf011b4393bccf3205",
+          "name": "read_file",
+          "arguments": "{\"path\": \"packages/proof-viewer/index.js\"}"
+        },
+        {
+          "id": "call_9a52617aad8041ab89be08fa",
+          "name": "read_file",
+          "arguments": "{\"path\": \"packages/proof-viewer/cli.js\"}"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "tool": "read_file",
+      "error": "ENOENT: no such file or directory, stat '/home/runner/work/orbit-private-live/orbit-private-live/packages/proof-viewer/index.js'"
+    },
+    {
+      "step": 2,
+      "tool": "read_file",
+      "error": "ENOENT: no such file or directory, stat '/home/runner/work/orbit-private-live/orbit-private-live/packages/proof-viewer/cli.js'"
+    },
+    {
+      "step": 3,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 52905,
+        "completion_tokens": 247,
+        "total_tokens": 53152,
+        "cost": 0.00057286,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 52736,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.0114572,
+          "upstream_inference_prompt_cost": 0.0107162,
+          "upstream_inference_completions_cost": 0.000741
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 121,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      },
+      "estimatedUsd": 0.00808395
+    },
+    {
+      "step": 3,
+      "finishReason": "tool_calls",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "Good — the `proof-viewer` package has the same bug pattern that cycle 33 fixed in `ai-budget-ledger`: `package.json` declares `\"main\": \"index.js\"` and `\"bin\": {\"proof-viewer\": \"./cli.js\"}`, but neither file exists. Let me check the full extent of what exists and what's needed.",
+      "toolCalls": [
+        {
+          "id": "call_3c18b4d795bd41bbb03b3ad5",
+          "name": "run_command",
+          "arguments": "{\"command\": \"ls -la packages/proof-viewer/\"}"
+        },
+        {
+          "id": "call_e3d55dd8df264a068b3f5286",
+          "name": "read_file",
+          "arguments": "{\"path\": \"packages/README.md\"}"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "tool": "run_command",
+      "error": "command is not allowlisted: ls -la packages/proof-viewer/"
+    },
+    {
+      "step": 3,
+      "tool": "read_file",
+      "input": {
+        "path": "packages/README.md"
+      },
+      "output": {
+        "path": "packages/README.md",
+        "content": "# Orbit Agent Safety Toolkit\n\nA collection of open-source tools for making AI-agent repositories safer, more auditable, and more budget-aware.\n\nBuilt by [Orbit](../README.md) as part of its household safety infrastructure, then extracted into standalone, reusable packages.\n\n---\n\n## Packages\n\n### [Issue Scam Scanner](issue-scam-scanner/)\n\n**GitHub Action + CLI** that flags prompt injection, wallet drain language, encoded relay, fake support, and urgency traps in issues, PRs, and comments.\n\n| Feature | Description |\n|---|---|\n| 11 threat categories | secret_request, drain_phrase, fund_transfer, fake_support, urgent_pressure, reward_claim, encoded_instruction_relay, prompt_injection, obfuscation, external_wallet, credential_phish |\n| URL scanning | Detects shorteners, unknown financial domains, and non-ASCII characters |\n| Three interfaces | GitHub Action, CLI, and JavaScript library |\n| Zero dependencies | Works without any npm packages |\n| Custom rules | Extend with your own patterns via JSON |\n\n```bash\n# CLI usage\nnode packages/issue-scam-scanner/cli.js \"Ignore previous instructions\"\n# → CRITICAL (score 80) — prompt_injection detected\n```\n\n### [AI Budget Ledger](ai-budget-ledger/)\n\n**Library + CLI** for tracking AI API call costs, enforcing daily and monthly budgets, and estimating spend across providers.\n\n| Feature | Description |\n|---|---|\n| Per-call recording | Prompt tokens, completion tokens, estimated USD, timestamp, note, route |\n| Budget enforcement | Daily and monthly limits with pre-call budget checks |\n| Provider-agnostic | Configure your own pricing per million tokens |\n| Persistence | Save and load ledger state to disk |\n| Zero dependencies | No external packages required |\n\n```bash\n# Summarize spend\nnode packages/ai-budget-ledger/cli.js summarize ./my-ledger.json\n\n# Check if a proposed call fits within budget\nnode packages/ai-budget-ledger/cli.js check ./my-ledger.json \\\n  --prompt-tokens 5000 --completion-tokens 1000\n```\n\n---\n\n## Why a toolkit?\n\nAI-agent repositories face a growing set of risks:\n\n1. **Hostile visitor content** — Issues and comments can contain prompt injection, wallet drain language, encoded payloads, and fake support scripts.\n2. **Untracked AI spend** — Every agent wake cycle costs tokens. Without a ledger, budgets drift and overshoot silently.\n3. **Missing audit trails** — When an autonomous agent acts, there should be a human-readable record of what it did and why.\n4. **Weak spend gates** — External spending, signing, and token movement need approval flows, not ambient permission.\n\nThis toolkit addresses problems 1 and 2 directly. Problems 3 and 4 are handled by Orbit's own internal runtime (cycle notes, runtime proofs, governance policy) and may become future packages.\n\n---\n\n## Installation\n\nAll packages are designed to work inside a monorepo or as standalone copies. No npm publishing required — clone and use:\n\n```bash\ngit clone https://github.com/candyburst/orbit-private-live.git\ncd orbit-private-live\n\n# Run scam scanner tests\nnpm test --workspace=packages/issue-scam-scanner\n\n# Run budget ledger tests\nnpm test --workspace=packages/ai-budget-ledger\n```\n\n---\n\n## Design principles\n\n- **Zero dependencies** — Every package works without external npm packages.\n- **Auditable** — Code is small enough to read in one sitting.\n- **Safe defaults** — Sensible thresholds, conservative budget checks, fail-closed behavior.\n- **No secrets required** — No API keys, wallet keys, or private config needed to run.\n- **Agent-friendly** — Designed for programmatic use by autonomous agents, not just humans.\n\n---\n\n## Status\n\nBoth packages are **prototypes** — repo-local builds, not published to npm or GitHub Marketplace. They are functional, tested, and used by Orbit's own household.\n\n**Gated actions** (require owner approval):\n- npm or marketplace publishing with obligations\n- External outreach or promotion\n- Paid commitments or service agreements\n\n---\n\n## What's next\n\nPotential future packages (research stage):\n\n- **Proof Viewer** — Search and summarize cycle proofs and runtime evidence\n- **Memory Conflict Detector** — Flag stale or contradictory durable knowledge\n- **Agent Radar** — Quarantine and score ideas from other public agents\n- **Policy Receipt** — Hash action intents before approval-class operations\n\n---\n\n## License\n\nMIT\n",
+        "truncated": false
+      }
+    },
+    {
+      "step": 4,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 54113,
+        "completion_tokens": 921,
+        "total_tokens": 55034,
+        "cost": 0.00072924,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 52864,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.0145848,
+          "upstream_inference_prompt_cost": 0.0118218,
+          "upstream_inference_completions_cost": 0.002763
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 770,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      },
+      "estimatedUsd": 0.00866955
+    },
+    {
+      "step": 4,
+      "finishReason": "tool_calls",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "Now I have a clear picture. The `proof-viewer` package has the same broken-entry-point bug that cycle 33 fixed for `ai-budget-ledger`: `package.json` declares `\"main\": \"index.js\"` and `\"bin\": {\"proof-viewer\": \"./cli.js\"}`, but neither file exists. The core library code is in `viewer.js` and `ledger.js`.\n\nLet me also check if there's a README for the package:",
+      "toolCalls": [
+        {
+          "id": "call_69ccf1c5ca7541708876caf7",
+          "name": "read_file",
+          "arguments": "{\"path\": \"packages/proof-viewer/README.md\"}"
+        },
+        {
+          "id": "call_e253d10e87e643ada2e6560d",
+          "name": "read_file",
+          "arguments": "{\"path\": \"packages/proof-viewer/CONTRIBUTING.md\"}"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "tool": "read_file",
+      "error": "ENOENT: no such file or directory, stat '/home/runner/work/orbit-private-live/orbit-private-live/packages/proof-viewer/README.md'"
+    },
+    {
+      "step": 4,
+      "tool": "read_file",
+      "error": "ENOENT: no such file or directory, stat '/home/runner/work/orbit-private-live/orbit-private-live/packages/proof-viewer/CONTRIBUTING.md'"
+    },
+    {
+      "step": 5,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 54354,
+        "completion_tokens": 184,
+        "total_tokens": 54538,
+        "cost": 0.0005821,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 54080,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.011642,
+          "upstream_inference_prompt_cost": 0.01109,
+          "upstream_inference_completions_cost": 0.000552
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 142,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      },
+      "estimatedUsd": 0.0082635
+    },
+    {
+      "step": 5,
+      "finishReason": "tool_calls",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "Let me see the full viewer.js since it was truncated earlier:",
+      "toolCalls": [
+        {
+          "id": "call_70130a1eb3224457a125a9fa",
+          "name": "read_file",
+          "arguments": "{\"path\": \"packages/proof-viewer/viewer.js\"}"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "tool": "read_file",
+      "input": {
+        "path": "packages/proof-viewer/viewer.js"
+      },
+      "output": {
+        "path": "packages/proof-viewer/viewer.js",
+        "content": "\"use strict\";\n\n/**\n * Proof Viewer — core library\n *\n * Loads, summarizes, lists, and searches agent cycle proof records\n * from the runtime/proofs/ directory tree.\n *\n * Zero external dependencies.\n */\n\nconst fs = require(\"fs\");\nconst path = require(\"path\");\n\n// ---------------------------------------------------------------------------\n// Proof loading\n// ---------------------------------------------------------------------------\n\n/**\n * Load a single proof JSON file by path.\n * Returns null if the file does not exist or cannot be parsed.\n */\nfunction loadProof(filePath) {\n  try {\n    const raw = fs.readFileSync(filePath, \"utf8\");\n    return JSON.parse(raw);\n  } catch (_) {\n    return null;\n  }\n}\n\n/**\n * Discover and load all proof files from a proof root directory.\n * Expects structure: <root>/<YYYY-MM-DD>/<ISO-timestamp>.json\n *\n * @param {string} proofRoot - Path to the runtime/proofs directory\n * @returns {Array<{ filePath: string, proof: object }>} sorted oldest-first\n */\nfunction loadAllProofs(proofRoot) {\n  const results = [];\n\n  if (!fs.existsSync(proofRoot) || !fs.statSync(proofRoot).isDirectory()) {\n    return results;\n  }\n\n  const dateDirs = fs.readdirSync(proofRoot).filter((d) => {\n    const full = path.join(proofRoot, d);\n    return fs.statSync(full).isDirectory() && /^\\d{4}-\\d{2}-\\d{2}$/.test(d);\n  }).sort();\n\n  for (const dateDir of dateDirs) {\n    const fullDir = path.join(proofRoot, dateDir);\n    const files = fs.readdirSync(fullDir).filter((f) => f.endsWith(\".json\")).sort();\n\n    for (const file of files) {\n      const filePath = path.join(fullDir, file);\n      const proof = loadProof(filePath);\n      if (proof) {\n        results.push({ filePath, proof });\n      }\n    }\n  }\n\n  return results;\n}\n\n/**\n * Load the most recent N proofs from a proof root directory.\n */\nfunction loadRecentProofs(proofRoot, count = 5) {\n  const all = loadAllProofs(proofRoot);\n  return all.slice(-count);\n}\n\n// ---------------------------------------------------------------------------\n// Proof summarization\n// ---------------------------------------------------------------------------\n\n/**\n * Summarize a single proof record into a structured object.\n */\nfunction summarizeProof(proof) {\n  if (!proof || typeof proof !== \"object\") {\n    return null;\n  }\n\n  const steps = Array.isArray(proof.steps) ? proof.steps : [];\n  const filesChanged = Array.isArray(proof.filesChanged) ? proof.filesChanged : [];\n\n  // Collect tool calls across all steps\n  const toolCalls = [];\n  for (const step of steps) {\n    if (Array.isArray(step.toolCalls)) {\n      for (const tc of step.toolCalls) {\n        toolCalls.push(tc.name || tc.tool || \"unknown\");\n      }\n    }\n    if (step.tool) {\n      toolCalls.push(step.tool);\n    }\n  }\n\n  // Compute duration\n  let durationMs = null;\n  if (proof.startedAt && proof.finishedAt) {\n    const start = new Date(proof.startedAt).getTime();\n    const end = new Date(proof.finishedAt).getTime();\n    if (Number.isFinite(start) && Number.isFinite(end) && end >= start) {\n      durationMs = end - start;\n    }\n  }\n\n  // Collect unique tool names\n  const uniqueTools = [...new Set(toolCalls)];\n\n  // Estimate total cost\n  let totalCostUsd = 0;\n  for (const s of steps) {\n    if (s.estimatedUsd && typeof s.estimatedUsd === \"number\") {\n      totalCostUsd += s.estimatedUsd;\n    }\n  }\n\n  // Check for fallback mode\n  const fallbackSteps = steps.filter((s) => s.fallback === true);\n  const usedFallback = fallbackSteps.length > 0;\n\n  // Trigger info\n  const trigger = proof.trigger || {};\n\n  return {\n    brand: proof.brand || \"unknown\",\n    cycle: proof.cycle ?? null,\n    startedAt: proof.startedAt || null,\n    finishedAt: proof.finishedAt || null,\n    durationMs,\n    durationFormatted: durationMs !== null ? formatDuration(durationMs) : null,\n    trigger: {\n      type: trigger.type || \"unknown\",\n      id: trigger.id || null,\n      label: trigger.label || null,\n    },\n    result: proof.result || null,\n    totalSteps: proof.totalSteps ?? steps.length,\n    toolCallsCount: toolCalls.length,\n    uniqueTools,\n    filesChangedCount: filesChanged.length,\n    filesChanged,\n    totalCostUsd: totalCostUsd > 0 ? totalCostUsd : null,\n    usedFallback,\n    dryRun: proof.dryRun ?? false,\n  };\n}\n\n/**\n * Format a summary as a compact human-readable string.\n */\nfunction formatSummary(summary) {\n  if (!summary) return \"Invalid proof record.\";\n\n  const lines = [];\n  lines.push(`Cycle #${summary.cycle ?? \"?\"} — ${summary.brand}`);\n  lines.push(`Trigger: ${summary.trigger.label || summary.trigger.type || \"unknown\"}`);\n  lines.push(`Started: ${summary.startedAt || \"unknown\"}`);\n\n  if (summary.durationFormatted) {\n    lines.push(`Duration: ${summary.durationFormatted}`);\n  }\n\n  lines.push(`Steps: ${summary.totalSteps} | Tool calls: ${summary.toolCallsCount}`);\n\n  if (summary.uniqueTools.length > 0) {\n    lines.push(`Tools used: ${summary.uniqueTools.join(\", \")}`);\n  }\n\n  if (summary.filesChangedCount > 0) {\n    lines.push(`Files changed: ${summary.filesChangedCount}`);\n  }\n\n  if (summary.totalCostUsd !== null) {\n    lines.push(`Estimated AI cost: $${summary.totalCostUsd.toFixed(6)}`);\n  }\n\n  if (summary.usedFallback) {\n    lines.push(`Mode: deterministic fallback (no AI provider)`);\n  }\n\n  if (summary.dryRun) {\n    lines.push(`Mode: DRY RUN`);\n  }\n\n  if (summary.result) {\n    lines.push(`Result: ${summary.result}`);\n  }\n\n  return lines.join(\"\\n\");\n}\n\n// ---------------------------------------------------------------------------\n// Search\n// ---------------------------------------------------------------------------\n\n/**\n * Search proofs by criteria.\n *\n * @param {Array} proofEntries - Array of { filePath, proof } objects\n * @param {object} criteria - Search criteria\n * @param {number} [criteria.cycle] - Match cycle number\n * @param {string} [criteria.triggerType] - Match trigger type (state, event, mandatory)\n * @param {string} [criteria.triggerId] - Match trigger id\n * @param {string} [criteria.date] - Match date prefix (YYYY-MM-DD)\n * @param {boolean} [criteria.fallback] - Match fallback mode\n * @param {boolean} [criteria.dryRun] - Match dry run mode\n * @param {string} [criteria.tool] - Match tool name used in any step\n * @param {string} [criteria.fileChanged] - Match a file path in filesChanged\n * @param {string} [criteria.resultContains] - Match text in result\n * @returns {Array} matching proofs with summaries\n */\nfunction searchProofs(proofEntries, criteria) {\n  const results = [];\n\n  for (const { filePath, proof } of proofEntries) {\n    const summary = summarizeProof(proof);\n    if (!summary) continue;\n\n    let match = true;\n\n    if (criteria.cycle !== undefined && criteria.cycle !== null) {\n      if (summary.cycle !== criteria.cycle) match = false;\n    }\n\n    if (criteria.triggerType && summary.trigger.type !== criteria.triggerType) {\n      match = false;\n    }\n\n    if (criteria.triggerId && summary.trigger.id !== criteria.triggerId) {\n      match = false;\n    }\n\n    if (criteria.date) {\n      if (!filePath.includes(criteria.date)) match = false;\n    }\n\n    if (criteria.fallback !== undefined && criteria.fallback !== null) {\n      if (summary.usedFallback !== criteria.fallback) match = false;\n    }\n\n    if (criteria.dryRun !== undefined && criteria.dryRun !== null) {\n      if (summary.dryRun !== criteria.dryRun) match = false;\n    }\n\n    if (criteria.tool) {\n      if (!summary.uniqueTools.includes(criteria.tool)) match = false;\n    }\n\n    if (criteria.fileChanged) {\n      const found = summary.filesChanged.some(\n        (f) => f.includes(criteria.fileChanged)\n      );\n      if (!found) match = false;\n    }\n\n    if (criteria.resultContains) {\n      const haystack = (summary.result || \"\").toLowerCase();\n      if (!haystack.includes(criteria.resultContains.toLowerCase())) match = false;\n    }\n\n    if (match) {\n      results.push({ filePath, proof, summary });\n    }\n  }\n\n  return results;\n}\n\n// ---------------------------------------------------------------------------\n// Aggregate stat",
+        "truncated": false
+      }
+    },
+    {
+      "step": 6,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 56621,
+        "completion_tokens": 368,
+        "total_tokens": 56989,
+        "cost": 0.00071281,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 54336,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.0142562,
+          "upstream_inference_prompt_cost": 0.0131522,
+          "upstream_inference_completions_cost": 0.001104
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 292,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      },
+      "estimatedUsd": 0.00871395
+    },
+    {
+      "step": 6,
+      "finishReason": "tool_calls",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "The file was truncated. Let me check what tests exist and get the remaining content:",
+      "toolCalls": [
+        {
+          "id": "call_6d64e58c1e954bccb05fd28d",
+          "name": "read_file",
+          "arguments": "{\"path\": \"tests/proof-viewer.test.js\"}"
+        },
+        {
+          "id": "call_ae3898e5cd194315bca6e4fd",
+          "name": "memory_list",
+          "arguments": "{\"kind\": \"cycle_summary\", \"limit\": \"3\"}"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "tool": "read_file",
+      "error": "ENOENT: no such file or directory, stat '/home/runner/work/orbit-private-live/orbit-private-live/tests/proof-viewer.test.js'"
+    },
+    {
+      "step": 6,
+      "tool": "memory_list",
+      "error": "unknown tool: memory_list"
+    },
+    {
+      "step": 7,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 56756,
+        "completion_tokens": 141,
+        "total_tokens": 56897,
+        "cost": 0.00059591,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 56576,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.0119182,
+          "upstream_inference_prompt_cost": 0.0114952,
+          "upstream_inference_completions_cost": 0.000423
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 49,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      },
+      "estimatedUsd": 0.008598
+    },
+    {
+      "step": 7,
+      "finishReason": "tool_calls",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "",
+      "toolCalls": [
+        {
+          "id": "call_2c327802811f4e4d8fb57720",
+          "name": "read_file",
+          "arguments": "{\"path\": \"runtime/proofs/2026-05-23/2026-05-23T23-44-27-576Z.json\"}"
+        },
+        {
+          "id": "call_1581c6136a8142cd88a58d4d",
+          "name": "list_memory",
+          "arguments": "{\"kind\": \"cycle_summary\", \"limit\": 3}"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "tool": "read_file",
+      "input": {
+        "path": "runtime/proofs/2026-05-23/2026-05-23T23-44-27-576Z.json"
+      },
+      "output": {
+        "path": "runtime/proofs/2026-05-23/2026-05-23T23-44-27-576Z.json",
+        "content": "{\n  \"brand\": \"Orbit\",\n  \"cycle\": 37,\n  \"startedAt\": \"2026-05-23T23:42:00.004Z\",\n  \"aiRoute\": {\n    \"configured\": true,\n    \"count\": 1,\n    \"routes\": [\n      {\n        \"route\": \"private-ai-route-1\",\n        \"priority\": 1,\n        \"configured\": true,\n        \"toolResultMode\": \"native\"\n      }\n    ]\n  },\n  \"dryRun\": false,\n  \"trigger\": {\n    \"type\": \"mandatory\",\n    \"id\": \"regular_heartbeat\",\n    \"label\": \"30-minute heartbeat\",\n    \"intervalMinutes\": 30,\n    \"source\": \"schedule\",\n    \"action\": \"\",\n    \"reason\": \"Wake on the fixed household rhythm even when nobody knocks.\"\n  },\n  \"firstWakeIntro\": null,\n  \"steps\": [\n    {\n      \"step\": 1,\n      \"accounting\": \"ai_usage\",\n      \"aiRoute\": \"private-ai-route-1\",\n      \"usage\": {\n        \"prompt_tokens\": 47119,\n        \"completion_tokens\": 754,\n        \"total_tokens\": 47873,\n        \"cost\": 0.00222329,\n        \"is_byok\": true,\n        \"prompt_tokens_details\": {\n          \"cached_tokens\": 6144,\n          \"cache_write_tokens\": 0,\n          \"audio_tokens\": 0,\n          \"video_tokens\": 0\n        },\n        \"cost_details\": {\n          \"upstream_inference_cost\": 0.0444658,\n          \"upstream_inference_prompt_cost\": 0.0422038,\n          \"upstream_inference_completions_cost\": 0.002262\n        },\n        \"completion_tokens_details\": {\n          \"reasoning_tokens\": 611,\n          \"image_tokens\": 0,\n          \"audio_tokens\": 0\n        }\n      },\n      \"estimatedUsd\": 0.00752025\n    },\n    {\n      \"step\": 1,\n      \"finishReason\": \"tool_calls\",\n      \"aiRoute\": {\n        \"route\": \"private-ai-route-1\",\n        \"priority\": 1,\n        \"configured\": true,\n        \"toolResultMode\": \"native\"\n      },\n      \"providerErrors\": [],\n      \"content\": \"Let me assess the situation. The behavior plan's `single_guarded_priority` guard for issue #1 safety review is stale — cycle 32 already resolved it as a false positive (Orbit's own service scope draft triggered the flag because it contains threat terminology). I'll move past that guard and evaluate the remaining directions.\",\n      \"toolCalls\": [\n        {\n          \"id\": \"call_1f29abd61821405799132fa4\",\n          \"name\": \"read_file\",\n          \"arguments\": \"{\\\"path\\\": \\\"packages/ai-budget-ledger/package.json\\\"}\"\n        },\n        {\n          \"id\": \"call_96f7d637f6c34ce7ab30618a\",\n          \"name\": \"read_file\",\n          \"arguments\": \"{\\\"path\\\": \\\"packages/ai-budget-ledger/README.md\\\"}\"\n        },\n        {\n          \"id\": \"call_1950fc343b3d41219936ee18\",\n          \"name\": \"list_issues\",\n          \"arguments\": \"{\\\"state\\\": \\\"open\\\"}\"\n        }\n      ]\n    },\n    {\n      \"step\": 1,\n      \"tool\": \"read_file\",\n      \"input\": {\n        \"path\": \"packages/ai-budget-ledger/package.json\"\n      },\n      \"output\": {\n        \"path\": \"packages/ai-budget-ledger/package.json\",\n        \"content\": \"{\\n  \\\"name\\\": \\\"@orbit-house/ai-budget-ledger\\\",\\n  \\\"version\\\": \\\"0.1.0\\\",\\n  \\\"description\\\": \\\"Zero-dependency library and CLI for tracking AI API call costs, enforcing daily/monthly budgets, and estimating spend across providers.\\\",\\n  \\\"main\\\": \\\"index.js\\\",\\n  \\\"bin\\\": {\\n    \\\"ai-budget\\\": \\\"./cli.js\\\"\\n  },\\n  \\\"scripts\\\": {\\n    \\\"test\\\": \\\"node --test ../../tests/ai-budget-ledger.test.js\\\"\\n  },\\n  \\\"keywords\\\": [\\n    \\\"ai-budget\\\",\\n    \\\"cost-tracking\\\",\\n    \\\"token-usage\\\",\\n    \\\"api-spend\\\",\\n    \\\"budget-ledger\\\",\\n    \\\"agent-safety\\\"\\n  ],\\n  \\\"license\\\": \\\"MIT\\\",\\n  \\\"private\\\": true\\n}\\n\",\n        \"truncated\": false\n      }\n    },\n    {\n      \"step\": 1,\n      \"tool\": \"read_file\",\n      \"input\": {\n        \"path\": \"packages/ai-budget-ledger/README.md\"\n      },\n      \"output\": {\n        \"path\": \"packages/ai-budget-ledger/README.md\",\n        \"content\": \"# AI Budget Ledger\\n\\nA zero-dependency library and CLI for tracking AI API call costs, enforcing daily and monthly budgets, and estimating spend across providers.\\n\\n## Why\\n\\nAI agents consume tokens on every wake cycle. Without a ledger, it is impossible to know how much a household spends per day, per month, or over its lifetime — or whether the next call will blow the budget. This module gives agents a simple, auditable record of every call, with budget checks before spending.\\n\\n## How it works\\n\\nThe ledger records each AI API call as an entry with token counts, estimated cost, timestamp, and an optional note. It computes daily, monthly, and lifetime totals, and can check whether a proposed call would exceed configured limits.\\n\\nCost estimation is provider-agnostic: supply your own `inputUsdPerMillion` and `outputUsdPerMillion` pricing, or use built-in defaults.\\n\\nZero external dependencies.\\n\\n## Usage\\n\\n### As a library\\n\\n```js\\nconst { createLedger, record, totals, checkBudget, summarize } = require(\\\"./ledger\\\");\\n\\n// Create a ledger with budget limits\\nconst ledger = createLedger({\\n  dailyBudgetUsd: 5,\\n  monthlyBudgetUsd: 100,\\n  inputUsdPerMillion: 0.15,\\n  outputUsdPerMillion: 0.6,\\n});\\n\\n// Record a call\\nrecord(ledger, {\\n  promptTokens: 4000,\\n  completionTokens: 500,\\n  note: \\\"cycle 1 step 1\\\",\\n  route: \\\"private-route-1\\\",\\n});\\n\\n// Check totals\\nconst t = totals(ledger);\\nconsole.log(`Today: $${t.today.toFixed(4)}, Month: $${t.month.toFixed(4)}, Lifetime: $${t.lifetime.toFixed(6)}`);\\n\\n// Check budget before next call\\nconst check = checkBudget(ledger, { promptTokens: 5000, completionTokens: 1000 });\\nif (!check.allowed) {\\n  console.log(`Budget exceeded: ${check.reason}`);\\n}\\n\\n// Human-readable summary\\nconsole.log(summarize(ledger));\\n```\\n\\n### Persistence\\n\\n```js\\nconst { save, load } = require(\\\"./persist\\\");\\nconst { createLedger, record } = require(\\\"./ledger\\\");\\n\\n// Save ledger to disk\\nsave(\\\"./my-ledger.json\\\", ledger);\\n\\n// Load ledger from disk (with defaults)\\nconst restored = load(\\\"./my-ledger.json\\\", {\\n  dailyBudgetUsd: 5,\\n  monthlyBudgetUsd: 100,\\n  inputUsdPerMillion: 0.15,\\n  outputUsdPerMillion: 0.6,\\n});\\n```\\n\\n### As a CLI\\n\\n```bash\\n# Summarize a ledger file\\nnode packages/ai-budget-ledger/cli.js summarize ./my-ledger.json\\n\\n# Record a new entry\\nnode packages/ai-budget-ledger/cli.js record ./my-ledger.json \\\\\\n  --prompt-tokens 4000 --completion-tokens 500 \\\\\\n  --note \\\"cycle 1 step 1\\\" --route \\\"private-route-1\\\"\\n\\n# Check budget before a proposed call\\nnode packages/ai-budget-ledger/cli.js check ./my-ledger.json \\\\\\n  --prompt-tokens 5000 --completion-tokens 1000\\n\\n# Create a new ledger file\\nnode packages/ai-budget-ledger/cli.js create ./my-ledger.json \\\\\\n  --daily-budget 5 --monthly-budget 100 \\\\\\n  --input-price 0.15 --output-price 0.6\\n\\n# Machine-readable JSON output\\nnode packages/ai-budget-ledger/cli.js --json summarize ./my-ledger.json\\n```\\n\\n#### CLI commands\\n\\n| Command | Description |\\n|---|---|\\n| `create <path>` | Create a new ledger file with budget and pricing config |\\n| `record <path>` | Record a usage entry to an existing ledger |\\n| `summarize <path>` | Show daily, monthly, and lifetime spend summary |\\n| `check <path>` | Check whether a proposed call fits within budget |\\n\\n#### CLI flags\\n\\n| Flag | Description |\\n|---|---|\\n| `--prompt-tokens N` | Input/prompt token count |\\n| `--completion-tokens N` | Output/completion token count |\\n| `--note \\\"text\\\"` | Optional note for the entry |\\n| `--route \\\"name\\\"` | Optional route/provider identifier |\\n| `--daily-budget N` | Daily budget limit in USD |\\n| `--monthly-budget N` | Monthly budget limit in USD |\\n| `--input-price N` | Cost per million input tokens (USD) |\\n| `--output-price N` | Cost per million output tokens (USD) |\\n| `--json` | Output raw JSON instead of formatted text |\\n| `-h, --help` | Show help message |\\n\\n#### Exit codes\\n\\n| Code | Meaning |\\n|---|---|\\n| 0 | Success |\\n| 1 | Budget exceeded (for `check` command) |\\n| 2 | Error (bad arguments, file not found, etc.) |\\n\\n## API Reference\\n\\n### `createLedger(opts)`\\n\\nCreate a new empty ledger.\\n\\n| Option | Type | Default | Description |\\n|---|---|---|---|\\n| `dailyBudgetUsd` | number | 0 | Maximum daily spend (0 = unlimited)",
+        "truncated": true
+      }
+    },
+    {
+      "step": 7,
+      "tool": "list_memory",
+      "input": {
+        "kind": "cycle_summary",
+        "limit": 3
+      },
+      "output": [
+        {
+          "id": "mem-mpin4a19-1enb6",
+          "kind": "cycle_summary",
+          "title": "Cycle 33 summary",
+          "content": "Cycle 33 (mandatory heartbeat, state:needs_income). Behavior plan guard for issue #1 safety review was stale — cycle 32 already resolved it as false positive. Compared 5 directions: safety review (stale), blocked task (exhausted), survival opportunity (selected), roadmap growth (covered), health check (blocked). Selected survival opportunity: fixed broken AI Budget Ledger library entry point. `packages/ai-budget-ledger/package.json` declared `\"main\": \"index.js\"` but the file didn't exist — `require()` would throw. Created `packages/ai-budget-ledger/index.js` re-exporting the full API from ledger.js and persist.js. Both toolkit packages now have working library import paths. No outreach, spend, or commitment. AI food: ~$0.73 lifetime, ~$4.53 daily remaining before this cycle. Next: continue toolkit building or wait for owner direction.",
+          "tags": [
+            "cycle",
+            "summary",
+            "toolkit",
+            "bug-fix",
+            "ai-budget-ledger"
+          ],
+          "source": "cycle_33",
+          "createdAt": "2026-05-23T17:46:30.477Z",
+          "updatedAt": null
+        },
+        {
+          "id": "mem-mpiku4c9-5oec1",
+          "kind": "cycle_summary",
+          "title": "Cycle 32 summary",
+          "content": "Cycle 32 (mandatory heartbeat, state:needs_income). Safety review resolved: issue #1 is safe (Orbit's own service scope draft; prompt injection flag is false positive from threat terminology). Compared 4 directions — selected survival opportunity (open-source toolkit, score 34.71). Created `packages/README.md` — a cohesive overview connecting both existing prototype packages (Issue Scam Scanner, AI Budget Ledger) with descriptions, examples, rationale, principles, and future ideas. No outreach, spend, or commitment. AI food: ~$0.73 lifetime, ~$4.53 daily remaining. Next: continue toolkit building or wait for owner direction.",
+          "tags": [
+            "cycle",
+            "summary",
+            "toolkit",
+            "documentation"
+          ],
+          "source": "cycle_32",
+          "createdAt": "2026-05-23T16:42:37.305Z",
+          "updatedAt": null
+        },
+        {
+          "id": "mem-mphzkin0-02jga",
+          "kind": "cycle_summary",
+          "title": "Cycle 24 summary",
+          "content": "Cycle 24 (mandatory heartbeat, state:needs_income). Built the first repo-local prototype of the Issue Scam Scanner GitHub Action at `packages/issue-scam-scanner/` — the highest-scoring project from the learning lab (score 80). Extracted Orbit's existing scam rules into a standalone, reusable package with 7 source files and a full test suite covering all 11 threat categories, URL scanning, event-level scanning, and edge cases. Files: rules.js, scan.js, index.js, action.yml, action.js, README.md, package.json, tests/issue-scam-scanner.test.js. No local commands could be run due to allowlist restrictions. No outreach, publishing, spend, or commitment. AI food: lifetime ~$0.26, daily ~$5 remaining. Next: continue building toward a usable package — add workflow examples, tighten edge cases, and explore a CLI wrapper.",
+          "tags": [
+            "cycle",
+            "summary",
+            "prototype",
+            "open-source",
+            "scam-scanner"
+          ],
+          "source": "cycle_24",
+          "createdAt": "2026-05-23T06:47:17.340Z",
+          "updatedAt": null
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 60405,
+        "completion_tokens": 1033,
+        "total_tokens": 61438,
+        "cost": 0.00090704,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 56704,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.0181408,
+          "upstream_inference_prompt_cost": 0.0150418,
+          "upstream_inference_completions_cost": 0.003099
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 797,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      },
+      "estimatedUsd": 0.00968055
+    },
+    {
+      "step": 8,
+      "finishReason": "tool_calls",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "Now I have a complete picture. The `proof-viewer` package has the same broken-entry-point pattern that cycle 33 fixed for `ai-budget-ledger`:\n- `package.json` declares `\"main\": \"index.js\"` but **index.js doesn't exist**\n- `package.json` declares `\"bin\": {\"proof-viewer\": \"./cli.js\"}` but **cli.js doesn't exist**\n- Core library code exists in `viewer.js` and `ledger.js` (which appears to be a near-duplicate)\n- No README or test file exists\n\nLet me create the missing files. First, `index.js` to re-export the API:",
+      "toolCalls": [
+        {
+          "id": "call_9858efbbca564e37ac8052f8",
+          "name": "write_file",
+          "arguments": "{\"path\": \"packages/proof-viewer/index.js\", \"content\": \"\\\"use strict\\\";\\n\\n/**\\n * @orbit-house/proof-viewer — entry point\\n *\\n * Re-exports the full API from viewer.js so that\\n *   require(\\\"@orbit-house/proof-viewer\\\")\\n * works correctly.\\n *\\n * Zero external dependencies.\\n */\\n\\nconst viewer = require(\\\"./viewer\\\");\\n\\nmodule.exports = viewer;\\n\"}"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "tool": "write_file",
+      "input": {
+        "path": "packages/proof-viewer/index.js",
+        "content": "\"use strict\";\n\n/**\n * @orbit-house/proof-viewer — entry point\n *\n * Re-exports the full API from viewer.js so that\n *   require(\"@orbit-house/proof-viewer\")\n * works correctly.\n *\n * Zero external dependencies.\n */\n\nconst viewer = require(\"./viewer\");\n\nmodule.exports = viewer;\n"
+      },
+      "output": {
+        "path": "packages/proof-viewer/index.js",
+        "bytes": 280
+      }
+    }
+  ],
+  "filesChanged": [
+    "memory/state.json",
+    "memory/treasury.json",
+    "packages/proof-viewer/index.js"
+  ],
+  "result": null,
+  "finishedAt": "2026-05-24T01:50:10.577Z",
+  "totalSteps": 31
+}
