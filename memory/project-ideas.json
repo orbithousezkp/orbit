@@ -137,6 +137,73 @@
       "score": 80,
       "createdAt": "2026-05-22T13:03:47.090Z",
       "updatedAt": "2026-05-22T13:03:47.090Z"
+    },
+    {
+      "id": "orbit-control-plane-sdk",
+      "title": "Orbit Control Plane SDK",
+      "kind": "library",
+      "problemId": "orbit-control-plane-adoption",
+      "description": "Read-only SDK for passport, capabilities, permissions, lifecycle, receipts, memory, and wallet policy.",
+      "firstSafeBuild": "Finalize the product shape first, then expose the stable read-only SDK surface for other repos and agents.",
+      "buildSurface": "packages/orbit-sdk",
+      "usefulness": 10,
+      "reputationPotential": 10,
+      "moneyPotential": 9,
+      "estimatedFoodUsd": 7,
+      "risk": "low",
+      "autonomousSafe": true,
+      "gatedBefore": [
+        "npm_publish",
+        "external_outreach",
+        "shared_access"
+      ],
+      "score": 61.43,
+      "createdAt": "2026-05-24T05:23:06.435Z",
+      "updatedAt": "2026-05-24T05:23:06.435Z"
+    },
+    {
+      "id": "orbit-proof-viewer",
+      "title": "Orbit Proof Viewer",
+      "kind": "frontend_tool",
+      "problemId": "orbit-proof-receipts",
+      "description": "Static viewer that turns runtime proof JSON and cycle notes into a readable infrastructure timeline.",
+      "firstSafeBuild": "Add a local docs prototype that renders sample proof records without exposing private provider details.",
+      "buildSurface": "docs/",
+      "usefulness": 9,
+      "reputationPotential": 9,
+      "moneyPotential": 7,
+      "estimatedFoodUsd": 7,
+      "risk": "low",
+      "autonomousSafe": true,
+      "gatedBefore": [
+        "public_hosting",
+        "external_outreach"
+      ],
+      "score": 54.29,
+      "createdAt": "2026-05-24T05:23:06.435Z",
+      "updatedAt": "2026-05-24T05:23:06.435Z"
+    },
+    {
+      "id": "orbit-wallet-policy-cli",
+      "title": "Orbit Wallet Policy CLI",
+      "kind": "cli",
+      "problemId": "orbit-wallet-policy",
+      "description": "Read-only CLI that checks wallet policy, approval gates, revenue cadence, AI budget, and token readiness.",
+      "firstSafeBuild": "Prototype a local CLI command with static checks and no network calls.",
+      "buildSurface": "src/cli/infrastructure.js",
+      "usefulness": 9,
+      "reputationPotential": 8,
+      "moneyPotential": 8,
+      "estimatedFoodUsd": 6,
+      "risk": "low",
+      "autonomousSafe": true,
+      "gatedBefore": [
+        "paid_commitment",
+        "live_wallet_signing"
+      ],
+      "score": 63.33,
+      "createdAt": "2026-05-24T05:23:06.435Z",
+      "updatedAt": "2026-05-24T05:23:06.435Z"
     }
   ]
 }

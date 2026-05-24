@@ -6,6 +6,131 @@
   },
   "opportunities": [
     {
+      "id": "orbit-agent-passport",
+      "title": "Orbit agent passport and capability registry",
+      "source": "agent_os",
+      "driverTypes": [
+        "mandatory",
+        "state"
+      ],
+      "triggers": [
+        "mandatory:regular_heartbeat",
+        "state:needs_income"
+      ],
+      "survivalNeed": "agent_identity",
+      "earningMethod": "Describe Orbit as a portable repo agent with a passport, capability registry, permissions, lifecycle state, proof root, and revocation boundary.",
+      "firstSafeMove": "Document the agent passport, capabilities, blocked live actions, and adoption checklist clearly in repo files.",
+      "status": "open",
+      "expectedRewardUsd": 200,
+      "estimatedFoodUsd": 6,
+      "risk": "low",
+      "approvalRequired": false,
+      "notes": "Other repos and agents need a stable way to identify Orbit before they can adopt it.",
+      "score": 33.33,
+      "createdAt": "2026-05-24T05:23:06.419Z",
+      "updatedAt": "2026-05-24T05:23:06.419Z"
+    },
+    {
+      "id": "orbit-infrastructure-sdk",
+      "title": "Orbit infrastructure SDK and CLI",
+      "source": "house_product",
+      "driverTypes": [
+        "state",
+        "mandatory"
+      ],
+      "triggers": [
+        "state:needs_income",
+        "mandatory:regular_heartbeat"
+      ],
+      "survivalNeed": "platform_product",
+      "earningMethod": "Package Orbit as a reusable repository control plane that other repos and agents can read through stable files, CLI commands, and a read-only SDK.",
+      "firstSafeMove": "Clarify the product layer first, then finalize SDK views after Orbit's GitHub, repo, agent, proof, permission, lifecycle, and wallet layers are stable.",
+      "status": "open",
+      "expectedRewardUsd": 220,
+      "estimatedFoodUsd": 7,
+      "risk": "low",
+      "approvalRequired": false,
+      "notes": "Make Orbit feel like infrastructure other repos can adopt, not a scanner or maintainer bot.",
+      "score": 31.43,
+      "createdAt": "2026-05-24T05:23:06.419Z",
+      "updatedAt": "2026-05-24T05:23:06.419Z"
+    },
+    {
+      "id": "orbit-wallet-policy",
+      "title": "Orbit wallet policy layer",
+      "source": "treasury_skill",
+      "driverTypes": [
+        "state",
+        "mandatory"
+      ],
+      "triggers": [
+        "state:needs_income",
+        "mandatory:regular_heartbeat"
+      ],
+      "survivalNeed": "wallet_governance",
+      "earningMethod": "Expose a read-only wallet policy layer for repo operators, SDK clients, dashboards, and agents.",
+      "firstSafeMove": "Clarify approval labels, blocked live actions, AI budget, weekly revenue cadence, token state, and private-route boundaries in public-safe status views.",
+      "status": "open",
+      "expectedRewardUsd": 180,
+      "estimatedFoodUsd": 6,
+      "risk": "low",
+      "approvalRequired": false,
+      "notes": "Keep the wallet boundary explicit without turning Orbit into a hot wallet.",
+      "score": 30,
+      "createdAt": "2026-05-24T05:23:06.419Z",
+      "updatedAt": "2026-05-24T05:23:06.419Z"
+    },
+    {
+      "id": "orbit-proof-receipts",
+      "title": "Orbit proof receipts and cycle digest",
+      "source": "proofs",
+      "driverTypes": [
+        "mandatory",
+        "state"
+      ],
+      "triggers": [
+        "mandatory:regular_heartbeat",
+        "state:needs_income"
+      ],
+      "survivalNeed": "auditability",
+      "earningMethod": "Turn Orbit's proof records into a reusable receipt and cycle-digest layer for other repositories.",
+      "firstSafeMove": "Improve proof digest metadata and make the latest receipt easier to inspect through CLI and later SDK views.",
+      "status": "open",
+      "expectedRewardUsd": 150,
+      "estimatedFoodUsd": 5,
+      "risk": "low",
+      "approvalRequired": false,
+      "notes": "Proof receipts are part of the infrastructure layer, not a separate app.",
+      "score": 30,
+      "createdAt": "2026-05-24T05:23:06.419Z",
+      "updatedAt": "2026-05-24T05:23:06.419Z"
+    },
+    {
+      "id": "orbit-lifecycle-runtime",
+      "title": "Orbit lifecycle runtime for repos",
+      "source": "runtime",
+      "driverTypes": [
+        "mandatory",
+        "state"
+      ],
+      "triggers": [
+        "mandatory:regular_heartbeat",
+        "state:needs_income"
+      ],
+      "survivalNeed": "runtime_layer",
+      "earningMethod": "Make wake/sleep cycles, deterministic fallback, health checks, and adoption status reusable for any GitHub repo.",
+      "firstSafeMove": "Tighten lifecycle docs and tests before adding new execution power.",
+      "status": "open",
+      "expectedRewardUsd": 160,
+      "estimatedFoodUsd": 6,
+      "risk": "low",
+      "approvalRequired": false,
+      "notes": "Lifecycle is the base product layer that other capabilities depend on.",
+      "score": 26.67,
+      "createdAt": "2026-05-24T05:23:06.419Z",
+      "updatedAt": "2026-05-24T05:23:06.419Z"
+    },
+    {
       "id": "open-source-agent-toolkit",
       "title": "Open-source agent safety toolkit",
       "source": "problem_lab",
@@ -54,6 +179,56 @@
       "score": 23.33,
       "createdAt": "2026-05-22T16:07:02.311Z",
       "updatedAt": "2026-05-22T16:07:02.311Z"
+    },
+    {
+      "id": "pull-request-review",
+      "title": "Pull request review",
+      "source": "house_product",
+      "driverTypes": [
+        "event",
+        "mandatory"
+      ],
+      "triggers": [
+        "event:front_door_activity",
+        "mandatory:regular_heartbeat"
+      ],
+      "survivalNeed": "guardrail",
+      "earningMethod": "Read open pull requests, post structured reviews (summary, scope, security, tests, recommendation) without merging. Owner still decides.",
+      "firstSafeMove": "List open pull requests; on each new one, get_pull_request then post one Orbit review comment.",
+      "status": "open",
+      "expectedRewardUsd": 110,
+      "estimatedFoodUsd": 5,
+      "risk": "low",
+      "approvalRequired": false,
+      "notes": "Orbit comments only. No merge, no close, no label changes from this opportunity.",
+      "score": 22,
+      "createdAt": "2026-05-24T05:23:06.419Z",
+      "updatedAt": "2026-05-24T05:23:06.419Z"
+    },
+    {
+      "id": "repo-intake-guardrail",
+      "title": "Repo intake guardrail package",
+      "source": "guardrail",
+      "driverTypes": [
+        "event",
+        "mandatory"
+      ],
+      "triggers": [
+        "event:front_door_activity",
+        "mandatory:regular_heartbeat"
+      ],
+      "survivalNeed": "guardrail",
+      "earningMethod": "Keep the issue scanner as a small reusable guardrail under Orbit infrastructure.",
+      "firstSafeMove": "Rebrand the scanner as an intake guardrail and avoid making it the product center.",
+      "status": "open",
+      "expectedRewardUsd": 80,
+      "estimatedFoodUsd": 4,
+      "risk": "low",
+      "approvalRequired": false,
+      "notes": "Scanner is useful but not Orbit's core identity.",
+      "score": 20,
+      "createdAt": "2026-05-24T05:23:06.419Z",
+      "updatedAt": "2026-05-24T05:23:06.419Z"
     },
     {
       "id": "repo-safety-audit",

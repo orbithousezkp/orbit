@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-05-23T00:00:00.000Z",
+  "updatedAt": "2026-05-24T05:30:00.000Z",
   "product": {
     "name": "Orbit",
     "category": "GitHub-native agent infrastructure",
@@ -97,9 +97,9 @@
     {
       "id": "agent-passport",
       "name": "Agent Passport",
-      "status": "planned",
-      "path": "memory/infrastructure.json",
-      "description": "Portable identity bundle for mission, permissions, capability claims, proof roots, and revocation status."
+      "status": "active",
+      "path": "docs/agent-passport.md",
+      "description": "Portable identity declaration for mission, capabilities, permissions, proof model, budget, token state, and adoption checklist."
     },
     {
       "id": "sdk-cli",
@@ -124,7 +124,8 @@
       "mode": "repo_public",
       "evidence": [
         "memory/identity.md",
-        "README.md"
+        "README.md",
+        "docs/agent-passport.md"
       ]
     },
     {
@@ -194,6 +195,16 @@
       ]
     },
     {
+      "id": "agent-passport",
+      "name": "Agent Passport",
+      "status": "active",
+      "mode": "repo_public",
+      "evidence": [
+        "docs/agent-passport.md",
+        "memory/infrastructure.json"
+      ]
+    },
+    {
       "id": "zk-receipts",
       "name": "ZK Policy Receipts",
       "status": "planned",
@@ -253,8 +264,44 @@
   ],
   "wallet": {
     "approvalMode": "owner_approval_required",
-    "publicViewOnly": true,
-    "noPrivateKeys": true,
+    "approvalIssueLabel": "orbit:approval",
+    "approvalAcceptedLabel": "orbit:approved",
+    "approvalRejectedLabel": "orbit:rejected",
+    "allowedWithoutApproval": [
+      "operator_revenue",
+      "treasury_internal",
+      "gas",
+      "claim_rewards",
+      "token_launch"
+    ],
+    "selfRecipients": {
+      "treasuryEnv": "ORBIT_TREASURY_ADDRESS",
+      "operatorRevenueEnv": "ORBIT_OPERATOR_REVENUE_ADDRESS"
+    },
+    "aiBudget": {
+      "dailyBudgetUsd": 5,
+      "monthlyBudgetUsd": 100,
+      "reserveUsd": 0,
+      "purchaseMode": "owner_approved_manual_credit_top_up",
+      "liveApiPurchase": false
+    },
+    "revenue": {
+      "cadence": "weekly_performance",
+      "claimIntervalDays": 7,
+      "performanceWindowDays": 7,
+      "operatorShareBps": 0,
+      "treasuryShareBps": 10000,
+      "lastClaimAttemptAt": null,
+      "lastClaimSentAt": null,
+      "canClaim": false
+    },
+    "token": {
+      "name": "Orbit",
+      "symbol": "ORBIT",
+      "launchStatus": "not_launched",
+      "launchedAt": null,
+      "configured": true
+    },
     "blockedLiveActions": [
       "wallet spending",
       "external payments",
@@ -262,8 +309,7 @@
       "token launch",
       "reward claims",
       "payout-route changes"
-    ],
-    "notes": "Orbit exposes wallet policy and budget state without private keys or live signing authority."
+    ]
   },
   "receipts": {
     "current": "runtime/proofs/",
