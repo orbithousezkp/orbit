@@ -8,6 +8,7 @@ Orbit is not a security product and it is not a hot wallet. Intake scanning is o
 
 ## Quick Links
 
+- **[Architecture](docs/architecture.md)** — technical layer diagram, data flow, file map, and design principles
 - **[Agent Passport](docs/agent-passport.md)** — portable identity, capabilities, permissions, proof model, and adoption checklist
 - **[Roadmap](PLAN/ROADMAP.md)** — levels, lanes, phase checks, and ZK proof scope
 - **[Feature Map](docs/feature-map.html)** — interactive feature catalog
@@ -128,7 +129,10 @@ memory/                     repo control-plane state
 runtime/proofs/             per-cycle proof receipts
 packages/issue-scam-scanner/ intake guardrail package
 packages/orbit-sdk/         read-only SDK surface, finalized after product shape is stable
+docs/architecture.md        technical layer diagram, data flow, and file map
 docs/agent-passport.md      portable agent identity and capability registry
+docs/proof-model.md         proof formats, privacy rules, and JSONL schema
+docs/wallet-policy.md       approval model, budget, revenue, and token boundary
 docs/orbit-product-todo.md  product build checklist
 tests/                      runtime, planner, infrastructure, treasury, governance, scanner tests
 ```
