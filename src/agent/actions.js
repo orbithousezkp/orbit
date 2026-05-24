@@ -411,6 +411,9 @@ async function executeTool(config, github, cycle, name, input) {
         ...pr,
         title: omitUnsafeVisitorContent(redactSecrets(pr.title || "")),
         body: omitUnsafeVisitorContent(redactSecrets(pr.body || "")).slice(0, 2_000),
+        author: redactSecrets(String(pr.author || "")).slice(0, 80),
+        labels: safePublicLabels(pr.labels || []),
+        url: String(pr.url || "").slice(0, 500),
         headRef: redactSecrets(String(pr.headRef || "")).slice(0, 200),
         baseRef: redactSecrets(String(pr.baseRef || "")).slice(0, 200)
       }));
@@ -423,6 +426,9 @@ async function executeTool(config, github, cycle, name, input) {
         ...pr,
         title: omitUnsafeVisitorContent(redactSecrets(pr.title || "")),
         body: omitUnsafeVisitorContent(redactSecrets(pr.body || "")).slice(0, 8_000),
+        author: redactSecrets(String(pr.author || "")).slice(0, 80),
+        labels: safePublicLabels(pr.labels || []),
+        url: String(pr.url || "").slice(0, 500),
         headRef: redactSecrets(String(pr.headRef || "")).slice(0, 200),
         baseRef: redactSecrets(String(pr.baseRef || "")).slice(0, 200)
       };

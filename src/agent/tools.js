@@ -297,7 +297,7 @@ const TOOLS = [
   },
   {
     name: "review_pull_request",
-    description: "Post a structured review comment on a pull request. Use only after reading the PR with get_pull_request. The comment renders as: summary, scope, security, tests, recommendation. All four review fields are public-safe text; secret-like content is refused.",
+    description: "Post a structured review comment on a pull request's conversation thread. This is a regular GitHub issue-style comment, NOT a binding PR review — it does not set approve/request_changes state and has no effect on merge eligibility. The owner still decides. Use only after reading the PR with get_pull_request. Renders as: summary, scope, security, tests, recommendation. All four review fields are public-safe text; secret-like content is refused.",
     inputSchema: {
       type: "object",
       properties: {
