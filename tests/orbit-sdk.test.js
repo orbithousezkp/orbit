@@ -1,196 +1,386 @@
-"use strict";
+/**
+ * Tests for the Orbit SDK — read-only access to machine-readable repository state.
+ */
 
-const assert = require("node:assert/strict");
-const fs = require("node:fs");
-const os = require("node:os");
-const path = require("node:path");
-const test = require("node:test");
-const {
-  adoptionChecklist,
-  createOrbitClient,
-  exportBundle,
-  readCapabilities,
-  readInfrastructure,
-  readPassport,
-  readReceipts,
-  readStatus,
-  readWalletPolicy
-} = require("../packages/orbit-sdk");
+const { describe, it, before, after } = require('node:test');
+const assert = require('node:assert');
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
 
-function writeJson(repoRoot, relativePath, value) {
-  const full = path.join(repoRoot, relativePath);
-  fs.mkdirSync(path.dirname(full), { recursive: true });
-  fs.writeFileSync(full, `${JSON.stringify(value, null, 2)}\n`);
-}
+const sdk = require('../packages/orbit-sdk/index.js');
 
-function tempRepo() {
-  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), "orbit-sdk-test-"));
-  writeJson(repoRoot, "memory/infrastructure.json", {
-    product: {
-      name: "Orbit",
-      category: "GitHub-native agent infrastructure",
-      problem: "Repos need agent control planes.",
-      solution: "Expose passport, capabilities, receipts, memory, permissions, and lifecycle."
-    },
-    activePhase: { id: "foundation-control-plane", name: "Foundation Control Plane", status: "active" },
-    layers: [
-      { id: "github-intake", name: "GitHub Intake", status: "active" },
-      { id: "wallet-policy", name: "Wallet Policy", status: "active" },
-      { id: "sdk-cli-access", name: "SDK And CLI Access", status: "planned" }
-    ],
-    surfaces: [
-      { id: "repo-control-plane", name: "Repository Control Plane", status: "active" },
-      { id: "sdk-cli", name: "SDK And CLI", status: "planned" }
-    ],
+// Create a temporary repo with test fixtures
+let tmpDir;
+
+function setupTmpRepo() {
+  tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'orbit-sdk-test-'));
+  const memDir = path.join(tmpDir, 'memory');
+  fs.mkdirSync(memDir, { recursive: true });
+  fs.mkdirSync(path.join(tmpDir, 'docs'), { recursive: true });
+
+  // state.json
+  fs.writeFileSync(path.join(memDir, 'state.json'), JSON.stringify({
+    cycle: 49,
+    born: '2026-05-22T01:46:39.981Z',
+    lastActive: new Date().toISOString(),
+    lastStatus: 'completed',
+    firstWakeIntroComplete: true,
+  }));
+
+  // passport.json
+  fs.writeFileSync(path.join(memDir, 'passport.json'), JSON.stringify({
+    version: 1,
+    identity: { name: 'Orbit', category: 'GitHub-native agent infrastructure' },
     capabilities: [
-      { id: "identity", name: "Identity", status: "active" },
-      { id: "proofs", name: "Proof Receipts", status: "active" },
-      { id: "zk", name: "ZK Receipts", status: "planned" }
+      { id: 'identity', name: 'Identity And Mission', status: 'active', mode: 'repo_public', evidence: ['memory/identity.md'] },
+      { id: 'lifecycle', name: 'Wake/Sleep Lifecycle', status: 'active', mode: 'github_actions', evidence: ['.github/workflows/orbit-cycle.yml'] },
+      { id: 'zk-receipts', name: 'ZK Policy Receipts', status: 'planned', mode: 'commitments_first', evidence: ['memory/roadmap.json'] },
     ],
-    commands: [
-      { name: "@orbit status", status: "planned" }
+    blockedActions: [
+      'wallet spending', 'external payments', 'signing',
+      'token launch', 'reward claims', 'payout-route changes',
     ],
-    access: [
-      { id: "cli", name: "CLI", status: "active" },
-      { id: "sdk", name: "SDK", status: "planned" }
-    ],
-    wallet: {
-      approvalMode: "owner_approval_required",
-      publicViewOnly: true,
-      noPrivateKeys: true,
-      blockedLiveActions: ["wallet spending", "signing"]
-    },
-    receipts: { current: "runtime/proofs/" },
-    blockedUntilApproved: ["Live wallet signing"]
-  });
-  writeJson(repoRoot, "memory/roadmap.json", {
-    currentLevel: { id: "level-1", name: "Safe Autonomy" }
-  });
-  fs.writeFileSync(path.join(repoRoot, "memory/identity.md"), "# Orbit\n\nAgent infrastructure.\n");
-  writeJson(repoRoot, "memory/state.json", {
-    cycle: 4,
-    born: "2026-01-01T00:00:00.000Z",
-    lastActive: "2026-01-02T00:00:00.000Z",
-    lastStatus: "completed",
-    firstWakeIntroComplete: true
-  });
-  writeJson(repoRoot, "memory/tasks.json", {
-    tasks: [{ id: "task-1", title: "Build SDK", status: "open" }]
-  });
-  writeJson(repoRoot, "memory/knowledge.json", {
-    entries: [{ id: "mem-1", title: "SDK", content: "Read-only contract.", kind: "product" }]
-  });
-  writeJson(repoRoot, "memory/governance.json", {
+    permissionModel: { defaultMode: 'owner_approval_required' },
+    budget: { dailyBudgetUsd: 5, monthlyBudgetUsd: 100 },
+    token: { symbol: 'ORBIT', launchStatus: 'not_launched' },
+  }));
+
+  // governance.json
+  fs.writeFileSync(path.join(memDir, 'governance.json'), JSON.stringify({
+    ownerUsername: '',
+    policyVersion: 1,
     externalSpend: {
-      mode: "owner_approval_required",
-      approvalIssueLabel: "orbit:approval",
-      approvalAcceptedLabel: "orbit:approved",
-      approvalRejectedLabel: "orbit:rejected",
-      allowedWithoutApproval: ["gas"]
+      mode: 'owner_approval_required',
+      approvalIssueLabel: 'orbit:approval',
+      approvalAcceptedLabel: 'orbit:approved',
+      approvalCommentPrefix: 'APPROVE ORBIT-SPEND',
+      allowedWithoutApproval: ['operator_revenue', 'treasury_internal', 'gas'],
     },
-    hardRules: ["No live wallet signing without approval."]
-  });
-  writeJson(repoRoot, "memory/treasury.json", {
+    selfRecipients: { treasuryEnv: 'ORBIT_TREASURY_ADDRESS' },
+    hardRules: ['Never send treasury funds to an unapproved external wallet.'],
+  }));
+
+  // treasury.json
+  const now = new Date().toISOString();
+  fs.writeFileSync(path.join(memDir, 'treasury.json'), JSON.stringify({
     ai: {
       dailyBudgetUsd: 5,
       monthlyBudgetUsd: 100,
-      reserveUsd: 1,
-      purchasePolicy: {
-        mode: "owner_approved_manual_credit_top_up",
-        liveApiPurchase: false
-      }
+      inputUsdPerMillion: 0.15,
+      outputUsdPerMillion: 0.6,
+      reserveUsd: 0,
+      ledger: [
+        { timestamp: now, note: 'test call', promptTokens: 1000, completionTokens: 500, totalTokens: 1500, estimatedUsd: 0.002, aiRoute: 'private-ai-route-1' },
+        { timestamp: '2026-05-23T10:00:00.000Z', note: 'older call', promptTokens: 2000, completionTokens: 1000, totalTokens: 3000, estimatedUsd: 0.005, aiRoute: 'private-ai-route-1' },
+      ],
     },
     revenue: {
-      cadence: "weekly_performance",
+      cadence: 'weekly_performance',
       claimIntervalDays: 7,
-      performanceWindowDays: 7,
-      operatorShareBps: 2000,
-      treasuryShareBps: 8000
+      operatorShareBps: 0,
+      treasuryShareBps: 10000,
+      lastClaimSentAt: null,
     },
-    token: {
-      name: "Orbit",
-      symbol: "ORBIT",
-      launchStatus: "planned"
-    }
-  });
-  fs.writeFileSync(path.join(repoRoot, "memory/cycles.jsonl"), `${JSON.stringify({ cycle: 4, timestamp: "2026-01-02T00:00:00.000Z", result: "done" })}\n`);
-  writeJson(repoRoot, "runtime/proofs/2026-01-02/proof.json", {
-    cycle: 4,
-    startedAt: "2026-01-02T00:00:00.000Z",
-    finishedAt: "2026-01-02T00:01:00.000Z",
-    trigger: { type: "mandatory" },
-    filesChanged: ["packages/orbit-sdk/index.js"],
-    result: "SDK built",
-    steps: [{ step: 1 }]
-  });
-  fs.mkdirSync(path.join(repoRoot, ".github/workflows"), { recursive: true });
-  fs.writeFileSync(path.join(repoRoot, ".github/workflows/orbit-cycle.yml"), "name: Orbit Cycle\n");
-  fs.writeFileSync(path.join(repoRoot, ".github/workflows/orbit-event.yml"), "name: Orbit Event\n");
-  return repoRoot;
+    token: { name: 'Orbit', symbol: 'ORBIT', launchStatus: 'not_launched', address: null },
+  }));
+
+  // roadmap.json
+  fs.writeFileSync(path.join(memDir, 'roadmap.json'), JSON.stringify({
+    currentLevel: { id: 'level-1', name: 'Control Plane Foundation', status: 'active', goal: 'Make every cycle measurable.' },
+    lanes: [
+      { id: 'control-plane-foundation', name: 'Control Plane Foundation', status: 'active', mission: 'Wake every cycle.' },
+      { id: 'mission-control', name: 'Mission Control', status: 'active', mission: 'Show visitors.' },
+      { id: 'proof-memory', name: 'Proof And Memory', status: 'planned', mission: 'Make proofs searchable.' },
+    ],
+    phaseChecks: [
+      { phaseId: 'safe-autonomy-core', status: 'active', checks: ['Emergency pause flag exists.'], evidence: ['memory/roadmap.json'] },
+      { phaseId: 'proof-memory-upgrade', status: 'planned', checks: ['Proof viewer works.'], evidence: [] },
+    ],
+    operatingRules: ['Roadmap progress must be backed by files.'],
+  }));
+
+  // tasks.json
+  fs.writeFileSync(path.join(memDir, 'tasks.json'), JSON.stringify({
+    tasks: [
+      { id: 'task-1', title: 'Build SDK', priority: 'high', status: 'open', source: 'cycle_49', notes: 'Test task', createdAt: now },
+      { id: 'task-2', title: 'Old task', priority: 'normal', status: 'done', source: 'cycle_1', notes: '', createdAt: '2026-05-22T00:00:00.000Z', completedAt: now, outcome: 'Done.' },
+      { id: 'task-3', title: 'Another open', priority: 'low', status: 'open', source: 'cycle_2', notes: '', createdAt: now },
+    ],
+  }));
+
+  // knowledge.json
+  fs.writeFileSync(path.join(memDir, 'knowledge.json'), JSON.stringify({
+    entries: [
+      { id: 'k1', kind: 'cycle_summary', title: 'Cycle 48 summary', content: 'Created status query reference.', tags: ['cycle', 'infrastructure'], source: 'cycle_48', createdAt: now },
+      { id: 'k2', kind: 'household_note', title: 'SDK created', content: 'Built orbit-sdk package.', tags: ['sdk', 'infrastructure'], source: 'cycle_49', createdAt: now },
+      { id: 'k3', kind: 'decision', title: 'Zero deps rule', content: 'All packages must have zero npm dependencies.', tags: ['principle'], source: 'cycle_5', createdAt: '2026-05-22T00:00:00.000Z' },
+    ],
+  }));
+
+  // infrastructure.json
+  fs.writeFileSync(path.join(memDir, 'infrastructure.json'), JSON.stringify({
+    product: { name: 'Orbit', category: 'GitHub-native agent infrastructure' },
+    capabilities: [
+      { id: 'identity', name: 'Identity And Mission', status: 'active' },
+      { id: 'lifecycle', name: 'Wake/Sleep Lifecycle', status: 'active' },
+      { id: 'agent-passport', name: 'Agent Passport', status: 'active' },
+    ],
+    walletBlockedLiveActions: ['wallet spending', 'signing'],
+  }));
+
+  // opportunities.json
+  fs.writeFileSync(path.join(memDir, 'opportunities.json'), JSON.stringify({
+    best: { id: 'orbit-agent-passport', title: 'Orbit agent passport', score: 42.33 },
+    opportunities: [
+      { id: 'orbit-agent-passport', title: 'Orbit agent passport', status: 'open', score: 42.33 },
+      { id: 'orbit-infrastructure-sdk', title: 'Orbit infrastructure SDK', status: 'open', score: 40.43 },
+    ],
+  }));
+
+  // approvals.json
+  fs.writeFileSync(path.join(memDir, 'approvals.json'), JSON.stringify({
+    approvals: [
+      { id: 'ap-1', purpose: 'Test approval', status: 'pending', createdAt: now },
+      { id: 'ap-2', purpose: 'Old approval', status: 'approved', createdAt: '2026-05-22T00:00:00.000Z' },
+    ],
+  }));
+
+  // Empty cycles.jsonl
+  fs.writeFileSync(path.join(memDir, 'cycles.jsonl'), '');
+
+  return tmpDir;
 }
 
-test("SDK reads Orbit status", () => {
-  const repoRoot = tempRepo();
-  const status = readStatus(repoRoot);
+function cleanupTmpRepo() {
+  if (tmpDir) {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+}
 
-  assert.equal(status.product.name, "Orbit");
-  assert.equal(status.lifecycle.cycle, 4);
-  assert.equal(status.capabilitySummary.activeCapabilities, 2);
-  assert.equal(status.latestReceipt.cycle, 4);
-});
+describe('Orbit SDK', () => {
+  before(() => {
+    setupTmpRepo();
+  });
 
-test("SDK exports agent passport with digest", () => {
-  const passport = readPassport(tempRepo());
+  after(() => {
+    cleanupTmpRepo();
+  });
 
-  assert.equal(passport.category, "GitHub-native agent infrastructure");
-  assert.equal(passport.permissionMode, "owner_approval_required");
-  assert.ok(passport.digest);
-});
+  describe('File readers', () => {
+    it('readState returns lifecycle state', () => {
+      const state = sdk.readState(tmpDir);
+      assert.strictEqual(state.cycle, 49);
+      assert.strictEqual(state.lastStatus, 'completed');
+      assert.strictEqual(state.firstWakeIntroComplete, true);
+    });
 
-test("SDK reads capabilities and adoption checklist", () => {
-  const repoRoot = tempRepo();
-  const capabilities = readCapabilities(repoRoot);
-  const adoption = adoptionChecklist(repoRoot);
+    it('readPassport returns agent identity', () => {
+      const passport = sdk.readPassport(tmpDir);
+      assert.strictEqual(passport.identity.name, 'Orbit');
+      assert.strictEqual(passport.version, 1);
+      assert.ok(Array.isArray(passport.capabilities));
+      assert.ok(passport.blockedActions.length > 0);
+    });
 
-  assert.equal(capabilities.summary.totalSurfaces, 2);
-  assert.equal(capabilities.summary.totalCommands, 1);
-  assert.equal(adoption.summary.ready, true);
-});
+    it('readGovernance returns approval policy', () => {
+      const gov = sdk.readGovernance(tmpDir);
+      assert.strictEqual(gov.externalSpend.mode, 'owner_approval_required');
+      assert.ok(Array.isArray(gov.hardRules));
+      assert.ok(gov.hardRules.length > 0);
+    });
 
-test("SDK reads infrastructure layers and wallet policy", () => {
-  const repoRoot = tempRepo();
-  const infrastructure = readInfrastructure(repoRoot);
-  const walletPolicy = readWalletPolicy(repoRoot);
+    it('readTreasury returns budget and revenue', () => {
+      const treasury = sdk.readTreasury(tmpDir);
+      assert.strictEqual(treasury.ai.dailyBudgetUsd, 5);
+      assert.strictEqual(treasury.ai.monthlyBudgetUsd, 100);
+      assert.strictEqual(treasury.token.symbol, 'ORBIT');
+      assert.strictEqual(treasury.revenue.cadence, 'weekly_performance');
+      assert.ok(Array.isArray(treasury.ai.ledger));
+    });
 
-  assert.equal(infrastructure.summary.totalLayers, 3);
-  assert.equal(infrastructure.summary.totalAccess, 2);
-  assert.equal(infrastructure.summary.sdkStatus, "planned");
-  assert.equal(infrastructure.layers[0].name, "GitHub Intake");
-  assert.equal(walletPolicy.approvalMode, "owner_approval_required");
-  assert.equal(walletPolicy.publicViewOnly, true);
-  assert.equal(walletPolicy.noPrivateKeys, true);
-  assert.equal(walletPolicy.aiBudget.dailyBudgetUsd, 5);
-  assert.equal(walletPolicy.revenue.cadence, "weekly_performance");
-  assert.equal(walletPolicy.token.symbol, "ORBIT");
-  assert.ok(walletPolicy.digest);
-});
+    it('readRoadmap returns levels and lanes', () => {
+      const roadmap = sdk.readRoadmap(tmpDir);
+      assert.strictEqual(roadmap.currentLevel.id, 'level-1');
+      assert.ok(Array.isArray(roadmap.lanes));
+      assert.ok(roadmap.lanes.length > 0);
+    });
 
-test("SDK reads proof receipts with digest", () => {
-  const receipts = readReceipts(tempRepo(), undefined, { limit: 1 });
+    it('readTasks returns work items', () => {
+      const tasks = sdk.readTasks(tmpDir);
+      assert.ok(Array.isArray(tasks.tasks));
+      assert.strictEqual(tasks.tasks.length, 3);
+    });
 
-  assert.equal(receipts.count, 1);
-  assert.equal(receipts.latest.filesChanged[0], "packages/orbit-sdk/index.js");
-  assert.ok(receipts.latest.digest);
-});
+    it('readKnowledge returns entries', () => {
+      const knowledge = sdk.readKnowledge(tmpDir);
+      assert.ok(Array.isArray(knowledge.entries));
+      assert.strictEqual(knowledge.entries.length, 3);
+    });
 
-test("SDK client exposes full bundle", () => {
-  const repoRoot = tempRepo();
-  const client = createOrbitClient({ repoRoot });
-  const bundle = exportBundle(repoRoot);
+    it('readInfrastructure returns product registry', () => {
+      const infra = sdk.readInfrastructure(tmpDir);
+      assert.strictEqual(infra.product.name, 'Orbit');
+      assert.ok(Array.isArray(infra.capabilities));
+    });
 
-  assert.equal(client.readLifecycle().recordedCycles, 1);
-  assert.equal(bundle.status.product.name, "Orbit");
-  assert.equal(bundle.infrastructure.summary.totalLayers, 3);
-  assert.equal(bundle.walletPolicy.approvalMode, "owner_approval_required");
-  assert.ok(bundle.digest);
+    it('readOpportunities returns earning ideas', () => {
+      const opps = sdk.readOpportunities(tmpDir);
+      assert.strictEqual(opps.best.id, 'orbit-agent-passport');
+      assert.ok(Array.isArray(opps.opportunities));
+    });
+
+    it('readApprovals returns approval queue', () => {
+      const approvals = sdk.readApprovals(tmpDir);
+      assert.ok(Array.isArray(approvals.approvals));
+      assert.strictEqual(approvals.approvals.length, 2);
+    });
+  });
+
+  describe('Convenience queries', () => {
+    it('quickStatus returns compact summary', () => {
+      const status = sdk.quickStatus(tmpDir);
+      assert.strictEqual(status.cycle, 49);
+      assert.strictEqual(status.lastStatus, 'completed');
+      assert.strictEqual(typeof status.staleMinutes, 'number');
+      assert.strictEqual(status.currentLevel.id, 'level-1');
+      assert.strictEqual(status.openTaskCount, 2);
+      assert.strictEqual(typeof status.aiBudget.dailyBudgetUsd, 'number');
+      assert.strictEqual(typeof status.aiBudget.canUseAi, 'boolean');
+      assert.strictEqual(status.tokenLaunchStatus, 'not_launched');
+    });
+
+    it('activeCapabilities filters to active', () => {
+      const caps = sdk.activeCapabilities(tmpDir);
+      assert.strictEqual(caps.length, 2);
+      assert.ok(caps.every(c => c.id !== 'zk-receipts'));
+      assert.ok(caps[0].id);
+      assert.ok(caps[0].name);
+    });
+
+    it('blockedActions returns list', () => {
+      const blocked = sdk.blockedActions(tmpDir);
+      assert.ok(blocked.includes('wallet spending'));
+      assert.ok(blocked.includes('signing'));
+      assert.strictEqual(blocked.length, 6);
+    });
+
+    it('checkApprovalRequired returns correct for external_payment', () => {
+      const check = sdk.checkApprovalRequired(tmpDir, 'external_payment');
+      assert.strictEqual(check.requiresApproval, true);
+      assert.strictEqual(check.mode, 'owner_approval_required');
+      assert.ok(check.hardRules.length > 0);
+    });
+
+    it('checkApprovalRequired returns false for allowed category', () => {
+      const check = sdk.checkApprovalRequired(tmpDir, 'gas');
+      assert.strictEqual(check.requiresApproval, false);
+    });
+
+    it('openTasks returns open tasks', () => {
+      const tasks = sdk.openTasks(tmpDir);
+      assert.strictEqual(tasks.length, 2);
+      assert.ok(tasks.every(t => !t.status || t.id)); // has id
+    });
+
+    it('openTasks filters by priority', () => {
+      const high = sdk.openTasks(tmpDir, 'high');
+      assert.strictEqual(high.length, 1);
+      assert.strictEqual(high[0].title, 'Build SDK');
+    });
+
+    it('budgetSummary calculates derived values', () => {
+      const budget = sdk.budgetSummary(tmpDir);
+      assert.strictEqual(budget.dailyBudgetUsd, 5);
+      assert.strictEqual(budget.monthlyBudgetUsd, 100);
+      assert.strictEqual(typeof budget.lifetimeSpendUsd, 'number');
+      assert.strictEqual(typeof budget.spentTodayUsd, 'number');
+      assert.strictEqual(typeof budget.dailyRemainingUsd, 'number');
+      assert.strictEqual(budget.lifetimeCalls, 2);
+      assert.ok(budget.lifetimeSpendUsd > 0);
+    });
+
+    it('revenueStatus returns revenue and token', () => {
+      const rev = sdk.revenueStatus(tmpDir);
+      assert.strictEqual(rev.revenue.cadence, 'weekly_performance');
+      assert.strictEqual(rev.token.symbol, 'ORBIT');
+      assert.strictEqual(rev.token.launchStatus, 'not_launched');
+    });
+
+    it('activeLanes returns active lanes only', () => {
+      const lanes = sdk.activeLanes(tmpDir);
+      assert.strictEqual(lanes.length, 2);
+      assert.ok(lanes.every(l => l.id !== 'proof-memory'));
+    });
+
+    it('activePhaseChecks returns active checks', () => {
+      const phases = sdk.activePhaseChecks(tmpDir);
+      assert.strictEqual(phases.length, 1);
+      assert.strictEqual(phases[0].phaseId, 'safe-autonomy-core');
+    });
+
+    it('queryKnowledge filters by kind', () => {
+      const summaries = sdk.queryKnowledge(tmpDir, { kind: 'cycle_summary' });
+      assert.strictEqual(summaries.length, 1);
+      assert.strictEqual(summaries[0].kind, 'cycle_summary');
+    });
+
+    it('queryKnowledge filters by tag', () => {
+      const infra = sdk.queryKnowledge(tmpDir, { tag: 'infrastructure' });
+      assert.strictEqual(infra.length, 2);
+    });
+
+    it('queryKnowledge applies limit', () => {
+      const recent = sdk.queryKnowledge(tmpDir, { limit: 1 });
+      assert.strictEqual(recent.length, 1);
+    });
+
+    it('machineReadableFiles returns file inventory', () => {
+      const files = sdk.machineReadableFiles(tmpDir);
+      assert.strictEqual(files.state.exists, true);
+      assert.strictEqual(files.passport.exists, true);
+      assert.ok(files.state.sizeBytes > 0);
+      // cycles.jsonl exists but may have sizeBytes === 0
+      assert.strictEqual(files.cycles.exists, true);
+    });
+
+    it('pendingApprovals filters to pending', () => {
+      const pending = sdk.pendingApprovals(tmpDir);
+      assert.strictEqual(pending.length, 1);
+      assert.strictEqual(pending[0].id, 'ap-1');
+    });
+  });
+
+  describe('Error handling', () => {
+    it('readState throws on missing file', () => {
+      assert.throws(() => sdk.readState('/nonexistent/path'));
+    });
+
+    it('safeReadJson returns null on missing file', () => {
+      const result = sdk.safeReadJson('/nonexistent/path', 'memory/state.json');
+      assert.strictEqual(result, null);
+    });
+
+    it('readApprovals uses safeReadJson for missing file', () => {
+      const approvals = sdk.readApprovals('/nonexistent/path');
+      assert.deepStrictEqual(approvals, { approvals: [] });
+    });
+  });
+
+  describe('FILES constant', () => {
+    it('defines all 11 machine-readable files', () => {
+      assert.strictEqual(Object.keys(sdk.FILES).length, 11);
+      assert.ok(sdk.FILES.state);
+      assert.ok(sdk.FILES.passport);
+      assert.ok(sdk.FILES.governance);
+      assert.ok(sdk.FILES.treasury);
+      assert.ok(sdk.FILES.roadmap);
+      assert.ok(sdk.FILES.tasks);
+      assert.ok(sdk.FILES.knowledge);
+      assert.ok(sdk.FILES.infrastructure);
+      assert.ok(sdk.FILES.opportunities);
+      assert.ok(sdk.FILES.cycles);
+      assert.ok(sdk.FILES.approvals);
+    });
+  });
 });
