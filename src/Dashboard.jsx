@@ -132,7 +132,7 @@ function Hero({ data }) {
             </a>
           ) : data.signer
             ? <span className="dash-muted">no signed receipt yet</span>
-            : <span className="dash-muted">signer not yet published</span>}
+            : <span className="dash-muted">agent signer pending — set ORBIT_AGENT_SIGNER on the repo to enable proof signing</span>}
         {latest && latest.path && (
           <a className="dash-cta dash-cta-secondary" href={`${REPO_URL}/blob/main/${latest.path}`}>view on github</a>
         )}
@@ -357,7 +357,7 @@ function VerifyBlock({ data }) {
 $ {command}</pre>
       {data.signer
         ? <p className="dash-muted">signer hash: <code>{data.signer}</code></p>
-        : <p className="dash-muted">signer not yet published.</p>}
+        : <p className="dash-muted">agent signer pending. set <code>ORBIT_AGENT_SIGNER</code> on the repo to start publishing signed proofs.</p>}
     </section>
   );
 }

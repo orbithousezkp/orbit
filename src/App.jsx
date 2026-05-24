@@ -146,7 +146,7 @@ function HouseVisual() {
             </span>
             <div>
               <div className="text-[13px] font-bold text-slate-950">Orbit Control Plane</div>
-              <div className="font-mono text-[11px] text-slate-500">github.com/asuran/orbit</div>
+              <div className="font-mono text-[11px] text-slate-500">github.com/orbit-house/orbit</div>
             </div>
           </div>
           <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 text-[11px] font-bold text-emerald-700">
@@ -602,7 +602,7 @@ export default function App() {
                 </div>
                 <pre className="overflow-x-auto rounded-xl bg-slate-950 p-4 font-mono text-[12px] leading-6 text-slate-200">
 {`cycle: 184
-repo: github.com/asuran/orbit
+repo: github.com/orbit-house/orbit
 intake: 3 issues
 chores: memory refresh, proof write
 earnings: dry-run only

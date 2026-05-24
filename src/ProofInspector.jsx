@@ -247,7 +247,7 @@ export default function ProofInspector() {
       <header className="dash-header">
         <div className="dash-header-row">
           <span className="dash-wordmark">orbit · proof inspector</span>
-          <a className="dash-link" href="#">dashboard</a>
+          <a className="dash-link" href="/">dashboard</a>
           <a className="dash-link" href={REPO_URL}>github</a>
         </div>
       </header>
@@ -258,6 +258,19 @@ export default function ProofInspector() {
           paste a proof JSON or load one by URL. verification runs entirely in this page
           using viem — nothing is uploaded.
         </p>
+        <details className="inspect-explainer">
+          <summary>what is a cycle proof?</summary>
+          <p className="dash-muted">
+            every time orbit runs a cycle (planning, acting, committing), it writes a JSON
+            receipt to <code>runtime/proofs/&lt;date&gt;/&lt;timestamp&gt;.json</code> in the
+            repo and signs it with an EIP-712 signature over the canonical payload hash.
+          </p>
+          <p className="dash-muted">
+            this tool re-derives the payload hash and recovers the signer address from the
+            signature. if the recovered signer matches the declared signer, the proof is
+            authentic — nobody tampered with the steps, the trigger, or the result.
+          </p>
+        </details>
       </section>
 
       <section className="dash-section">
