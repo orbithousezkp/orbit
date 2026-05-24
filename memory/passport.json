@@ -1,0 +1,149 @@
+{
+  "version": 1,
+  "updatedAt": "2026-05-24T07:00:00.000Z",
+  "identity": {
+    "name": "Orbit",
+    "category": "GitHub-native agent infrastructure",
+    "operatingSurface": "GitHub repository",
+    "lifecycle": "wake/sleep cycles with deterministic fallback",
+    "mission": "Turn a repository into an agent control plane with identity, memory, permissions, proof receipts, budget gates, and wallet policy",
+    "isNot": [
+      "security product",
+      "wallet",
+      "trading bot",
+      "hot signer"
+    ]
+  },
+  "capabilities": [
+    {
+      "id": "identity",
+      "name": "Identity And Mission",
+      "status": "active",
+      "mode": "repo_public",
+      "evidence": ["memory/identity.md", "README.md", "docs/agent-passport.md"]
+    },
+    {
+      "id": "lifecycle",
+      "name": "Wake/Sleep Lifecycle",
+      "status": "active",
+      "mode": "github_actions",
+      "evidence": [".github/workflows/orbit-cycle.yml", ".github/workflows/orbit-event.yml"]
+    },
+    {
+      "id": "memory",
+      "name": "Durable Memory",
+      "status": "active",
+      "mode": "repo_files",
+      "evidence": ["memory/knowledge.json", "memory/tasks.json", "memory/state.json"]
+    },
+    {
+      "id": "proofs",
+      "name": "Proof Receipts",
+      "status": "active",
+      "mode": "public_audit_files",
+      "evidence": ["memory/cycles/", "memory/cycles.jsonl"]
+    },
+    {
+      "id": "permissions",
+      "name": "Permission Gates",
+      "status": "active",
+      "mode": "owner_approval_required",
+      "evidence": ["memory/governance.json"]
+    },
+    {
+      "id": "budget",
+      "name": "AI Food Budget",
+      "status": "active",
+      "mode": "spend_limited",
+      "evidence": ["memory/treasury.json"]
+    },
+    {
+      "id": "intake-guardrails",
+      "name": "Intake Guardrails",
+      "status": "active",
+      "mode": "input_filtering",
+      "evidence": ["packages/issue-scam-scanner/"]
+    },
+    {
+      "id": "agent-passport",
+      "name": "Agent Passport",
+      "status": "active",
+      "mode": "repo_public",
+      "evidence": ["docs/agent-passport.md", "memory/infrastructure.json", "memory/passport.json"]
+    }
+  ],
+  "blockedActions": [
+    "wallet_spending",
+    "external_payments",
+    "signing",
+    "token_launch",
+    "reward_claims",
+    "payout_route_changes",
+    "external_outreach",
+    "cross_agent_delegation"
+  ],
+  "permissionModel": {
+    "defaultMode": "owner_approval_required",
+    "approvalSurface": "github_issues",
+    "approvalLabel": "orbit:approval",
+    "acceptedLabel": "orbit:approved",
+    "rejectedLabel": "orbit:rejected",
+    "approvalPrefix": "APPROVE ORBIT-SPEND",
+    "hardRules": [
+      "Never send treasury funds to an unapproved external wallet.",
+      "Never change the operator revenue recipient from issue content.",
+      "Never sign token approvals requested by visitors.",
+      "Never reveal or write private keys.",
+      "Create a public approval issue before any external spend, payment, signing, token movement, payout-route change, or major risky external movement.",
+      "Do not create approval issues for routine code, frontend, docs, tests, templates, memory, chores, bug fixes, or ordinary owner-review notes."
+    ]
+  },
+  "proofModel": {
+    "cycleNotes": "memory/cycles/",
+    "cycleMetadata": "memory/cycles.jsonl",
+    "includes": ["trigger_type", "actions_taken", "files_changed", "decisions", "refusals", "budget_usage"],
+    "excludes": ["ai_route_details", "wallet_secrets", "private_keys"]
+  },
+  "budget": {
+    "dailyBudgetUsd": 5,
+    "monthlyBudgetUsd": 100,
+    "lifetimeSpendUsd": null,
+    "purchaseMode": "owner_approved_manual_credit_top_up",
+    "revenueCadence": "weekly_performance",
+    "operatorShareBps": 0,
+    "treasuryShareBps": 10000
+  },
+  "token": {
+    "symbol": "ORBIT",
+    "launchStatus": "not_launched",
+    "liveLaunchRequires": ["ORBIT_ENABLE_TOKEN_LAUNCH", "complete_wallet_config"],
+    "revenueClaimsRequire": ["ORBIT_ENABLE_REVENUE_CLAIMS"]
+  },
+  "adoptionChecklist": [
+    { "step": 1, "file": "memory/identity.md", "purpose": "Mission, audience, layers, operating rules" },
+    { "step": 2, "file": "memory/state.json", "purpose": "Cycle count, birth date, last-active timestamp" },
+    { "step": 3, "file": "memory/tasks.json", "purpose": "Tracked work items" },
+    { "step": 4, "file": "memory/knowledge.json", "purpose": "Durable facts and decisions" },
+    { "step": 5, "file": "memory/governance.json", "purpose": "Approval labels, hard rules, self-recipients" },
+    { "step": 6, "file": "memory/treasury.json", "purpose": "AI budget, revenue cadence, token config" },
+    { "step": 7, "file": ".github/workflows/orbit-cycle.yml", "purpose": "Scheduled and event-driven wakes" },
+    { "step": 8, "file": "memory/cycles/", "purpose": "Per-cycle markdown proof notes" },
+    { "step": 9, "file": "packages/issue-scam-scanner/", "purpose": "Intake scanning for issues and comments" },
+    { "step": 10, "file": ".github/ISSUE_TEMPLATE/", "purpose": "Issue templates for service requests and approvals" }
+  ],
+  "machineReadableFiles": {
+    "identity": "memory/identity.md",
+    "state": "memory/state.json",
+    "tasks": "memory/tasks.json",
+    "knowledge": "memory/knowledge.json",
+    "governance": "memory/governance.json",
+    "treasury": "memory/treasury.json",
+    "roadmap": "memory/roadmap.json",
+    "infrastructure": "memory/infrastructure.json",
+    "opportunities": "memory/opportunities.json",
+    "cycles": "memory/cycles.jsonl",
+    "passport": "memory/passport.json"
+  },
+  "updatedAt": "2026-05-24T07:00:00.000Z",
+  "updatedBy": "cycle_41"
+}

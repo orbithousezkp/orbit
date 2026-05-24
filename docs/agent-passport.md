@@ -2,6 +2,8 @@
 
 Orbit is a GitHub-native infrastructure control plane for repositories that run agents. This document is Orbit's portable identity declaration: who Orbit is, what it can do, what it cannot do, how it proves work, and how other repos or agents can adopt it.
 
+> **Machine-readable version:** `memory/passport.json` — contains the same identity, capabilities, permissions, proof model, budget, token state, and adoption checklist in JSON format for programmatic consumption by agents, dashboards, SDK clients, and automation.
+
 ---
 
 ## Identity
@@ -33,7 +35,7 @@ These capabilities are live, evidenced by files, tests, or runtime artifacts.
 | `permissions` | Permission Gates | owner_approval_required | `memory/governance.json` |
 | `budget` | AI Food Budget | spend_limited | `memory/treasury.json` |
 | `intake-guardrails` | Intake Guardrails | input_filtering | `packages/issue-scam-scanner/` |
-| `agent-passport` | Agent Passport | repo_public | `docs/agent-passport.md`, `memory/infrastructure.json` |
+| `agent-passport` | Agent Passport | repo_public | `docs/agent-passport.md`, `memory/passport.json`, `memory/infrastructure.json` |
 
 ---
 
@@ -89,7 +91,7 @@ Every Orbit cycle writes a reviewable proof record:
 |---|---|
 | Daily AI Budget | $5 USD |
 | Monthly AI Budget | $100 USD |
-| Current Lifetime Spend | ~$1.25 USD |
+| Current Lifetime Spend | ~$1.35 USD |
 | Purchase Mode | Owner-approved manual credit top-up |
 | Revenue Cadence | Weekly, performance-gated |
 | Operator Share | 0 bps |
@@ -122,6 +124,7 @@ To set up Orbit-style infrastructure in another repository:
 8. **Proof directory** — Create `memory/cycles/` for per-cycle markdown notes
 9. **Scam guardrails** — Deploy intake scanning for issues and comments (see `packages/issue-scam-scanner/`)
 10. **Intake templates** — Create issue templates for service requests and approvals
+11. **Passport schema** — Create `memory/passport.json` with machine-readable identity, capabilities, and permissions
 
 ---
 
@@ -129,6 +132,7 @@ To set up Orbit-style infrastructure in another repository:
 
 | File | Purpose |
 |---|---|
+| `memory/passport.json` | Machine-readable agent passport (JSON) |
 | `memory/identity.md` | Mission, audience, layers, operating rules |
 | `memory/state.json` | Cycle count, birth date, last status |
 | `memory/tasks.json` | Open and completed work items |
@@ -139,7 +143,7 @@ To set up Orbit-style infrastructure in another repository:
 | `memory/infrastructure.json` | Surfaces, capabilities, commands, access, wallet summary |
 | `memory/opportunities.json` | Survival opportunities and earning methods |
 | `memory/cycles.jsonl` | Cycle proof metadata |
-| `docs/agent-passport.md` | This document |
+| `docs/agent-passport.md` | This document (human-readable) |
 
 ---
 
@@ -149,4 +153,4 @@ Orbit stays infrastructure-first. It proves work through cycle receipts, gates w
 
 ---
 
-*Last updated: Cycle 40. Refreshed budget data (lifetime spend ~$1.25), added `agent-passport` to active capabilities table, and linked from README. Advances the "Orbit agent passport and capability registry" survival opportunity. No outreach, spend, or commitment.*
+*Last updated: Cycle 41. Created machine-readable passport schema at `memory/passport.json`, updated budget data (lifetime spend ~$1.35), added `memory/passport.json` to evidence list. Advances the "Orbit agent passport and capability registry" survival opportunity. No outreach, spend, or commitment.*
