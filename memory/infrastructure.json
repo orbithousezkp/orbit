@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-05-24T12:30:00.000Z",
+  "updatedAt": "2026-05-24T14:30:00.000Z",
   "product": {
     "name": "Orbit",
     "category": "GitHub-native agent infrastructure",
@@ -109,6 +109,13 @@
       "description": "Detailed documentation of proof formats, privacy rules, JSONL schema, lifecycle, auditability, and adoption pattern."
     },
     {
+      "id": "wallet-policy-doc",
+      "name": "Wallet Policy Documentation",
+      "status": "active",
+      "path": "docs/wallet-policy.md",
+      "description": "Read-only wallet policy boundary: approval model, hard rules, AI-call budget, revenue cadence, token state, blocked live actions, and privacy rules."
+    },
+    {
       "id": "sdk-cli",
       "name": "SDK And CLI Surface",
       "status": "planned",
@@ -187,6 +194,7 @@
       "mode": "spend_limited",
       "evidence": [
         "memory/treasury.json",
+        "docs/wallet-policy.md",
         "src/agent/treasury.js",
         "tests/treasury.test.js"
       ]
@@ -318,8 +326,18 @@
       "token launch",
       "reward claims",
       "payout-route changes"
-    ]
+    ],
+    "documentation": "docs/wallet-policy.md"
   },
+  "walletMode": "owner_approval_required",
+  "walletBlockedLiveActions": [
+    "wallet spending",
+    "external payments",
+    "signing",
+    "token launch",
+    "reward claims",
+    "payout-route changes"
+  ],
   "receipts": {
     "current": "runtime/proofs/",
     "proofModelDoc": "docs/proof-model.md",
