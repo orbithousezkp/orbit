@@ -1,7 +1,7 @@
 {
   "schema": "orbit-dashboard/1",
-  "generatedAt": "2026-05-24T05:25:29.599Z",
-  "gitCommit": "bea4511",
+  "generatedAt": "2026-05-24T06:13:36.834Z",
+  "gitCommit": "04de881",
   "product": {
     "name": "Orbit",
     "category": "GitHub-native agent infrastructure",
@@ -17,12 +17,12 @@
   },
   "signer": null,
   "lifecycle": {
-    "cycle": 39,
+    "cycle": 40,
     "born": "2026-05-22T01:46:39.981Z",
-    "lastActive": "2026-05-24T05:23:05.885Z",
+    "lastActive": "2026-05-24T06:10:59.331Z",
     "lastStatus": "completed",
     "firstWakeIntroComplete": true,
-    "recordedCycles": 39
+    "recordedCycles": 40
   },
   "walletPolicy": {
     "approvalMode": "owner_approval_required",
@@ -58,23 +58,20 @@
   "receipts": {
     "count": 10,
     "latest": {
-      "path": "runtime/proofs/2026-05-24/2026-05-24T05-25-29-596Z.json",
-      "cycle": 39,
-      "startedAt": "2026-05-24T05:23:05.885Z",
-      "finishedAt": "2026-05-24T05:25:29.596Z",
+      "path": "runtime/proofs/cycle-40.json",
+      "cycle": 40,
+      "startedAt": null,
+      "finishedAt": null,
       "trigger": {
-        "type": "event",
-        "id": "owner_manual_wake",
-        "label": "owner manual wake",
-        "source": "workflow_dispatch",
-        "action": "",
-        "reason": "Wake because the owner asked for a cycle now."
+        "type": "mandatory",
+        "id": "regular_heartbeat",
+        "label": "30-minute heartbeat"
       },
       "dryRun": false,
-      "totalSteps": 32,
-      "filesChangedCount": 10,
+      "totalSteps": 0,
+      "filesChangedCount": 5,
       "result": "",
-      "digest": "fd8682d489a5434c70cad03bd071a7424d76d45cd6f197fcb8b3229566320272",
+      "digest": "db0d0dfa0e46914755c8d9ed495eaaa76cba419a5295d8ed347b5b942dc1afd9",
       "signed": false,
       "signer": null,
       "signatureScheme": null,
@@ -82,54 +79,6 @@
     },
     "latestSigned": null,
     "list": [
-      {
-        "path": "runtime/proofs/2026-05-23/2026-05-23T14-06-01-660Z.json",
-        "cycle": 30,
-        "startedAt": "2026-05-23T14:02:44.728Z",
-        "finishedAt": "2026-05-23T14:06:01.660Z",
-        "trigger": {
-          "type": "mandatory",
-          "id": "regular_heartbeat",
-          "label": "30-minute heartbeat",
-          "intervalMinutes": 30,
-          "source": "schedule",
-          "action": "",
-          "reason": "Wake on the fixed household rhythm even when nobody knocks."
-        },
-        "dryRun": false,
-        "totalSteps": 34,
-        "filesChangedCount": 4,
-        "result": "",
-        "digest": "d4a49c4bce21606bcde062b7c1411b9bd2d7d22a6eaf40afdb91f4706554ca72",
-        "signed": false,
-        "signer": null,
-        "signatureScheme": null,
-        "payloadHash": null
-      },
-      {
-        "path": "runtime/proofs/2026-05-23/2026-05-23T15-22-58-074Z.json",
-        "cycle": 31,
-        "startedAt": "2026-05-23T15:19:29.706Z",
-        "finishedAt": "2026-05-23T15:22:58.074Z",
-        "trigger": {
-          "type": "mandatory",
-          "id": "regular_heartbeat",
-          "label": "30-minute heartbeat",
-          "intervalMinutes": 30,
-          "source": "schedule",
-          "action": "",
-          "reason": "Wake on the fixed household rhythm even when nobody knocks."
-        },
-        "dryRun": false,
-        "totalSteps": 32,
-        "filesChangedCount": 5,
-        "result": "",
-        "digest": "60df6e122f24a6037386a1110f45adf4388ff85e97c76b5c6bb3b69daee8668c",
-        "signed": false,
-        "signer": null,
-        "signatureScheme": null,
-        "payloadHash": null
-      },
       {
         "path": "runtime/proofs/2026-05-23/2026-05-23T16-42-46-385Z.json",
         "cycle": 32,
@@ -315,7 +264,51 @@
         "totalSteps": 32,
         "filesChangedCount": 10,
         "result": "",
-        "digest": "fd8682d489a5434c70cad03bd071a7424d76d45cd6f197fcb8b3229566320272",
+        "digest": "759af4aa518963c8cf2b3770548a97add659a4b4b41a37880a1029c3691dcfb4",
+        "signed": false,
+        "signer": null,
+        "signatureScheme": null,
+        "payloadHash": null
+      },
+      {
+        "path": "runtime/proofs/2026-05-24/2026-05-24T06-13-36-832Z.json",
+        "cycle": 40,
+        "startedAt": "2026-05-24T06:10:59.331Z",
+        "finishedAt": "2026-05-24T06:13:36.832Z",
+        "trigger": {
+          "type": "mandatory",
+          "id": "regular_heartbeat",
+          "label": "30-minute heartbeat",
+          "intervalMinutes": 30,
+          "source": "schedule",
+          "action": "",
+          "reason": "Wake on the fixed repository control-plane rhythm even when no event fires."
+        },
+        "dryRun": false,
+        "totalSteps": 28,
+        "filesChangedCount": 7,
+        "result": "",
+        "digest": "917fad1a8cc051f7df5043d4c224028ab41d04261fd2a49d1d2cc4ea5e250c75",
+        "signed": false,
+        "signer": null,
+        "signatureScheme": null,
+        "payloadHash": null
+      },
+      {
+        "path": "runtime/proofs/cycle-40.json",
+        "cycle": 40,
+        "startedAt": null,
+        "finishedAt": null,
+        "trigger": {
+          "type": "mandatory",
+          "id": "regular_heartbeat",
+          "label": "30-minute heartbeat"
+        },
+        "dryRun": false,
+        "totalSteps": 0,
+        "filesChangedCount": 5,
+        "result": "",
+        "digest": "db0d0dfa0e46914755c8d9ed495eaaa76cba419a5295d8ed347b5b942dc1afd9",
         "signed": false,
         "signer": null,
         "signatureScheme": null,
@@ -324,5 +317,5 @@
     ]
   },
   "refusals": [],
-  "digest": "eba9ecddd9f80b736ce11c4cec9249ab816a94264312467c32642a51b7808385"
+  "digest": "4a67854923e3cdf03697e0e17ba2a69c293b5c14d97985dc7e8476f8164b5f15"
 }

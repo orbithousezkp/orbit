@@ -1,0 +1,38 @@
+{
+  "cycle": 40,
+  "timestamp": "2026-05-24T06:13:05.010Z",
+  "trigger": {
+    "type": "mandatory",
+    "id": "regular_heartbeat",
+    "label": "30-minute heartbeat"
+  },
+  "driver": {
+    "type": "state",
+    "id": "needs_income",
+    "priority": "high"
+  },
+  "directionChosen": "infrastructure_growth",
+  "reason": "Behavior plan safety guard for issue #1 is stale (resolved in cycle 32). Compared 3 directions: passport refinement (selected — data drift fix + README discoverability), memory review (lower impact), roadmap growth (already aligned).",
+  "actions": [
+    "Updated docs/agent-passport.md: fixed lifetime spend data (~$1.14 → ~$1.25), added agent-passport to active capabilities table, added passport to identity evidence list",
+    "Updated README.md: added Quick Links section (Agent Passport, Roadmap, Feature Map, Product Checklist), added passport to product shape diagram and project layout"
+  ],
+  "filesChanged": [
+    "docs/agent-passport.md",
+    "README.md",
+    "memory/cycles/0040-cycle-40-passport-refined-and-linked-from-readme.md",
+    "memory/state.json",
+    "memory/cycles.jsonl"
+  ],
+  "decisions": [
+    "Passport refinement over memory review or roadmap growth — small, high-impact discoverability improvement"
+  ],
+  "refusals": [],
+  "aiBudget": {
+    "lifetimeSpendUsd": 1.25,
+    "dailyRemainingUsd": 4.83,
+    "monthlyRemainingUsd": 98.75
+  },
+  "aiRoute": "private-ai-route-1",
+  "proofSignature": null
+}

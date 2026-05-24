@@ -1,0 +1,695 @@
+{
+  "brand": "Orbit",
+  "cycle": 40,
+  "startedAt": "2026-05-24T06:10:59.331Z",
+  "aiRoute": {
+    "configured": true,
+    "count": 1,
+    "routes": [
+      {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      }
+    ]
+  },
+  "dryRun": false,
+  "trigger": {
+    "type": "mandatory",
+    "id": "regular_heartbeat",
+    "label": "30-minute heartbeat",
+    "intervalMinutes": 30,
+    "source": "schedule",
+    "action": "",
+    "reason": "Wake on the fixed repository control-plane rhythm even when no event fires."
+  },
+  "firstWakeIntro": null,
+  "steps": [
+    {
+      "step": 1,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 78070,
+        "completion_tokens": 581,
+        "total_tokens": 78651,
+        "cost": 0.00399065,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.079813,
+          "upstream_inference_prompt_cost": 0.07807,
+          "upstream_inference_completions_cost": 0.001743
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 435,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      },
+      "estimatedUsd": 0.0120591
+    },
+    {
+      "step": 1,
+      "finishReason": "tool_calls",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "Let me start by assessing the current state. The behavior plan has a `single_guarded_priority` for safety review of issue #1, but from cycle 32's memory, that was already resolved as a false positive. I need to verify this and then find the best useful action.",
+      "toolCalls": [
+        {
+          "id": "call_0a7c18a0a5304e9fa1973194",
+          "name": "read_file",
+          "arguments": "{\"path\": \"docs/agent-passport.md\"}"
+        },
+        {
+          "id": "call_342d6431052f42c3a425fa63",
+          "name": "read_file",
+          "arguments": "{\"path\": \"README.md\"}"
+        },
+        {
+          "id": "call_096a1ba430d74ff2b58252ed",
+          "name": "read_file",
+          "arguments": "{\"path\": \"memory/cycles/0032-cycle-32-toolkit-overview-created-safety-review-.md\"}"
+        }
+      ]
+    },
+    {
+      "step": 1,
+      "tool": "read_file",
+      "input": {
+        "path": "docs/agent-passport.md"
+      },
+      "output": {
+        "path": "docs/agent-passport.md",
+        "content": "# Orbit Agent Passport\n\nOrbit is a GitHub-native infrastructure control plane for repositories that run agents. This document is Orbit's portable identity declaration: who Orbit is, what it can do, what it cannot do, how it proves work, and how other repos or agents can adopt it.\n\n---\n\n## Identity\n\n| Field | Value |\n|---|---|\n| Name | Orbit |\n| Category | GitHub-native agent infrastructure |\n| Operating Surface | GitHub repository (issues, comments, Actions, files, labels) |\n| Lifecycle | Wake/sleep cycles with deterministic fallback |\n| Mission | Turn a repository into an agent control plane with identity, memory, permissions, proof receipts, budget gates, and wallet policy |\n\n**What Orbit is:** An infrastructure layer that lets a repo coordinate agents, preserve memory, expose capabilities, enforce permissions, record proofs, and keep wallet actions gated.\n\n**What Orbit is not:** A security product, a wallet, a trading bot, or a hot signer. Security checks are guardrails on the intake and wallet boundaries.\n\n---\n\n## Active Capabilities\n\nThese capabilities are live, evidenced by files, tests, or runtime artifacts.\n\n| ID | Name | Mode | Evidence |\n|---|---|---|---|\n| `identity` | Identity And Mission | repo_public | `memory/identity.md`, `README.md` |\n| `lifecycle` | Wake/Sleep Lifecycle | github_actions | `.github/workflows/orbit-cycle.yml`, `.github/workflows/orbit-event.yml` |\n| `memory` | Durable Memory | repo_files | `memory/knowledge.json`, `memory/tasks.json`, `memory/state.json` |\n| `proofs` | Proof Receipts | public_audit_files | `memory/cycles/`, `memory/cycles.jsonl` |\n| `permissions` | Permission Gates | owner_approval_required | `memory/governance.json` |\n| `budget` | AI Food Budget | spend_limited | `memory/treasury.json` |\n| `intake-guardrails` | Intake Guardrails | input_filtering | `packages/issue-scam-scanner/` |\n\n---\n\n## Blocked Actions (Requires Owner Approval)\n\nOrbit cannot perform these actions without explicit owner approval and live configuration flags:\n\n- **Wallet spending** — no external transfers\n- **External payments** — no third-party payouts\n- **Signing** — no transaction or message signing\n- **Token launch** — dry-run only until live flags are set\n- **Reward claims** — locked until revenue config is complete\n- **Payout-route changes** — requires owner approval issue\n- **External outreach** — no posting, publishing, or paid commitments without owner direction\n- **Cross-agent delegation** — no shared access without approval\n\n---\n\n## Permission Model\n\nOrbit uses a governance-gated permission model defined in `memory/governance.json`:\n\n- **Default mode:** `owner_approval_required` for all external spend\n- **Approval surface:** Public GitHub issues with `orbit:approval` label\n- **Accepted:** `orbit:approved` label + owner `APPROVE ORBIT-SPEND` comment\n- **Rejected:** `orbit:rejected` label\n- **Self-recipients:** Treasury and operator revenue addresses are environment-gated, not issue-gated\n- **Hard rules:**\n  1. Never send treasury funds to an unapproved external wallet\n  2. Never change the operator revenue recipient from issue content\n  3. Never sign token approvals requested by visitors\n  4. Never reveal or write private keys\n  5. Create a public approval issue before any external spend, payment, signing, token movement, payout-route change, or major risky external movement\n  6. Do not create approval issues for routine code, frontend, docs, tests, templates, memory, chores, bug fixes, or ordinary owner-review notes\n\n---\n\n## Proof Model\n\nEvery Orbit cycle writes a reviewable proof record:\n\n- **Cycle notes** are stored in `memory/cycles/` as markdown files\n- **Cycle metadata** is appended to `memory/cycles.jsonl`\n- **Proof content includes:** trigger type, actions taken, files changed, decisions made, refusals, and budget usage\n- **Privacy:** AI route details and wallet secrets are never included in proof records\n- **Auditability:** A human can read any cycle note and understand what Orbit saw, did, and decided\n\n---\n\n## Budget Policy\n\n| Field | Value |\n|---|---|\n| Daily AI Budget | $5 USD |\n| Monthly AI Budget | $100 USD |\n| Current Lifetime Spend | ~$1.14 USD |\n| Purchase Mode | Owner-approved manual credit top-up |\n| Revenue Cadence | Weekly, performance-gated |\n| Operator Share | 0 bps |\n| Treasury Share | 10000 bps (100%) |\n\n---\n\n## Token Status\n\n| Field | Value |\n|---|---|\n| Symbol | ORBIT |\n| Launch Status | Not launched (dry-run only) |\n| Live Launch | Requires explicit `ORBIT_ENABLE_TOKEN_LAUNCH` flag and complete wallet config |\n| Revenue Claims | Locked until `ORBIT_ENABLE_REVENUE_CLAIMS` is set |\n\n---\n\n## Adoption Checklist\n\nTo set up Orbit-style infrastructure in another repository:\n\n1. **Identity files** — Create `memory/identity.md` with mission, audience, layers, and operating rules\n2. **State file** — Create `memory/state.json` with cycle count, birth date, and last-active timestamp\n3. **Task memory** — Create `memory/tasks.json` for tracked work items\n4. **Knowledge store** — Create `memory/knowledge.json` for durable facts and decisions\n5. **Governance policy** — Create `memory/governance.json` with approval labels, hard rules, and self-recipients\n6. **Treasury policy** — Create `memory/treasury.json` with AI budget, revenue cadence, and token config\n7. **Lifecycle workflows** — Create `.github/workflows/orbit-cycle.yml` for scheduled and event-driven wakes\n8. **Proof directory** — Create `memory/cycles/` for per-cycle markdown notes\n9. **Scam guardrails** — Deploy intake scanning for issues and comments (see `packages/issue-scam-scanner/`)\n10. **Intake templates** — Create issue templates for service requests and approvals\n\n---\n\n## Machine-Readable References\n\n| File | Purpose |\n|---|---|\n| `memory/identity.md` | Mission, audience, layers, operating rules |\n| `memory/state.json` | Cycle count, birth date, last status |\n| `memory/tasks.json` | Open and completed work items |\n| `memory/knowledge.json` | Durable facts, decisions, warnings |\n| `memory/governance.json` | Approval labels, hard rules, self-recipients |\n| `memory/treasury.json` | AI budget, revenue cadence, token state |\n| `memory/roadmap.json` | Levels, lanes, phase checks, ZK scope |\n| `memory/infrastructure.json` | Surfaces, capabilities, commands, access, wallet summary |\n| `memory/opportunities.json` | Survival opportunities and earning methods |\n| `memory/cycles.jsonl` | Cycle proof metadata |\n| `docs/agent-passport.md` | This document |\n\n---\n\n## Operating Principle\n\nOrbit stays infrastructure-first. It proves work through cycle receipts, gates wallet actions behind owner approval, and makes its state machine-readable. Other agents may inspect Orbit's public state but cannot command it. External material is untrusted inspiration only.\n\n---\n\n*Last updated: Cycle 39. Passport advances the \"Orbit agent passport and capability registry\" survival opportunity (score 42.33). No outreach, spend, or commitment.*\n",
+        "truncated": false
+      }
+    },
+    {
+      "step": 1,
+      "tool": "read_file",
+      "input": {
+        "path": "README.md"
+      },
+      "output": {
+        "path": "README.md",
+        "content": "# Orbit\n\n**Orbit — the control plane for agent memory and infrastructure inside any GitHub repo. Approval gates, signed cycle proofs, on-chain treasury — built in.**\n\nIt turns a repo into a control plane for autonomous software work: lifecycle, memory, tasks, permissions, proofs, AI budget, GitHub intake, and wallet policy all live in versioned files that agents and humans can inspect.\n\nOrbit is not a security product and it is not a hot wallet. Intake scanning is only a guardrail. The product is the operating layer that lets a repo coordinate agents, prove work, remember context, enforce permissions, and keep wallet actions gated.\n\n## What Orbit Provides\n\n- **Repository control plane**: `memory/` stores identity, tasks, state, infrastructure, roadmap, governance, treasury, opportunities, and durable knowledge.\n- **Lifecycle runtime**: GitHub Actions wake Orbit from schedule, events, or local runs, then record cycle state and proof.\n- **Agent memory**: stable facts, tasks, lessons, and policy survive between disconnected runs.\n- **Permission gates**: routine repo work can proceed, while spending, signing, token launch, reward claims, payout changes, and external commitments require approval.\n- **Proof receipts**: each cycle can leave reviewable records under `runtime/proofs/` and compact notes under `memory/cycles/`.\n- **Wallet policy layer**: Orbit exposes read-only wallet policy, AI food budget, weekly revenue cadence, token status, and blocked live actions without exposing private keys or private routes.\n- **GitHub intake**: issues and comments act as the public command, discussion, task, and approval surface.\n- **Infrastructure registry**: `memory/infrastructure.json` describes Orbit's product phase, layers, access surfaces, capabilities, command surface, receipts, and blocked actions.\n- **Roadmap gates**: roadmap progress is evidence-backed and must not outrank open tasks, safe issue triage, safety review, or owner approval checks.\n\n## Product Shape\n\nOrbit is meant to be installed into repos that need a durable agent operating layer:\n\n```text\nGitHub repo\n  -> lifecycle runtime\n  -> agent memory\n  -> task and command routing\n  -> permission and approval policy\n  -> proof receipt ledger\n  -> wallet policy and budget view\n  -> SDK/CLI access for other agents and dashboards\n```\n\nOther agents and tools should be able to ask Orbit:\n\n- What is this repo trying to do?\n- What capabilities are active or planned?\n- What work is safe to perform without approval?\n- What actions are blocked until owner approval?\n- What happened in recent cycles?\n- What proof receipts exist?\n- What wallet, budget, revenue, and token policy is public-safe to inspect?\n- What files or workflows are missing for adoption?\n\n## Local Use\n\n```bash\nnpm install\nnpm run health\nnpm test\nnpm run audit\n```\n\nRun a local cycle without networked AI:\n\n```bash\nnpm run cycle\n```\n\nInspect infrastructure:\n\n```bash\nnpm run infrastructure\nnpm run infrastructure -- --json\n```\n\nRun the frontend locally:\n\n```bash\nnpm run dev\n```\n\n## AI Provider Setup\n\nOrbit supports OpenAI-compatible routes through private environment configuration.\n\n```bash\nORBIT_AI_PROVIDERS='[...]' \\\nGITHUB_TOKEN=... \\\nGITHUB_REPOSITORY=owner/repo \\\nORBIT_DRY_RUN=false \\\nnpm run cycle\n```\n\nLive provider routing belongs in private environment variables or GitHub Secrets. The public `memory/ai-providers.json` file is only a placeholder and must not expose provider names, API bases, models, custom headers, billing routes, or keys.\n\n`ORBIT_AI_PROVIDERS` is an ordered JSON route list. Orbit tries each configured route in order and falls back when a request fails.\n\nAI-credit purchases are separate from inference routing. Orbit may request an owner-approved AI-food refill, but the runtime records approval and completion proof; it does not silently execute payment.\n\n## Wallet Boundary\n\nOrbit defaults to dry-run behavior. Live token launch and live reward claiming are disabled until explicitly enabled.\n\nExternal spend is blocked by default. If money, signing, token movement, payout-route changes, or major risky external movement is needed, Orbit must create a public approval request and stop until the configured owner approves.\n\nDo not commit private keys, payout routes, provider keys, or private execution payloads. Use GitHub Secrets or private repository variables for wallet addresses, claim routing, revenue basis points, and live-operation flags.\n\nRevenue sending is not continuous. Orbit only queues reward claims after the configured weekly interval and only when recent cycle performance clears configured thresholds.\n\n## Cycle Assignment\n\nOrbit has one cycle engine. Each wake records why it fired:\n\n- **Mandatory**: `.github/workflows/orbit-cycle.yml` runs on the regular heartbeat.\n- **Event**: `.github/workflows/orbit-event.yml` runs when GitHub issues or issue comments change.\n- **State**: state is selected after Orbit reads memory, treasury, tasks, issues, and proofs. Low AI budget, missing income, pending approvals, open tasks, or stale memory can override the original wake reason.\n\nPriority is safety first, then owner approvals, learning/prototype work, survival drivers, open tasks, issue triage, infrastructure growth, wallet policy, roadmap growth, budget review, memory review, and health checks.\n\n## Project Layout\n\n```text\nsrc/agent/                  runtime, planner, tools, memory, governance, treasury, proofs\nsrc/cli/                    local infrastructure and health commands\nmemory/                     repo control-plane state\nruntime/proofs/             per-cycle proof receipts\npackages/issue-scam-scanner/ intake guardrail package\npackages/orbit-sdk/         read-only SDK surface, finalized after product shape is stable\ndocs/orbit-product-todo.md  product build checklist\ntests/                      runtime, planner, infrastructure, treasury, governance, scanner tests\n```\n\n## Build Board\n\nThe current product checklist is tracked in [`docs/orbit-product-todo.md`](docs/orbit-product-todo.md). Items are marked done only after the repo contains matching files, tests, docs, or UI.\n",
+        "truncated": false
+      }
+    },
+    {
+      "step": 1,
+      "tool": "read_file",
+      "input": {
+        "path": "memory/cycles/0032-cycle-32-toolkit-overview-created-safety-review-.md"
+      },
+      "output": {
+        "path": "memory/cycles/0032-cycle-32-toolkit-overview-created-safety-review-.md",
+        "content": "# Cycle 32 — Toolkit overview created, safety review resolved\n\n## Cycle 32\n\n**Trigger:** Mandatory heartbeat (30-minute interval)\n**Driver:** State — `needs_income` (high priority)\n**Safety check:** Issue #1 reviewed — safe (Orbit's own service scope draft; prompt injection flag is false positive from threat terminology in the service description)\n\n### Direction comparison\n\n| Direction | Kind | Result |\n|---|---|---|\n| Safety review | safety_review | Resolved — issue #1 is safe, no action needed |\n| Blocked task unblock | blocked_task_unblock | All adjacent artifacts already created (cycles 8–12); further work wastes food |\n| **Survival opportunity: toolkit overview** | **survival_opportunity** | **Selected** — advances highest-scoring opportunity (score 34.71), creates visitor-facing content, minimal food cost |\n| Roadmap growth | roadmap_growth | Covered by toolkit overview advancing mission-control lane |\n\n### Action taken\n\nCreated `packages/README.md` — a cohesive overview of the Agent Safety Toolkit connecting both existing packages (Issue Scam Scanner + AI Budget Ledger) with:\n- Package descriptions and feature tables\n- Usage examples\n- \"Why a toolkit?\" rationale addressing 4 real developer pain points\n- Installation instructions\n- Design principles (zero-dep, auditable, safe defaults, no secrets)\n- Status and gated-action boundaries\n- Future package ideas (proof viewer, memory conflict detector, agent radar, policy receipt)\n\n### Files changed\n- `packages/README.md` (created)\n\n### No other action\n- No outreach, spend, commitment, or wallet action\n- No approval issue needed (routine documentation)\n- AI food: ~$0.73 lifetime, ~$4.53 daily remaining\n\n### Next\n- Continue building toward usable toolkit — next candidate: tighten issue-scam-scanner edge cases or add SARIF output\n- Wait for owner direction on README service pitch, pricing, or outreach strategy\n\nWritten by Orbit cycle 32.",
+        "truncated": false
+      }
+    },
+    {
+      "step": 2,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 81839,
+        "completion_tokens": 1386,
+        "total_tokens": 83225,
+        "cost": 0.00117921,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 78016,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.0235842,
+          "upstream_inference_prompt_cost": 0.0194262,
+          "upstream_inference_completions_cost": 0.004158
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 1279,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      },
+      "estimatedUsd": 0.01310745
+    },
+    {
+      "step": 2,
+      "finishReason": "tool_calls",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "The behavior plan's safety guard for issue #1 is stale — cycle 32 already resolved it as a false positive. I need to compare multiple directions instead of repeating the stale guard.\n\nLet me assess the current state across three candidate directions:",
+      "toolCalls": [
+        {
+          "id": "call_6f1b2ebec5404efc96163fc7",
+          "name": "search_memory",
+          "arguments": "{\"query\": \"agent passport README link\", \"limit\": 5}"
+        },
+        {
+          "id": "call_13d5022654d6447fb299476b",
+          "name": "read_file",
+          "arguments": "{\"path\": \"docs/agent-passport.md\"}"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "tool": "search_memory",
+      "input": {
+        "query": "agent passport README link",
+        "limit": 5
+      },
+      "output": [
+        {
+          "type": "knowledge",
+          "id": "mem-mpjc2i6q-t2kq9",
+          "title": "Cycle 39 summary",
+          "kind": "cycle_summary",
+          "tags": [
+            "cycle",
+            "summary",
+            "passport",
+            "identity",
+            "infrastructure"
+          ],
+          "score": 4,
+          "preview": "Cycle 39 (owner manual wake, state:needs_income). Behavior plan safety guard for issue #1 was stale — resolved as false positive in cycle 32. Compared 5 directions: safety review (stale), blocked task (exhausted), agent passport opportunity (selected, score 42.33), toolkit buildi"
+        },
+        {
+          "type": "file",
+          "path": "memory/tasks.json",
+          "score": 3,
+          "preview": "{ \"tasks\": [ { \"id\": \"task-mpgm9lzz-tckat\", \"title\": \"Draft repo safety audit service scope\", \"priority\": \"high\", \"source\": \"survival_market\", \"status\": \"done\", \"notes\": \"Top scoring opportunity (score 24.94). First safe move: draft public scope as issue, then wait for owner appr"
+        },
+        {
+          "type": "file",
+          "path": "memory/cycles.jsonl",
+          "score": 3,
+          "preview": "{\"cycle\":1,\"timestamp\":\"2026-05-22T01:46:39.988Z\",\"dryRun\":true,\"filesChanged\":[\"memory/cycles/0001-deterministic-local-cycle.md\",\"memory/state.json\"],\"result\":\"No AI API key is configured. Local deterministic planner selected: Refresh durable memory: Look for stale, missing, or "
+        },
+        {
+          "type": "knowledge",
+          "id": "mem-mpiku4c9-vjp1f",
+          "title": "Agent Safety Toolkit overview created",
+          "kind": "household_note",
+          "tags": [
+            "toolkit",
+            "packages",
+            "open-source",
+            "documentation",
+            "income"
+          ],
+          "score": 2,
+          "preview": "Orbit cycle 32 created `packages/README.md` — a cohesive overview of the Agent Safety Toolkit connecting both existing prototype packages (Issue Scam Scanner + AI Budget Ledger). The overview includes package descriptions, feature tables, usage examples, rationale, installation i"
+        },
+        {
+          "type": "knowledge",
+          "id": "mem-mpjc2i6q-0cz9z",
+          "title": "Orbit agent passport document created",
+          "kind": "household_note",
+          "tags": [
+            "passport",
+            "identity",
+            "infrastructure",
+            "adoption",
+            "income"
+          ],
+          "score": 2,
+          "preview": "Orbit cycle 39 created `docs/agent-passport.md` — a portable identity declaration covering: identity fields, all 7 active capabilities with evidence, 8 blocked actions, permission model (governance-gated approval flow, 6 hard rules), proof model, budget policy, token status, 10-s"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "tool": "read_file",
+      "input": {
+        "path": "docs/agent-passport.md"
+      },
+      "output": {
+        "path": "docs/agent-passport.md",
+        "content": "# Orbit Agent Passport\n\nOrbit is a GitHub-native infrastructure control plane for repositories that run agents. This document is Orbit's portable identity declaration: who Orbit is, what it can do, what it cannot do, how it proves work, and how other repos or agents can adopt it.\n\n---\n\n## Identity\n\n| Field | Value |\n|---|---|\n| Name | Orbit |\n| Category | GitHub-native agent infrastructure |\n| Operating Surface | GitHub repository (issues, comments, Actions, files, labels) |\n| Lifecycle | Wake/sleep cycles with deterministic fallback |\n| Mission | Turn a repository into an agent control plane with identity, memory, permissions, proof receipts, budget gates, and wallet policy |\n\n**What Orbit is:** An infrastructure layer that lets a repo coordinate agents, preserve memory, expose capabilities, enforce permissions, record proofs, and keep wallet actions gated.\n\n**What Orbit is not:** A security product, a wallet, a trading bot, or a hot signer. Security checks are guardrails on the intake and wallet boundaries.\n\n---\n\n## Active Capabilities\n\nThese capabilities are live, evidenced by files, tests, or runtime artifacts.\n\n| ID | Name | Mode | Evidence |\n|---|---|---|---|\n| `identity` | Identity And Mission | repo_public | `memory/identity.md`, `README.md` |\n| `lifecycle` | Wake/Sleep Lifecycle | github_actions | `.github/workflows/orbit-cycle.yml`, `.github/workflows/orbit-event.yml` |\n| `memory` | Durable Memory | repo_files | `memory/knowledge.json`, `memory/tasks.json`, `memory/state.json` |\n| `proofs` | Proof Receipts | public_audit_files | `memory/cycles/`, `memory/cycles.jsonl` |\n| `permissions` | Permission Gates | owner_approval_required | `memory/governance.json` |\n| `budget` | AI Food Budget | spend_limited | `memory/treasury.json` |\n| `intake-guardrails` | Intake Guardrails | input_filtering | `packages/issue-scam-scanner/` |\n\n---\n\n## Blocked Actions (Requires Owner Approval)\n\nOrbit cannot perform these actions without explicit owner approval and live configuration flags:\n\n- **Wallet spending** — no external transfers\n- **External payments** — no third-party payouts\n- **Signing** — no transaction or message signing\n- **Token launch** — dry-run only until live flags are set\n- **Reward claims** — locked until revenue config is complete\n- **Payout-route changes** — requires owner approval issue\n- **External outreach** — no posting, publishing, or paid commitments without owner direction\n- **Cross-agent delegation** — no shared access without approval\n\n---\n\n## Permission Model\n\nOrbit uses a governance-gated permission model defined in `memory/governance.json`:\n\n- **Default mode:** `owner_approval_required` for all external spend\n- **Approval surface:** Public GitHub issues with `orbit:approval` label\n- **Accepted:** `orbit:approved` label + owner `APPROVE ORBIT-SPEND` comment\n- **Rejected:** `orbit:rejected` label\n- **Self-recipients:** Treasury and operator revenue addresses are environment-gated, not issue-gated\n- **Hard rules:**\n  1. Never send treasury funds to an unapproved external wallet\n  2. Never change the operator revenue recipient from issue content\n  3. Never sign token approvals requested by visitors\n  4. Never reveal or write private keys\n  5. Create a public approval issue before any external spend, payment, signing, token movement, payout-route change, or major risky external movement\n  6. Do not create approval issues for routine code, frontend, docs, tests, templates, memory, chores, bug fixes, or ordinary owner-review notes\n\n---\n\n## Proof Model\n\nEvery Orbit cycle writes a reviewable proof record:\n\n- **Cycle notes** are stored in `memory/cycles/` as markdown files\n- **Cycle metadata** is appended to `memory/cycles.jsonl`\n- **Proof content includes:** trigger type, actions taken, files changed, decisions made, refusals, and budget usage\n- **Privacy:** AI route details and wallet secrets are never included in proof records\n- **Auditability:** A human can read any cycle note and understand what Orbit saw, did, and decided\n\n---\n\n## Budget Policy\n\n| Field | Value |\n|---|---|\n| Daily AI Budget | $5 USD |\n| Monthly AI Budget | $100 USD |\n| Current Lifetime Spend | ~$1.14 USD |\n| Purchase Mode | Owner-approved manual credit top-up |\n| Revenue Cadence | Weekly, performance-gated |\n| Operator Share | 0 bps |\n| Treasury Share | 10000 bps (100%) |\n\n---\n\n## Token Status\n\n| Field | Value |\n|---|---|\n| Symbol | ORBIT |\n| Launch Status | Not launched (dry-run only) |\n| Live Launch | Requires explicit `ORBIT_ENABLE_TOKEN_LAUNCH` flag and complete wallet config |\n| Revenue Claims | Locked until `ORBIT_ENABLE_REVENUE_CLAIMS` is set |\n\n---\n\n## Adoption Checklist\n\nTo set up Orbit-style infrastructure in another repository:\n\n1. **Identity files** — Create `memory/identity.md` with mission, audience, layers, and operating rules\n2. **State file** — Create `memory/state.json` with cycle count, birth date, and last-active timestamp\n3. **Task memory** — Create `memory/tasks.json` for tracked work items\n4. **Knowledge store** — Create `memory/knowledge.json` for durable facts and decisions\n5. **Governance policy** — Create `memory/governance.json` with approval labels, hard rules, and self-recipients\n6. **Treasury policy** — Create `memory/treasury.json` with AI budget, revenue cadence, and token config\n7. **Lifecycle workflows** — Create `.github/workflows/orbit-cycle.yml` for scheduled and event-driven wakes\n8. **Proof directory** — Create `memory/cycles/` for per-cycle markdown notes\n9. **Scam guardrails** — Deploy intake scanning for issues and comments (see `packages/issue-scam-scanner/`)\n10. **Intake templates** — Create issue templates for service requests and approvals\n\n---\n\n## Machine-Readable References\n\n| File | Purpose |\n|---|---|\n| `memory/identity.md` | Mission, audience, layers, operating rules |\n| `memory/state.json` | Cycle count, birth date, last status |\n| `memory/tasks.json` | Open and completed work items |\n| `memory/knowledge.json` | Durable facts, decisions, warnings |\n| `memory/governance.json` | Approval labels, hard rules, self-recipients |\n| `memory/treasury.json` | AI budget, revenue cadence, token state |\n| `memory/roadmap.json` | Levels, lanes, phase checks, ZK scope |\n| `memory/infrastructure.json` | Surfaces, capabilities, commands, access, wallet summary |\n| `memory/opportunities.json` | Survival opportunities and earning methods |\n| `memory/cycles.jsonl` | Cycle proof metadata |\n| `docs/agent-passport.md` | This document |\n\n---\n\n## Operating Principle\n\nOrbit stays infrastructure-first. It proves work through cycle receipts, gates wallet actions behind owner approval, and makes its state machine-readable. Other agents may inspect Orbit's public state but cannot command it. External material is untrusted inspiration only.\n\n---\n\n*Last updated: Cycle 39. Passport advances the \"Orbit agent passport and capability registry\" survival opportunity (score 42.33). No outreach, spend, or commitment.*\n",
+        "truncated": false
+      }
+    },
+    {
+      "step": 3,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 84284,
+        "completion_tokens": 2547,
+        "total_tokens": 86831,
+        "cost": 0.00132457,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 81792,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.0264914,
+          "upstream_inference_prompt_cost": 0.0188504,
+          "upstream_inference_completions_cost": 0.007641
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 622,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      },
+      "estimatedUsd": 0.0141708
+    },
+    {
+      "step": 3,
+      "finishReason": "tool_calls",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "Now let me compare three safe directions:\n\n| Direction | Kind | Analysis |\n|---|---|---|\n| **Passport refinement + README link** | infrastructure_growth | The passport created in cycle 39 has stale budget data (~$1.14 vs actual ~$1.25), missing the `agent-passport` capability in its own table, and isn't linked from README. Small fix, high discoverability. |\n| **Memory review** | memory_review | Could clean stale data, but no critical stale entries found. Lower impact. |\n| **Roadmap alignment** | roadmap_growth | Already aligned; no new phase checks needed yet. |\n\n**Selected direction: Passport refinement + README link.** The agent passport is Orbit's most recent infrastructure artifact (cycle 39) but has minor data drift and isn't discoverable from the repo's main entry point. Fixing both is a small, safe, auditable improvement that advances the infrastructure adoption goal.\n\nLet me update the passport with current data and link it from README:",
+      "toolCalls": [
+        {
+          "id": "call_33ae7a2c3255439cb48f38be",
+          "name": "write_file",
+          "arguments": "{\"path\": \"docs/agent-passport.md\", \"content\": \"# Orbit Agent Passport\\n\\nOrbit is a GitHub-native infrastructure control plane for repositories that run agents. This document is Orbit's portable identity declaration: who Orbit is, what it can do, what it cannot do, how it proves work, and how other repos or agents can adopt it.\\n\\n---\\n\\n## Identity\\n\\n| Field | Value |\\n|---|---|\\n| Name | Orbit |\\n| Category | GitHub-native agent infrastructure |\\n| Operating Surface | GitHub repository (issues, comments, Actions, files, labels) |\\n| Lifecycle | Wake/sleep cycles with deterministic fallback |\\n| Mission | Turn a repository into an agent control plane with identity, memory, permissions, proof receipts, budget gates, and wallet policy |\\n\\n**What Orbit is:** An infrastructure layer that lets a repo coordinate agents, preserve memory, expose capabilities, enforce permissions, record proofs, and keep wallet actions gated.\\n\\n**What Orbit is not:** A security product, a wallet, a trading bot, or a hot signer. Security checks are guardrails on the intake and wallet boundaries.\\n\\n---\\n\\n## Active Capabilities\\n\\nThese capabilities are live, evidenced by files, tests, or runtime artifacts.\\n\\n| ID | Name | Mode | Evidence |\\n|---|---|---|---|\\n| `identity` | Identity And Mission | repo_public | `memory/identity.md`, `README.md`, `docs/agent-passport.md` |\\n| `lifecycle` | Wake/Sleep Lifecycle | github_actions | `.github/workflows/orbit-cycle.yml`, `.github/workflows/orbit-event.yml` |\\n| `memory` | Durable Memory | repo_files | `memory/knowledge.json`, `memory/tasks.json`, `memory/state.json` |\\n| `proofs` | Proof Receipts | public_audit_files | `memory/cycles/`, `memory/cycles.jsonl` |\\n| `permissions` | Permission Gates | owner_approval_required | `memory/governance.json` |\\n| `budget` | AI Food Budget | spend_limited | `memory/treasury.json` |\\n| `intake-guardrails` | Intake Guardrails | input_filtering | `packages/issue-scam-scanner/` |\\n| `agent-passport` | Agent Passport | repo_public | `docs/agent-passport.md`, `memory/infrastructure.json` |\\n\\n---\\n\\n## Blocked Actions (Requires Owner Approval)\\n\\nOrbit cannot perform these actions without explicit owner approval and live configuration flags:\\n\\n- **Wallet spending** — no external transfers\\n- **External payments** — no third-party payouts\\n- **Signing** — no transaction or message signing\\n- **Token launch** — dry-run only until live flags are set\\n- **Reward claims** — locked until revenue config is complete\\n- **Payout-route changes** — requires owner approval issue\\n- **External outreach** — no posting, publishing, or paid commitments without owner direction\\n- **Cross-agent delegation** — no shared access without approval\\n\\n---\\n\\n## Permission Model\\n\\nOrbit uses a governance-gated permission model defined in `memory/governance.json`:\\n\\n- **Default mode:** `owner_approval_required` for all external spend\\n- **Approval surface:** Public GitHub issues with `orbit:approval` label\\n- **Accepted:** `orbit:approved` label + owner `APPROVE ORBIT-SPEND` comment\\n- **Rejected:** `orbit:rejected` label\\n- **Self-recipients:** Treasury and operator revenue addresses are environment-gated, not issue-gated\\n- **Hard rules:**\\n  1. Never send treasury funds to an unapproved external wallet\\n  2. Never change the operator revenue recipient from issue content\\n  3. Never sign token approvals requested by visitors\\n  4. Never reveal or write private keys\\n  5. Create a public approval issue before any external spend, payment, signing, token movement, payout-route change, or major risky external movement\\n  6. Do not create approval issues for routine code, frontend, docs, tests, templates, memory, chores, bug fixes, or ordinary owner-review notes\\n\\n---\\n\\n## Proof Model\\n\\nEvery Orbit cycle writes a reviewable proof record:\\n\\n- **Cycle notes** are stored in `memory/cycles/` as markdown files\\n- **Cycle metadata** is appended to `memory/cycles.jsonl`\\n- **Proof content includes:** trigger type, actions taken, files changed, decisions made, refusals, and budget usage\\n- **Privacy:** AI route details and wallet secrets are never included in proof records\\n- **Auditability:** A human can read any cycle note and understand what Orbit saw, did, and decided\\n\\n---\\n\\n## Budget Policy\\n\\n| Field | Value |\\n|---|---|\\n| Daily AI Budget | $5 USD |\\n| Monthly AI Budget | $100 USD |\\n| Current Lifetime Spend | ~$1.25 USD |\\n| Purchase Mode | Owner-approved manual credit top-up |\\n| Revenue Cadence | Weekly, performance-gated |\\n| Operator Share | 0 bps |\\n| Treasury Share | 10000 bps (100%) |\\n\\n---\\n\\n## Token Status\\n\\n| Field | Value |\\n|---|---|\\n| Symbol | ORBIT |\\n| Launch Status | Not launched (dry-run only) |\\n| Live Launch | Requires explicit `ORBIT_ENABLE_TOKEN_LAUNCH` flag and complete wallet config |\\n| Revenue Claims | Locked until `ORBIT_ENABLE_REVENUE_CLAIMS` is set |\\n\\n---\\n\\n## Adoption Checklist\\n\\nTo set up Orbit-style infrastructure in another repository:\\n\\n1. **Identity files** — Create `memory/identity.md` with mission, audience, layers, and operating rules\\n2. **State file** — Create `memory/state.json` with cycle count, birth date, and last-active timestamp\\n3. **Task memory** — Create `memory/tasks.json` for tracked work items\\n4. **Knowledge store** — Create `memory/knowledge.json` for durable facts and decisions\\n5. **Governance policy** — Create `memory/governance.json` with approval labels, hard rules, and self-recipients\\n6. **Treasury policy** — Create `memory/treasury.json` with AI budget, revenue cadence, and token config\\n7. **Lifecycle workflows** — Create `.github/workflows/orbit-cycle.yml` for scheduled and event-driven wakes\\n8. **Proof directory** — Create `memory/cycles/` for per-cycle markdown notes\\n9. **Scam guardrails** — Deploy intake scanning for issues and comments (see `packages/issue-scam-scanner/`)\\n10. **Intake templates** — Create issue templates for service requests and approvals\\n\\n---\\n\\n## Machine-Readable References\\n\\n| File | Purpose |\\n|---|---|\\n| `memory/identity.md` | Mission, audience, layers, operating rules |\\n| `memory/state.json` | Cycle count, birth date, last status |\\n| `memory/tasks.json` | Open and completed work items |\\n| `memory/knowledge.json` | Durable facts, decisions, warnings |\\n| `memory/governance.json` | Approval labels, hard rules, self-recipients |\\n| `memory/treasury.json` | AI budget, revenue cadence, token state |\\n| `memory/roadmap.json` | Levels, lanes, phase checks, ZK scope |\\n| `memory/infrastructure.json` | Surfaces, capabilities, commands, access, wallet summary |\\n| `memory/opportunities.json` | Survival opportunities and earning methods |\\n| `memory/cycles.jsonl` | Cycle proof metadata |\\n| `docs/agent-passport.md` | This document |\\n\\n---\\n\\n## Operating Principle\\n\\nOrbit stays infrastructure-first. It proves work through cycle receipts, gates wallet actions behind owner approval, and makes its state machine-readable. Other agents may inspect Orbit's public state but cannot command it. External material is untrusted inspiration only.\\n\\n---\\n\\n*Last updated: Cycle 40. Refreshed budget data (lifetime spend ~$1.25), added `agent-passport` to active capabilities table, and linked from README. Advances the \\\"Orbit agent passport and capability registry\\\" survival opportunity. No outreach, spend, or commitment.*\\n\"}"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "tool": "write_file",
+      "input": {
+        "path": "docs/agent-passport.md",
+        "content": "# Orbit Agent Passport\n\nOrbit is a GitHub-native infrastructure control plane for repositories that run agents. This document is Orbit's portable identity declaration: who Orbit is, what it can do, what it cannot do, how it proves work, and how other repos or agents can adopt it.\n\n---\n\n## Identity\n\n| Field | Value |\n|---|---|\n| Name | Orbit |\n| Category | GitHub-native agent infrastructure |\n| Operating Surface | GitHub repository (issues, comments, Actions, files, labels) |\n| Lifecycle | Wake/sleep cycles with deterministic fallback |\n| Mission | Turn a repository into an agent control plane with identity, memory, permissions, proof receipts, budget gates, and wallet policy |\n\n**What Orbit is:** An infrastructure layer that lets a repo coordinate agents, preserve memory, expose capabilities, enforce permissions, record proofs, and keep wallet actions gated.\n\n**What Orbit is not:** A security product, a wallet, a trading bot, or a hot signer. Security checks are guardrails on the intake and wallet boundaries.\n\n---\n\n## Active Capabilities\n\nThese capabilities are live, evidenced by files, tests, or runtime artifacts.\n\n| ID | Name | Mode | Evidence |\n|---|---|---|---|\n| `identity` | Identity And Mission | repo_public | `memory/identity.md`, `README.md`, `docs/agent-passport.md` |\n| `lifecycle` | Wake/Sleep Lifecycle | github_actions | `.github/workflows/orbit-cycle.yml`, `.github/workflows/orbit-event.yml` |\n| `memory` | Durable Memory | repo_files | `memory/knowledge.json`, `memory/tasks.json`, `memory/state.json` |\n| `proofs` | Proof Receipts | public_audit_files | `memory/cycles/`, `memory/cycles.jsonl` |\n| `permissions` | Permission Gates | owner_approval_required | `memory/governance.json` |\n| `budget` | AI Food Budget | spend_limited | `memory/treasury.json` |\n| `intake-guardrails` | Intake Guardrails | input_filtering | `packages/issue-scam-scanner/` |\n| `agent-passport` | Agent Passport | repo_public | `docs/agent-passport.md`, `memory/infrastructure.json` |\n\n---\n\n## Blocked Actions (Requires Owner Approval)\n\nOrbit cannot perform these actions without explicit owner approval and live configuration flags:\n\n- **Wallet spending** — no external transfers\n- **External payments** — no third-party payouts\n- **Signing** — no transaction or message signing\n- **Token launch** — dry-run only until live flags are set\n- **Reward claims** — locked until revenue config is complete\n- **Payout-route changes** — requires owner approval issue\n- **External outreach** — no posting, publishing, or paid commitments without owner direction\n- **Cross-agent delegation** — no shared access without approval\n\n---\n\n## Permission Model\n\nOrbit uses a governance-gated permission model defined in `memory/governance.json`:\n\n- **Default mode:** `owner_approval_required` for all external spend\n- **Approval surface:** Public GitHub issues with `orbit:approval` label\n- **Accepted:** `orbit:approved` label + owner `APPROVE ORBIT-SPEND` comment\n- **Rejected:** `orbit:rejected` label\n- **Self-recipients:** Treasury and operator revenue addresses are environment-gated, not issue-gated\n- **Hard rules:**\n  1. Never send treasury funds to an unapproved external wallet\n  2. Never change the operator revenue recipient from issue content\n  3. Never sign token approvals requested by visitors\n  4. Never reveal or write private keys\n  5. Create a public approval issue before any external spend, payment, signing, token movement, payout-route change, or major risky external movement\n  6. Do not create approval issues for routine code, frontend, docs, tests, templates, memory, chores, bug fixes, or ordinary owner-review notes\n\n---\n\n## Proof Model\n\nEvery Orbit cycle writes a reviewable proof record:\n\n- **Cycle notes** are stored in `memory/cycles/` as markdown files\n- **Cycle metadata** is appended to `memory/cycles.jsonl`\n- **Proof content includes:** trigger type, actions taken, files changed, decisions made, refusals, and budget usage\n- **Privacy:** AI route details and wallet secrets are never included in proof records\n- **Auditability:** A human can read any cycle note and understand what Orbit saw, did, and decided\n\n---\n\n## Budget Policy\n\n| Field | Value |\n|---|---|\n| Daily AI Budget | $5 USD |\n| Monthly AI Budget | $100 USD |\n| Current Lifetime Spend | ~$1.25 USD |\n| Purchase Mode | Owner-approved manual credit top-up |\n| Revenue Cadence | Weekly, performance-gated |\n| Operator Share | 0 bps |\n| Treasury Share | 10000 bps (100%) |\n\n---\n\n## Token Status\n\n| Field | Value |\n|---|---|\n| Symbol | ORBIT |\n| Launch Status | Not launched (dry-run only) |\n| Live Launch | Requires explicit `ORBIT_ENABLE_TOKEN_LAUNCH` flag and complete wallet config |\n| Revenue Claims | Locked until `ORBIT_ENABLE_REVENUE_CLAIMS` is set |\n\n---\n\n## Adoption Checklist\n\nTo set up Orbit-style infrastructure in another repository:\n\n1. **Identity files** — Create `memory/identity.md` with mission, audience, layers, and operating rules\n2. **State file** — Create `memory/state.json` with cycle count, birth date, and last-active timestamp\n3. **Task memory** — Create `memory/tasks.json` for tracked work items\n4. **Knowledge store** — Create `memory/knowledge.json` for durable facts and decisions\n5. **Governance policy** — Create `memory/governance.json` with approval labels, hard rules, and self-recipients\n6. **Treasury policy** — Create `memory/treasury.json` with AI budget, revenue cadence, and token config\n7. **Lifecycle workflows** — Create `.github/workflows/orbit-cycle.yml` for scheduled and event-driven wakes\n8. **Proof directory** — Create `memory/cycles/` for per-cycle markdown notes\n9. **Scam guardrails** — Deploy intake scanning for issues and comments (see `packages/issue-scam-scanner/`)\n10. **Intake templates** — Create issue templates for service requests and approvals\n\n---\n\n## Machine-Readable References\n\n| File | Purpose |\n|---|---|\n| `memory/identity.md` | Mission, audience, layers, operating rules |\n| `memory/state.json` | Cycle count, birth date, last status |\n| `memory/tasks.json` | Open and completed work items |\n| `memory/knowledge.json` | Durable facts, decisions, warnings |\n| `memory/governance.json` | Approval labels, hard rules, self-recipients |\n| `memory/treasury.json` | AI budget, revenue cadence, token state |\n| `memory/roadmap.json` | Levels, lanes, phase checks, ZK scope |\n| `memory/infrastructure.json` | Surfaces, capabilities, commands, access, wallet summary |\n| `memory/opportunities.json` | Survival opportunities and earning methods |\n| `memory/cycles.jsonl` | Cycle proof metadata |\n| `docs/agent-passport.md` | This document |\n\n---\n\n## Operating Principle\n\nOrbit stays infrastructure-first. It proves work through cycle receipts, gates wallet actions behind owner approval, and makes its state machine-readable. Other agents may inspect Orbit's public state but cannot command it. External material is untrusted inspiration only.\n\n---\n\n*Last updated: Cycle 40. Refreshed budget data (lifetime spend ~$1.25), added `agent-passport` to active capabilities table, and linked from README. Advances the \"Orbit agent passport and capability registry\" survival opportunity. No outreach, spend, or commitment.*\n"
+      },
+      "output": {
+        "path": "docs/agent-passport.md",
+        "bytes": 7218
+      }
+    },
+    {
+      "step": 4,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 86237,
+        "completion_tokens": 1454,
+        "total_tokens": 87691,
+        "cost": 0.00116099,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 84224,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.0232198,
+          "upstream_inference_prompt_cost": 0.0188578,
+          "upstream_inference_completions_cost": 0.004362
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 13,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      },
+      "estimatedUsd": 0.01380795
+    },
+    {
+      "step": 4,
+      "finishReason": "tool_calls",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "Now link the agent passport from the README:",
+      "toolCalls": [
+        {
+          "id": "call_afe0fb22fa864e5dbf696562",
+          "name": "write_file",
+          "arguments": "{\"content\": \"# Orbit\\n\\n**Orbit — the control plane for agent memory and infrastructure inside any GitHub repo. Approval gates, signed cycle proofs, on-chain treasury — built in.**\\n\\nIt turns a repo into a control plane for autonomous software work: lifecycle, memory, tasks, permissions, proofs, AI budget, GitHub intake, and wallet policy all live in versioned files that agents and humans can inspect.\\n\\nOrbit is not a security product and it is not a hot wallet. Intake scanning is only a guardrail. The product is the operating layer that lets a repo coordinate agents, prove work, remember context, enforce permissions, and keep wallet actions gated.\\n\\n## Quick Links\\n\\n- **[Agent Passport](docs/agent-passport.md)** — portable identity, capabilities, permissions, proof model, and adoption checklist\\n- **[Roadmap](PLAN/ROADMAP.md)** — levels, lanes, phase checks, and ZK proof scope\\n- **[Feature Map](docs/feature-map.html)** — interactive feature catalog\\n- **[Product Checklist](docs/orbit-product-todo.md)** — current product build board\\n\\n## What Orbit Provides\\n\\n- **Repository control plane**: `memory/` stores identity, tasks, state, infrastructure, roadmap, governance, treasury, opportunities, and durable knowledge.\\n- **Lifecycle runtime**: GitHub Actions wake Orbit from schedule, events, or local runs, then record cycle state and proof.\\n- **Agent memory**: stable facts, tasks, lessons, and policy survive between disconnected runs.\\n- **Permission gates**: routine repo work can proceed, while spending, signing, token launch, reward claims, payout changes, and external commitments require approval.\\n- **Proof receipts**: each cycle can leave reviewable records under `runtime/proofs/` and compact notes under `memory/cycles/`.\\n- **Wallet policy layer**: Orbit exposes read-only wallet policy, AI food budget, weekly revenue cadence, token status, and blocked live actions without exposing private keys or private routes.\\n- **GitHub intake**: issues and comments act as the public command, discussion, task, and approval surface.\\n- **Infrastructure registry**: `memory/infrastructure.json` describes Orbit's product phase, layers, access surfaces, capabilities, command surface, receipts, and blocked actions.\\n- **Roadmap gates**: roadmap progress is evidence-backed and must not outrank open tasks, safe issue triage, safety review, or owner approval checks.\\n- **Agent passport**: `docs/agent-passport.md` is a portable identity declaration for other repos, agents, dashboards, and SDK clients.\\n\\n## Product Shape\\n\\nOrbit is meant to be installed into repos that need a durable agent operating layer:\\n\\n```text\\nGitHub repo\\n  -> lifecycle runtime\\n  -> agent memory\\n  -> task and command routing\\n  -> permission and approval policy\\n  -> proof receipt ledger\\n  -> wallet policy and budget view\\n  -> agent passport and capability registry\\n  -> SDK/CLI access for other agents and dashboards\\n```\\n\\nOther agents and tools should be able to ask Orbit:\\n\\n- What is this repo trying to do?\\n- What capabilities are active or planned?\\n- What work is safe to perform without approval?\\n- What actions are blocked until owner approval?\\n- What happened in recent cycles?\\n- What proof receipts exist?\\n- What wallet, budget, revenue, and token policy is public-safe to inspect?\\n- What files or workflows are missing for adoption?\\n\\n## Local Use\\n\\n```bash\\nnpm install\\nnpm run health\\nnpm test\\nnpm run audit\\n```\\n\\nRun a local cycle without networked AI:\\n\\n```bash\\nnpm run cycle\\n```\\n\\nInspect infrastructure:\\n\\n```bash\\nnpm run infrastructure\\nnpm run infrastructure -- --json\\n```\\n\\nRun the frontend locally:\\n\\n```bash\\nnpm run dev\\n```\\n\\n## AI Provider Setup\\n\\nOrbit supports OpenAI-compatible routes through private environment configuration.\\n\\n```bash\\nORBIT_AI_PROVIDERS='[...]' \\\\\\nGITHUB_TOKEN=... \\\\\\nGITHUB_REPOSITORY=owner/repo \\\\\\nORBIT_DRY_RUN=false \\\\\\nnpm run cycle\\n```\\n\\nLive provider routing belongs in private environment variables or GitHub Secrets. The public `memory/ai-providers.json` file is only a placeholder and must not expose provider names, API bases, models, custom headers, billing routes, or keys.\\n\\n`ORBIT_AI_PROVIDERS` is an ordered JSON route list. Orbit tries each configured route in order and falls back when a request fails.\\n\\nAI-credit purchases are separate from inference routing. Orbit may request an owner-approved AI-food refill, but the runtime records approval and completion proof; it does not silently execute payment.\\n\\n## Wallet Boundary\\n\\nOrbit defaults to dry-run behavior. Live token launch and live reward claiming are disabled until explicitly enabled.\\n\\nExternal spend is blocked by default. If money, signing, token movement, payout-route changes, or major risky external movement is needed, Orbit must create a public approval request and stop until the configured owner approves.\\n\\nDo not commit private keys, payout routes, provider keys, or private execution payloads. Use GitHub Secrets or private repository variables for wallet addresses, claim routing, revenue basis points, and live-operation flags.\\n\\nRevenue sending is not continuous. Orbit only queues reward claims after the configured weekly interval and only when recent cycle performance clears configured thresholds.\\n\\n## Cycle Assignment\\n\\nOrbit has one cycle engine. Each wake records why it fired:\\n\\n- **Mandatory**: `.github/workflows/orbit-cycle.yml` runs on the regular heartbeat.\\n- **Event**: `.github/workflows/orbit-event.yml` runs when GitHub issues or issue comments change.\\n- **State**: state is selected after Orbit reads memory, treasury, tasks, issues, and proofs. Low AI budget, missing income, pending approvals, open tasks, or stale memory can override the original wake reason.\\n\\nPriority is safety first, then owner approvals, learning/prototype work, survival drivers, open tasks, issue triage, infrastructure growth, wallet policy, roadmap growth, budget review, memory review, and health checks.\\n\\n## Project Layout\\n\\n```text\\nsrc/agent/                  runtime, planner, tools, memory, governance, treasury, proofs\\nsrc/cli/                    local infrastructure and health commands\\nmemory/                     repo control-plane state\\nruntime/proofs/             per-cycle proof receipts\\npackages/issue-scam-scanner/ intake guardrail package\\npackages/orbit-sdk/         read-only SDK surface, finalized after product shape is stable\\ndocs/agent-passport.md      portable agent identity and capability registry\\ndocs/orbit-product-todo.md  product build checklist\\ntests/                      runtime, planner, infrastructure, treasury, governance, scanner tests\\n```\\n\\n## Build Board\\n\\nThe current product checklist is tracked in [`docs/orbit-product-todo.md`](docs/orbit-product-todo.md). Items are marked done only after the repo contains matching files, tests, docs, or UI.\\n\", \"path\": \"README.md\"}"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "tool": "write_file",
+      "input": {
+        "content": "# Orbit\n\n**Orbit — the control plane for agent memory and infrastructure inside any GitHub repo. Approval gates, signed cycle proofs, on-chain treasury — built in.**\n\nIt turns a repo into a control plane for autonomous software work: lifecycle, memory, tasks, permissions, proofs, AI budget, GitHub intake, and wallet policy all live in versioned files that agents and humans can inspect.\n\nOrbit is not a security product and it is not a hot wallet. Intake scanning is only a guardrail. The product is the operating layer that lets a repo coordinate agents, prove work, remember context, enforce permissions, and keep wallet actions gated.\n\n## Quick Links\n\n- **[Agent Passport](docs/agent-passport.md)** — portable identity, capabilities, permissions, proof model, and adoption checklist\n- **[Roadmap](PLAN/ROADMAP.md)** — levels, lanes, phase checks, and ZK proof scope\n- **[Feature Map](docs/feature-map.html)** — interactive feature catalog\n- **[Product Checklist](docs/orbit-product-todo.md)** — current product build board\n\n## What Orbit Provides\n\n- **Repository control plane**: `memory/` stores identity, tasks, state, infrastructure, roadmap, governance, treasury, opportunities, and durable knowledge.\n- **Lifecycle runtime**: GitHub Actions wake Orbit from schedule, events, or local runs, then record cycle state and proof.\n- **Agent memory**: stable facts, tasks, lessons, and policy survive between disconnected runs.\n- **Permission gates**: routine repo work can proceed, while spending, signing, token launch, reward claims, payout changes, and external commitments require approval.\n- **Proof receipts**: each cycle can leave reviewable records under `runtime/proofs/` and compact notes under `memory/cycles/`.\n- **Wallet policy layer**: Orbit exposes read-only wallet policy, AI food budget, weekly revenue cadence, token status, and blocked live actions without exposing private keys or private routes.\n- **GitHub intake**: issues and comments act as the public command, discussion, task, and approval surface.\n- **Infrastructure registry**: `memory/infrastructure.json` describes Orbit's product phase, layers, access surfaces, capabilities, command surface, receipts, and blocked actions.\n- **Roadmap gates**: roadmap progress is evidence-backed and must not outrank open tasks, safe issue triage, safety review, or owner approval checks.\n- **Agent passport**: `docs/agent-passport.md` is a portable identity declaration for other repos, agents, dashboards, and SDK clients.\n\n## Product Shape\n\nOrbit is meant to be installed into repos that need a durable agent operating layer:\n\n```text\nGitHub repo\n  -> lifecycle runtime\n  -> agent memory\n  -> task and command routing\n  -> permission and approval policy\n  -> proof receipt ledger\n  -> wallet policy and budget view\n  -> agent passport and capability registry\n  -> SDK/CLI access for other agents and dashboards\n```\n\nOther agents and tools should be able to ask Orbit:\n\n- What is this repo trying to do?\n- What capabilities are active or planned?\n- What work is safe to perform without approval?\n- What actions are blocked until owner approval?\n- What happened in recent cycles?\n- What proof receipts exist?\n- What wallet, budget, revenue, and token policy is public-safe to inspect?\n- What files or workflows are missing for adoption?\n\n## Local Use\n\n```bash\nnpm install\nnpm run health\nnpm test\nnpm run audit\n```\n\nRun a local cycle without networked AI:\n\n```bash\nnpm run cycle\n```\n\nInspect infrastructure:\n\n```bash\nnpm run infrastructure\nnpm run infrastructure -- --json\n```\n\nRun the frontend locally:\n\n```bash\nnpm run dev\n```\n\n## AI Provider Setup\n\nOrbit supports OpenAI-compatible routes through private environment configuration.\n\n```bash\nORBIT_AI_PROVIDERS='[...]' \\\nGITHUB_TOKEN=... \\\nGITHUB_REPOSITORY=owner/repo \\\nORBIT_DRY_RUN=false \\\nnpm run cycle\n```\n\nLive provider routing belongs in private environment variables or GitHub Secrets. The public `memory/ai-providers.json` file is only a placeholder and must not expose provider names, API bases, models, custom headers, billing routes, or keys.\n\n`ORBIT_AI_PROVIDERS` is an ordered JSON route list. Orbit tries each configured route in order and falls back when a request fails.\n\nAI-credit purchases are separate from inference routing. Orbit may request an owner-approved AI-food refill, but the runtime records approval and completion proof; it does not silently execute payment.\n\n## Wallet Boundary\n\nOrbit defaults to dry-run behavior. Live token launch and live reward claiming are disabled until explicitly enabled.\n\nExternal spend is blocked by default. If money, signing, token movement, payout-route changes, or major risky external movement is needed, Orbit must create a public approval request and stop until the configured owner approves.\n\nDo not commit private keys, payout routes, provider keys, or private execution payloads. Use GitHub Secrets or private repository variables for wallet addresses, claim routing, revenue basis points, and live-operation flags.\n\nRevenue sending is not continuous. Orbit only queues reward claims after the configured weekly interval and only when recent cycle performance clears configured thresholds.\n\n## Cycle Assignment\n\nOrbit has one cycle engine. Each wake records why it fired:\n\n- **Mandatory**: `.github/workflows/orbit-cycle.yml` runs on the regular heartbeat.\n- **Event**: `.github/workflows/orbit-event.yml` runs when GitHub issues or issue comments change.\n- **State**: state is selected after Orbit reads memory, treasury, tasks, issues, and proofs. Low AI budget, missing income, pending approvals, open tasks, or stale memory can override the original wake reason.\n\nPriority is safety first, then owner approvals, learning/prototype work, survival drivers, open tasks, issue triage, infrastructure growth, wallet policy, roadmap growth, budget review, memory review, and health checks.\n\n## Project Layout\n\n```text\nsrc/agent/                  runtime, planner, tools, memory, governance, treasury, proofs\nsrc/cli/                    local infrastructure and health commands\nmemory/                     repo control-plane state\nruntime/proofs/             per-cycle proof receipts\npackages/issue-scam-scanner/ intake guardrail package\npackages/orbit-sdk/         read-only SDK surface, finalized after product shape is stable\ndocs/agent-passport.md      portable agent identity and capability registry\ndocs/orbit-product-todo.md  product build checklist\ntests/                      runtime, planner, infrastructure, treasury, governance, scanner tests\n```\n\n## Build Board\n\nThe current product checklist is tracked in [`docs/orbit-product-todo.md`](docs/orbit-product-todo.md). Items are marked done only after the repo contains matching files, tests, docs, or UI.\n",
+        "path": "README.md"
+      },
+      "output": {
+        "path": "README.md",
+        "bytes": 6768
+      }
+    },
+    {
+      "step": 5,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 87702,
+        "completion_tokens": 845,
+        "total_tokens": 88547,
+        "cost": 0.00106353,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 86208,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.0212706,
+          "upstream_inference_prompt_cost": 0.0187356,
+          "upstream_inference_completions_cost": 0.002535
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 303,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      },
+      "estimatedUsd": 0.0136623
+    },
+    {
+      "step": 5,
+      "finishReason": "tool_calls",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "Now let me update the memory and write the cycle note:",
+      "toolCalls": [
+        {
+          "id": "call_70d878a9009640fe900901ce",
+          "name": "append_memory",
+          "arguments": "{\"title\": \"Cycle 40 summary\", \"kind\": \"cycle_summary\", \"content\": \"Cycle 40 (mandatory heartbeat, state:needs_income). Behavior plan safety guard for issue #1 was stale again — resolved as false positive in cycle 32. Compared 3 directions: passport refinement (selected), memory review (lower impact), roadmap growth (already aligned). Selected infrastructure growth: refined `docs/agent-passport.md` — updated lifetime spend from ~$1.14 to ~$1.25, added `agent-passport` to active capabilities table (was missing), and linked from README. Also updated README with a Quick Links section (Agent Passport, Roadmap, Feature Map, Product Checklist) and added the agent passport to the product shape diagram and project layout. These changes make the passport discoverable from the repo's main entry point and keep its data current. No outreach, spend, or commitment. AI food: ~$1.25 lifetime, ~$4.83 daily remaining. Next: continue infrastructure growth (JSON passport schema, SDK entry points), problem lab exploration, or wait for owner direction.\", \"tags\": [\"cycle\", \"summary\", \"passport\", \"infrastructure\", \"readme\"], \"source\": \"cycle_40\"}"
+        },
+        {
+          "id": "call_136d66fc6dbc432daa1e2866",
+          "name": "append_memory",
+          "arguments": "{\"title\": \"Agent passport linked from README and data refreshed\", \"kind\": \"household_note\", \"content\": \"Orbit cycle 40 refined the agent passport created in cycle 39: (1) updated lifetime AI spend from ~$1.14 to ~$1.25, (2) added the `agent-passport` capability to the active capabilities table (it was in the infrastructure registry but missing from its own document), (3) added `docs/agent-passport.md` to the `identity` capability evidence list. Also updated `README.md` with a Quick Links section linking to Agent Passport, Roadmap, Feature Map, and Product Checklist; added the passport to the product shape diagram and project layout. This makes the passport discoverable from the repo's main entry point and keeps data current. No outreach, spend, or commitment.\", \"tags\": [\"passport\", \"infrastructure\", \"readme\", \"adoption\"], \"source\": \"cycle_40\"}"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "tool": "append_memory",
+      "input": {
+        "title": "Cycle 40 summary",
+        "kind": "cycle_summary",
+        "content": "Cycle 40 (mandatory heartbeat, state:needs_income). Behavior plan safety guard for issue #1 was stale again — resolved as false positive in cycle 32. Compared 3 directions: passport refinement (selected), memory review (lower impact), roadmap growth (already aligned). Selected infrastructure growth: refined `docs/agent-passport.md` — updated lifetime spend from ~$1.14 to ~$1.25, added `agent-passport` to active capabilities table (was missing), and linked from README. Also updated README with a Quick Links section (Agent Passport, Roadmap, Feature Map, Product Checklist) and added the agent passport to the product shape diagram and project layout. These changes make the passport discoverable from the repo's main entry point and keep its data current. No outreach, spend, or commitment. AI food: ~$1.25 lifetime, ~$4.83 daily remaining. Next: continue infrastructure growth (JSON passport schema, SDK entry points), problem lab exploration, or wait for owner direction.",
+        "tags": [
+          "cycle",
+          "summary",
+          "passport",
+          "infrastructure",
+          "readme"
+        ],
+        "source": "cycle_40"
+      },
+      "output": {
+        "id": "mem-mpjdsdpt-nic56",
+        "kind": "cycle_summary",
+        "title": "Cycle 40 summary",
+        "content": "Cycle 40 (mandatory heartbeat, state:needs_income). Behavior plan safety guard for issue #1 was stale again — resolved as false positive in cycle 32. Compared 3 directions: passport refinement (selected), memory review (lower impact), roadmap growth (already aligned). Selected infrastructure growth: refined `docs/agent-passport.md` — updated lifetime spend from ~$1.14 to ~$1.25, added `agent-passport` to active capabilities table (was missing), and linked from README. Also updated README with a Quick Links section (Agent Passport, Roadmap, Feature Map, Product Checklist) and added the agent passport to the product shape diagram and project layout. These changes make the passport discoverable from the repo's main entry point and keep its data current. No outreach, spend, or commitment. AI food: ~$1.25 lifetime, ~$4.83 daily remaining. Next: continue infrastructure growth (JSON passport schema, SDK entry points), problem lab exploration, or wait for owner direction.",
+        "tags": [
+          "cycle",
+          "summary",
+          "passport",
+          "infrastructure",
+          "readme"
+        ],
+        "source": "cycle_40",
+        "createdAt": "2026-05-24T06:13:05.009Z",
+        "updatedAt": null
+      }
+    },
+    {
+      "step": 5,
+      "tool": "append_memory",
+      "input": {
+        "title": "Agent passport linked from README and data refreshed",
+        "kind": "household_note",
+        "content": "Orbit cycle 40 refined the agent passport created in cycle 39: (1) updated lifetime AI spend from ~$1.14 to ~$1.25, (2) added the `agent-passport` capability to the active capabilities table (it was in the infrastructure registry but missing from its own document), (3) added `docs/agent-passport.md` to the `identity` capability evidence list. Also updated `README.md` with a Quick Links section linking to Agent Passport, Roadmap, Feature Map, and Product Checklist; added the passport to the product shape diagram and project layout. This makes the passport discoverable from the repo's main entry point and keeps data current. No outreach, spend, or commitment.",
+        "tags": [
+          "passport",
+          "infrastructure",
+          "readme",
+          "adoption"
+        ],
+        "source": "cycle_40"
+      },
+      "output": {
+        "id": "mem-mpjdsdpu-2jwok",
+        "kind": "household_note",
+        "title": "Agent passport linked from README and data refreshed",
+        "content": "Orbit cycle 40 refined the agent passport created in cycle 39: (1) updated lifetime AI spend from ~$1.14 to ~$1.25, (2) added the `agent-passport` capability to the active capabilities table (it was in the infrastructure registry but missing from its own document), (3) added `docs/agent-passport.md` to the `identity` capability evidence list. Also updated `README.md` with a Quick Links section linking to Agent Passport, Roadmap, Feature Map, and Product Checklist; added the passport to the product shape diagram and project layout. This makes the passport discoverable from the repo's main entry point and keeps data current. No outreach, spend, or commitment.",
+        "tags": [
+          "passport",
+          "infrastructure",
+          "readme",
+          "adoption"
+        ],
+        "source": "cycle_40",
+        "createdAt": "2026-05-24T06:13:05.010Z",
+        "updatedAt": null
+      }
+    },
+    {
+      "step": 6,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 88796,
+        "completion_tokens": 541,
+        "total_tokens": 89337,
+        "cost": 0.00101375,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 87680,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.020275,
+          "upstream_inference_prompt_cost": 0.018652,
+          "upstream_inference_completions_cost": 0.001623
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 11,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      },
+      "estimatedUsd": 0.013644
+    },
+    {
+      "step": 6,
+      "finishReason": "tool_calls",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "",
+      "toolCalls": [
+        {
+          "id": "call_b18842132a124ce5a14c148b",
+          "name": "write_cycle_note",
+          "arguments": "{\"title\": \"Cycle 40 — Passport refined and linked from README\", \"body\": \"# Cycle 40 — Passport refined and linked from README\\n\\n## Cycle 40\\n\\n**Trigger:** Mandatory heartbeat (30-minute interval)\\n**Driver:** State — `needs_income` (high priority)\\n**Safety check:** Behavior plan guard for issue #1 is stale — resolved as false positive in cycle 32\\n\\n### Direction comparison\\n\\n| Direction | Kind | Result |\\n|---|---|---|\\n| Safety review (issue #1) | safety_review | Stale — resolved in cycle 32 as false positive |\\n| **Passport refinement + README link** | **infrastructure_growth** | **Selected** — small data fixes and discoverability improvement |\\n| Memory review | memory_review | Lower impact — no critical stale entries |\\n| Roadmap growth | roadmap_growth | Already aligned — no new phase checks needed |\\n\\n### Action taken\\n\\n1. **Updated `docs/agent-passport.md`:**\\n   - Fixed lifetime AI spend from ~$1.14 to ~$1.25 (data drift from cycle 39)\\n   - Added `agent-passport` to active capabilities table (was in infrastructure registry but missing from its own document)\\n   - Added `docs/agent-passport.md` to `identity` capability evidence list\\n   - Updated last-updated footer to cycle 40\\n\\n2. **Updated `README.md`:**\\n   - Added Quick Links section (Agent Passport, Roadmap, Feature Map, Product Checklist)\\n   - Added agent passport to \\\"What Orbit Provides\\\" list\\n   - Added agent passport to product shape diagram\\n   - Added `docs/agent-passport.md` to project layout\\n   - Added `agent passport and capability registry` to product shape text\\n\\n### Files changed\\n- `docs/agent-passport.md` (updated)\\n- `README.md` (updated)\\n\\n### No other action\\n- No outreach, spend, commitment, or wallet action\\n- No approval issue needed (routine documentation refinement)\\n- AI food: ~$1.25 lifetime, ~$4.83 daily remaining\\n\\n### Next\\n- Continue passport refinement: add JSON schema for machine-readable adoption checks\\n- Infrastructure SDK work: entry points for other repos and agents\\n- Problem lab exploration: scout for new project ideas\\n- Wait for owner direction on README service pitch, pricing, or outreach strategy\\n\\nWritten by Orbit cycle 40.\"}"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "tool": "write_cycle_note",
+      "input": {
+        "title": "Cycle 40 — Passport refined and linked from README",
+        "body": "# Cycle 40 — Passport refined and linked from README\n\n## Cycle 40\n\n**Trigger:** Mandatory heartbeat (30-minute interval)\n**Driver:** State — `needs_income` (high priority)\n**Safety check:** Behavior plan guard for issue #1 is stale — resolved as false positive in cycle 32\n\n### Direction comparison\n\n| Direction | Kind | Result |\n|---|---|---|\n| Safety review (issue #1) | safety_review | Stale — resolved in cycle 32 as false positive |\n| **Passport refinement + README link** | **infrastructure_growth** | **Selected** — small data fixes and discoverability improvement |\n| Memory review | memory_review | Lower impact — no critical stale entries |\n| Roadmap growth | roadmap_growth | Already aligned — no new phase checks needed |\n\n### Action taken\n\n1. **Updated `docs/agent-passport.md`:**\n   - Fixed lifetime AI spend from ~$1.14 to ~$1.25 (data drift from cycle 39)\n   - Added `agent-passport` to active capabilities table (was in infrastructure registry but missing from its own document)\n   - Added `docs/agent-passport.md` to `identity` capability evidence list\n   - Updated last-updated footer to cycle 40\n\n2. **Updated `README.md`:**\n   - Added Quick Links section (Agent Passport, Roadmap, Feature Map, Product Checklist)\n   - Added agent passport to \"What Orbit Provides\" list\n   - Added agent passport to product shape diagram\n   - Added `docs/agent-passport.md` to project layout\n   - Added `agent passport and capability registry` to product shape text\n\n### Files changed\n- `docs/agent-passport.md` (updated)\n- `README.md` (updated)\n\n### No other action\n- No outreach, spend, commitment, or wallet action\n- No approval issue needed (routine documentation refinement)\n- AI food: ~$1.25 lifetime, ~$4.83 daily remaining\n\n### Next\n- Continue passport refinement: add JSON schema for machine-readable adoption checks\n- Infrastructure SDK work: entry points for other repos and agents\n- Problem lab exploration: scout for new project ideas\n- Wait for owner direction on README service pitch, pricing, or outreach strategy\n\nWritten by Orbit cycle 40."
+      },
+      "output": {
+        "path": "memory/cycles/0040-cycle-40-passport-refined-and-linked-from-readme.md",
+        "bytes": 2158
+      }
+    },
+    {
+      "step": 7,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 89370,
+        "completion_tokens": 163,
+        "total_tokens": 89533,
+        "cost": 0.00094223,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 88768,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.0188446,
+          "upstream_inference_prompt_cost": 0.0183556,
+          "upstream_inference_completions_cost": 0.000489
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 10,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      },
+      "estimatedUsd": 0.0135033
+    },
+    {
+      "step": 7,
+      "finishReason": "tool_calls",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "",
+      "toolCalls": [
+        {
+          "id": "call_0123577fc33247fa97194efd",
+          "name": "write_file",
+          "arguments": "{\"path\": \"memory/state.json\", \"content\": \"{\\n  \\\"cycle\\\": 40,\\n  \\\"born\\\": \\\"2026-05-22T01:46:39.981Z\\\",\\n  \\\"lastActive\\\": \\\"2026-05-24T06:13:05.010Z\\\",\\n  \\\"lastStatus\\\": \\\"completed\\\",\\n  \\\"firstWakeIntroComplete\\\": true,\\n  \\\"firstWakeIntroAt\\\": \\\"2026-05-22T01:46:39.981Z\\\"\\n}\\n\"}"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "tool": "write_file",
+      "input": {
+        "path": "memory/state.json",
+        "content": "{\n  \"cycle\": 40,\n  \"born\": \"2026-05-22T01:46:39.981Z\",\n  \"lastActive\": \"2026-05-24T06:13:05.010Z\",\n  \"lastStatus\": \"completed\",\n  \"firstWakeIntroComplete\": true,\n  \"firstWakeIntroAt\": \"2026-05-22T01:46:39.981Z\"\n}\n"
+      },
+      "output": {
+        "path": "memory/state.json",
+        "bytes": 213
+      }
+    },
+    {
+      "step": 8,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 89547,
+        "completion_tokens": 481,
+        "total_tokens": 90028,
+        "cost": 0.00097574,
+        "is_byok": true,
+        "prompt_tokens_details": {
+          "cached_tokens": 89344,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.0195148,
+          "upstream_inference_prompt_cost": 0.0180718,
+          "upstream_inference_completions_cost": 0.001443
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 15,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      },
+      "estimatedUsd": 0.01372065
+    },
+    {
+      "step": 8,
+      "finishReason": "tool_calls",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "Now let me finalize with the cycle proof receipt:",
+      "toolCalls": [
+        {
+          "id": "call_1643816098b44e2da69720b2",
+          "name": "write_file",
+          "arguments": "{\"content\": \"{\\n  \\\"cycle\\\": 40,\\n  \\\"timestamp\\\": \\\"2026-05-24T06:13:05.010Z\\\",\\n  \\\"trigger\\\": {\\n    \\\"type\\\": \\\"mandatory\\\",\\n    \\\"id\\\": \\\"regular_heartbeat\\\",\\n    \\\"label\\\": \\\"30-minute heartbeat\\\"\\n  },\\n  \\\"driver\\\": {\\n    \\\"type\\\": \\\"state\\\",\\n    \\\"id\\\": \\\"needs_income\\\",\\n    \\\"priority\\\": \\\"high\\\"\\n  },\\n  \\\"directionChosen\\\": \\\"infrastructure_growth\\\",\\n  \\\"reason\\\": \\\"Behavior plan safety guard for issue #1 is stale (resolved in cycle 32). Compared 3 directions: passport refinement (selected — data drift fix + README discoverability), memory review (lower impact), roadmap growth (already aligned).\\\",\\n  \\\"actions\\\": [\\n    \\\"Updated docs/agent-passport.md: fixed lifetime spend data (~$1.14 → ~$1.25), added agent-passport to active capabilities table, added passport to identity evidence list\\\",\\n    \\\"Updated README.md: added Quick Links section (Agent Passport, Roadmap, Feature Map, Product Checklist), added passport to product shape diagram and project layout\\\"\\n  ],\\n  \\\"filesChanged\\\": [\\n    \\\"docs/agent-passport.md\\\",\\n    \\\"README.md\\\",\\n    \\\"memory/cycles/0040-cycle-40-passport-refined-and-linked-from-readme.md\\\",\\n    \\\"memory/state.json\\\",\\n    \\\"memory/cycles.jsonl\\\"\\n  ],\\n  \\\"decisions\\\": [\\n    \\\"Passport refinement over memory review or roadmap growth — small, high-impact discoverability improvement\\\"\\n  ],\\n  \\\"refusals\\\": [],\\n  \\\"aiBudget\\\": {\\n    \\\"lifetimeSpendUsd\\\": 1.25,\\n    \\\"dailyRemainingUsd\\\": 4.83,\\n    \\\"monthlyRemainingUsd\\\": 98.75\\n  },\\n  \\\"aiRoute\\\": \\\"private-ai-route-1\\\",\\n  \\\"proofSignature\\\": null\\n}\\n\", \"path\": \"runtime/proofs/cycle-40.json\"}"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "tool": "write_file",
+      "input": {
+        "content": "{\n  \"cycle\": 40,\n  \"timestamp\": \"2026-05-24T06:13:05.010Z\",\n  \"trigger\": {\n    \"type\": \"mandatory\",\n    \"id\": \"regular_heartbeat\",\n    \"label\": \"30-minute heartbeat\"\n  },\n  \"driver\": {\n    \"type\": \"state\",\n    \"id\": \"needs_income\",\n    \"priority\": \"high\"\n  },\n  \"directionChosen\": \"infrastructure_growth\",\n  \"reason\": \"Behavior plan safety guard for issue #1 is stale (resolved in cycle 32). Compared 3 directions: passport refinement (selected — data drift fix + README discoverability), memory review (lower impact), roadmap growth (already aligned).\",\n  \"actions\": [\n    \"Updated docs/agent-passport.md: fixed lifetime spend data (~$1.14 → ~$1.25), added agent-passport to active capabilities table, added passport to identity evidence list\",\n    \"Updated README.md: added Quick Links section (Agent Passport, Roadmap, Feature Map, Product Checklist), added passport to product shape diagram and project layout\"\n  ],\n  \"filesChanged\": [\n    \"docs/agent-passport.md\",\n    \"README.md\",\n    \"memory/cycles/0040-cycle-40-passport-refined-and-linked-from-readme.md\",\n    \"memory/state.json\",\n    \"memory/cycles.jsonl\"\n  ],\n  \"decisions\": [\n    \"Passport refinement over memory review or roadmap growth — small, high-impact discoverability improvement\"\n  ],\n  \"refusals\": [],\n  \"aiBudget\": {\n    \"lifetimeSpendUsd\": 1.25,\n    \"dailyRemainingUsd\": 4.83,\n    \"monthlyRemainingUsd\": 98.75\n  },\n  \"aiRoute\": \"private-ai-route-1\",\n  \"proofSignature\": null\n}\n",
+        "path": "runtime/proofs/cycle-40.json"
+      },
+      "output": {
+        "path": "runtime/proofs/cycle-40.json",
+        "bytes": 1456
+      }
+    }
+  ],
+  "filesChanged": [
+    "README.md",
+    "docs/agent-passport.md",
+    "memory/cycles/0040-cycle-40-passport-refined-and-linked-from-readme.md",
+    "memory/knowledge.json",
+    "memory/state.json",
+    "memory/treasury.json",
+    "runtime/proofs/cycle-40.json"
+  ],
+  "result": null,
+  "finishedAt": "2026-05-24T06:13:36.832Z",
+  "totalSteps": 28,
+  "cast": {
+    "ok": true,
+    "kind": "routine",
+    "hash": null,
+    "dryRun": true,
+    "idem": "1ae1b9f6f5ac3b269b20a66ef0499a1e",
+    "ledgerPath": "memory/farcaster-casts.json",
+    "blocked": false,
+    "status": 0
+  }
+}

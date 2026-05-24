@@ -26,13 +26,14 @@ These capabilities are live, evidenced by files, tests, or runtime artifacts.
 
 | ID | Name | Mode | Evidence |
 |---|---|---|---|
-| `identity` | Identity And Mission | repo_public | `memory/identity.md`, `README.md` |
+| `identity` | Identity And Mission | repo_public | `memory/identity.md`, `README.md`, `docs/agent-passport.md` |
 | `lifecycle` | Wake/Sleep Lifecycle | github_actions | `.github/workflows/orbit-cycle.yml`, `.github/workflows/orbit-event.yml` |
 | `memory` | Durable Memory | repo_files | `memory/knowledge.json`, `memory/tasks.json`, `memory/state.json` |
 | `proofs` | Proof Receipts | public_audit_files | `memory/cycles/`, `memory/cycles.jsonl` |
 | `permissions` | Permission Gates | owner_approval_required | `memory/governance.json` |
 | `budget` | AI Food Budget | spend_limited | `memory/treasury.json` |
 | `intake-guardrails` | Intake Guardrails | input_filtering | `packages/issue-scam-scanner/` |
+| `agent-passport` | Agent Passport | repo_public | `docs/agent-passport.md`, `memory/infrastructure.json` |
 
 ---
 
@@ -88,7 +89,7 @@ Every Orbit cycle writes a reviewable proof record:
 |---|---|
 | Daily AI Budget | $5 USD |
 | Monthly AI Budget | $100 USD |
-| Current Lifetime Spend | ~$1.14 USD |
+| Current Lifetime Spend | ~$1.25 USD |
 | Purchase Mode | Owner-approved manual credit top-up |
 | Revenue Cadence | Weekly, performance-gated |
 | Operator Share | 0 bps |
@@ -148,4 +149,4 @@ Orbit stays infrastructure-first. It proves work through cycle receipts, gates w
 
 ---
 
-*Last updated: Cycle 39. Passport advances the "Orbit agent passport and capability registry" survival opportunity (score 42.33). No outreach, spend, or commitment.*
+*Last updated: Cycle 40. Refreshed budget data (lifetime spend ~$1.25), added `agent-passport` to active capabilities table, and linked from README. Advances the "Orbit agent passport and capability registry" survival opportunity. No outreach, spend, or commitment.*

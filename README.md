@@ -6,6 +6,13 @@ It turns a repo into a control plane for autonomous software work: lifecycle, me
 
 Orbit is not a security product and it is not a hot wallet. Intake scanning is only a guardrail. The product is the operating layer that lets a repo coordinate agents, prove work, remember context, enforce permissions, and keep wallet actions gated.
 
+## Quick Links
+
+- **[Agent Passport](docs/agent-passport.md)** — portable identity, capabilities, permissions, proof model, and adoption checklist
+- **[Roadmap](PLAN/ROADMAP.md)** — levels, lanes, phase checks, and ZK proof scope
+- **[Feature Map](docs/feature-map.html)** — interactive feature catalog
+- **[Product Checklist](docs/orbit-product-todo.md)** — current product build board
+
 ## What Orbit Provides
 
 - **Repository control plane**: `memory/` stores identity, tasks, state, infrastructure, roadmap, governance, treasury, opportunities, and durable knowledge.
@@ -17,6 +24,7 @@ Orbit is not a security product and it is not a hot wallet. Intake scanning is o
 - **GitHub intake**: issues and comments act as the public command, discussion, task, and approval surface.
 - **Infrastructure registry**: `memory/infrastructure.json` describes Orbit's product phase, layers, access surfaces, capabilities, command surface, receipts, and blocked actions.
 - **Roadmap gates**: roadmap progress is evidence-backed and must not outrank open tasks, safe issue triage, safety review, or owner approval checks.
+- **Agent passport**: `docs/agent-passport.md` is a portable identity declaration for other repos, agents, dashboards, and SDK clients.
 
 ## Product Shape
 
@@ -30,6 +38,7 @@ GitHub repo
   -> permission and approval policy
   -> proof receipt ledger
   -> wallet policy and budget view
+  -> agent passport and capability registry
   -> SDK/CLI access for other agents and dashboards
 ```
 
@@ -119,6 +128,7 @@ memory/                     repo control-plane state
 runtime/proofs/             per-cycle proof receipts
 packages/issue-scam-scanner/ intake guardrail package
 packages/orbit-sdk/         read-only SDK surface, finalized after product shape is stable
+docs/agent-passport.md      portable agent identity and capability registry
 docs/orbit-product-todo.md  product build checklist
 tests/                      runtime, planner, infrastructure, treasury, governance, scanner tests
 ```
