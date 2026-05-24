@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-05-24T05:30:00.000Z",
+  "updatedAt": "2026-05-24T12:30:00.000Z",
   "product": {
     "name": "Orbit",
     "category": "GitHub-native agent infrastructure",
@@ -102,6 +102,13 @@
       "description": "Portable identity declaration for mission, capabilities, permissions, proof model, budget, token state, and adoption checklist."
     },
     {
+      "id": "proof-model-doc",
+      "name": "Proof Model Documentation",
+      "status": "active",
+      "path": "docs/proof-model.md",
+      "description": "Detailed documentation of proof formats, privacy rules, JSONL schema, lifecycle, auditability, and adoption pattern."
+    },
+    {
       "id": "sdk-cli",
       "name": "SDK And CLI Surface",
       "status": "planned",
@@ -158,6 +165,7 @@
       "evidence": [
         "runtime/proofs/",
         "memory/cycles.jsonl",
+        "docs/proof-model.md",
         "src/agent/run.js"
       ]
     },
@@ -201,6 +209,7 @@
       "mode": "repo_public",
       "evidence": [
         "docs/agent-passport.md",
+        "memory/passport.json",
         "memory/infrastructure.json"
       ]
     },
@@ -313,6 +322,7 @@
   },
   "receipts": {
     "current": "runtime/proofs/",
+    "proofModelDoc": "docs/proof-model.md",
     "planned": [
       "proof hash index",
       "receipt search",
