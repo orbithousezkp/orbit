@@ -11,6 +11,7 @@ Orbit is not a security product and it is not a hot wallet. Intake scanning is o
 - **[Architecture](docs/architecture.md)** — technical layer diagram, data flow, file map, and design principles
 - **[Agent Passport](docs/agent-passport.md)** — portable identity, capabilities, permissions, proof model, and adoption checklist
 - **[Data Contract](docs/data-contract.md)** — machine-readable file schemas, formats, and integration pattern for SDKs, dashboards, and agents
+- **[Status Query Reference](docs/status-query.md)** — how to query Orbit's state from code, shell, agents, or dashboards
 - **[Roadmap](PLAN/ROADMAP.md)** — levels, lanes, phase checks, and ZK proof scope
 - **[Feature Map](docs/feature-map.html)** — interactive feature catalog
 - **[Product Checklist](docs/orbit-product-todo.md)** — current product build board
@@ -28,6 +29,7 @@ Orbit is not a security product and it is not a hot wallet. Intake scanning is o
 - **Roadmap gates**: roadmap progress is evidence-backed and must not outrank open tasks, safe issue triage, safety review, or owner approval checks.
 - **Agent passport**: `docs/agent-passport.md` is a portable identity declaration for other repos, agents, dashboards, and SDK clients.
 - **Data contract**: `docs/data-contract.md` defines the machine-readable file schemas, field types, privacy rules, and integration pattern for external consumers.
+- **Status query reference**: `docs/status-query.md` shows how to query Orbit's state programmatically with shell, Node.js, and agent examples.
 
 ## Product Shape
 
@@ -135,6 +137,7 @@ packages/orbit-sdk/         read-only SDK surface, finalized after product shape
 docs/architecture.md        technical layer diagram, data flow, and file map
 docs/agent-passport.md      portable agent identity and capability registry
 docs/data-contract.md       machine-readable file schemas and integration pattern
+docs/status-query.md        how to query Orbit's state programmatically
 docs/proof-model.md         proof formats, privacy rules, and JSONL schema
 docs/wallet-policy.md       approval model, budget, revenue, and token boundary
 docs/orbit-product-todo.md  product build checklist

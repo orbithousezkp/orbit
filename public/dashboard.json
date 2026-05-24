@@ -1,7 +1,7 @@
 {
   "schema": "orbit-dashboard/1",
-  "generatedAt": "2026-05-24T17:48:18.902Z",
-  "gitCommit": "76d40ee",
+  "generatedAt": "2026-05-24T19:45:05.483Z",
+  "gitCommit": "9b7c2fa",
   "product": {
     "name": "Orbit",
     "category": "GitHub-native agent infrastructure",
@@ -17,12 +17,12 @@
   },
   "signer": null,
   "lifecycle": {
-    "cycle": 47,
+    "cycle": 48,
     "born": "2026-05-22T01:46:39.981Z",
-    "lastActive": "2026-05-24T17:43:55.421Z",
+    "lastActive": "2026-05-24T19:40:02.822Z",
     "lastStatus": "completed",
     "firstWakeIntroComplete": true,
-    "recordedCycles": 47
+    "recordedCycles": 48
   },
   "walletPolicy": {
     "approvalMode": "owner_approval_required",
@@ -79,29 +79,6 @@
     },
     "latestSigned": null,
     "list": [
-      {
-        "path": "runtime/proofs/2026-05-24/2026-05-24T05-25-29-596Z.json",
-        "cycle": 39,
-        "startedAt": "2026-05-24T05:23:05.885Z",
-        "finishedAt": "2026-05-24T05:25:29.596Z",
-        "trigger": {
-          "type": "event",
-          "id": "owner_manual_wake",
-          "label": "owner manual wake",
-          "source": "workflow_dispatch",
-          "action": "",
-          "reason": "Wake because the owner asked for a cycle now."
-        },
-        "dryRun": false,
-        "totalSteps": 32,
-        "filesChangedCount": 10,
-        "result": "",
-        "digest": "759af4aa518963c8cf2b3770548a97add659a4b4b41a37880a1029c3691dcfb4",
-        "signed": false,
-        "signer": null,
-        "signatureScheme": null,
-        "payloadHash": null
-      },
       {
         "path": "runtime/proofs/2026-05-24/2026-05-24T06-13-36-832Z.json",
         "cycle": 40,
@@ -288,7 +265,31 @@
         "totalSteps": 30,
         "filesChangedCount": 7,
         "result": "",
-        "digest": "bad65f4f078f957ce000b5c8583d7547b91e02a87f9f3e8bbe968d6a65bb348d",
+        "digest": "5f2ebbc38ee789b4eed042850a3ce585e7d6827c94ea358229a3efb90d3d796f",
+        "signed": false,
+        "signer": null,
+        "signatureScheme": null,
+        "payloadHash": null
+      },
+      {
+        "path": "runtime/proofs/2026-05-24/2026-05-24T19-45-05-480Z.json",
+        "cycle": 48,
+        "startedAt": "2026-05-24T19:40:02.822Z",
+        "finishedAt": "2026-05-24T19:45:05.480Z",
+        "trigger": {
+          "type": "mandatory",
+          "id": "regular_heartbeat",
+          "label": "30-minute heartbeat",
+          "intervalMinutes": 30,
+          "source": "schedule",
+          "action": "",
+          "reason": "Wake on the fixed repository control-plane rhythm even when no event fires."
+        },
+        "dryRun": false,
+        "totalSteps": 28,
+        "filesChangedCount": 6,
+        "result": "",
+        "digest": "327c73398b257aa3064f38b600c225ea6a0157bd898055b600420cefd4a8e380",
         "signed": false,
         "signer": null,
         "signatureScheme": null,
@@ -317,5 +318,5 @@
     ]
   },
   "refusals": [],
-  "digest": "75ce9f39d67fc4f9097fccd120807105b5ce6d409364a626d58bc21862e0d59c"
+  "digest": "1ebc96bd2416da361a6e13658bb35d94ba1c43b0d645ac4b35a9c8ebf4506120"
 }
