@@ -1,10 +1,10 @@
 {
   "name": "@orbit-house/orbit-sdk",
   "version": "0.1.0",
-  "description": "Read-only SDK and CLI for querying Orbit's machine-readable repository state — identity, capabilities, governance, budget, roadmap, tasks, knowledge, infrastructure, proofs, and opportunities.",
+  "description": "Zero-dependency SDK for reading Orbit's machine-readable state: identity, passport, governance, treasury, roadmap, tasks, knowledge, infrastructure, opportunities, and cycle proofs.",
   "main": "index.js",
   "bin": {
-    "orbit-query": "./cli.js"
+    "orbit": "./cli.js"
   },
   "scripts": {
     "test": "node --test ../../tests/orbit-sdk.test.js"
@@ -12,12 +12,11 @@
   "keywords": [
     "orbit",
     "agent-control-plane",
-    "repository-infrastructure",
     "github-agent",
-    "agent-identity",
+    "repository-infrastructure",
     "proof-receipts",
-    "governance",
-    "read-only-sdk"
+    "agent-passport",
+    "governance"
   ],
   "license": "MIT",
   "private": true

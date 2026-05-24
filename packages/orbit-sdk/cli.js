@@ -1,194 +1,133 @@
 #!/usr/bin/env node
 /**
- * orbit-query — CLI for reading Orbit's machine-readable repository state.
+ * Orbit CLI — Query Orbit's state from the command line.
  *
  * Usage:
- *   orbit-query status [repo-path]
- *   orbit-query state [repo-path]
- *   orbit-query passport [repo-path]
- *   orbit-query governance [repo-path]
- *   orbit-query budget [repo-path]
- *   orbit-query roadmap [repo-path]
- *   orbit-query tasks [--priority high|normal|low] [repo-path]
- *   orbit-query knowledge [--kind <kind>] [--tag <tag>] [--limit N] [repo-path]
- *   orbit-query capabilities [repo-path]
- *   orbit-query blocked [repo-path]
- *   orbit-query revenue [repo-path]
- *   orbit-query lanes [repo-path]
- *   orbit-query phases [repo-path]
- *   orbit-query approvals [repo-path]
- *   orbit-query files [repo-path]
- *   orbit-query check-approval <category> [repo-path]
+ *   orbit status [--repo /path/to/repo]
+ *   orbit budget [--repo /path/to/repo]
+ *   orbit capabilities [--repo /path/to/repo]
+ *   orbit tasks [--repo /path/to/repo]
+ *   orbit blocked [--repo /path/to/repo]
+ *   orbit opportunities [--repo /path/to/repo] [--limit 5]
+ *   orbit latest-cycle [--repo /path/to/repo]
+ *   orbit health [--repo /path/to/repo]
+ *   orbit files [--repo /path/to/repo]
  */
 
-const sdk = require('./index.js');
+const path = require('path');
+const { create } = require('./index');
 
-const args = process.argv.slice(2);
-const command = args[0];
-
-function getRepoPath() {
-  // Last arg is repo path if it doesn't start with --
-  const last = args[args.length - 1];
-  if (last && !last.startsWith('--') && last !== command) {
-    // Check if it's a flag value
-    const flagIndex = args.indexOf('--priority') ;
-    const kindIndex = args.indexOf('--kind');
-    const tagIndex = args.indexOf('--tag');
-    const limitIndex = args.indexOf('--limit');
-    const valueIndices = [flagIndex + 1, kindIndex + 1, tagIndex + 1, limitIndex + 1].filter(i => i > 0);
-    if (!valueIndices.includes(args.length - 1)) {
-      return last;
+function parseArgs(argv) {
+  const args = { command: null, repo: process.cwd(), limit: 5 };
+  let i = 2;
+  while (i < argv.length) {
+    const arg = argv[i];
+    if (arg === '--repo' || arg === '-r') {
+      args.repo = argv[++i];
+    } else if (arg === '--limit' || arg === '-l') {
+      args.limit = parseInt(argv[++i], 10) || 5;
+    } else if (arg === '--help' || arg === '-h') {
+      args.command = 'help';
+    } else if (!args.command) {
+      args.command = arg;
     }
+    i++;
   }
-  return undefined;
+  return args;
 }
 
-function getFlag(name) {
-  const idx = args.indexOf(name);
-  if (idx === -1) return undefined;
-  return args[idx + 1];
-}
-
-function print(obj) {
+function printJson(obj) {
   console.log(JSON.stringify(obj, null, 2));
 }
 
-function usage() {
+function help() {
   console.log(`
-orbit-query — Read Orbit's machine-readable repository state
+Orbit CLI — Query Orbit's machine-readable state.
 
 Commands:
-  status              Quick status summary (cycle, budget, tasks, level)
-  state               Lifecycle state (cycle, born, last active)
-  passport            Full agent passport (identity, capabilities, permissions)
-  governance          Approval model and hard rules
-  budget              AI-call budget summary with lifetime and daily spend
-  roadmap             Current level, lanes, and phase checks
-  tasks [--priority]  Open (or filtered) tasks
-  knowledge [--kind] [--tag] [--limit]  Durable knowledge entries
-  capabilities        Active capabilities from passport
-  blocked             Blocked actions from passport
-  revenue             Revenue policy and token status
-  lanes               Active roadmap lanes
-  phases              Active phase checks
-  approvals           Pending approval requests
-  files               Machine-readable file inventory
-  check-approval <category>  Check if an action category needs approval
+  status          Quick status summary (cycle, level, tasks, budget)
+  budget          AI-call budget summary (daily, monthly, lifetime spend)
+  capabilities    Active and planned capabilities
+  tasks           Open and blocked tasks
+  blocked         Wallet and external action restrictions
+  opportunities   Top earning opportunities by score
+  latest-cycle    Most recent cycle note
+  health          Verify that expected files exist and are parseable
+  files           List all machine-readable file paths
 
 Options:
-  --priority <level>  Filter tasks by priority (high, normal, low)
-  --kind <kind>       Filter knowledge by kind
-  --tag <tag>         Filter knowledge by tag
-  --limit <N>         Limit results to last N entries
-
-Examples:
-  orbit-query status
-  orbit-query budget /path/to/orbit/repo
-  orbit-query tasks --priority high
-  orbit-query knowledge --kind cycle_summary --limit 3
-  orbit-query check-approval external_payment
-`);
+  --repo, -r      Path to Orbit repo (default: current directory)
+  --limit, -l     Number of items to show (default: 5)
+  --help, -h      Show this help message
+`.trim());
 }
 
-try {
-  if (!command || command === '--help' || command === '-h') {
-    usage();
-    process.exit(0);
+function main() {
+  const args = parseArgs(process.argv);
+
+  if (args.command === 'help' || !args.command) {
+    help();
+    process.exit(args.command ? 0 : 1);
   }
 
-  const repoPath = getRepoPath();
+  const sdk = create(args.repo);
 
-  switch (command) {
+  switch (args.command) {
     case 'status':
-      print(sdk.quickStatus(repoPath));
-      break;
-
-    case 'state':
-      print(sdk.readState(repoPath));
-      break;
-
-    case 'passport':
-      print(sdk.readPassport(repoPath));
-      break;
-
-    case 'governance':
-      print(sdk.readGovernance(repoPath));
+      printJson(sdk.quickStatus());
       break;
 
     case 'budget':
-      print(sdk.budgetSummary(repoPath));
+      printJson(sdk.budgetSummary());
       break;
 
-    case 'roadmap': {
-      const roadmap = sdk.readRoadmap(repoPath);
-      print({
-        currentLevel: roadmap.currentLevel,
-        activeLanes: (roadmap.lanes || []).filter(l => l.status === 'active').map(l => ({ id: l.id, name: l.name })),
-        activePhaseChecks: (roadmap.phaseChecks || []).filter(p => p.status === 'active').map(p => p.phaseId),
-        operatingRules: roadmap.operatingRules,
+    case 'capabilities': {
+      const caps = sdk.getCapabilities();
+      printJson({
+        active: caps.active.map(c => ({ id: c.id, name: c.name, mode: c.mode })),
+        planned: caps.planned.map(c => ({ id: c.id, name: c.name, mode: c.mode })),
       });
       break;
     }
 
-    case 'tasks': {
-      const priority = getFlag('--priority');
-      print(sdk.openTasks(repoPath, priority));
-      break;
-    }
-
-    case 'knowledge': {
-      const kind = getFlag('--kind');
-      const tag = getFlag('--tag');
-      const limitStr = getFlag('--limit');
-      const limit = limitStr ? parseInt(limitStr, 10) : undefined;
-      print(sdk.queryKnowledge(repoPath, { kind, tag, limit }));
-      break;
-    }
-
-    case 'capabilities':
-      print(sdk.activeCapabilities(repoPath));
+    case 'tasks':
+      printJson(sdk.getOpenTasks());
       break;
 
     case 'blocked':
-      print(sdk.blockedActions(repoPath));
+      printJson(sdk.getBlockedActions());
       break;
 
-    case 'revenue':
-      print(sdk.revenueStatus(repoPath));
-      break;
-
-    case 'lanes':
-      print(sdk.activeLanes(repoPath));
-      break;
-
-    case 'phases':
-      print(sdk.activePhaseChecks(repoPath));
-      break;
-
-    case 'approvals':
-      print(sdk.pendingApprovals(repoPath));
-      break;
-
-    case 'files':
-      print(sdk.machineReadableFiles(repoPath));
-      break;
-
-    case 'check-approval': {
-      const category = args[1];
-      if (!category) {
-        console.error('Usage: orbit-query check-approval <category> [repo-path]');
-        process.exit(1);
-      }
-      print(sdk.checkApprovalRequired(repoPath, category));
+    case 'opportunities': {
+      const opps = sdk.getTopOpportunities(args.limit);
+      printJson(opps.map(o => ({
+        id: o.id,
+        title: o.title,
+        score: o.driverAdjustedScore || o.score,
+        status: o.status,
+        risk: o.risk,
+        approvalRequired: o.approvalRequired,
+      })));
       break;
     }
 
+    case 'latest-cycle':
+      printJson(sdk.getLatestCycle());
+      break;
+
+    case 'health':
+      printJson(sdk.healthCheck());
+      break;
+
+    case 'files':
+      printJson(sdk.getFileList());
+      break;
+
     default:
-      console.error(`Unknown command: ${command}`);
-      usage();
+      console.error(`Unknown command: ${args.command}`);
+      help();
       process.exit(1);
   }
-} catch (err) {
-  console.error(`Error: ${err.message}`);
-  process.exit(1);
 }
+
+main();

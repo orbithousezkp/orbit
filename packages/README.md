@@ -8,6 +8,39 @@ Built by [Orbit](../README.md) as part of its household safety infrastructure, t
 
 ## Packages
 
+### [Orbit SDK](orbit-sdk/)
+
+**Library + CLI** for reading Orbit's machine-readable state files programmatically. Covers all 11 files from the data contract: identity, passport, governance, treasury, roadmap, tasks, knowledge, infrastructure, opportunities, approvals, and cycle proofs.
+
+| Feature | Description |
+|---|---|
+| 11 file readers | state, passport, governance, treasury, roadmap, tasks, knowledge, infrastructure, opportunities, approvals, cycles |
+| 7 derived views | quickStatus, budgetSummary, capabilities, openTasks, blockedActions, latestCycle, topOpportunities |
+| Health check | Verify all expected files exist and are parseable |
+| CLI interface | `orbit status`, `orbit budget`, `orbit capabilities`, `orbit tasks`, `orbit blocked`, `orbit health` |
+| Zero dependencies | Works without any npm packages |
+| Graceful fallback | Returns null/empty for missing files instead of throwing |
+
+```bash
+# Quick status from the repo root
+node packages/orbit-sdk/cli.js status
+
+# Budget summary
+node packages/orbit-sdk/cli.js budget
+
+# Health check all files
+node packages/orbit-sdk/cli.js health
+```
+
+```javascript
+// Library usage
+const { create } = require('./packages/orbit-sdk');
+const sdk = create('/path/to/orbit-repo');
+const status = sdk.quickStatus();
+const budget = sdk.budgetSummary();
+const caps = sdk.getCapabilities();
+```
+
 ### [Issue Scam Scanner](issue-scam-scanner/)
 
 **GitHub Action + CLI** that flags prompt injection, wallet drain language, encoded relay, fake support, and urgency traps in issues, PRs, and comments.
@@ -58,7 +91,7 @@ AI-agent repositories face a growing set of risks:
 3. **Missing audit trails** — When an autonomous agent acts, there should be a human-readable record of what it did and why.
 4. **Weak spend gates** — External spending, signing, and token movement need approval flows, not ambient permission.
 
-This toolkit addresses problems 1 and 2 directly. Problems 3 and 4 are handled by Orbit's own internal runtime (cycle notes, runtime proofs, governance policy) and may become future packages.
+This toolkit addresses problems 1 and 2 directly. Problem 3 is addressed by the Orbit SDK's cycle note and proof readers. Problem 4 is handled by Orbit's own governance runtime and exposed through the SDK's `getBlockedActions()` method.
 
 ---
 
@@ -69,6 +102,9 @@ All packages are designed to work inside a monorepo or as standalone copies. No 
 ```bash
 git clone https://github.com/candyburst/orbit-private-live.git
 cd orbit-private-live
+
+# Run SDK tests
+npm test --workspace=packages/orbit-sdk
 
 # Run scam scanner tests
 npm test --workspace=packages/issue-scam-scanner
@@ -91,7 +127,7 @@ npm test --workspace=packages/ai-budget-ledger
 
 ## Status
 
-Both packages are **prototypes** — repo-local builds, not published to npm or GitHub Marketplace. They are functional, tested, and used by Orbit's own household.
+All packages are **prototypes** — repo-local builds, not published to npm or GitHub Marketplace. They are functional and used by Orbit's own household.
 
 **Gated actions** (require owner approval):
 - npm or marketplace publishing with obligations
