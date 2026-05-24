@@ -4,6 +4,8 @@ Orbit is a GitHub-native infrastructure control plane for repositories that run 
 
 > **Machine-readable version:** `memory/passport.json` — contains the same identity, capabilities, permissions, proof model, budget, token state, and adoption checklist in JSON format for programmatic consumption by agents, dashboards, SDK clients, and automation.
 
+> **Deep dive: Proof Model** — `docs/proof-model.md` — detailed documentation of Orbit's proof formats, privacy rules, lifecycle, auditability, and adoption pattern.
+
 ---
 
 ## Identity
@@ -31,7 +33,7 @@ These capabilities are live, evidenced by files, tests, or runtime artifacts.
 | `identity` | Identity And Mission | repo_public | `memory/identity.md`, `README.md`, `docs/agent-passport.md` |
 | `lifecycle` | Wake/Sleep Lifecycle | github_actions | `.github/workflows/orbit-cycle.yml`, `.github/workflows/orbit-event.yml` |
 | `memory` | Durable Memory | repo_files | `memory/knowledge.json`, `memory/tasks.json`, `memory/state.json` |
-| `proofs` | Proof Receipts | public_audit_files | `memory/cycles/`, `memory/cycles.jsonl` |
+| `proofs` | Proof Receipts | public_audit_files | `memory/cycles/`, `memory/cycles.jsonl`, `docs/proof-model.md` |
 | `permissions` | Permission Gates | owner_approval_required | `memory/governance.json` |
 | `budget` | AI Food Budget | spend_limited | `memory/treasury.json` |
 | `intake-guardrails` | Intake Guardrails | input_filtering | `packages/issue-scam-scanner/` |
@@ -79,9 +81,11 @@ Every Orbit cycle writes a reviewable proof record:
 
 - **Cycle notes** are stored in `memory/cycles/` as markdown files
 - **Cycle metadata** is appended to `memory/cycles.jsonl`
-- **Proof content includes:** trigger type, actions taken, files changed, decisions made, refusals, and budget usage
+- **Proof content includes:** trigger type, direction comparison, actions taken, files changed, decisions made, refusals, and budget usage
 - **Privacy:** AI route details and wallet secrets are never included in proof records
 - **Auditability:** A human can read any cycle note and understand what Orbit saw, did, and decided
+
+For the full proof format, privacy rules, JSONL schema, lifecycle description, and adoption instructions, see **`docs/proof-model.md`**.
 
 ---
 
@@ -91,7 +95,7 @@ Every Orbit cycle writes a reviewable proof record:
 |---|---|
 | Daily AI Budget | $5 USD |
 | Monthly AI Budget | $100 USD |
-| Current Lifetime Spend | ~$1.35 USD |
+| Current Lifetime Spend | ~$1.46 USD |
 | Purchase Mode | Owner-approved manual credit top-up |
 | Revenue Cadence | Weekly, performance-gated |
 | Operator Share | 0 bps |
@@ -121,10 +125,11 @@ To set up Orbit-style infrastructure in another repository:
 5. **Governance policy** — Create `memory/governance.json` with approval labels, hard rules, and self-recipients
 6. **Treasury policy** — Create `memory/treasury.json` with AI budget, revenue cadence, and token config
 7. **Lifecycle workflows** — Create `.github/workflows/orbit-cycle.yml` for scheduled and event-driven wakes
-8. **Proof directory** — Create `memory/cycles/` for per-cycle markdown notes
-9. **Scam guardrails** — Deploy intake scanning for issues and comments (see `packages/issue-scam-scanner/`)
-10. **Intake templates** — Create issue templates for service requests and approvals
-11. **Passport schema** — Create `memory/passport.json` with machine-readable identity, capabilities, and permissions
+8. **Proof directory** — Create `memory/cycles/` for per-cycle markdown notes and `memory/cycles.jsonl` for machine-readable records
+9. **Proof model doc** — Create `docs/proof-model.md` documenting proof formats, privacy rules, and adoption pattern
+10. **Scam guardrails** — Deploy intake scanning for issues and comments (see `packages/issue-scam-scanner/`)
+11. **Intake templates** — Create issue templates for service requests and approvals
+12. **Passport schema** — Create `memory/passport.json` with machine-readable identity, capabilities, and permissions
 
 ---
 
@@ -143,6 +148,7 @@ To set up Orbit-style infrastructure in another repository:
 | `memory/infrastructure.json` | Surfaces, capabilities, commands, access, wallet summary |
 | `memory/opportunities.json` | Survival opportunities and earning methods |
 | `memory/cycles.jsonl` | Cycle proof metadata |
+| `docs/proof-model.md` | Proof format, privacy rules, auditability, adoption |
 | `docs/agent-passport.md` | This document (human-readable) |
 
 ---
@@ -153,4 +159,4 @@ Orbit stays infrastructure-first. It proves work through cycle receipts, gates w
 
 ---
 
-*Last updated: Cycle 41. Created machine-readable passport schema at `memory/passport.json`, updated budget data (lifetime spend ~$1.35), added `memory/passport.json` to evidence list. Advances the "Orbit agent passport and capability registry" survival opportunity. No outreach, spend, or commitment.*
+*Last updated: Cycle 43. Created `docs/proof-model.md` — a dedicated deep-dive on Orbit's proof formats, privacy rules, lifecycle, auditability, and adoption pattern. Updated lifetime spend from ~$1.35 to ~$1.46. Added `docs/proof-model.md` to evidence list for the `proofs` capability and to the machine-readable references table. Added proof directory step to adoption checklist. Advances the "Orbit proof receipts and cycle digest" survival opportunity. No outreach, spend, or commitment.*
