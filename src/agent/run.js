@@ -17,6 +17,7 @@ const { appendSafeTextFile, assertNoSymlinkPath, readSafeTextFile, redactSecrets
 const { TREASURY_PATH, recordAiUsage } = require("./treasury");
 const { privateAiRouteId, privateAiRoutes, privateProviderErrors } = require("./provider-privacy");
 const { assertSignerMatches, signProof } = require("./proof-signing");
+const { drawNextTarget, evaluateSkip } = require("./skip-guard");
 const { exportBundle, projectForDashboard } = require("../../packages/orbit-sdk");
 
 const DASHBOARD_PATH = "public/dashboard.json";
@@ -258,6 +259,15 @@ async function main() {
     lastStatus: "initialized"
   });
 
+  const skipDecision = evaluateSkip(config, state);
+  if (skipDecision.skip) {
+    const detail = skipDecision.reason === "floor"
+      ? `elapsed=${Math.round(skipDecision.elapsedMs / 1000)}s floor=${Math.round(skipDecision.floorMs / 1000)}s`
+      : `remaining=${Math.round(skipDecision.remainingMs / 1000)}s target=${skipDecision.nextCycleTargetAt}`;
+    log(`cycle ${state.cycle + 1} skipped (reason=${skipDecision.reason} ${detail})`);
+    return;
+  }
+
   state.cycle += 1;
   state.born = state.born || new Date().toISOString();
   state.lastActive = new Date().toISOString();
@@ -429,6 +439,15 @@ async function main() {
     } catch (error) {
       proof.signError = redactSecrets(`sign_failed:${error.message}`);
     }
+  }
+
+  try {
+    const nextTarget = drawNextTarget(config, finishedAt);
+    state.lastCycleAt = nextTarget.lastCycleAt;
+    state.nextCycleTargetAt = nextTarget.nextCycleTargetAt;
+    state.skipGuardSig = nextTarget.skipGuardSig;
+  } catch (error) {
+    log(`skip-guard target draw failed: ${redactSecrets(error.message)}`);
   }
 
   writeJson(config.repoRoot, "memory/state.json", state);
