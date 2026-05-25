@@ -14,6 +14,7 @@
 // Decision: PLAN/DECISIONS.md D-019
 
 const crypto = require("crypto");
+const safes = require("./safes");
 
 const TREASURY_BUCKETS_SCHEMA = "orbit-treasury-buckets/1";
 const SWEEP_INTERVAL_DAYS_DEFAULT = 7;
@@ -106,21 +107,76 @@ function isSweepEnabled(config, state, env) {
   if (!state || typeof state.tokenAddress !== "string" || state.tokenAddress.length < 10) {
     reasons.push("state.tokenAddress is not set");
   }
-  const missingBuckets = bucketsMissingAddresses(env);
-  if (missingBuckets.length > 0) reasons.push(`missing bucket addresses: ${missingBuckets.join(", ")}`);
+  const blocked = bucketsBlockedReason(env);
+  if (blocked !== null) reasons.push(blocked);
   return reasons.length === 0
     ? { enabled: true }
     : { enabled: false, reason: reasons.join("; ") };
 }
 
 function bucketsMissingAddresses(env) {
-  const e = env || {};
+  // Route through the centralized safes module so validation rules
+  // (missing / invalid / duplicate) are consistent across the codebase.
+  // Note: despite the name, this returns ALL non-valid Safes (missing,
+  // invalid, duplicate). Callers wanting a per-reason breakdown should use
+  // bucketsBlockedReason() instead. Kept for backwards-compatibility.
+  const result = safes.loadSafes(env);
   const missing = [];
-  if (!e.ORBIT_TREASURY_SAFE) missing.push("fee-receive (ORBIT_TREASURY_SAFE)");
-  for (const bucket of BUCKETS) {
-    if (!e[bucket.addressEnv]) missing.push(`${bucket.id} (${bucket.addressEnv})`);
+  for (const safe of result.safes) {
+    if (safe.valid) continue;
+    if (safe.id === "fee-receive") {
+      missing.push(`fee-receive (${safe.env})`);
+    } else {
+      missing.push(`${safe.id} (${safe.env})`);
+    }
   }
   return missing;
+}
+
+// Group every non-valid Safe by its reason and return a single string
+// suitable for the isSweepEnabled.reason field. Returns null if every Safe
+// is valid. Output shape:
+//   "missing bucket addresses: a (ENV_A), b (ENV_B); invalid: c (ENV_C); duplicate: d (ENV_D), e (ENV_E)"
+// Prefixes are omitted for reason groups with zero members. The "missing"
+// group keeps the legacy "missing bucket addresses:" prefix when present
+// (so existing log greps + tests still match); other groups use short
+// "<reason>:" prefixes.
+function bucketsBlockedReason(env) {
+  const result = safes.loadSafes(env);
+  const groups = new Map(); // reason -> ["id (ENV)", ...]
+  for (const safe of result.safes) {
+    if (safe.valid) continue;
+    const reason = safe.reason || "invalid";
+    const label = `${safe.id} (${safe.env})`;
+    if (!groups.has(reason)) groups.set(reason, []);
+    groups.get(reason).push(label);
+  }
+  if (groups.size === 0) return null;
+
+  // Render in a stable order: missing first (keeps the legacy prefix
+  // verbatim), then invalid, duplicate, bad_checksum, then any other.
+  const ORDER = ["missing", "invalid", "duplicate", "bad_checksum"];
+  const parts = [];
+  const seen = new Set();
+  for (const reason of ORDER) {
+    if (!groups.has(reason)) continue;
+    parts.push(formatReasonGroup(reason, groups.get(reason)));
+    seen.add(reason);
+  }
+  for (const [reason, list] of groups.entries()) {
+    if (seen.has(reason)) continue;
+    parts.push(formatReasonGroup(reason, list));
+  }
+  return parts.join("; ");
+}
+
+function formatReasonGroup(reason, list) {
+  if (reason === "missing") {
+    // Keep legacy phrasing so existing log scrapers + tests continue to
+    // match `missing bucket addresses:`.
+    return `missing bucket addresses: ${list.join(", ")}`;
+  }
+  return `${reason}: ${list.join(", ")}`;
 }
 
 function alreadySwept(state, sweepWeek) {
@@ -257,6 +313,7 @@ module.exports = {
   sweepWeekFromTimestamp,
   isSweepEnabled,
   bucketsMissingAddresses,
+  bucketsBlockedReason,
   alreadySwept,
   buildSweepProposal,
   commentApprovesSweep,

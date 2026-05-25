@@ -11,6 +11,7 @@ const {
   sweepWeekFromTimestamp,
   isSweepEnabled,
   bucketsMissingAddresses,
+  bucketsBlockedReason,
   alreadySwept,
   buildSweepProposal,
   commentApprovesSweep,
@@ -299,4 +300,82 @@ test("projectTreasuryBuckets includes nextSweepWeek when history exists", () => 
   const slim = projectTreasuryBuckets(state, {}, ALL_ADDRESSES_ENV);
   assert.equal(slim.sweep.lastSweepWeek, 20);
   assert.equal(slim.sweep.nextSweepWeek, 21);
+});
+
+// ---------------------------------------------------------------------------
+// Honest reason strings for non-valid bucket Safes (Bug fix)
+//   The old code reported `missing bucket addresses: ...` for every kind of
+//   fault — including invalid + duplicate. Now we group by reason.
+// ---------------------------------------------------------------------------
+
+test("bucketsBlockedReason returns null when every Safe is valid", () => {
+  assert.equal(bucketsBlockedReason(ALL_ADDRESSES_ENV), null);
+});
+
+test("bucketsBlockedReason: all-missing keeps legacy `missing bucket addresses:` prefix", () => {
+  const env = { ...ALL_ADDRESSES_ENV };
+  delete env.ORBIT_FLOOR_RESERVE_SAFE;
+  delete env.ORBIT_BUYBACK_SAFE;
+  const reason = bucketsBlockedReason(env);
+  assert.match(reason, /^missing bucket addresses: /);
+  assert.match(reason, /floor-reserve \(ORBIT_FLOOR_RESERVE_SAFE\)/);
+  assert.match(reason, /buyback \(ORBIT_BUYBACK_SAFE\)/);
+  // No other reason prefixes present.
+  assert.equal(/invalid:/.test(reason), false);
+  assert.equal(/duplicate:/.test(reason), false);
+});
+
+test("bucketsBlockedReason: one invalid Safe uses `invalid:` prefix (not `missing`)", () => {
+  const env = { ...ALL_ADDRESSES_ENV, ORBIT_BUYBACK_SAFE: "0xNOT_AN_ADDRESS" };
+  const reason = bucketsBlockedReason(env);
+  assert.match(reason, /invalid: buyback \(ORBIT_BUYBACK_SAFE\)/);
+  // Must NOT mislabel an invalid Safe as missing.
+  assert.equal(/missing bucket addresses:[^;]*buyback/.test(reason), false);
+});
+
+test("bucketsBlockedReason: two duplicates use `duplicate:` prefix", () => {
+  const env = { ...ALL_ADDRESSES_ENV };
+  // Point growth + ai-costs at the same address as floor-reserve so all
+  // three end up flagged as duplicate by safes.loadSafes.
+  env.ORBIT_GROWTH_SAFE = env.ORBIT_FLOOR_RESERVE_SAFE;
+  env.ORBIT_AI_COSTS_SAFE = env.ORBIT_FLOOR_RESERVE_SAFE;
+  const reason = bucketsBlockedReason(env);
+  assert.match(reason, /duplicate: /);
+  assert.match(reason, /growth \(ORBIT_GROWTH_SAFE\)/);
+  assert.match(reason, /ai-costs \(ORBIT_AI_COSTS_SAFE\)/);
+  // The "missing" prefix must be absent when nothing is missing.
+  assert.equal(/missing bucket addresses:/.test(reason), false);
+});
+
+test("bucketsBlockedReason: mix of missing + invalid uses both prefixes joined by `; `", () => {
+  const env = { ...ALL_ADDRESSES_ENV };
+  delete env.ORBIT_FLOOR_RESERVE_SAFE;       // → missing
+  env.ORBIT_BUYBACK_SAFE = "0xnope";          // → invalid
+  const reason = bucketsBlockedReason(env);
+  assert.match(reason, /missing bucket addresses: floor-reserve \(ORBIT_FLOOR_RESERVE_SAFE\)/);
+  assert.match(reason, /invalid: buyback \(ORBIT_BUYBACK_SAFE\)/);
+  // Groups separated by "; "
+  assert.match(reason, /; /);
+  // Ordered: missing first, then invalid.
+  const missingIdx = reason.indexOf("missing bucket addresses:");
+  const invalidIdx = reason.indexOf("invalid:");
+  assert.ok(missingIdx >= 0 && invalidIdx > missingIdx, "missing must precede invalid");
+});
+
+test("isSweepEnabled surfaces grouped reason (invalid Safe is NOT labeled `missing`)", () => {
+  const env = { ...ALL_ADDRESSES_ENV, ORBIT_BUYBACK_SAFE: "0xnope" };
+  const result = isSweepEnabled({}, VERIFIED_STATE, env);
+  assert.equal(result.enabled, false);
+  assert.match(result.reason, /invalid: buyback/);
+  // The literal phrase "missing bucket addresses: buyback" must not appear.
+  assert.equal(/missing bucket addresses:[^;]*buyback/.test(result.reason), false);
+});
+
+test("isSweepEnabled keeps the legacy `missing bucket addresses:` phrase when all are missing", () => {
+  const env = { ...ALL_ADDRESSES_ENV };
+  delete env.ORBIT_AI_COSTS_SAFE;
+  const result = isSweepEnabled({}, VERIFIED_STATE, env);
+  assert.equal(result.enabled, false);
+  // Preserves backwards-compatible scraper behavior.
+  assert.match(result.reason, /missing bucket addresses: ai-costs \(ORBIT_AI_COSTS_SAFE\)/);
 });

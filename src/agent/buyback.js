@@ -3,6 +3,7 @@
 const crypto = require("crypto");
 const { isAddress } = require("./addresses");
 const { assertTreasuryFloor } = require("./governance");
+const safes = require("./safes");
 const {
   assertSafePublicReply,
   readSafeTextFile,
@@ -134,8 +135,14 @@ function normalizeRationale(raw) {
 
 // --- approval issue body -------------------------------------------------
 
-function buybackApprovalIssueBody({ idem, wethAmount, rationale, weekStart, cycle, dryRun, pairedToken, tokenAddress }) {
-  return [
+function buybackSafeAddress(env) {
+  // Source of truth for the Buyback Safe address per D-019. Returns null when
+  // missing or invalid; callers decide whether to surface that to the owner.
+  return safes.addressOf(env || process.env, "buyback");
+}
+
+function buybackApprovalIssueBody({ idem, wethAmount, rationale, weekStart, cycle, dryRun, pairedToken, tokenAddress, buybackSafe }) {
+  const lines = [
     "Orbit is requesting public owner approval to buy back $ORBIT with treasury WETH.",
     "",
     `Idempotency key: \`${idem}\``,
@@ -144,7 +151,12 @@ function buybackApprovalIssueBody({ idem, wethAmount, rationale, weekStart, cycl
     `WETH to spend: \`${wethAmount} WETH\``,
     `Paired token (WETH on Base): \`${pairedToken}\``,
     `$ORBIT token address: \`${tokenAddress}\``,
-    `Mode: \`${dryRun ? "DRY_RUN" : "LIVE"}\``,
+    `Mode: \`${dryRun ? "DRY_RUN" : "LIVE"}\``
+  ];
+  if (buybackSafe) {
+    lines.push(`Buyback Safe (D-019 destination): \`${buybackSafe}\``);
+  }
+  lines.push(
     "",
     `Rationale: ${rationale}`,
     "",
@@ -158,7 +170,8 @@ function buybackApprovalIssueBody({ idem, wethAmount, rationale, weekStart, cycl
     "To reject, the configured owner must add this exact standalone comment:",
     "",
     `\`REJECT ORBIT-BUYBACK ${idem}\``
-  ].join("\n");
+  );
+  return lines.join("\n");
 }
 
 function commentApprovesBuyback(ownerUsername, comment, idem) {
@@ -217,6 +230,7 @@ async function proposeBuyback(config, context, params = {}) {
   }
 
   const title = `[orbit buyback] propose ${wethAmount.string} WETH ${dryRun ? "(DRY_RUN)" : ""}`.trim();
+  const buybackSafe = buybackSafeAddress(process.env);
   const body = buybackApprovalIssueBody({
     idem,
     wethAmount: wethAmount.string,
@@ -225,7 +239,8 @@ async function proposeBuyback(config, context, params = {}) {
     cycle,
     dryRun,
     pairedToken,
-    tokenAddress
+    tokenAddress,
+    buybackSafe
   });
   assertSafePublicReply(`${title}\n${body}`);
 
@@ -514,6 +529,7 @@ function formatBuybackReceipt(entry = {}) {
 module.exports = {
   BUYBACK_LEDGER_PATH,
   buybackIdempotencyKey,
+  buybackSafeAddress,
   commentApprovesBuyback,
   deterministicMockOrbitReceived,
   executeBuyback,
