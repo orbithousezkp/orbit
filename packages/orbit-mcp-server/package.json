@@ -1,0 +1,40 @@
+{
+  "name": "@orbit-house/mcp-server",
+  "version": "0.1.0",
+  "description": "MCP (Model Context Protocol) server exposing Orbit's machine-readable state as read-only tools and resources. Lets Claude Desktop, IDE extensions, and other MCP clients query Orbit cycles, receipts, refusals, treasury, and dashboard projection.",
+  "main": "src/server.js",
+  "bin": {
+    "orbit-mcp": "./bin.js"
+  },
+  "scripts": {
+    "test": "node --test ../../tests/mcp-server.test.js",
+    "start": "node bin.js"
+  },
+  "keywords": [
+    "orbit",
+    "mcp",
+    "model-context-protocol",
+    "claude",
+    "agent-control-plane",
+    "github-agent"
+  ],
+  "author": "Orbit House",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@orbit-house/sdk": "^0.1.0"
+  },
+  "files": [
+    "bin.js",
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/orbithousezkp/orbit",
+    "directory": "packages/orbit-mcp-server"
+  }
+}
