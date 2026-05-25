@@ -5,7 +5,7 @@
  * follows the Orbit data contract (see docs/data-contract.md).
  *
  * Usage:
- *   const orbit = require('@orbit-house/orbit-sdk');
+ *   const orbit = require('@orbit-house/sdk');
  *   const sdk = orbit.create('/path/to/orbit-repo');
  *   const status = sdk.quickStatus();
  *   const passport = sdk.getPassport();
@@ -329,10 +329,315 @@ function create(repoRoot) {
     healthCheck,
     getFileList,
 
+    // Dashboard bundle + projection (client-side wrappers)
+    exportBundle: (options) => exportBundle(resolvedRoot, undefined, options),
+    projectForDashboard: (options) => projectForDashboard(exportBundle(resolvedRoot, undefined, options), options),
+
     // Metadata
     repoRoot: resolvedRoot,
     files: FILES,
   };
 }
 
-module.exports = { create, FILES };
+// ── Bundle export + dashboard projection ─────────────────────────────────────
+
+const DASHBOARD_SCHEMA = "orbit-dashboard/1";
+const DEFAULT_REFUSAL_LIMIT = 20;
+const REFUSAL_SUMMARY_MAX = 120;
+const RESULT_SUMMARY_MAX = 240;
+
+const SECRET_PATTERNS = [
+  /\bghp_[A-Za-z0-9]{10,}\b/g,
+  /\bgho_[A-Za-z0-9]{10,}\b/g,
+  /\bghs_[A-Za-z0-9]{10,}\b/g,
+  /\bsk-[A-Za-z0-9_-]{16,}\b/g,
+  /\bxoxb-[A-Za-z0-9-]{10,}\b/g,
+  /\bAKIA[0-9A-Z]{12,}\b/g,
+];
+const EVM_ADDRESS = /\b0x[a-fA-F0-9]{40}\b/g;
+
+function redactInline(text) {
+  if (typeof text !== "string") return "";
+  let out = text;
+  for (const re of SECRET_PATTERNS) {
+    out = out.replace(re, "[REDACTED_SECRET]");
+  }
+  out = out.replace(EVM_ADDRESS, "[REDACTED_ADDRESS]");
+  return out;
+}
+
+function isMeaningfulSummary(text) {
+  if (!text) return false;
+  const cleaned = text
+    .replace(/\[REDACTED[^\]]*\]/g, "")
+    .replace(/[^A-Za-z]/g, "");
+  return cleaned.length >= 4;
+}
+
+function listReceiptFiles(repoRoot) {
+  const proofRoot = path.join(repoRoot, "runtime", "proofs");
+  if (!fs.existsSync(proofRoot)) return [];
+  const files = [];
+  try {
+    const days = fs
+      .readdirSync(proofRoot, { withFileTypes: true })
+      .filter((d) => d.isDirectory())
+      .map((d) => d.name)
+      .sort();
+    for (const day of days) {
+      const dayDir = path.join(proofRoot, day);
+      const entries = fs
+        .readdirSync(dayDir)
+        .filter((f) => f.endsWith(".json"))
+        .sort();
+      for (const e of entries) {
+        files.push(path.join(dayDir, e));
+      }
+    }
+  } catch {
+    // best-effort
+  }
+  return files;
+}
+
+function loadReceiptsSorted(repoRoot, limit) {
+  const files = listReceiptFiles(repoRoot);
+  const all = [];
+  for (const fp of files) {
+    const data = readJson(fp);
+    if (!data) continue;
+    const rel = path.relative(repoRoot, fp).split(path.sep).join("/");
+    all.push({ ...data, path: rel });
+  }
+  all.sort((a, b) => {
+    const cycleDelta = (b.cycle || 0) - (a.cycle || 0);
+    if (cycleDelta !== 0) return cycleDelta;
+    return String(b.finishedAt || "").localeCompare(String(a.finishedAt || ""));
+  });
+  const total = all.length;
+  const cap = Number.isFinite(limit) && limit >= 0 ? all.slice(0, limit) : all;
+  return { count: total, list: cap };
+}
+
+function isSignedReceipt(receipt) {
+  return Boolean(
+    receipt && receipt.signature && receipt.signer && receipt.payloadHash
+  );
+}
+
+function projectReceipt(r) {
+  return {
+    path: r.path || null,
+    cycle: r.cycle || 0,
+    startedAt: r.startedAt || null,
+    finishedAt: r.finishedAt || null,
+    trigger: r.trigger || null,
+    dryRun: Boolean(r.dryRun),
+    totalSteps: r.totalSteps || (Array.isArray(r.steps) ? r.steps.length : 0),
+    filesChangedCount: Array.isArray(r.filesChanged) ? r.filesChanged.length : 0,
+    result:
+      typeof r.result === "string"
+        ? redactInline(r.result).slice(0, RESULT_SUMMARY_MAX)
+        : null,
+    signed: isSignedReceipt(r),
+    signer: r.signer || null,
+    signatureScheme: r.signatureScheme || null,
+    payloadHash: r.payloadHash || null,
+  };
+}
+
+function digestForObject(obj) {
+  // Deterministic, zero-dep, 8-hex digest. Not cryptographic; not a proof.
+  let h = 0;
+  const s = JSON.stringify(obj || null);
+  for (let i = 0; i < s.length; i += 1) {
+    h = (h * 31 + s.charCodeAt(i)) | 0;
+  }
+  return "0x" + (h >>> 0).toString(16).padStart(8, "0");
+}
+
+function extractRefusalsFromReceipt(receipt) {
+  const refusals = [];
+  const steps = Array.isArray(receipt.steps) ? receipt.steps : [];
+  for (const step of steps) {
+    if (!step) continue;
+    const risk = step.risk || {};
+    const level = risk.level || "";
+    const refused =
+      step.refused === true || level === "high" || level === "critical";
+    if (!refused) continue;
+    const reasonRaw = step.refusalReason || step.reason || "";
+    const summary = redactInline(reasonRaw).slice(0, REFUSAL_SUMMARY_MAX);
+    if (!isMeaningfulSummary(summary)) continue;
+    refusals.push({
+      cycle: receipt.cycle || 0,
+      at: receipt.finishedAt || receipt.startedAt || null,
+      category: risk.category || "unknown",
+      severity: level || "unknown",
+      tool: step.tool || null,
+      oneLineSummary: summary,
+    });
+  }
+  return refusals;
+}
+
+function exportBundle(repoRoot, _unused, options) {
+  const opts = options || {};
+  const root = path.resolve(repoRoot);
+  const limit = Number.isFinite(opts.receiptLimit) ? opts.receiptLimit : 10;
+  const includeMemory = opts.includeMemory !== false;
+
+  const bundle = {
+    infrastructure: readJson(path.join(root, FILES.infrastructure)),
+    state: readJson(path.join(root, FILES.state)),
+    governance: readJson(path.join(root, FILES.governance)),
+    treasury: readJson(path.join(root, FILES.treasury)),
+    receipts: loadReceiptsSorted(root, limit),
+    recordedCycles: readJsonl(path.join(root, FILES.cycles)).length,
+  };
+  if (includeMemory) {
+    bundle.memory = {
+      tasks: readJson(path.join(root, FILES.tasks)),
+      knowledge: readJson(path.join(root, FILES.knowledge)),
+      opportunities: readJson(path.join(root, FILES.opportunities)),
+    };
+  }
+  return bundle;
+}
+
+function projectForDashboard(bundle, options) {
+  const opts = options || {};
+  const b = bundle || {};
+  const infra = b.infrastructure || {};
+  const state = b.state || {};
+  const governance = b.governance || {};
+  const treasury = b.treasury || {};
+  const receiptsBundle = b.receipts || { count: 0, list: [] };
+  const receiptList = Array.isArray(receiptsBundle.list) ? receiptsBundle.list : [];
+
+  const externalSpend = governance.externalSpend || {};
+  const token = treasury.token || {};
+  const product = infra.product || {};
+  const activePhase = infra.activePhase || null;
+
+  const receiptCap = Number.isFinite(opts.receiptLimit) ? opts.receiptLimit : 10;
+  const refusalCap = Number.isFinite(opts.refusalLimit) ? opts.refusalLimit : DEFAULT_REFUSAL_LIMIT;
+
+  const projectedList = receiptList.slice(0, receiptCap).map(projectReceipt);
+  const latest = projectedList[0] || null;
+  const latestSignedRaw = receiptList.find(isSignedReceipt) || null;
+  const latestSigned = latestSignedRaw ? projectReceipt(latestSignedRaw) : null;
+  const signer = latestSigned ? latestSigned.signer : null;
+
+  const allRefusals = [];
+  for (const r of receiptList) {
+    for (const refusal of extractRefusalsFromReceipt(r)) {
+      allRefusals.push(refusal);
+    }
+  }
+  allRefusals.sort((a, b2) => {
+    const cycleDelta = (b2.cycle || 0) - (a.cycle || 0);
+    if (cycleDelta !== 0) return cycleDelta;
+    return String(b2.at || "").localeCompare(String(a.at || ""));
+  });
+  const refusals = allRefusals.slice(0, refusalCap);
+
+  const walletDigest = digestForObject({
+    approvalMode: externalSpend.mode || "owner_approval_required",
+    token,
+    blocked: infra.blockedUntilApproved || [],
+  });
+
+  const slim = {
+    schema: DASHBOARD_SCHEMA,
+    generatedAt: new Date().toISOString(),
+    gitCommit: typeof opts.gitCommit === "string" ? opts.gitCommit.slice(0, 12) : null,
+    product: {
+      name: product.name || "Orbit",
+      category: product.category || null,
+    },
+    activePhase: activePhase
+      ? {
+          id: activePhase.id || null,
+          name: activePhase.name || null,
+          status: activePhase.status || null,
+        }
+      : null,
+    signer,
+    lifecycle: {
+      cycle: state.cycle || 0,
+      born: state.born || null,
+      lastActive: state.lastActive || null,
+      lastStatus: state.lastStatus || "unknown",
+      firstWakeIntroComplete: Boolean(state.firstWakeIntroComplete),
+      recordedCycles: b.recordedCycles || 0,
+    },
+    walletPolicy: {
+      approvalMode: externalSpend.mode || "owner_approval_required",
+      publicViewOnly: true,
+      noPrivateKeys: true,
+      token: {
+        name: token.name || null,
+        symbol: token.symbol || null,
+        launchStatus: token.launchStatus || "planned",
+        launchedAt: token.launchedAt || null,
+        configured: Boolean(token.address),
+      },
+      digest: walletDigest,
+    },
+    permissions: {
+      allowedWithoutApproval: Array.isArray(externalSpend.allowedWithoutApproval)
+        ? [...externalSpend.allowedWithoutApproval]
+        : [],
+      blockedUntilApproved: Array.isArray(infra.blockedUntilApproved)
+        ? [...infra.blockedUntilApproved]
+        : [],
+    },
+    receipts: {
+      count: receiptsBundle.count || 0,
+      latest,
+      latestSigned,
+      list: projectedList,
+    },
+    refusals,
+  };
+
+  slim.digest = digestForObject({
+    schema: slim.schema,
+    gitCommit: slim.gitCommit,
+    lifecycle: slim.lifecycle,
+    walletPolicy: slim.walletPolicy,
+    permissions: slim.permissions,
+    receiptCount: slim.receipts.count,
+    latestPath: latest ? latest.path : null,
+    refusalCount: refusals.length,
+  });
+
+  return slim;
+}
+
+function createOrbitClient(config) {
+  const cfg = config || {};
+  if (!cfg.repoRoot) {
+    throw new Error("createOrbitClient: repoRoot is required");
+  }
+  const root = path.resolve(cfg.repoRoot);
+  const sdk = create(root);
+  return {
+    ...sdk,
+    exportBundle: (options) => exportBundle(root, undefined, options),
+    projectForDashboard: (options) =>
+      projectForDashboard(
+        exportBundle(root, undefined, options),
+        options
+      ),
+  };
+}
+
+module.exports = {
+  create,
+  createOrbitClient,
+  exportBundle,
+  projectForDashboard,
+  FILES,
+};
