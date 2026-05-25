@@ -2839,6 +2839,78 @@
         "completionTokens": 51,
         "totalTokens": 126023,
         "estimatedUsd": 0.0189264
+      },
+      {
+        "timestamp": "2026-05-25T12:46:09.850Z",
+        "aiRoute": "private-ai-route-1",
+        "note": "cycle 57 step 1",
+        "promptTokens": 74280,
+        "completionTokens": 1066,
+        "totalTokens": 75346,
+        "estimatedUsd": 0.0117816
+      },
+      {
+        "timestamp": "2026-05-25T12:46:32.278Z",
+        "aiRoute": "private-ai-route-1",
+        "note": "cycle 57 step 2",
+        "promptTokens": 79830,
+        "completionTokens": 810,
+        "totalTokens": 80640,
+        "estimatedUsd": 0.0124605
+      },
+      {
+        "timestamp": "2026-05-25T12:47:00.378Z",
+        "aiRoute": "private-ai-route-1",
+        "note": "cycle 57 step 3",
+        "promptTokens": 85543,
+        "completionTokens": 915,
+        "totalTokens": 86458,
+        "estimatedUsd": 0.01338045
+      },
+      {
+        "timestamp": "2026-05-25T12:47:11.454Z",
+        "aiRoute": "private-ai-route-1",
+        "note": "cycle 57 step 4",
+        "promptTokens": 88470,
+        "completionTokens": 139,
+        "totalTokens": 88609,
+        "estimatedUsd": 0.0133539
+      },
+      {
+        "timestamp": "2026-05-25T12:47:57.418Z",
+        "aiRoute": "private-ai-route-1",
+        "note": "cycle 57 step 5",
+        "promptTokens": 90771,
+        "completionTokens": 1530,
+        "totalTokens": 92301,
+        "estimatedUsd": 0.01453365
+      },
+      {
+        "timestamp": "2026-05-25T12:49:03.085Z",
+        "aiRoute": "private-ai-route-1",
+        "note": "cycle 57 step 6",
+        "promptTokens": 94324,
+        "completionTokens": 4511,
+        "totalTokens": 98835,
+        "estimatedUsd": 0.0168552
+      },
+      {
+        "timestamp": "2026-05-25T12:49:30.087Z",
+        "aiRoute": "private-ai-route-1",
+        "note": "cycle 57 step 7",
+        "promptTokens": 97207,
+        "completionTokens": 923,
+        "totalTokens": 98130,
+        "estimatedUsd": 0.01513485
+      },
+      {
+        "timestamp": "2026-05-25T12:49:43.353Z",
+        "aiRoute": "private-ai-route-1",
+        "note": "cycle 57 step 8",
+        "promptTokens": 98466,
+        "completionTokens": 429,
+        "totalTokens": 98895,
+        "estimatedUsd": 0.0150273
       }
     ]
   },
@@ -2858,6 +2930,15 @@
     "lastClaimSentAt": null,
     "lastClaimResult": null
   },
+  "token": {
+    "name": "Orbit",
+    "symbol": "ORBIT",
+    "launchStatus": "not_launched",
+    "address": null,
+    "txHash": null,
+    "launchedAt": null,
+    "launchRequest": null
+  },
   "buckets": {
     "schema": "orbit-treasury-buckets/1",
     "note": "D-019 / TREASURY_ALLOCATION.md. Six bucket Safes drained weekly from the Fee Receive Safe. Bps of the 95% creator-share inflow (operator 5% is OUTSIDE this math).",
@@ -2867,21 +2948,48 @@
       "history": []
     },
     "list": [
-      { "id": "floor-reserve",     "category": "treasury",   "bps": 4500, "addressEnv": "ORBIT_FLOOR_RESERVE_SAFE",    "purpose": "Price-floor anchor; not deployable through normal cycle paths" },
-      { "id": "productive-yield",  "category": "treasury",   "bps": 2000, "addressEnv": "ORBIT_PRODUCTIVE_YIELD_SAFE", "purpose": "Aave/Uniswap deployment per S-027; withdrawable <=7d" },
-      { "id": "buyback",           "category": "business",   "bps":  500, "addressEnv": "ORBIT_BUYBACK_SAFE",          "purpose": "Funds weekly $ORBIT buyback per D-005" },
-      { "id": "growth",            "category": "business",   "bps": 1500, "addressEnv": "ORBIT_GROWTH_SAFE",           "purpose": "Mission rewards + adopter incentives + bounty matches (33/33/34 policy)" },
-      { "id": "ai-costs",          "category": "operations", "bps": 1000, "addressEnv": "ORBIT_AI_COSTS_SAFE",         "purpose": "Reimburses operator monthly for AI invoices (Anthropic/OpenAI)" },
-      { "id": "ops-runway",        "category": "operations", "bps":  500, "addressEnv": "ORBIT_OPS_RUNWAY_SAFE",       "purpose": "Gas + RPC + infra contingency; 6-12mo runway buffer" }
+      {
+        "id": "floor-reserve",
+        "category": "treasury",
+        "bps": 4500,
+        "addressEnv": "ORBIT_FLOOR_RESERVE_SAFE",
+        "purpose": "Price-floor anchor; not deployable through normal cycle paths"
+      },
+      {
+        "id": "productive-yield",
+        "category": "treasury",
+        "bps": 2000,
+        "addressEnv": "ORBIT_PRODUCTIVE_YIELD_SAFE",
+        "purpose": "Aave/Uniswap deployment per S-027; withdrawable <=7d"
+      },
+      {
+        "id": "buyback",
+        "category": "business",
+        "bps": 500,
+        "addressEnv": "ORBIT_BUYBACK_SAFE",
+        "purpose": "Funds weekly $ORBIT buyback per D-005"
+      },
+      {
+        "id": "growth",
+        "category": "business",
+        "bps": 1500,
+        "addressEnv": "ORBIT_GROWTH_SAFE",
+        "purpose": "Mission rewards + adopter incentives + bounty matches (33/33/34 policy)"
+      },
+      {
+        "id": "ai-costs",
+        "category": "operations",
+        "bps": 1000,
+        "addressEnv": "ORBIT_AI_COSTS_SAFE",
+        "purpose": "Reimburses operator monthly for AI invoices (Anthropic/OpenAI)"
+      },
+      {
+        "id": "ops-runway",
+        "category": "operations",
+        "bps": 500,
+        "addressEnv": "ORBIT_OPS_RUNWAY_SAFE",
+        "purpose": "Gas + RPC + infra contingency; 6-12mo runway buffer"
+      }
     ]
-  },
-  "token": {
-    "name": "Orbit",
-    "symbol": "ORBIT",
-    "launchStatus": "not_launched",
-    "address": null,
-    "txHash": null,
-    "launchedAt": null,
-    "launchRequest": null
   }
 }
