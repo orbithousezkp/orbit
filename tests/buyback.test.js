@@ -9,12 +9,14 @@ const test = require("node:test");
 const { executeTool } = require("../src/agent/actions");
 const {
   BUYBACK_LEDGER_PATH,
+  CAMPAIGN_STATE_PATH,
   buybackIdempotencyKey,
   deterministicMockOrbitReceived,
   executeBuyback,
   formatBuybackReceipt,
   isBuybackEnabled,
   loadBuybackLedger,
+  loadCampaignState,
   proposeBuyback,
   weekStartFromDate
 } = require("../src/agent/buyback");
@@ -57,11 +59,25 @@ function baseConfig(repoRoot, overrides = {}) {
   };
 }
 
+// S-BUY-1 / S-FLOOR-1: by default, supply enough Fee Receive observation +
+// week-start snapshot that the fee-floor evaluates to met. Individual tests
+// override these to exercise the not-met path.
+const FLOOR_MET_BALANCE_WEI = "500000000000000000"; // 0.5 WETH > 0.1 floor
+const FLOOR_MET_WEEK_START_BALANCE = "0";
+
 function readyState(overrides = {}) {
   return {
     cycle: 42,
     preLaunchVerified: true,
     tokenAddress: VALID_TOKEN,
+    feeFloor: {
+      weekStartedAt: "2026-05-18T00:00:00.000Z",
+      weekStartBalanceWei: FLOOR_MET_WEEK_START_BALANCE,
+      lastWeekBoundaryAt: "2026-05-18T00:00:00.000Z"
+    },
+    treasurySweep: {
+      lastObservedFeeReceiveBalanceWei: FLOOR_MET_BALANCE_WEI
+    },
     ...overrides
   };
 }
@@ -353,18 +369,28 @@ test("executeBuyback in dry-run with full approval simulates a swap and writes l
     return Promise.reject(new Error("no fetch in test"));
   };
 
+  // S-BUY-1: a buyback is now a CAMPAIGN of N sub-buys. We drain it by
+  // calling executeBuyback in a loop with `now` set 100 hours in the
+  // future so every scheduled time is due. Per-cycle invariant: AT MOST
+  // ONE sub-buy fires per call, so this loop simulates N cycles.
   try {
-    const result = await executeBuyback(config, {
-      cycle: 9,
-      state: readyState(),
-      github: execGithub
-    }, { proposalIssueNumber });
+    const far = new Date("2026-06-01T00:00:00Z");
+    let last;
+    for (let i = 0; i < 20; i += 1) {
+      // eslint-disable-next-line no-await-in-loop
+      last = await executeBuyback(config, {
+        cycle: 9 + i,
+        state: readyState(),
+        github: execGithub
+      }, { proposalIssueNumber, now: far });
+      if (last && last.status === "executed_dry") break;
+    }
 
-    assert.equal(result.ok, true);
-    assert.equal(result.dryRun, true);
-    assert.match(result.txHash, /^0xdry/);
-    assert.equal(result.wethSpent, "0.2");
-    assert.ok(result.orbitReceived);
+    assert.ok(last, "expected at least one executeBuyback call");
+    assert.equal(last.ok, true);
+    assert.equal(last.dryRun, true);
+    assert.match(last.txHash, /^0xdry/);
+    assert.ok(last.orbitReceived);
     assert.equal(fetchCalls, 0, "dry-run must not call fetch");
   } finally {
     global.fetch = originalFetch;
@@ -376,6 +402,7 @@ test("executeBuyback in dry-run with full approval simulates a swap and writes l
   assert.equal(entry.status, "executed_dry");
   assert.equal(entry.approved, true);
   assert.equal(entry.dryRun, true);
+  assert.equal(entry.wethSpent, "0.2");
 });
 
 test("executeBuyback ignores APPROVE comments from non-owner authors", async () => {
@@ -543,9 +570,19 @@ test("execute_buyback handler returns only safe summary fields and no router cal
     comments: [{ author: "owner", body: `APPROVE ORBIT-BUYBACK ${entry.idem}` }]
   });
 
-  const result = await executeTool(config, execGithub, 27, "execute_buyback", {
-    proposalIssueNumber
-  });
+  // S-BUY-1: a buyback is a campaign of N randomized sub-buys; the handler
+  // fires AT MOST ONE per call. Loop with `now` 100h in the future so every
+  // scheduled time is due, then check the final result.
+  const far = new Date("2026-06-01T00:00:00Z").toISOString();
+  let result;
+  for (let i = 0; i < 20; i += 1) {
+    // eslint-disable-next-line no-await-in-loop
+    result = await executeTool(config, execGithub, 27, "execute_buyback", {
+      proposalIssueNumber,
+      now: far
+    });
+    if (result && result.status === "executed_dry") break;
+  }
 
   const allowedKeys = new Set([
     "kind",
@@ -576,4 +613,257 @@ test("execute_buyback handler returns only safe summary fields and no router cal
 
 test("BUYBACK_LEDGER_PATH points at memory/buybacks.json", () => {
   assert.equal(BUYBACK_LEDGER_PATH, "memory/buybacks.json");
+});
+
+// ====================================================================
+// S-BUY-1: campaign flow tests
+// ====================================================================
+
+test("S-BUY-1: proposeBuyback returns blocked + does NOT create issue when fee-floor not met", async () => {
+  const repoRoot = tempRepo();
+  const config = baseConfig(repoRoot);
+  const github = fakeGithub({ proposalIssueNumber: 201 });
+
+  // State carries an observation but the weekStartBalance equals it, so
+  // weekInflow = 0 < 0.1 floor.
+  const state = readyState({
+    cycle: 42,
+    treasurySweep: { lastObservedFeeReceiveBalanceWei: "0" },
+    feeFloor: {
+      weekStartedAt: "2026-05-18T00:00:00.000Z",
+      weekStartBalanceWei: "0",
+      lastWeekBoundaryAt: "2026-05-18T00:00:00.000Z"
+    }
+  });
+
+  const result = await proposeBuyback(config, {
+    cycle: 42,
+    state,
+    github,
+    env: {}, // floor module uses defaults: 0.1 WETH floor
+    now: new Date("2026-05-25T00:00:00Z")
+  }, { wethAmount: "0.1", rationale: "below floor" });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.blocked, true);
+  assert.equal(result.reason, "fee_floor_not_met");
+  // CRITICAL: no approval issue should be created when floor is not met.
+  assert.equal(github.created.length, 0, "must NOT create an approval issue when floor blocks");
+  // And no ledger entry written.
+  const ledger = loadBuybackLedger(repoRoot);
+  assert.equal(ledger.buybacks.length, 0);
+});
+
+test("S-BUY-1: approval issue body describes the campaign (N sub-buys, 48-hour window)", async () => {
+  const repoRoot = tempRepo();
+  const config = baseConfig(repoRoot);
+  const github = fakeGithub({ proposalIssueNumber: 202 });
+
+  const result = await proposeBuyback(config, {
+    cycle: 99,
+    state: readyState({ cycle: 99 }),
+    github,
+    now: new Date("2026-05-25T00:00:00Z")
+  }, { wethAmount: "0.3", rationale: "campaign-shape test" });
+
+  assert.equal(result.ok, true);
+  assert.equal(github.created.length, 1);
+  const body = github.created[0].body;
+  // Spec text: "N sub-buys"
+  assert.match(body, /\d+ sub-buys/, "body must mention N sub-buys");
+  // Spec text: "48-hour window" (or the configured windowHours)
+  assert.match(body, /48-hour window/, "body must mention the 48-hour window");
+  // Body must mention randomization
+  assert.match(body, /randomized/i);
+  // And the buyback-campaign sub-label was applied
+  assert.ok(github.created[0].labels.includes("buyback-campaign"), "buyback-campaign sub-label missing");
+});
+
+test("S-BUY-1: executeBuyback generates a schedule on first call after approval", async () => {
+  const repoRoot = tempRepo();
+  const config = baseConfig(repoRoot);
+  const proposalIssueNumber = 211;
+  const github = fakeGithub({ proposalIssueNumber });
+
+  const proposal = await proposeBuyback(config, {
+    cycle: 5,
+    state: readyState({ cycle: 5 }),
+    github
+  }, { wethAmount: "0.1", rationale: "schedule generation" });
+  assert.equal(proposal.ok, true);
+
+  const execGithub = fakeGithub({
+    proposalIssueNumber,
+    labels: ["orbit:approved"],
+    comments: [{ author: "owner", body: `APPROVE ORBIT-BUYBACK ${proposal.idem}` }]
+  });
+
+  // Before exec: no active campaign on disk.
+  const beforeState = loadCampaignState(repoRoot);
+  assert.equal(beforeState.activeCampaign, null);
+
+  // One call at scheduled-time approval-instant — most sub-buys probably
+  // aren't due yet (they're spread over 48h) — but the schedule MUST be
+  // generated and persisted regardless.
+  await executeBuyback(config, {
+    cycle: 5,
+    state: readyState({ cycle: 5 }),
+    github: execGithub
+  }, { proposalIssueNumber });
+
+  const afterState = loadCampaignState(repoRoot);
+  assert.ok(afterState.activeCampaign, "active campaign must be persisted");
+  assert.equal(afterState.activeCampaign.idem, proposal.idem);
+  assert.ok(Array.isArray(afterState.activeCampaign.subBuys));
+  assert.ok(afterState.activeCampaign.subBuys.length >= 3);
+  assert.ok(afterState.activeCampaign.subBuys.length <= 10);
+  // Each sub-buy carries scheduledAt, amountWei, status=pending
+  for (const sb of afterState.activeCampaign.subBuys) {
+    assert.ok(sb.scheduledAt);
+    assert.ok(sb.amountWei);
+    assert.ok(["pending", "completed", "failed"].includes(sb.status));
+  }
+});
+
+test("S-BUY-1: executeBuyback fires AT MOST ONE sub-buy per call (even when many are due)", async () => {
+  const repoRoot = tempRepo();
+  const config = baseConfig(repoRoot);
+  const proposalIssueNumber = 221;
+  const github = fakeGithub({ proposalIssueNumber });
+
+  const proposal = await proposeBuyback(config, {
+    cycle: 7,
+    state: readyState({ cycle: 7 }),
+    github
+  }, { wethAmount: "0.25", rationale: "per-cycle cap" });
+  assert.equal(proposal.ok, true);
+
+  const execGithub = fakeGithub({
+    proposalIssueNumber,
+    labels: ["orbit:approved"],
+    comments: [{ author: "owner", body: `APPROVE ORBIT-BUYBACK ${proposal.idem}` }]
+  });
+
+  // Drive `now` far past the window so EVERY scheduled time is due, then
+  // verify ONLY ONE sub-buy flips to "completed" per call.
+  const far = new Date("2026-06-01T00:00:00Z");
+
+  // First call: create schedule + fire ONE sub-buy.
+  await executeBuyback(config, {
+    cycle: 7,
+    state: readyState({ cycle: 7 }),
+    github: execGithub
+  }, { proposalIssueNumber, now: far });
+
+  const state1 = loadCampaignState(repoRoot);
+  const completed1 = state1.activeCampaign.subBuys.filter((sb) => sb.status === "completed").length;
+  assert.equal(completed1, 1, "first call must fire exactly 1 sub-buy");
+
+  // Second call (same `now`): fires exactly one MORE sub-buy.
+  await executeBuyback(config, {
+    cycle: 8,
+    state: readyState({ cycle: 8 }),
+    github: execGithub
+  }, { proposalIssueNumber, now: far });
+
+  const state2 = loadCampaignState(repoRoot);
+  // Campaign might be archived if it had only 2 sub-buys; check disk + ledger.
+  if (state2.activeCampaign) {
+    const completed2 = state2.activeCampaign.subBuys.filter((sb) => sb.status === "completed").length;
+    assert.equal(completed2, 2, "second call must fire exactly 1 more sub-buy (total 2)");
+  } else {
+    // Campaign archived. It must have completed total of subBuyCount.
+    assert.ok(state2.history.length >= 1);
+  }
+});
+
+test("S-BUY-1: executeBuyback archives the campaign when complete", async () => {
+  const repoRoot = tempRepo();
+  const config = baseConfig(repoRoot);
+  const proposalIssueNumber = 231;
+  const github = fakeGithub({ proposalIssueNumber });
+
+  const proposal = await proposeBuyback(config, {
+    cycle: 11,
+    state: readyState({ cycle: 11 }),
+    github
+  }, { wethAmount: "0.15", rationale: "archive on complete" });
+  assert.equal(proposal.ok, true);
+
+  const execGithub = fakeGithub({
+    proposalIssueNumber,
+    labels: ["orbit:approved"],
+    comments: [{ author: "owner", body: `APPROVE ORBIT-BUYBACK ${proposal.idem}` }]
+  });
+
+  // Drain the campaign by calling exec in a loop with `now` far in the future.
+  const far = new Date("2026-06-01T00:00:00Z");
+  let result;
+  for (let i = 0; i < 20; i += 1) {
+    // eslint-disable-next-line no-await-in-loop
+    result = await executeBuyback(config, {
+      cycle: 11 + i,
+      state: readyState({ cycle: 11 + i }),
+      github: execGithub
+    }, { proposalIssueNumber, now: far });
+    if (result && result.status === "executed_dry") break;
+  }
+  assert.equal(result.status, "executed_dry", "final call should report executed_dry");
+
+  const after = loadCampaignState(repoRoot);
+  assert.equal(after.activeCampaign, null, "active campaign must be cleared on completion");
+  assert.equal(after.history.length, 1, "exactly one archived campaign expected");
+  const archived = after.history[0];
+  assert.equal(archived.idem, proposal.idem);
+  assert.ok(archived.archivedAt);
+  // Every sub-buy completed
+  for (const sb of archived.subBuys) {
+    assert.equal(sb.status, "completed", `sub-buy ${sb.scheduledAt} not completed`);
+    assert.match(sb.txHash, /^0xdry/);
+  }
+});
+
+test("S-BUY-1: subsequent executeBuyback calls reuse the same campaign (idem match)", async () => {
+  const repoRoot = tempRepo();
+  const config = baseConfig(repoRoot);
+  const proposalIssueNumber = 241;
+  const github = fakeGithub({ proposalIssueNumber });
+
+  const proposal = await proposeBuyback(config, {
+    cycle: 21,
+    state: readyState({ cycle: 21 }),
+    github
+  }, { wethAmount: "0.2", rationale: "schedule reuse" });
+  assert.equal(proposal.ok, true);
+
+  const execGithub = fakeGithub({
+    proposalIssueNumber,
+    labels: ["orbit:approved"],
+    comments: [{ author: "owner", body: `APPROVE ORBIT-BUYBACK ${proposal.idem}` }]
+  });
+
+  // First call: schedule generated.
+  await executeBuyback(config, {
+    cycle: 21,
+    state: readyState({ cycle: 21 }),
+    github: execGithub
+  }, { proposalIssueNumber, now: new Date("2026-05-26T00:00:00Z") });
+
+  const first = loadCampaignState(repoRoot);
+  const firstTimes = first.activeCampaign.subBuys.map((sb) => sb.scheduledAt);
+
+  // Second call: same campaign, same schedule (no regeneration).
+  await executeBuyback(config, {
+    cycle: 22,
+    state: readyState({ cycle: 22 }),
+    github: execGithub
+  }, { proposalIssueNumber, now: new Date("2026-05-26T01:00:00Z") });
+
+  const second = loadCampaignState(repoRoot);
+  const secondTimes = second.activeCampaign.subBuys.map((sb) => sb.scheduledAt);
+  assert.deepEqual(secondTimes, firstTimes, "schedule must not be regenerated on subsequent calls");
+});
+
+test("S-BUY-1: CAMPAIGN_STATE_PATH points at memory/buyback-campaign.json", () => {
+  assert.equal(CAMPAIGN_STATE_PATH, "memory/buyback-campaign.json");
 });
