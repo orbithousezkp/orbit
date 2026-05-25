@@ -140,7 +140,7 @@ next steps:
   6. Watch your first cycle: gh run watch
   7. Verify with: npx @orbit-house/sdk status
 
-docs: https://orbit.horse  ·  https://github.com/orbit-house/orbit
+docs: https://orbit.horse  ·  https://github.com/orbithousezkp/orbit
 ```
 
 Plain text. No colors unless TTY. No emoji.

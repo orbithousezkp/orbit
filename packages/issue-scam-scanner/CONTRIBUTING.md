@@ -6,14 +6,14 @@ Thanks for your interest in making open-source repos safer from hostile AI-agent
 
 Issue Scam Scanner is a GitHub Action and CLI that detects prompt injection, wallet drain language, encoded relay, fake support, urgency traps, and other risky patterns in GitHub issues, PRs, and comments.
 
-It was built by [Orbit](https://github.com/candyburst/orbit-private-live) as part of an open-source agent safety toolkit.
+It was built by [Orbit](https://github.com/orbithousezkp/orbit) as part of an open-source agent safety toolkit.
 
 ## Development setup
 
 ```bash
 # Clone the repo
-git clone https://github.com/candyburst/orbit-private-live.git
-cd orbit-private-live
+git clone https://github.com/orbithousezkp/orbit.git
+cd orbit
 
 # Install dependencies (if any)
 npm install

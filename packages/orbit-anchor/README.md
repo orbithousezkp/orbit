@@ -1,6 +1,6 @@
 # @orbit-house/anchor — MerkleAnchor.sol
 
-_Part of [Orbit](https://github.com/candyburst/orbit) — the control plane for agent memory and infrastructure inside any GitHub repo._
+_Part of [Orbit](https://github.com/orbithousezkp/orbit) — the control plane for agent memory and infrastructure inside any GitHub repo._
 
 The `MerkleAnchor` contract is the on-chain half of [D-012](../../PLAN/DECISIONS.md).
 It stores one Merkle root per cycle-proof window on Base. The off-chain half

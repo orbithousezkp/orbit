@@ -1,6 +1,6 @@
 # @orbit-house/tool-example
 
-_Part of [Orbit](https://github.com/candyburst/orbit) — the control plane for agent memory and infrastructure inside any GitHub repo._
+_Part of [Orbit](https://github.com/orbithousezkp/orbit) — the control plane for agent memory and infrastructure inside any GitHub repo._
 
 Reference plugin scaffold for the Orbit plugin/tool loader (S-024). Use this
 as the starting point for your own `@orbit-house/tool-*` plugin.

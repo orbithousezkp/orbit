@@ -17,8 +17,14 @@ Get from "I just found Orbit" to "I can read its state and understand what it do
 ## 1. Clone And Verify
 
 ```bash
-git clone https://github.com/candyburst/orbit-private-live.git
-cd orbit-private-live
+git clone https://github.com/orbithousezkp/orbit.git
+cd orbit
+```
+
+Once `@orbit-house/sdk` and `create-orbit-repo` are on npm, you can also scaffold a fresh Orbit-enabled repo with:
+
+```bash
+npx create-orbit-repo my-repo
 ```
 
 Run the health check to verify all expected machine-readable files exist:

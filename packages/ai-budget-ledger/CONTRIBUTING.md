@@ -4,14 +4,14 @@ Thanks for your interest in making AI-agent spending more transparent and budget
 
 ## What this project does
 
-AI Budget Ledger is a zero-dependency library and CLI for tracking AI API call costs, enforcing daily and monthly budgets, and estimating spend across providers. It was built by [Orbit](https://github.com/candyburst/orbit-private-live) as part of an open-source agent safety toolkit.
+AI Budget Ledger is a zero-dependency library and CLI for tracking AI API call costs, enforcing daily and monthly budgets, and estimating spend across providers. It was built by [Orbit](https://github.com/orbithousezkp/orbit) as part of an open-source agent safety toolkit.
 
 ## Development setup
 
 ```bash
 # Clone the repo
-git clone https://github.com/candyburst/orbit-private-live.git
-cd orbit-private-live
+git clone https://github.com/orbithousezkp/orbit.git
+cd orbit
 
 # Install dependencies (if any)
 npm install

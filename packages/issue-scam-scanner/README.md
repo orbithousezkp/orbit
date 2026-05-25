@@ -1,6 +1,6 @@
 # Orbit Intake Guardrail
 
-_Part of [Orbit](https://github.com/candyburst/orbit) — the control plane for agent memory and infrastructure inside any GitHub repo._
+_Part of [Orbit](https://github.com/orbithousezkp/orbit) — the control plane for agent memory and infrastructure inside any GitHub repo._
 
 A GitHub Action, CLI, and JS library that turns risky issue/comment content into a reviewable intake decision: `allow`, `warn`, `quarantine`, or `block`.
 

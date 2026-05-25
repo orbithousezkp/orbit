@@ -100,8 +100,8 @@ This toolkit addresses problems 1 and 2 directly. Problem 3 is addressed by the 
 All packages are designed to work inside a monorepo or as standalone copies. No npm publishing required — clone and use:
 
 ```bash
-git clone https://github.com/candyburst/orbit-private-live.git
-cd orbit-private-live
+git clone https://github.com/orbithousezkp/orbit.git
+cd orbit
 
 # Run SDK tests
 npm test --workspace=packages/orbit-sdk

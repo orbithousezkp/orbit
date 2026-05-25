@@ -1,6 +1,6 @@
 # @orbit-house/verifier
 
-_Part of [Orbit](https://github.com/candyburst/orbit) — the control plane for agent memory and infrastructure inside any GitHub repo._
+_Part of [Orbit](https://github.com/orbithousezkp/orbit) — the control plane for agent memory and infrastructure inside any GitHub repo._
 
 Verify Orbit cycle proof signatures from outside the repo. No Orbit dependency — just Node 20+ and viem.
 

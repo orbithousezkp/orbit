@@ -1,6 +1,6 @@
 # create-orbit-repo
 
-_Part of [Orbit](https://github.com/candyburst/orbit) — the control plane for agent memory and infrastructure inside any GitHub repo._
+_Part of [Orbit](https://github.com/orbithousezkp/orbit) — the control plane for agent memory and infrastructure inside any GitHub repo._
 
 Scaffolder for new Orbit repos. Adds GitHub Actions workflows, memory files, governance, treasury policy, and the `@orbit-house/sdk` dependency to a target repository.
 
