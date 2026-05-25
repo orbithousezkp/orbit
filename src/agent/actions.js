@@ -64,6 +64,7 @@ const {
   upsertPendingTopUp
 } = require("./treasury");
 const { fetchUrl, webSearch } = require("./web");
+const revenueExplorer = require("./revenue-explorer");
 
 const filesChanged = new Set();
 const PROTECTED_WRITE_PATHS = new Set([
@@ -862,6 +863,22 @@ async function executeTool(config, github, cycle, name, input) {
         idem: result.idem || null,
         status: result.status || (result.ok ? "executed" : "blocked"),
         reason: result.reason || null
+      };
+    }
+
+    case "revenue_explorer_status": {
+      const stateNow = (() => {
+        try { return JSON.parse(readSafeTextFile(config.repoRoot, "memory/state.json")); }
+        catch { return {}; }
+      })();
+      const proposals = revenueExplorer.listProposals(stateNow);
+      return {
+        proposals,
+        lastRanAt: (stateNow.revenueExplorer && stateNow.revenueExplorer.lastRanAt) || null,
+        runHistory: (stateNow.revenueExplorer && Array.isArray(stateNow.revenueExplorer.runHistory)
+          ? stateNow.revenueExplorer.runHistory
+          : []
+        ).slice(-5)
       };
     }
 

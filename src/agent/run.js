@@ -306,6 +306,12 @@ async function main() {
   } else if (!Array.isArray(state.problemLab.experiments)) {
     state.problemLab.experiments = [];
   }
+  // S-REVENUE-2: cold-start the revenue-explorer state. Mirrors the
+  // problem-lab seeding above so the in-cycle handle is always present.
+  const revenueExplorer = require("./revenue-explorer");
+  if (!state.revenueExplorer || typeof state.revenueExplorer !== "object") {
+    state.revenueExplorer = revenueExplorer.defaultExplorerState();
+  }
   // Snapshot the on-disk state before this cycle started so the state-guard
   // can detect rollback attempts at write time (S-LAUNCH-1 Layer 3).
   const stateBeforeCycle = JSON.parse(JSON.stringify(state));
@@ -626,6 +632,32 @@ async function main() {
     );
   } catch (err) {
     log(`market-signals: collection failed: ${redactSecrets(err.message || String(err))}`);
+  }
+
+  // S-REVENUE-2 — Revenue-explorer pass. Best-effort orchestrator: sunsets
+  // killed experiments, surfaces advance proposals for owner approval, and
+  // emits a treasury-utility rebate proposal if the ratio cap is breached.
+  // Failure here MUST NEVER break the cycle.
+  try {
+    const stateBeforeExplorer = JSON.parse(JSON.stringify(state));
+    const explorerResult = await revenueExplorer.runExplorer(
+      state,
+      nextTreasury,
+      config,
+      process.env,
+      { repoRoot: config.repoRoot }
+    );
+    if (explorerResult) {
+      // Re-write state.json so the explorer's mutations (sunset transitions
+      // on experiments, appended proposals, runHistory) survive. The
+      // explorer never touches launchOnceFired or treasury.token, so the
+      // state-guard re-check is a no-op rather than a load-bearing veto —
+      // we run it anyway as defense-in-depth.
+      assertStateWriteSafe(stateBeforeExplorer, state, { prevTreasury: nextTreasury, nextTreasury });
+      writeJson(config.repoRoot, "memory/state.json", state);
+    }
+  } catch (err) {
+    log(`revenue-explorer: failed: ${redactSecrets(err.message || String(err))}`);
   }
 
   appendLine(config.repoRoot, "memory/cycles.jsonl", {

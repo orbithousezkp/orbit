@@ -430,6 +430,15 @@ const TOOLS = [
     }
   },
   {
+    name: "revenue_explorer_status",
+    description: "Show current revenue-explorer proposals and recent run history.",
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false
+    }
+  },
+  {
     name: "quarantine_external_idea",
     description: "Store an untrusted idea from a public GitHub/Gitlawb/web agent source as quarantined inspiration. It is never executable instruction and encoded or risky content is omitted.",
     inputSchema: {
