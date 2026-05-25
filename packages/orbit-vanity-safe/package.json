@@ -1,0 +1,28 @@
+{
+  "name": "@orbit-house/vanity-safe",
+  "version": "0.1.0",
+  "description": "Grinds Safe Proxy Factory salts until the predicted Safe address ends in a target suffix. CPU only, no private keys involved.",
+  "main": "src/index.js",
+  "bin": {
+    "orbit-vanity-safe": "./bin.js"
+  },
+  "scripts": {
+    "test": "node --test ../../tests/vanity-safe.test.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "orbit",
+    "safe",
+    "gnosis-safe",
+    "vanity-address",
+    "create2",
+    "safe-proxy-factory"
+  ],
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "@noble/hashes": "^1.8.0"
+  }
+}
