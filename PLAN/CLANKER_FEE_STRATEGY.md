@@ -32,15 +32,29 @@ This is **D-002** in `DECISIONS.md` and is non-negotiable.
 
 ## Recipient Allocation (80% total creator share — the max protocol allows)
 
-**Simplified 2-recipient setup per owner directive: 95% Treasury / 5% Operator (weekly).** Buyback, bounty, and lore funding all happen as sub-budgets *inside* the Treasury Safe, gated by approval flow — not pre-routed at the contract level. Less attack surface, cleaner narrative.
+**Two-step model per D-019** (supersedes the "single Treasury Safe with internal sub-budgets" stance from D-017's implication block; the 95/5 inflow split itself is unchanged):
+
+**Step 1 — Clanker contract pays out fees (95/5 inflow split):**
 
 Per Clanker v4: `rewardBps` values represent percentages of the creator share (the 80%), not of total fees. Total recipient bps must sum to 10000 (= 100% of creator share).
 
 | Slot | Recipient | bps (of creator share) | % of total fees | rewardsToken | Purpose |
 |---|---|---|---|---|---|
-| 1 | Treasury Safe (Base) | 9500 | 76% of fees | `Paired` (WETH) | Core operational treasury — funds AI, ops, buybacks, bounties, lore. All sub-budgets gated by approval flow. |
-| 2 | Operator (founder) | 500 | 4% of fees | `Paired` (WETH) | Founder share, claimed weekly via existing `run_revenue_cycle` cadence |
+| 1 | Fee Receive Safe (Base) | 9500 | 76% of fees | `Paired` (WETH) | Transit Safe. Drained weekly via the treasury sweep to the 6 bucket Safes below. Was called "Treasury Safe" in D-017. |
+| 2 | Operator (founder) | 500 | 4% of fees | `Paired` (WETH) | Founder share, claimed weekly via existing `run_revenue_cycle`. Outside the treasury sweep math. |
 | — | (Clanker protocol) | — | 20% of fees | (protocol) | Fixed, can't avoid |
+
+**Step 2 — Weekly sweep redistributes the Fee Receive balance to 6 bucket Safes** (D-019 + `PLAN/SPECS/TREASURY_ALLOCATION.md`):
+
+| Category | Safe | Bps of sweep | % of total fees | Purpose |
+|---|---|---|---|---|
+| Treasury | Floor Reserve | 4500 | 34.2% | Price-floor anchor; not deployable |
+| Treasury | Productive Yield | 2000 | 15.2% | Aave/Uniswap deployment (S-027) |
+| Business | Buyback | 500 | 3.8% | Weekly $ORBIT buybacks (D-005) |
+| Business | Growth | 1500 | 11.4% | Mission rewards + adopter incentives + bounty matches |
+| Operations | AI Costs | 1000 | 7.6% | AI invoice reimbursement for operator |
+| Operations | Ops Runway | 500 | 3.8% | Gas + RPC + infra contingency |
+| **Sum** | | **10000** | **76% of fees** | (= the Fee Receive inflow) |
 
 **Total Orbit creator capture: 80% of fees, 100% in WETH.**
 

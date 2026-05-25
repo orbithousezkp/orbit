@@ -211,3 +211,39 @@ Both recipients have `admin = Treasury Safe`. Buyback, bounty payouts, and lore 
 - The 12-hour clean run window is the proof artifact for this gate. Capture the cycle range (`firstCleanCycle: N`, `lastCleanCycle: N+24`) in `memory/state.json`
 
 **Scope:** This decision overrides D-013's "two ladders" timing — Ladder B (Wallet & Trust) cannot proceed past wallet policy view until the cycle engine has demonstrated the 12-hour clean run.
+
+---
+
+## D-019 — Treasury split into 6 dedicated Safes (3 categories) with weekly sweep allocation
+
+**When:** 2026-05-25
+**Session:** S-TREAS-1
+**Decision:** **The 95% creator-share Treasury slice (per D-017) is held across 6 dedicated Safe multisigs on Base, organized into 3 categories (Treasury / Business / Operations), not a single Treasury Safe.** Each Safe is approval-gated independently per D-014. The 5% Operator share remains a single recipient as in D-017 (unchanged).
+
+Allocation, all percentages **of the 95% creator-share inflow** (i.e., post-operator-cut):
+
+| Category | Safe | Bps | Purpose |
+|---|---|---|---|
+| Treasury (6500 bps) | Floor Reserve | 4500 | Price-floor anchor. Funds not deployable from this Safe except in extreme circumstances (separate D-XXX required to drain). |
+| Treasury | Productive Yield | 2000 | Funds deployed to Aave/Uniswap per `TREASURY_PRODUCTIVE.md` (S-027). |
+| Business (2000 bps) | Buyback | 500 | Weekly $ORBIT buybacks per D-005. |
+| Business | Growth | 1500 | Combined Safe funding mission rewards (`MISSION_BOARD.md`), adopter incentives (handshake bounties + first-cycle subsidies), and bounty-market matches (`BOUNTY_MARKET.md`). Internal ledger in `memory/growth-allocations.json` tracks sub-purpose. |
+| Operations (1500 bps) | AI Costs | 1000 | Funds AI inference. Reimburses the operator monthly for documented AI spend (Anthropic, OpenAI invoices) since providers don't accept WETH directly. |
+| Operations | Operations Runway | 500 | Gas, RPC, infrastructure contingency. 6–12 month operational buffer. |
+
+Weekly sweep mechanic: every 7 days the Fee Receive Safe (where Clanker pays out the 95%) is drained 100% to the 6 sub-Safes in the bps proportions above. The sweep proposes a single approval issue per cycle containing all 6 transfer params. Owner approves once with `APPROVE ORBIT-TREASURY-SWEEP {idem}`; the cycle executes all 6 transfers atomically (refuses if any leg fails).
+
+**Why:** Owner directive. Separate Safes give bucket-level security boundaries: compromise of one bucket is bounded to its allocation; the Floor reserve gets the strictest threshold and is structurally unable to fund non-floor uses; D-014 approval surface is enforced per-bucket. The simplified 2-recipient model in D-017 (single Treasury Safe with sub-budgets as accounting entries) is replaced because contract-level separation beats policy-level separation when the buckets serve such different purposes (long-term floor vs week-to-week operational spend vs operator livelihood). AI costs get a dedicated Safe because the AI provider invoices are a recurring cash obligation distinct from optional growth or buyback spend.
+
+**Implication:**
+- D-017's recipient table stays: 9500 bps Treasury Safe (now interpreted as **Fee Receive Safe**) + 500 bps Operator. The token contract is unchanged.
+- The Fee Receive Safe ceases to be the resting place; it's a transit Safe drained weekly via the sweep.
+- Owner deploys 7 Safes total (Fee Receive + 6 buckets). Each Safe is 2/3 threshold across 3 owner-controlled signers, with the backup procedure in `PLAN/SPECS/TREASURY_KEYS_BACKUP.md`.
+- `memory/treasury.json` gains a `buckets` config recording each Safe's address (env-var name), bps share, and category.
+- `src/agent/treasury-sweep.js` implements the weekly sweep. DRY_RUN-locked behind `state.preLaunchVerified` per D-018.
+- `OWNER_ACTIONS.md` item 4 expands from "Deploy Treasury Safe" to "Deploy 7 Safes."
+- See `PLAN/SPECS/TREASURY_ALLOCATION.md` for the full bucket spec; `TREASURY_KEYS_BACKUP.md` for signer key management.
+
+**Supersedes:** D-017's "single Treasury Safe with internal sub-budgets" stance. The 95/5 inflow split itself, and the operator weekly-payout cadence, are unchanged.
+
+**Scope:** Pure Treasury topology — no change to Clanker fees, AI budgets, governance, or any other module. Bounty market, mission board, productive deployment specs reference the new Safe addresses where they previously referenced "Treasury Safe."

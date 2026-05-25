@@ -54,17 +54,35 @@ The workflow `.github/workflows/deploy-dashboard.yml` is already wired. `public/
 
 ---
 
-## 4. Deploy Treasury Safe on Base
+## 4. Deploy 7 Safes on Base (per D-019 / TREASURY_ALLOCATION.md)
 
-**Why.** D-004 mandates Orbit's only custodial wallet is a Safe multisig on Base. No buyback, no live token deploy, no productive treasury work proceeds without the Safe address recorded in `memory/treasury.json`.
+**Why.** D-019 mandates Orbit's treasury is split across 7 Safe multisigs on Base — 1 Fee Receive (transit) + 6 bucket Safes (long-term holdings). Each Safe is approval-gated independently per D-014; the Floor Reserve Safe in particular gives the price-floor anchor contract-level protection from operational spending. No buyback, no productive deployment, no mission rewards, no live token deploy without the Safes deployed and recorded.
 
-**Do.** Follow `PLAN/SPECS/TREASURY_SAFE_DEPLOY.md` — 8-item checklist. Highlights:
-1. Deploy via the Safe app on Base mainnet. Owners: at least 2 EOAs you control. Threshold ≥ 2/3.
-2. Send a tiny test transaction (e.g., 0.0001 ETH self-transfer) to confirm signing flow works.
-3. Record the address in `memory/treasury.json.safe.address` and commit.
-4. Set repo variable `ORBIT_TREASURY_SAFE = 0x...`.
+**Do.** Follow `PLAN/SPECS/TREASURY_KEYS_BACKUP.md` for the full setup. Highlights:
 
-**Acceptance.** `memory/treasury.json` has `safe.address` set + tx hash of the test transfer. `governance.json` reflects the Safe as the only signing path for external spend.
+1. **One-time signer setup (do this FIRST, once):** initialize 3 hardware wallets — different vendors recommended (Ledger / Trezor / GridPlus). Write down each 24-word seed phrase on paper or metal; **never** photograph or type into a computer. You now have 3 signer addresses (A, B, C) used across all 7 Safes.
+2. **Deploy each Safe** on https://app.safe.global on Base mainnet. For each Safe:
+   - Owners: A, B, C (same 3 addresses for every Safe)
+   - Threshold: 2/3
+3. Send a tiny test transaction (e.g., 0.0001 ETH self-transfer) on each Safe to confirm the multisig flow works.
+4. Record each Safe's address in:
+   - `memory/treasury.json.buckets.list[*].address` (extends the existing `safe.address`)
+   - The corresponding repo secret listed below
+   - `PLAN/SPECS/TREASURY_KEYS_BACKUP.md` §6 inventory
+
+**Repo secrets to set:**
+
+```
+ORBIT_TREASURY_SAFE             = 0x...  (Fee Receive — transit; was the only one in D-017)
+ORBIT_FLOOR_RESERVE_SAFE        = 0x...  (4500 bps; price-floor anchor)
+ORBIT_PRODUCTIVE_YIELD_SAFE     = 0x...  (2000 bps; Aave/Uniswap deployment target)
+ORBIT_BUYBACK_SAFE              = 0x...  ( 500 bps; D-005 weekly buyback source)
+ORBIT_GROWTH_SAFE               = 0x...  (1500 bps; missions + adopter + bounty match)
+ORBIT_AI_COSTS_SAFE             = 0x...  (1000 bps; AI invoice reimbursement)
+ORBIT_OPS_RUNWAY_SAFE           = 0x...  ( 500 bps; gas + RPC + infra)
+```
+
+**Acceptance.** All 7 Safe addresses recorded; test transactions confirmed on each; `memory/treasury.json.buckets.list[*].address` populated; `governance.json` reflects the Fee Receive Safe as the only Clanker payout target; backup procedure verified per `TREASURY_KEYS_BACKUP.md §4`.
 
 ---
 
