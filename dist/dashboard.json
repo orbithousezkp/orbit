@@ -1,24 +1,24 @@
 {
   "schema": "orbit-dashboard/1",
-  "generatedAt": "2026-05-24T01:00:00.000Z",
-  "gitCommit": "fb205b0e0000",
+  "generatedAt": "2026-05-25T05:30:00.000Z",
+  "gitCommit": "519f5c6",
   "product": {
     "name": "Orbit",
     "category": "GitHub-native agent infrastructure"
   },
   "activePhase": {
-    "id": "phase-1",
-    "name": "Launch",
+    "id": "foundation-control-plane",
+    "name": "Foundation Control Plane",
     "status": "active"
   },
-  "signer": "0x19E7E376E7C213B7E7e7e46cc70A5dD086DAff2A",
+  "signer": "[REDACTED_ADDRESS]",
   "lifecycle": {
-    "cycle": 27,
-    "born": "2026-05-22T00:00:00.000Z",
-    "lastActive": "2026-05-24T00:48:00.000Z",
+    "cycle": 55,
+    "born": "2026-05-22T01:46:39.981Z",
+    "lastActive": "2026-05-25T05:18:51.668Z",
     "lastStatus": "completed",
     "firstWakeIntroComplete": true,
-    "recordedCycles": 27
+    "recordedCycles": 54
   },
   "walletPolicy": {
     "approvalMode": "owner_approval_required",
@@ -27,139 +27,92 @@
     "token": {
       "name": "Orbit",
       "symbol": "ORBIT",
-      "launchStatus": "planned"
+      "launchStatus": "not_launched"
     },
-    "digest": "0xfeedbeef"
+    "blockedLiveActions": [
+      "wallet spending",
+      "external payments",
+      "signing",
+      "token launch",
+      "reward claims",
+      "payout-route changes"
+    ]
   },
   "permissions": {
     "allowedWithoutApproval": [
       "read repository state",
       "write cycle receipts",
       "ai inference within daily budget",
-      "refuse scam intake"
+      "refuse scam intake",
+      "routine code and docs maintenance",
+      "repo-local prototypes"
     ],
     "blockedUntilApproved": [
       "live wallet signing",
       "outbound treasury transfers",
-      "external integrations beyond github"
+      "external integrations beyond github",
+      "token launch",
+      "reward claims",
+      "payout-route changes"
     ]
+  },
+  "aiBudget": {
+    "dailyBudgetUsd": 5,
+    "monthlyBudgetUsd": 100,
+    "lifetimeSpendUsd": 3.02,
+    "spentTodayUsd": 0.27,
+    "dailyRemainingUsd": 4.73,
+    "monthlyRemainingUsd": 96.98
+  },
+  "activeLayers": [
+    { "id": "github-intake", "name": "GitHub Intake", "status": "active" },
+    { "id": "repo-memory", "name": "Repo Memory", "status": "active" },
+    { "id": "agent-lifecycle", "name": "Agent Lifecycle", "status": "active" },
+    { "id": "permissions", "name": "Permissions And Approvals", "status": "active" },
+    { "id": "proof-receipts", "name": "Proof Receipts", "status": "active" },
+    { "id": "wallet-policy", "name": "Wallet Policy", "status": "active" }
+  ],
+  "activeCapabilities": [
+    { "id": "identity", "name": "Identity And Mission", "status": "active" },
+    { "id": "lifecycle", "name": "Wake/Sleep Lifecycle", "status": "active" },
+    { "id": "memory", "name": "Durable Memory", "status": "active" },
+    { "id": "proofs", "name": "Proof Receipts", "status": "active" },
+    { "id": "permissions", "name": "Permission Gates", "status": "active" },
+    { "id": "budget", "name": "AI Food Budget", "status": "active" },
+    { "id": "intake-guardrails", "name": "Intake Guardrails", "status": "active" },
+    { "id": "agent-passport", "name": "Agent Passport", "status": "active" }
+  ],
+  "roadmap": {
+    "currentLevel": {
+      "id": "level-1",
+      "name": "Control Plane Foundation",
+      "status": "active"
+    },
+    "activePhase": {
+      "id": "safe-autonomy-core",
+      "name": "Safe Autonomy Core",
+      "status": "active"
+    },
+    "laneCounts": {
+      "active": 2,
+      "planned": 6,
+      "research": 2,
+      "later": 1
+    }
   },
   "receipts": {
-    "count": 5,
-    "latest": {
-      "path": "runtime/proofs/2026-05-24/05.json",
-      "cycle": 27,
-      "startedAt": "2026-05-24T00:48:00.000Z",
-      "finishedAt": "2026-05-24T00:48:14.000Z",
-      "trigger": { "type": "schedule", "id": "regular_heartbeat" },
-      "dryRun": false,
-      "totalSteps": 6,
-      "filesChangedCount": 3,
-      "result": "cycle complete - triaged 2 issues, refused 1 phishing intake",
-      "digest": "0xabc1",
-      "signed": true,
-      "signer": "0x19E7E376E7C213B7E7e7e46cc70A5dD086DAff2A",
-      "signatureScheme": "eip712:orbit-cycle-proof/1",
-      "payloadHash": "0xbeef0000000000000000000000000000000000000000000000000000000beef0"
-    },
-    "latestSigned": {
-      "path": "runtime/proofs/2026-05-24/05.json",
-      "cycle": 27,
-      "startedAt": "2026-05-24T00:48:00.000Z",
-      "finishedAt": "2026-05-24T00:48:14.000Z",
-      "trigger": { "type": "schedule", "id": "regular_heartbeat" },
-      "dryRun": false,
-      "totalSteps": 6,
-      "filesChangedCount": 3,
-      "result": "cycle complete - triaged 2 issues, refused 1 phishing intake",
-      "digest": "0xabc1",
-      "signed": true,
-      "signer": "0x19E7E376E7C213B7E7e7e46cc70A5dD086DAff2A",
-      "signatureScheme": "eip712:orbit-cycle-proof/1",
-      "payloadHash": "0xbeef0000000000000000000000000000000000000000000000000000000beef0"
-    },
-    "list": [
-      {
-        "path": "runtime/proofs/2026-05-23/01.json",
-        "cycle": 23,
-        "startedAt": "2026-05-23T22:00:00.000Z",
-        "finishedAt": "2026-05-23T22:00:11.000Z",
-        "trigger": { "type": "schedule" },
-        "dryRun": false,
-        "totalSteps": 4,
-        "filesChangedCount": 2,
-        "result": "cycle complete",
-        "digest": "0xa001",
-        "signed": true,
-        "signer": "0x19E7E376E7C213B7E7e7e46cc70A5dD086DAff2A",
-        "signatureScheme": "eip712:orbit-cycle-proof/1",
-        "payloadHash": "0xaa01"
-      },
-      {
-        "path": "runtime/proofs/2026-05-23/02.json",
-        "cycle": 24,
-        "startedAt": "2026-05-23T22:30:00.000Z",
-        "finishedAt": "2026-05-23T22:30:09.000Z",
-        "trigger": { "type": "schedule" },
-        "dryRun": false,
-        "totalSteps": 5,
-        "filesChangedCount": 2,
-        "result": "refused 1 drain attempt",
-        "digest": "0xa002",
-        "signed": true,
-        "signer": "0x19E7E376E7C213B7E7e7e46cc70A5dD086DAff2A",
-        "signatureScheme": "eip712:orbit-cycle-proof/1",
-        "payloadHash": "0xaa02"
-      },
-      {
-        "path": "runtime/proofs/2026-05-24/03.json",
-        "cycle": 25,
-        "startedAt": "2026-05-24T00:00:00.000Z",
-        "finishedAt": "2026-05-24T00:00:12.000Z",
-        "trigger": { "type": "schedule" },
-        "dryRun": false,
-        "totalSteps": 5,
-        "filesChangedCount": 1,
-        "result": "cycle complete",
-        "digest": "0xa003",
-        "signed": true,
-        "signer": "0x19E7E376E7C213B7E7e7e46cc70A5dD086DAff2A",
-        "signatureScheme": "eip712:orbit-cycle-proof/1",
-        "payloadHash": "0xaa03"
-      },
-      {
-        "path": "runtime/proofs/2026-05-24/04.json",
-        "cycle": 26,
-        "startedAt": "2026-05-24T00:30:00.000Z",
-        "finishedAt": "2026-05-24T00:30:10.000Z",
-        "trigger": { "type": "schedule" },
-        "dryRun": false,
-        "totalSteps": 5,
-        "filesChangedCount": 2,
-        "result": "cycle complete",
-        "digest": "0xa004",
-        "signed": true,
-        "signer": "0x19E7E376E7C213B7E7e7e46cc70A5dD086DAff2A",
-        "signatureScheme": "eip712:orbit-cycle-proof/1",
-        "payloadHash": "0xaa04"
-      },
-      {
-        "path": "runtime/proofs/2026-05-24/05.json",
-        "cycle": 27,
-        "startedAt": "2026-05-24T00:48:00.000Z",
-        "finishedAt": "2026-05-24T00:48:14.000Z",
-        "trigger": { "type": "schedule", "id": "regular_heartbeat" },
-        "dryRun": false,
-        "totalSteps": 6,
-        "filesChangedCount": 3,
-        "result": "cycle complete - triaged 2 issues, refused 1 phishing intake",
-        "digest": "0xa005",
-        "signed": true,
-        "signer": "0x19E7E376E7C213B7E7e7e46cc70A5dD086DAff2A",
-        "signatureScheme": "eip712:orbit-cycle-proof/1",
-        "payloadHash": "0xbeef0000000000000000000000000000000000000000000000000000000beef0"
-      }
-    ]
+    "totalCycles": 54,
+    "latestCycle": 54,
+    "latestResult": "SPA frontend rewrite merged, cycle infrastructure maintained"
   },
-  "digest": "0xdadbeef0"
+  "opportunities": {
+    "top": {
+      "id": "orbit-agent-passport",
+      "title": "Orbit agent passport and capability registry",
+      "score": 42.33,
+      "status": "open"
+    },
+    "count": 16
+  },
+  "digest": "0xcycle55-dashboard-sync"
 }
