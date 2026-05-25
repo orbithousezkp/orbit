@@ -1,0 +1,33 @@
+{
+  "name": "@orbit-house/keygen",
+  "version": "0.1.0",
+  "description": "Local Ethereum keypair generator. Writes Web3 Keystore v3 (importable by MetaMask, Frame, geth). Private keys never leave the local filesystem.",
+  "main": "src/index.js",
+  "bin": {
+    "orbit-keygen": "./bin.js"
+  },
+  "scripts": {
+    "test": "node --test ../../tests/keygen.test.js"
+  },
+  "keywords": [
+    "orbit",
+    "ethereum",
+    "keystore",
+    "web3-keystore-v3",
+    "secp256k1",
+    "keccak256",
+    "local-keygen",
+    "metamask",
+    "frame",
+    "self-custody"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@noble/curves": "^1.9.0",
+    "@noble/hashes": "^1.8.0"
+  },
+  "license": "MIT",
+  "private": true
+}
