@@ -1,0 +1,159 @@
+{
+  "schema": "orbit-well-known/1",
+  "generatedAt": "2026-05-25T05:54:11.901Z",
+  "product": {
+    "name": "Orbit",
+    "category": "GitHub-native agent infrastructure"
+  },
+  "identity": {
+    "brand": "Orbit",
+    "repo": "github.com/orbithousezkp/orbit",
+    "publicUrl": "https://orbit.horse",
+    "farcaster": null,
+    "signer": null
+  },
+  "activePhase": {
+    "id": "foundation-control-plane",
+    "name": "Foundation Control Plane",
+    "status": "active"
+  },
+  "capabilities": [
+    {
+      "id": "identity",
+      "name": "Identity And Mission",
+      "surface": null,
+      "mode": "repo_public"
+    },
+    {
+      "id": "lifecycle",
+      "name": "Wake/Sleep Lifecycle",
+      "surface": null,
+      "mode": "github_actions"
+    },
+    {
+      "id": "memory",
+      "name": "Durable Memory",
+      "surface": null,
+      "mode": "repo_files"
+    },
+    {
+      "id": "proofs",
+      "name": "Proof Receipts",
+      "surface": null,
+      "mode": "public_audit_files"
+    },
+    {
+      "id": "permissions",
+      "name": "Permission Gates",
+      "surface": null,
+      "mode": "owner_approval_required"
+    },
+    {
+      "id": "budget",
+      "name": "AI Food Budget",
+      "surface": null,
+      "mode": "spend_limited"
+    },
+    {
+      "id": "intake-guardrails",
+      "name": "Intake Guardrails",
+      "surface": null,
+      "mode": "input_filtering"
+    },
+    {
+      "id": "agent-passport",
+      "name": "Agent Passport",
+      "surface": null,
+      "mode": "repo_public"
+    }
+  ],
+  "surfaces": [
+    {
+      "id": "repo-control-plane",
+      "name": "Repository Control Plane",
+      "url": "memory/",
+      "mode": null
+    },
+    {
+      "id": "lifecycle-runtime",
+      "name": "Lifecycle Runtime",
+      "url": ".github/workflows/",
+      "mode": null
+    },
+    {
+      "id": "capability-registry",
+      "name": "Capability Registry",
+      "url": "src/agent/tools.js",
+      "mode": null
+    },
+    {
+      "id": "command-router",
+      "name": "Issue Command Router",
+      "url": "src/agent/github.js",
+      "mode": null
+    },
+    {
+      "id": "receipt-ledger",
+      "name": "Receipt Ledger",
+      "url": "runtime/proofs/",
+      "mode": null
+    },
+    {
+      "id": "agent-passport",
+      "name": "Agent Passport",
+      "url": "docs/agent-passport.md",
+      "mode": null
+    },
+    {
+      "id": "proof-model-doc",
+      "name": "Proof Model Documentation",
+      "url": "docs/proof-model.md",
+      "mode": null
+    },
+    {
+      "id": "wallet-policy-doc",
+      "name": "Wallet Policy Documentation",
+      "url": "docs/wallet-policy.md",
+      "mode": null
+    },
+    {
+      "id": "sdk-cli",
+      "name": "SDK And CLI Surface",
+      "url": "src/cli/",
+      "mode": null
+    },
+    {
+      "id": "integration-adapters",
+      "name": "Integration Adapters",
+      "url": "src/agent/",
+      "mode": null
+    }
+  ],
+  "walletPolicy": {
+    "approvalMode": "owner_approval_required",
+    "publicViewOnly": true,
+    "noPrivateKeys": true,
+    "token": {
+      "name": "Orbit",
+      "symbol": "ORBIT",
+      "launchStatus": "not_launched",
+      "address": null
+    }
+  },
+  "federation": {
+    "version": 1,
+    "transport": "https_get",
+    "schemaUrl": "https://orbit.horse/.well-known/orbit.json",
+    "acceptsEnvelopes": false,
+    "contact": {
+      "github": "github.com/orbithousezkp/orbit",
+      "farcaster": null
+    }
+  },
+  "pointers": {
+    "dashboard": "/dashboard.json",
+    "passport": "/agent-passport.md",
+    "walletPolicy": "/wallet-policy.md",
+    "docs": "/quickstart.md"
+  }
+}

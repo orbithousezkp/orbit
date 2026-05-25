@@ -19,8 +19,10 @@ const { privateAiRouteId, privateAiRoutes, privateProviderErrors } = require("./
 const { assertSignerMatches, signProof } = require("./proof-signing");
 const { drawNextTarget, evaluateSkip } = require("./skip-guard");
 const { exportBundle, projectForDashboard } = require("../../packages/orbit-sdk");
+const { projectForWellKnown } = require("./well-known");
 
 const DASHBOARD_PATH = "public/dashboard.json";
+const WELL_KNOWN_PATH = "public/.well-known/orbit.json";
 const DASHBOARD_MAX_BYTES = 60_000;
 
 const REDACTED_PRIVATE_CONFIG = "[REDACTED_PRIVATE_CONFIG]";
@@ -116,6 +118,22 @@ function writeDashboardSnapshot(config) {
   }
 
   writeFile({ repoRoot: config.repoRoot }, DASHBOARD_PATH, `${json}\n`);
+
+  // Also refresh the federation discovery document so other orbits can read
+  // this repo's capabilities + signer at a well-known location.
+  try {
+    const wellKnown = projectForWellKnown(bundle, {
+      repo: config.repoFullName || null,
+      publicUrl: config.publicBaseUrl || null,
+      signer: config.agentSigner || (slim && slim.signer) || null,
+      githubRepo: config.repoFullName || null,
+      dashboardUrl: "/dashboard.json"
+    });
+    writeFile({ repoRoot: config.repoRoot }, WELL_KNOWN_PATH, `${JSON.stringify(wellKnown, null, 2)}\n`);
+  } catch (error) {
+    log(`well-known refresh skipped: ${redactSecrets(error.message)}`);
+  }
+
   return { written: true, bytes: Buffer.byteLength(json), path: DASHBOARD_PATH };
 }
 
@@ -315,7 +333,7 @@ async function main() {
 
   for (let step = 1; step <= config.maxSteps; step += 1) {
     log(`step ${step}/${config.maxSteps}`);
-    const result = await infer(config, messages, TOOLS);
+    const result = await infer(config, messages, TOOLS, state.aiRouting);
     if (!result.fallback && result.usage) {
       const aiRoute = result.provider && result.provider.route ? result.provider.route : privateAiRouteId({}, 0);
       const usage = recordAiUsage(config, config.repoRoot, result.usage, aiRoute, `cycle ${state.cycle} step ${step}`);

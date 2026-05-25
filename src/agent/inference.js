@@ -3,6 +3,7 @@
 const { planCycle } = require("./behavior");
 const { budgetStatus } = require("./treasury");
 const { privateAiRoute, privateProviderErrors } = require("./provider-privacy");
+const { orderProviders, recordSuccess, recordFailure } = require("./ai-routing");
 
 const DEFAULT_AI_REQUEST_MAX_BYTES = 2_500_000;
 
@@ -153,9 +154,10 @@ function requestMaxBytes(config = {}, provider = {}) {
   return Number.isFinite(configured) && configured > 0 ? configured : DEFAULT_AI_REQUEST_MAX_BYTES;
 }
 
-async function infer(config, messages, tools) {
+async function infer(config, messages, tools, routing) {
   const contextMessage = messages.find((message) => message.role === "user");
   const context = contextMessage && contextMessage.context ? contextMessage.context : {};
+  const aiRouting = routing && typeof routing === "object" ? routing : { providers: {} };
 
   const providers = Array.isArray(config.aiProviders) && config.aiProviders.length
     ? config.aiProviders
@@ -199,7 +201,14 @@ async function infer(config, messages, tools) {
   }));
   const providerErrors = [];
 
-  for (const [index, provider] of providers.entries()) {
+  // T-8: order providers by performance weights (auto-demote/promote stored
+  // in state.aiRouting). Falls back to insertion order when routing is empty.
+  const orderedProviders = orderProviders(aiRouting, providers);
+
+  for (const [iterIndex, provider] of orderedProviders.entries()) {
+    const originalIndex = providers.indexOf(provider);
+    const index = originalIndex >= 0 ? originalIndex : iterIndex;
+    const providerName = provider.name || `route_${index}`;
     const body = {
       model: provider.model,
       messages: apiMessages,
@@ -207,6 +216,7 @@ async function infer(config, messages, tools) {
       tools: toolsSchema
     };
 
+    const startedAt = Date.now();
     try {
       const serialized = JSON.stringify(body);
       const bodyBytes = Buffer.byteLength(serialized);
@@ -233,6 +243,9 @@ async function infer(config, messages, tools) {
         throw new Error("AI API returned no message");
       }
 
+      const latencyMs = Date.now() - startedAt;
+      recordSuccess(aiRouting, providerName, { latencyMs });
+
       return {
         fallback: false,
         provider: privateAiRoute(provider, index),
@@ -241,9 +254,11 @@ async function infer(config, messages, tools) {
         toolCalls: choice.message.tool_calls || [],
         finishReason: choice.finish_reason,
         usage: parsed.usage || null,
-        raw: parsed
+        raw: parsed,
+        routing: aiRouting
       };
     } catch (error) {
+      recordFailure(aiRouting, providerName, { reason: "AI route failed" });
       providerErrors.push({
         ...privateAiRoute(provider, index),
         error: "AI route failed"
@@ -253,6 +268,7 @@ async function infer(config, messages, tools) {
 
   const fallback = deterministicResponse(context, "All configured AI routes failed.");
   fallback.providerErrors = privateProviderErrors(providerErrors);
+  fallback.routing = aiRouting;
   return fallback;
 }
 
