@@ -28,6 +28,7 @@ const FILES = {
   knowledge:      'memory/knowledge.json',
   infrastructure: 'memory/infrastructure.json',
   opportunities:  'memory/opportunities.json',
+  missions:       'memory/missions.json',
   cycles:         'memory/cycles.jsonl',
   approvals:      'memory/approvals.json',
 };
@@ -343,6 +344,8 @@ function create(repoRoot) {
 
 const DASHBOARD_SCHEMA = "orbit-dashboard/1";
 const DEFAULT_REFUSAL_LIMIT = 20;
+const DEFAULT_MISSION_LIMIT = 20;
+const MISSION_SCHEMA = "orbit-missions/1";
 const REFUSAL_SUMMARY_MAX = 120;
 const RESULT_SUMMARY_MAX = 240;
 
@@ -425,6 +428,33 @@ function isSignedReceipt(receipt) {
   );
 }
 
+function projectMissionsSlim(missionsRecord, options) {
+  const opts = options || {};
+  const limit = Number.isFinite(opts.missionLimit) ? opts.missionLimit : DEFAULT_MISSION_LIMIT;
+  const record = missionsRecord && typeof missionsRecord === "object" ? missionsRecord : null;
+  if (!record) {
+    return { schema: MISSION_SCHEMA, active: 0, total: 0, list: [] };
+  }
+  const list = Array.isArray(record.missions) ? record.missions : [];
+  const open = list.filter((m) => (m && (m.status || "open")) === "open");
+  const projected = open.slice(0, limit).map((m) => ({
+    id: m.id || null,
+    issueNumber: typeof m.issueNumber === "number" ? m.issueNumber : null,
+    issueUrl: m.issueUrl || null,
+    title: redactInline(m.title || ""),
+    proposer: m.proposer || "unknown",
+    deadline: m.deadline || null,
+    acceptanceCount: Array.isArray(m.acceptanceCriteria) ? m.acceptanceCriteria.length : 0,
+    updatedAt: m.updatedAt || m.createdAt || null,
+  }));
+  return {
+    schema: record.schema || MISSION_SCHEMA,
+    active: open.length,
+    total: list.length,
+    list: projected,
+  };
+}
+
 function projectReceipt(r) {
   return {
     path: r.path || null,
@@ -494,6 +524,7 @@ function exportBundle(repoRoot, _unused, options) {
     treasury: readJson(path.join(root, FILES.treasury)),
     receipts: loadReceiptsSorted(root, limit),
     recordedCycles: readJsonl(path.join(root, FILES.cycles)).length,
+    missions: readJson(path.join(root, FILES.missions)),
   };
   if (includeMemory) {
     bundle.memory = {
@@ -600,6 +631,7 @@ function projectForDashboard(bundle, options) {
       list: projectedList,
     },
     refusals,
+    missions: projectMissionsSlim(b.missions, opts),
   };
 
   slim.digest = digestForObject({
@@ -611,6 +643,7 @@ function projectForDashboard(bundle, options) {
     receiptCount: slim.receipts.count,
     latestPath: latest ? latest.path : null,
     refusalCount: refusals.length,
+    missionActive: slim.missions ? slim.missions.active : 0,
   });
 
   return slim;

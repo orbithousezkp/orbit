@@ -349,3 +349,63 @@ test("projectForDashboard treats step.risk.level=high as refusal when no explici
   assert.equal(slim.refusals[0].category, "governance");
   assert.equal(slim.refusals[0].severity, "high");
 });
+
+test("projectForDashboard surfaces missions from memory/missions.json", () => {
+  const repoRoot = tempRepo();
+  writeJson(repoRoot, "memory/missions.json", {
+    schema: "orbit-missions/1",
+    lastScannedCycle: 27,
+    lastScannedAt: "2026-05-25T00:00:00Z",
+    missions: [
+      {
+        id: "mission-101",
+        issueNumber: 101,
+        issueUrl: "https://github.com/example/repo/issues/101",
+        title: "Ship federation discovery",
+        proposer: "alice",
+        rationale: "Other orbits need to find us.",
+        acceptanceCriteria: ["pr-merged", "tests-pass"],
+        deadline: "2026-06-15",
+        status: "open",
+        createdAt: "2026-05-20T00:00:00Z",
+        updatedAt: "2026-05-22T00:00:00Z"
+      },
+      {
+        id: "mission-99",
+        issueNumber: 99,
+        issueUrl: "https://github.com/example/repo/issues/99",
+        title: "Old shipped one",
+        proposer: "bob",
+        rationale: "",
+        acceptanceCriteria: [],
+        deadline: null,
+        status: "closed",
+        createdAt: "2026-05-01T00:00:00Z",
+        updatedAt: "2026-05-10T00:00:00Z"
+      }
+    ]
+  });
+  const bundle = exportBundle(repoRoot, undefined, { receiptLimit: 10 });
+  const slim = projectForDashboard(bundle);
+
+  assert.ok(slim.missions, "missions slice must exist");
+  assert.equal(slim.missions.schema, "orbit-missions/1");
+  assert.equal(slim.missions.active, 1);
+  assert.equal(slim.missions.total, 2);
+  assert.equal(slim.missions.list.length, 1);
+  assert.equal(slim.missions.list[0].issueNumber, 101);
+  assert.equal(slim.missions.list[0].proposer, "alice");
+  assert.equal(slim.missions.list[0].deadline, "2026-06-15");
+  assert.equal(slim.missions.list[0].acceptanceCount, 2);
+});
+
+test("projectForDashboard returns empty missions slice when memory file missing", () => {
+  const repoRoot = tempRepo();
+  const bundle = exportBundle(repoRoot, undefined, { receiptLimit: 10 });
+  const slim = projectForDashboard(bundle);
+
+  assert.ok(slim.missions);
+  assert.equal(slim.missions.active, 0);
+  assert.equal(slim.missions.total, 0);
+  assert.deepEqual(slim.missions.list, []);
+});

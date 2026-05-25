@@ -1,0 +1,60 @@
+name: Mission
+description: Propose work that Orbit or an adopter repo should ship next.
+labels: ["orbit:mission"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Public mission
+
+        Use this form to propose a piece of work for Orbit to ship next. Open missions
+        appear on the public dashboard at `/dashboard.json` so anyone can see what has
+        been proposed and what is being worked on.
+
+        This is the Phase 1/2 widget — no staking, no token transfer, no on-chain action.
+        The proposer-staking version is specced in
+        [`PLAN/SPECS/MISSION_BOARD.md`](../../PLAN/SPECS/MISSION_BOARD.md) and is hard-blocked
+        behind S-GATE-3.
+
+  - type: textarea
+    id: rationale
+    attributes:
+      label: What should happen and why?
+      description: One or two paragraphs. Why is this worth doing now? What changes if it ships?
+      placeholder: "Describe the proposed work and the rationale behind it."
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: |
+        A checklist that defines "shipped". Each line should be a verifiable check.
+        Known checker names are interpreted automatically by the spec's verifier
+        (see PLAN/SPECS/MISSION_BOARD.md §6).
+      value: |
+        ## Acceptance Criteria
+        - [ ] pr-merged
+        - [ ] tests-pass
+    validations:
+      required: true
+
+  - type: input
+    id: deadline
+    attributes:
+      label: Deadline (optional)
+      description: When should this be done by? ISO date or a free-form date string.
+      placeholder: "Deadline: 2026-06-15"
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: ack
+    attributes:
+      label: Acknowledgments
+      options:
+        - label: I understand this is a public proposal and the rationale will be visible on the dashboard.
+          required: true
+        - label: I understand no payment, stake, or on-chain action results from filing this issue.
+          required: true

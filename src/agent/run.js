@@ -20,9 +20,11 @@ const { assertSignerMatches, signProof } = require("./proof-signing");
 const { drawNextTarget, evaluateSkip } = require("./skip-guard");
 const { exportBundle, projectForDashboard } = require("../../packages/orbit-sdk");
 const { projectForWellKnown } = require("./well-known");
+const { scanMissions, buildMissionsRecord } = require("./missions");
 
 const DASHBOARD_PATH = "public/dashboard.json";
 const WELL_KNOWN_PATH = "public/.well-known/orbit.json";
+const MISSIONS_PATH = "memory/missions.json";
 const DASHBOARD_MAX_BYTES = 60_000;
 
 const REDACTED_PRIVATE_CONFIG = "[REDACTED_PRIVATE_CONFIG]";
@@ -307,6 +309,20 @@ async function main() {
   context.cycle = state.cycle;
   if (firstWakeIntro) {
     context.firstWakeIntro = firstWakeIntro;
+  }
+
+  // Mission board widget — lift open `orbit:mission` issues into a public
+  // record that the SDK projects onto /dashboard.json. Phase 1/2 scope; no
+  // staking, no on-chain action. See PLAN/SPECS/MISSION_BOARD.md for the
+  // Phase 3 staking-contract version.
+  try {
+    const rawIssues = Array.isArray(context.issues) ? context.issues : [];
+    const missionList = scanMissions(rawIssues);
+    const missionsRecord = buildMissionsRecord(missionList, { cycle: state.cycle });
+    writeFile({ repoRoot: config.repoRoot }, MISSIONS_PATH, `${JSON.stringify(missionsRecord, null, 2)}\n`);
+    context.missions = missionsRecord;
+  } catch (error) {
+    log(`mission scan skipped: ${redactSecrets(error.message)}`);
   }
 
   const proof = {
