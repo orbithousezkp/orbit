@@ -64,7 +64,12 @@ function fullEnv() {
     ORBIT_WALLET_PRIVATE_KEY:         TEST_PRIVATE_KEY,
     ORBIT_OPERATOR_REVENUE_ADDRESS:   ADDR.operator,
     ORBIT_AI_PROVIDERS:               JSON.stringify([{ name: "anthropic" }, { name: "openai" }]),
-    ORBIT_AI_PROVIDER_KEYS:           JSON.stringify({ anthropic: "sk-ant-x", openai: "sk-x" })
+    ORBIT_AI_PROVIDER_KEYS:           JSON.stringify({ anthropic: "sk-ant-x", openai: "sk-x" }),
+    // Bus-factor: minimal tmp repos have only one commit and no adopters,
+    // so we lower the maintainer minimum to 1 in test scenarios. This is
+    // the same env knob the real bus-factor module reads.
+    ORBIT_BUS_FACTOR_MIN_MAINTAINERS: "1",
+    ORBIT_BUS_FACTOR_MIN_COMMITS:     "1"
   };
 }
 
@@ -407,9 +412,9 @@ test("renderLines: header line present + section banners + summary", () => {
   const lines = renderLines(result, { color: false, now: "2026-05-25T13:00:00Z" });
   assert.equal(lines[0], "=== Orbit Preflight Check ===");
   assert.equal(lines[1], "Run: 2026-05-25T13:00:00Z");
-  // section headers numbered [1/7] ... [7/7]
-  const headers = lines.filter((l) => /^\[\d+\/7\]/.test(l));
-  assert.equal(headers.length, 7);
+  // section headers numbered [1/8] ... [8/8]
+  const headers = lines.filter((l) => /^\[\d+\/8\]/.test(l));
+  assert.equal(headers.length, 8);
   // summary line at the end
   assert.ok(lines.some((l) => /^Summary:/.test(l)));
   assert.ok(lines.some((l) => /^Exit:/.test(l)));
@@ -575,4 +580,48 @@ test("parseArgv: --strict present → strict true", () => {
   assert.equal(parseArgv(["node", "orbit-preflight.js"]).strict, false);
   assert.equal(parseArgv([]).strict, false);
   assert.equal(parseArgv(null).strict, false);
+});
+
+// ---------------------------------------------------------------------------
+// S-REVENUE-3: Bus-factor section
+// ---------------------------------------------------------------------------
+
+test("runPreflight: bus-factor section appears with a PASS/WARN/FAIL line on current repo", () => {
+  const repoRoot = path.resolve(__dirname, "..");
+  const result = runPreflight({
+    env: { ORBIT_BUS_FACTOR_MIN_MAINTAINERS: "1", ORBIT_BUS_FACTOR_MIN_COMMITS: "1" },
+    repoRoot,
+    state: null,
+    treasury: null,
+    ownerActions: null
+  });
+  const busSection = result.sections.find((s) => /Bus-factor/.test(s.title));
+  assert.ok(busSection, "expected Bus-factor section");
+  assert.equal(busSection.checks.length, 1);
+  const status = busSection.checks[0].status;
+  assert.ok(
+    status === PASS || status === WARN || status === FAIL,
+    `expected PASS/WARN/FAIL, got ${status}`
+  );
+  assert.match(busSection.checks[0].detail, /bus-factor=/);
+});
+
+test("runPreflight: bus-factor gate handles missing git gracefully (FAIL, not crash)", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "orbit-preflight-nobus-"));
+  try {
+    const result = runPreflight({
+      env: {},
+      repoRoot: dir,
+      state: null,
+      treasury: null,
+      ownerActions: null
+    });
+    const busSection = result.sections.find((s) => /Bus-factor/.test(s.title));
+    assert.ok(busSection);
+    assert.equal(busSection.checks.length, 1);
+    // No git + no adopters → bus-factor = 0 < min → FAIL (recommendation=critical).
+    assert.equal(busSection.checks[0].status, FAIL);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
 });

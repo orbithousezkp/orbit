@@ -23,6 +23,8 @@ const { execFileSync } = require("child_process");
 
 const { loadSafes, SAFE_DEFINITIONS } = require("../agent/safes");
 const { isAddress } = require("../agent/addresses");
+const busFactor = require("../agent/bus-factor");
+const busFactorData = require("../agent/bus-factor-data");
 
 const PASS = "PASS";
 const WARN = "WARN";
@@ -609,6 +611,57 @@ function checkOwnerActions(text) {
 }
 
 // ===========================================================================
+// Section 8: Bus-factor (S-REVENUE-3)
+// ===========================================================================
+
+function checkBusFactor(repoRoot, env) {
+  // Surfaces commitAuthor + adopter count for the relevant lookback window.
+  // PASS when busFactor.summarizeBusFactor().recommendation === "ok",
+  // WARN when "fragile", FAIL when "critical".
+  //
+  // Defensive: any thrown error from data extraction is downgraded to WARN
+  // with the error message in the detail. The preflight check must never
+  // crash the launch decision on a safeguard read.
+  const checks = [];
+  let summary;
+  try {
+    const inputs = busFactorData.gatherBusFactorInputs(repoRoot, env || {});
+    summary = busFactor.summarizeBusFactor(
+      Array.isArray(inputs.commits) ? inputs.commits : [],
+      Array.isArray(inputs.adopters) ? inputs.adopters : [],
+      env || {}
+    );
+  } catch (err) {
+    checks.push({
+      status: WARN,
+      label: "bus-factor",
+      detail: `evaluation skipped: ${err && err.message ? err.message : err}`
+    });
+    return checks;
+  }
+  if (!summary || typeof summary !== "object") {
+    checks.push({
+      status: WARN,
+      label: "bus-factor",
+      detail: "no summary returned"
+    });
+    return checks;
+  }
+  const rec = summary.recommendation || "critical";
+  let status;
+  if (rec === "ok") status = PASS;
+  else if (rec === "fragile") status = WARN;
+  else status = FAIL;
+  const detail =
+    `bus-factor=${summary.busFactor} (min ${summary.minRequired}); ` +
+    `commit authors=${summary.commitAuthorCount}, ` +
+    `adopter implementations=${summary.adopterImplementationCount}; ` +
+    `recommendation=${rec}`;
+  checks.push({ status, label: "bus-factor", detail });
+  return checks;
+}
+
+// ===========================================================================
 // runPreflight
 // ===========================================================================
 
@@ -641,7 +694,8 @@ function runPreflight(options = {}) {
     { title: "D-018 gate state",                            checks: checkD018(state) },
     { title: "Treasury topology",                           checks: checkTreasury(treasury) },
     { title: "Public surface",                              checks: checkPublicSurface(repoRoot) },
-    { title: "OWNER_ACTIONS punch list",                    checks: checkOwnerActions(ownerActions) }
+    { title: "OWNER_ACTIONS punch list",                    checks: checkOwnerActions(ownerActions) },
+    { title: "Bus-factor (S-REVENUE-3)",                    checks: checkBusFactor(repoRoot, env) }
   ];
 
   let pass = 0;
@@ -799,5 +853,6 @@ module.exports = {
   checkTreasury,
   checkPublicSurface,
   checkOwnerActions,
+  checkBusFactor,
   parseOwnerActions
 };

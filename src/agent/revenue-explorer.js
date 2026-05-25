@@ -23,6 +23,8 @@ const path = require("path");
 const revenueExperiments = require("./revenue-experiments");
 const learningLab = require("./learning-lab");
 const marketSignals = require("./market-signals");
+const identityCapture = require("./identity-capture");
+const identityCaptureData = require("./identity-capture-data");
 
 // Defensive require for treasury-utility: Agent B is building this in
 // parallel and it may not be importable yet. Fall back to a no-op shim so
@@ -473,7 +475,37 @@ async function runExplorer(state, treasury, config, env, opts) {
     explorerState.runHistory = explorerState.runHistory.slice(-RUN_HISTORY_CAP);
   }
 
-  return summary;
+  // 6. Identity-capture (Goodhart) evaluation. Best-effort; data extraction
+  // or evaluation failure MUST NOT fail the cycle.
+  let identityCaptureEvaluation = null;
+  try {
+    const inputs = identityCaptureData.gatherCaptureInputs(repoRoot, env, now);
+    identityCaptureEvaluation = identityCapture.evaluateCapture(
+      inputs.treasuryGrowth,
+      inputs.qualitativeSignals,
+      env,
+      { now }
+    );
+    if (identityCaptureEvaluation && identityCaptureEvaluation.ok && identityCaptureEvaluation.warning) {
+      if (!Array.isArray(explorerState.warnings)) {
+        explorerState.warnings = [];
+      }
+      explorerState.warnings.push({
+        kind: "identity_capture",
+        ts: now.toISOString(),
+        riskIndex: identityCaptureEvaluation.captureRiskIndex,
+        recommendation: identityCaptureEvaluation.recommendation,
+        summary: identityCapture.summarizeCapture(identityCaptureEvaluation)
+      });
+      if (explorerState.warnings.length > 20) {
+        explorerState.warnings = explorerState.warnings.slice(-20);
+      }
+    }
+  } catch (err) {
+    try { console.warn(`identity-capture: evaluation failed: ${err.message}`); } catch {}
+  }
+
+  return { ...summary, identityCapture: identityCaptureEvaluation };
 }
 
 module.exports = {

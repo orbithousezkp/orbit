@@ -7,6 +7,19 @@
 // kill criteria, and a graduation path into a revenue stream.
 
 const revenueStreams = require("./revenue-streams");
+const sybilFloor = require("./sybil-floor");
+let busFactor;
+try {
+  busFactor = require("./bus-factor");
+} catch (err) {
+  busFactor = null;
+}
+let busFactorData;
+try {
+  busFactorData = require("./bus-factor-data");
+} catch (err) {
+  busFactorData = null;
+}
 
 const EXPERIMENT_STATUSES = ["hypothesis", "dry_run", "bounded_live", "graduated", "sunset"];
 
@@ -143,6 +156,23 @@ function findExperiment(state, experimentId) {
 }
 
 function advanceLifecycle(state, experimentId, newStatus, opts) {
+  // Lifecycle transition.
+  //
+  // S-REVENUE-3 sybil-floor integration:
+  //   When newStatus === "bounded_live" AND opts.funders is a non-empty array,
+  //   we gate the transition with sybilFloor.assertSybilFloorMet. If the floor
+  //   is not met, the assertion throws SYBIL_FLOOR_NOT_MET and the experiment
+  //   status is NOT updated. This is opt-in: callers that do not supply
+  //   opts.funders skip the check entirely (back-compat for the legacy
+  //   call sites that do not yet collect funder rows).
+  //
+  // Escape hatch:
+  //   opts.skipSybilCheck === true bypasses the gate even when funders are
+  //   provided. Used by test scaffolding and admin overrides.
+  //
+  // opts.env (object) is forwarded to sybilFloor.loadConfig; defaults to
+  // process.env when omitted.
+  // opts.now (Date | number | string) is forwarded to sybilFloor as `now`.
   const experiment = findExperiment(state, experimentId);
   if (!experiment) throw new Error(`unknown experiment: ${experimentId}`);
   if (!EXPERIMENT_STATUSES.includes(newStatus)) {
@@ -153,6 +183,21 @@ function advanceLifecycle(state, experimentId, newStatus, opts) {
     throw new Error(`invalid transition: ${experiment.status} -> ${newStatus}`);
   }
   const options = isPlainObject(opts) ? opts : {};
+
+  // Sybil floor gate (opt-in, fail-loud).
+  if (
+    newStatus === "bounded_live"
+    && options.skipSybilCheck !== true
+    && Array.isArray(options.funders)
+    && options.funders.length > 0
+  ) {
+    sybilFloor.assertSybilFloorMet(
+      options.funders,
+      options.env || process.env,
+      options.now ? { now: options.now } : undefined
+    );
+  }
+
   const entry = {
     status: newStatus,
     ts: new Date().toISOString(),
@@ -237,10 +282,57 @@ function isOverBudget(experiment) {
   return spent >= budget;
 }
 
-function graduateToStream(state, treasury, experimentId, streamConfig) {
+function graduateToStream(state, treasury, experimentId, streamConfig, opts) {
+  // S-REVENUE-3 bus-factor integration.
+  //
+  // Before promoting an experiment to a real revenue stream we require that
+  // enough independent maintainers (commit authors + active adopters) are
+  // exercising the code path. Without this guard a single-maintainer
+  // experiment can graduate into something the household cannot keep alive.
+  //
+  // Behaviour:
+  //   - opts.skipBusFactorCheck === true: skip the gate entirely.
+  //   - opts.repoRoot missing/null: skip the gate (defensive; the legacy
+  //     test scaffolding does not pass a real repo).
+  //   - otherwise: gather commits + adopters from disk, run
+  //     busFactor.assertBusFactorMet, propagate BUS_FACTOR_NOT_MET on
+  //     failure so the caller refuses graduation.
+  //
+  // opts.env is forwarded to busFactor.loadConfig; defaults to process.env.
   const experiment = findExperiment(state, experimentId);
   if (!experiment) throw new Error(`unknown experiment: ${experimentId}`);
   if (!isPlainObject(streamConfig)) throw new Error("streamConfig must be an object");
+
+  const options = isPlainObject(opts) ? opts : {};
+  if (
+    options.skipBusFactorCheck !== true
+    && options.repoRoot
+    && busFactor
+    && busFactorData
+    && typeof busFactorData.gatherBusFactorInputs === "function"
+    && typeof busFactor.assertBusFactorMet === "function"
+  ) {
+    let inputs;
+    try {
+      inputs = busFactorData.gatherBusFactorInputs(
+        options.repoRoot,
+        options.env || process.env
+      );
+    } catch (err) {
+      // Defensive: data extraction should never crash graduation. If we
+      // can't read the inputs we degrade to "skip" rather than refuse.
+      try { console.warn(`graduateToStream: bus-factor data gather failed: ${err.message}`); } catch {}
+      inputs = null;
+    }
+    if (inputs) {
+      busFactor.assertBusFactorMet(
+        Array.isArray(inputs.commits) ? inputs.commits : [],
+        Array.isArray(inputs.adopters) ? inputs.adopters : [],
+        options.env || process.env,
+        options.now ? { now: options.now } : undefined
+      );
+    }
+  }
 
   const config = {
     ...streamConfig,

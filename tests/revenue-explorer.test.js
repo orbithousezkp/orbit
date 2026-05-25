@@ -473,3 +473,96 @@ test("clearProposal removes by experimentId", () => {
   // No-op when id doesn't match.
   assert.equal(clearProposal(state, "nope"), false);
 });
+
+// ---------------------------------------------------------------------------
+// S-REVENUE-3: identity-capture wiring
+// ---------------------------------------------------------------------------
+
+test("runExplorer with no signal data returns identityCapture: { ok: false, reason: insufficient_data }", async () => {
+  const dir = tmpRepo();
+  try {
+    const state = freshState([]);
+    const result = await runExplorer(state, {}, { repoRoot: dir }, {}, { repoRoot: dir });
+    assert.ok(result.identityCapture);
+    assert.equal(result.identityCapture.ok, false);
+    assert.equal(result.identityCapture.reason, "insufficient_data");
+  } finally {
+    rm(dir);
+  }
+});
+
+test("runExplorer with capture-pattern mock data adds a warning entry to state.revenueExplorer.warnings", async () => {
+  const dir = tmpRepo();
+  try {
+    // Build a divergent capture pattern: treasury rising, adopter signals
+    // falling. We need >= 8 aligned points per signal to clear the
+    // insufficient_data threshold and the capture index must exceed the
+    // warning threshold to land a warning entry.
+    const signalRows = [];
+    const treasuryStreams = [];
+    // We'll write treasury-snapshots/*.json to seed the treasury growth
+    // series, and matching issue_reaction_index signals to seed the
+    // qualitative series. 10 points each.
+    fs.mkdirSync(path.join(dir, "memory", "treasury-snapshots"), { recursive: true });
+    const baseMs = Date.parse("2026-05-01T00:00:00Z");
+    const N = 10;
+    for (let i = 0; i < N; i += 1) {
+      const ts = new Date(baseMs + i * 24 * 60 * 60 * 1000).toISOString();
+      // Treasury monotonically increases.
+      const treasuryWei = String((i + 1) * 1000);
+      fs.writeFileSync(
+        path.join(dir, "memory", "treasury-snapshots", `snap-${i}.json`),
+        JSON.stringify({ ts, totalRevenueWei: treasuryWei })
+      );
+      // Qualitative signal: monotonically decreasing repo count + score.
+      signalRows.push({
+        kind: "issue_reaction_index",
+        ts,
+        repos: Array.from({ length: N - i }, (_, k) => ({ repo: `r/${k}`, score: N - i - k }))
+      });
+    }
+    fs.writeFileSync(
+      path.join(dir, "memory", "market-signals.jsonl"),
+      signalRows.map((r) => JSON.stringify(r)).join("\n") + "\n"
+    );
+    // Seed an adopters-registry so specImplementationCount has data points
+    // aligned to the signal timestamps.
+    fs.writeFileSync(
+      path.join(dir, "memory", "adopters-registry.json"),
+      JSON.stringify({
+        schema: "orbit-adopters/1",
+        adopters: [
+          { repo: "a/a", status: "verified", adopted: true },
+          { repo: "b/b", status: "verified", adopted: true }
+        ]
+      })
+    );
+
+    const state = freshState([]);
+    const now = new Date("2026-05-15T00:00:00Z");
+    const result = await runExplorer(
+      state,
+      {},
+      { repoRoot: dir },
+      {
+        // Lower minDataPoints so 10 samples is plenty + tighten warning
+        // threshold so the divergence registers.
+        ORBIT_CAPTURE_MIN_DATA_POINTS: "4",
+        ORBIT_CAPTURE_WARNING_THRESHOLD: "0.3"
+      },
+      { repoRoot: dir, now }
+    );
+    assert.ok(result.identityCapture);
+    assert.equal(result.identityCapture.ok, true, "expected detector to have enough samples");
+    assert.ok(result.identityCapture.warning, "expected divergence to trigger a warning");
+    assert.ok(Array.isArray(state.revenueExplorer.warnings));
+    assert.equal(state.revenueExplorer.warnings.length, 1);
+    const entry = state.revenueExplorer.warnings[0];
+    assert.equal(entry.kind, "identity_capture");
+    assert.equal(typeof entry.ts, "string");
+    assert.equal(typeof entry.riskIndex, "number");
+    assert.equal(typeof entry.recommendation, "string");
+  } finally {
+    rm(dir);
+  }
+});
