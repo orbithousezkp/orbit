@@ -113,9 +113,9 @@ cd ../orbit-tool-example && npm publish --access public
 
 ---
 
-## 7. Verify 12-hour clean cycle stretch
+## 7. Verify 12-hour clean cycle stretch — **gates first operator payout**
 
-**Why.** D-018 hard-blocks token launch until 24 consecutive cycles run without `REFUSAL` or `FAIL`. This is the headline `state.preLaunchVerified` flag — the master switch for every gated on-chain feature (buyback, clanker launch, mission-board staking, bounty market).
+**Why.** D-018 hard-blocks token launch until 24 consecutive cycles run without `REFUSAL` or `FAIL`. This is the headline `state.preLaunchVerified` flag — the master switch for every gated on-chain feature (buyback, clanker launch, mission-board staking, bounty market). It is also the final gate before any operator revenue can flow — both the 5% operator share and the 76% treasury share are zero until this closes and S-011/S-012 land $ORBIT on Base.
 
 **Do.**
 1. Once items 1–6 are done, let the GitHub Actions cron run for ~12 hours (default cron is hourly via `.github/workflows/orbit-cycle.yml`).
