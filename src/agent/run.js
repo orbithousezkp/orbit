@@ -289,6 +289,13 @@ async function main() {
     lastStatus: "initialized",
     launchOnceFired: false
   });
+  // S-FLOOR-1: cold-start the weekly fee-floor counter. The fee-floor module
+  // treats `state.feeFloor == null` as "first-ever observation" (gate returns
+  // due-but-zero-inflow), so this default is functionally equivalent to
+  // omitting it — but writing the shape eagerly keeps memory/state.json
+  // self-documenting for operators inspecting the file by hand.
+  const feeFloor = require("./fee-floor");
+  if (!state.feeFloor) state.feeFloor = feeFloor.defaultState();
   // Snapshot the on-disk state before this cycle started so the state-guard
   // can detect rollback attempts at write time (S-LAUNCH-1 Layer 3).
   const stateBeforeCycle = JSON.parse(JSON.stringify(state));

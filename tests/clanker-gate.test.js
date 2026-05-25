@@ -97,7 +97,19 @@ test("runRevenueCycle passes D-018 gate when verified, then short-circuits at no
   // With preLaunchVerified=true the function proceeds past the gate, then
   // returns "no_token" because the fresh treasury file has no token address
   // recorded — long before any live Clanker SDK call.
-  const result = await runRevenueCycle(baseConfig(tempRepo()), { preLaunchVerified: true });
+  //
+  // S-FLOOR-1: we also need the weekly fee-floor gate to pass, which means
+  // (a) the boundary check is due (feeFloor=null => first-ever => true) and
+  // (b) weekly inflow >= floor (default 0.1 ETH). We give the state a
+  // synthetic observed Fee Receive balance of exactly 0.1 ETH and no
+  // weekStartBalance, so the inflow is 0.1 ETH which clears the floor.
+  const state = {
+    preLaunchVerified: true,
+    treasurySweep: {
+      lastObservedFeeReceiveBalanceWei: "100000000000000000"
+    }
+  };
+  const result = await runRevenueCycle(baseConfig(tempRepo()), state);
   assert.equal(result.status, "no_token");
   assert.equal(result.blocked, undefined);
   assert.equal(result.reason, undefined);

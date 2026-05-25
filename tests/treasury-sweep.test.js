@@ -35,7 +35,14 @@ const VERIFIED_STATE = {
   cycle: 100,
   preLaunchVerified: true,
   tokenAddress: "0xABCDEFabcdef0123456789012345678901234567",
-  treasurySweep: {}
+  // S-FLOOR-1: existing tests assume the weekly fee-floor gate is satisfied.
+  // feeFloor is null/undefined => boundary check treats this as a first-ever
+  // observation (true). lastObservedFeeReceiveBalanceWei >= 0.1 ETH satisfies
+  // the inflow-vs-floor check. Tests that specifically exercise the floor
+  // gate override these locally.
+  treasurySweep: {
+    lastObservedFeeReceiveBalanceWei: "100000000000000000" // 0.1 ETH
+  }
 };
 
 test("BUCKETS bps sum to 10000 per D-019", () => {
@@ -237,7 +244,10 @@ test("proposeTreasurySweep returns sweep_dust_below_minimum for balance below fl
 test("proposeTreasurySweep returns sweep_week_already_executed when history blocks it", async () => {
   const state = {
     ...VERIFIED_STATE,
-    treasurySweep: { history: [{ sweepWeek: 20, status: "executed" }] }
+    treasurySweep: {
+      lastObservedFeeReceiveBalanceWei: "100000000000000000",
+      history: [{ sweepWeek: 20, status: "executed" }]
+    }
   };
   const result = await proposeTreasurySweep({
     config: {},
@@ -378,4 +388,73 @@ test("isSweepEnabled keeps the legacy `missing bucket addresses:` phrase when al
   assert.equal(result.enabled, false);
   // Preserves backwards-compatible scraper behavior.
   assert.match(result.reason, /missing bucket addresses: ai-costs \(ORBIT_AI_COSTS_SAFE\)/);
+});
+
+// ---------------------------------------------------------------------------
+// S-FLOOR-1: weekly fee-floor gate. The sweep is gated by a weekly check on a
+// configurable day-of-week + hour (default Sunday 00:00 UTC). If inflow
+// during the closing week did not clear the floor (default 0.1 ETH), the
+// sweep is SKIPPED for the week — no rollover into the next week.
+// ---------------------------------------------------------------------------
+
+test("S-FLOOR-1: isSweepEnabled returns fee_floor_check_not_due when boundary not reached", () => {
+  // Boundary already recorded for this week => not yet due for the next.
+  // Use a "now" guaranteed to be within the same week as 2026-05-24
+  // (Sunday) but BEFORE the next Sunday boundary.
+  const realDate = Date;
+  global.Date = class extends realDate {
+    constructor(...args) {
+      if (args.length === 0) return new realDate("2026-05-25T12:00:00.000Z");
+      return new realDate(...args);
+    }
+    static now() { return realDate.parse("2026-05-25T12:00:00.000Z"); }
+  };
+  try {
+    const state = {
+      ...VERIFIED_STATE,
+      feeFloor: { lastWeekBoundaryAt: "2026-05-24T00:00:00.000Z" }
+    };
+    const result = isSweepEnabled({}, state, ALL_ADDRESSES_ENV);
+    assert.equal(result.enabled, false);
+    assert.equal(result.reason, "fee_floor_check_not_due");
+  } finally {
+    global.Date = realDate;
+  }
+});
+
+test("S-FLOOR-1: isSweepEnabled returns fee_floor_not_met when inflow < floor", () => {
+  // Boundary IS due (first-ever observation), but the observed balance is
+  // only 0.05 ETH — half the 0.1 ETH floor.
+  const state = {
+    ...VERIFIED_STATE,
+    treasurySweep: {
+      lastObservedFeeReceiveBalanceWei: "50000000000000000" // 0.05 ETH
+    }
+  };
+  const result = isSweepEnabled({}, state, ALL_ADDRESSES_ENV);
+  assert.equal(result.enabled, false);
+  assert.match(result.reason, /^fee_floor_not_met:/);
+  assert.match(result.reason, /weekInflow=50000000000000000/);
+  assert.match(result.reason, /floor=100000000000000000/);
+});
+
+test("S-FLOOR-1: isSweepEnabled proceeds (enabled:true) when floor is met at boundary", () => {
+  // Boundary is due (first-ever observation), inflow >= floor.
+  const state = {
+    ...VERIFIED_STATE,
+    treasurySweep: {
+      lastObservedFeeReceiveBalanceWei: "100000000000000000" // exactly the floor
+    }
+  };
+  const result = isSweepEnabled({}, state, ALL_ADDRESSES_ENV);
+  assert.equal(result.enabled, true);
+});
+
+test("S-FLOOR-1: tryStartNewWeek writes lastWeekBoundaryAt + weekStartBalanceWei", () => {
+  const { tryStartNewWeek } = require("../src/agent/treasury-sweep");
+  const state = {};
+  tryStartNewWeek(state, 1234567890n);
+  assert.equal(state.feeFloor.weekStartBalanceWei, "1234567890");
+  assert.equal(typeof state.feeFloor.weekStartedAt, "string");
+  assert.equal(typeof state.feeFloor.lastWeekBoundaryAt, "string");
 });

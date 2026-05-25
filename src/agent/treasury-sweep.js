@@ -14,6 +14,7 @@
 // Decision: PLAN/DECISIONS.md D-019
 
 const crypto = require("crypto");
+const feeFloor = require("./fee-floor");
 const safes = require("./safes");
 
 const TREASURY_BUCKETS_SCHEMA = "orbit-treasury-buckets/1";
@@ -109,9 +110,50 @@ function isSweepEnabled(config, state, env) {
   }
   const blocked = bucketsBlockedReason(env);
   if (blocked !== null) reasons.push(blocked);
-  return reasons.length === 0
-    ? { enabled: true }
-    : { enabled: false, reason: reasons.join("; ") };
+  if (reasons.length !== 0) {
+    return { enabled: false, reason: reasons.join("; ") };
+  }
+
+  // S-FLOOR-1: weekly fee-floor gate.
+  //
+  // (a) Is the next week boundary due? If not, the gate cannot fire YET —
+  //     fees are still accumulating in the current week, no decision time.
+  // (b) Has weekly inflow met the floor? If not, SKIP THE WEEK ENTIRELY.
+  //     No rollover: the floor must clear in a single week. See
+  //     src/agent/fee-floor.js for the precise definition.
+  //
+  // Inflow basis: current Fee Receive Safe balance MINUS the balance at
+  // week-start, clamped to >= 0 (a mid-week sweep can leave the current
+  // balance below the snapshot — that does not count as negative inflow).
+  // We read both halves from state.feeFloor + state.treasurySweep so this
+  // function stays synchronous; the caller is responsible for refreshing
+  // state.treasurySweep.lastObservedFeeReceiveBalanceWei before invoking us.
+  const floorConfig = feeFloor.loadConfig(env);
+  if (!feeFloor.isAtOrPastWeekBoundary(state, new Date(), floorConfig)) {
+    return { enabled: false, reason: "fee_floor_check_not_due" };
+  }
+  const currentBalance = BigInt(
+    (state && state.treasurySweep && state.treasurySweep.lastObservedFeeReceiveBalanceWei) || "0"
+  );
+  const weekInflow = feeFloor.weekInflowSince(state, currentBalance);
+  const gate = feeFloor.evaluateGate(weekInflow, floorConfig);
+  if (!gate.met) {
+    return {
+      enabled: false,
+      reason: `fee_floor_not_met: weekInflow=${gate.weekInflowWei} wei < floor=${gate.floorWei} wei`
+    };
+  }
+
+  return { enabled: true };
+}
+
+// S-FLOOR-1 helper: callers invoke this AFTER they decide whether to fire
+// the weekly on-chain actions (sweep + buyback + operator payout) — or AFTER
+// they decide to skip the week — to roll state.feeFloor forward into the
+// next observation window. Thin wrapper around feeFloor.startWeek so callers
+// don't need to import the fee-floor module directly.
+function tryStartNewWeek(state, currentSafeBalanceWei) {
+  return feeFloor.startWeek(state, new Date(), currentSafeBalanceWei);
 }
 
 function bucketsMissingAddresses(env) {
@@ -319,5 +361,6 @@ module.exports = {
   commentApprovesSweep,
   proposeTreasurySweep,
   recordSweepExecution,
-  projectTreasuryBuckets
+  projectTreasuryBuckets,
+  tryStartNewWeek
 };

@@ -493,6 +493,31 @@ async function runRevenueCycle(config, state = {}) {
       reason: "state.preLaunchVerified is not true (D-018 pre-launch gate)"
     };
   }
+
+  // S-FLOOR-1: weekly fee-floor gate. Operator payout is half of the weekly
+  // on-chain action set (sweep + buyback + operator payout). If the week-
+  // boundary check is not yet due, defer. If the weekly inflow has not
+  // cleared the floor, SKIP THE WEEK ENTIRELY — no rollover. See
+  // src/agent/fee-floor.js for the precise definition.
+  const feeFloor = require("./fee-floor");
+  const floorConfig = feeFloor.loadConfig(process.env);
+  if (!feeFloor.isAtOrPastWeekBoundary(state, new Date(), floorConfig)) {
+    return { status: "deferred", reason: "fee_floor_check_not_due" };
+  }
+  const currentFeeBalance = BigInt(
+    (state.treasurySweep && state.treasurySweep.lastObservedFeeReceiveBalanceWei) || "0"
+  );
+  const weekInflow = feeFloor.weekInflowSince(state, currentFeeBalance);
+  const gate = feeFloor.evaluateGate(weekInflow, floorConfig);
+  if (!gate.met) {
+    return {
+      status: "deferred",
+      reason: "fee_floor_not_met",
+      weekInflowWei: gate.weekInflowWei,
+      floorWei: gate.floorWei
+    };
+  }
+
   const treasury = loadTreasury(config.repoRoot, config);
   const token = treasury.token.address;
   const operatorRecipient = config.operatorRevenueAddress;

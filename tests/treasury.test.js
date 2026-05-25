@@ -225,7 +225,12 @@ test("revenue claim dry run only queues after weekly and performance gates pass"
   treasury.revenue.lastClaimSentAt = new Date(Date.now() - (8 * 86_400_000)).toISOString();
   saveTreasury(cfg.repoRoot, treasury);
 
-  const result = await runRevenueCycle(cfg, { preLaunchVerified: true });
+  const result = await runRevenueCycle(cfg, {
+    preLaunchVerified: true,
+    // S-FLOOR-1: synthetic Fee Receive balance at-or-above the 0.1 ETH floor
+    // so the weekly gate proceeds to the "dry_run" / claim path.
+    treasurySweep: { lastObservedFeeReceiveBalanceWei: "100000000000000000" }
+  });
 
   assert.equal(result.status, "dry_run");
   assert.equal(result.claimStatus.canClaim, true);
