@@ -1,24 +1,28 @@
 {
   "schema": "orbit-dashboard/1",
-  "generatedAt": "2026-05-25T05:30:00.000Z",
-  "gitCommit": "519f5c6",
+  "generatedAt": "2026-05-24T20:40:47.117Z",
+  "gitCommit": "4c3d09f",
   "product": {
     "name": "Orbit",
-    "category": "GitHub-native agent infrastructure"
+    "category": "GitHub-native agent infrastructure",
+    "problem": "AI agents can write code, but most projects still lack a durable operating layer for identity, permissions, memory, receipts, budget, lifecycle, and human approval.",
+    "solution": "Orbit turns a repository into an agent control plane: the repo stores the agent passport, capability registry, command surface, memory, proof receipts, lifecycle state, and policy gates.",
+    "positioning": "Security checks are guardrails. The product is the infrastructure that lets an autonomous software operator run, prove work, and stay governable."
   },
   "activePhase": {
     "id": "foundation-control-plane",
     "name": "Foundation Control Plane",
-    "status": "active"
+    "status": "active",
+    "goal": "Make Orbit understandable as infrastructure before expanding execution power."
   },
-  "signer": "[REDACTED_ADDRESS]",
+  "signer": null,
   "lifecycle": {
-    "cycle": 55,
+    "cycle": 49,
     "born": "2026-05-22T01:46:39.981Z",
-    "lastActive": "2026-05-25T05:18:51.668Z",
+    "lastActive": "2026-05-24T20:36:29.542Z",
     "lastStatus": "completed",
     "firstWakeIntroComplete": true,
-    "recordedCycles": 54
+    "recordedCycles": 49
   },
   "walletPolicy": {
     "approvalMode": "owner_approval_required",
@@ -27,92 +31,292 @@
     "token": {
       "name": "Orbit",
       "symbol": "ORBIT",
-      "launchStatus": "not_launched"
+      "launchStatus": "not_launched",
+      "launchedAt": null,
+      "configured": true
     },
-    "blockedLiveActions": [
-      "wallet spending",
-      "external payments",
-      "signing",
-      "token launch",
-      "reward claims",
-      "payout-route changes"
-    ]
+    "digest": "b12adb97bce36e7b3c63020c6231c620ebdffed3d26769888ca756ad8c880bfc"
   },
   "permissions": {
     "allowedWithoutApproval": [
-      "read repository state",
-      "write cycle receipts",
-      "ai inference within daily budget",
-      "refuse scam intake",
-      "routine code and docs maintenance",
-      "repo-local prototypes"
+      "operator_revenue",
+      "treasury_internal",
+      "gas",
+      "claim_rewards",
+      "token_launch"
     ],
     "blockedUntilApproved": [
-      "live wallet signing",
-      "outbound treasury transfers",
-      "external integrations beyond github",
-      "token launch",
-      "reward claims",
-      "payout-route changes"
+      "Live wallet signing",
+      "Token launch",
+      "Reward claims",
+      "External payment",
+      "Payout-route changes",
+      "External hosting or publishing that creates obligations",
+      "Cross-agent delegation with shared access"
     ]
   },
-  "aiBudget": {
-    "dailyBudgetUsd": 5,
-    "monthlyBudgetUsd": 100,
-    "lifetimeSpendUsd": 3.02,
-    "spentTodayUsd": 0.27,
-    "dailyRemainingUsd": 4.73,
-    "monthlyRemainingUsd": 96.98
-  },
-  "activeLayers": [
-    { "id": "github-intake", "name": "GitHub Intake", "status": "active" },
-    { "id": "repo-memory", "name": "Repo Memory", "status": "active" },
-    { "id": "agent-lifecycle", "name": "Agent Lifecycle", "status": "active" },
-    { "id": "permissions", "name": "Permissions And Approvals", "status": "active" },
-    { "id": "proof-receipts", "name": "Proof Receipts", "status": "active" },
-    { "id": "wallet-policy", "name": "Wallet Policy", "status": "active" }
-  ],
-  "activeCapabilities": [
-    { "id": "identity", "name": "Identity And Mission", "status": "active" },
-    { "id": "lifecycle", "name": "Wake/Sleep Lifecycle", "status": "active" },
-    { "id": "memory", "name": "Durable Memory", "status": "active" },
-    { "id": "proofs", "name": "Proof Receipts", "status": "active" },
-    { "id": "permissions", "name": "Permission Gates", "status": "active" },
-    { "id": "budget", "name": "AI Food Budget", "status": "active" },
-    { "id": "intake-guardrails", "name": "Intake Guardrails", "status": "active" },
-    { "id": "agent-passport", "name": "Agent Passport", "status": "active" }
-  ],
-  "roadmap": {
-    "currentLevel": {
-      "id": "level-1",
-      "name": "Control Plane Foundation",
-      "status": "active"
-    },
-    "activePhase": {
-      "id": "safe-autonomy-core",
-      "name": "Safe Autonomy Core",
-      "status": "active"
-    },
-    "laneCounts": {
-      "active": 2,
-      "planned": 6,
-      "research": 2,
-      "later": 1
-    }
-  },
   "receipts": {
-    "totalCycles": 54,
-    "latestCycle": 54,
-    "latestResult": "SPA frontend rewrite merged, cycle infrastructure maintained"
-  },
-  "opportunities": {
-    "top": {
-      "id": "orbit-agent-passport",
-      "title": "Orbit agent passport and capability registry",
-      "score": 42.33,
-      "status": "open"
+    "count": 10,
+    "latest": {
+      "path": "runtime/proofs/cycle-40.json",
+      "cycle": 40,
+      "startedAt": null,
+      "finishedAt": null,
+      "trigger": {
+        "type": "mandatory",
+        "id": "regular_heartbeat",
+        "label": "30-minute heartbeat"
+      },
+      "dryRun": false,
+      "totalSteps": 0,
+      "filesChangedCount": 5,
+      "result": "",
+      "digest": "db0d0dfa0e46914755c8d9ed495eaaa76cba419a5295d8ed347b5b942dc1afd9",
+      "signed": false,
+      "signer": null,
+      "signatureScheme": null,
+      "payloadHash": null
     },
-    "count": 16
+    "latestSigned": null,
+    "list": [
+      {
+        "path": "runtime/proofs/2026-05-24/2026-05-24T08-47-58-070Z.json",
+        "cycle": 41,
+        "startedAt": "2026-05-24T08:45:10.008Z",
+        "finishedAt": "2026-05-24T08:47:58.070Z",
+        "trigger": {
+          "type": "mandatory",
+          "id": "regular_heartbeat",
+          "label": "30-minute heartbeat",
+          "intervalMinutes": 30,
+          "source": "schedule",
+          "action": "",
+          "reason": "Wake on the fixed repository control-plane rhythm even when no event fires."
+        },
+        "dryRun": false,
+        "totalSteps": 26,
+        "filesChangedCount": 4,
+        "result": "",
+        "digest": "20333708a0f170466e91f903d75fa567eb79946e76057a3ed6a1e82ee8a199cf",
+        "signed": false,
+        "signer": null,
+        "signatureScheme": null,
+        "payloadHash": null
+      },
+      {
+        "path": "runtime/proofs/2026-05-24/2026-05-24T10-50-32-696Z.json",
+        "cycle": 42,
+        "startedAt": "2026-05-24T10:50:31.473Z",
+        "finishedAt": "2026-05-24T10:50:32.696Z",
+        "trigger": {
+          "type": "mandatory",
+          "id": "regular_heartbeat",
+          "label": "30-minute heartbeat",
+          "intervalMinutes": 30,
+          "source": "schedule",
+          "action": "",
+          "reason": "Wake on the fixed repository control-plane rhythm even when no event fires."
+        },
+        "dryRun": false,
+        "totalSteps": 2,
+        "filesChangedCount": 1,
+        "result": "All configured AI routes failed. Local deterministic planner selected: Review risky issue #1: Draft scope: Repo safety audit as a paid service",
+        "digest": "5f0307667197c8e03f39036e98ac29b29c1578943d0846103ad864f0505c9d69",
+        "signed": false,
+        "signer": null,
+        "signatureScheme": null,
+        "payloadHash": null
+      },
+      {
+        "path": "runtime/proofs/2026-05-24/2026-05-24T12-14-50-577Z.json",
+        "cycle": 43,
+        "startedAt": "2026-05-24T12:11:17.841Z",
+        "finishedAt": "2026-05-24T12:14:50.577Z",
+        "trigger": {
+          "type": "mandatory",
+          "id": "regular_heartbeat",
+          "label": "30-minute heartbeat",
+          "intervalMinutes": 30,
+          "source": "schedule",
+          "action": "",
+          "reason": "Wake on the fixed repository control-plane rhythm even when no event fires."
+        },
+        "dryRun": false,
+        "totalSteps": 31,
+        "filesChangedCount": 3,
+        "result": "",
+        "digest": "617baf8866c4c961205ddab7086c5fbe98d92e57e92651a50f57844f7eea7805",
+        "signed": false,
+        "signer": null,
+        "signatureScheme": null,
+        "payloadHash": null
+      },
+      {
+        "path": "runtime/proofs/2026-05-24/2026-05-24T14-06-16-228Z.json",
+        "cycle": 44,
+        "startedAt": "2026-05-24T14:01:55.641Z",
+        "finishedAt": "2026-05-24T14:06:16.228Z",
+        "trigger": {
+          "type": "mandatory",
+          "id": "regular_heartbeat",
+          "label": "30-minute heartbeat",
+          "intervalMinutes": 30,
+          "source": "schedule",
+          "action": "",
+          "reason": "Wake on the fixed repository control-plane rhythm even when no event fires."
+        },
+        "dryRun": false,
+        "totalSteps": 28,
+        "filesChangedCount": 3,
+        "result": "",
+        "digest": "b8aa5fd8b165ed82f60982b48eb12e58509c902633c48af315634864abfdf353",
+        "signed": false,
+        "signer": null,
+        "signatureScheme": null,
+        "payloadHash": null
+      },
+      {
+        "path": "runtime/proofs/2026-05-24/2026-05-24T15-26-00-442Z.json",
+        "cycle": 45,
+        "startedAt": "2026-05-24T15:22:17.223Z",
+        "finishedAt": "2026-05-24T15:26:00.442Z",
+        "trigger": {
+          "type": "mandatory",
+          "id": "regular_heartbeat",
+          "label": "30-minute heartbeat",
+          "intervalMinutes": 30,
+          "source": "schedule",
+          "action": "",
+          "reason": "Wake on the fixed repository control-plane rhythm even when no event fires."
+        },
+        "dryRun": false,
+        "totalSteps": 31,
+        "filesChangedCount": 3,
+        "result": "",
+        "digest": "967baa5f62a36e316e59a5e5159d8094392261389d70993a0f9433f2e33ca8a1",
+        "signed": false,
+        "signer": null,
+        "signatureScheme": null,
+        "payloadHash": null
+      },
+      {
+        "path": "runtime/proofs/2026-05-24/2026-05-24T16-51-37-137Z.json",
+        "cycle": 46,
+        "startedAt": "2026-05-24T16:42:21.570Z",
+        "finishedAt": "2026-05-24T16:51:37.137Z",
+        "trigger": {
+          "type": "mandatory",
+          "id": "regular_heartbeat",
+          "label": "30-minute heartbeat",
+          "intervalMinutes": 30,
+          "source": "schedule",
+          "action": "",
+          "reason": "Wake on the fixed repository control-plane rhythm even when no event fires."
+        },
+        "dryRun": false,
+        "totalSteps": 30,
+        "filesChangedCount": 4,
+        "result": "",
+        "digest": "43b41f459d6c1ff76a7861ba2dbc26619b19c33f36f1ab1cdb80bf0b23a236b3",
+        "signed": false,
+        "signer": null,
+        "signatureScheme": null,
+        "payloadHash": null
+      },
+      {
+        "path": "runtime/proofs/2026-05-24/2026-05-24T17-48-18-900Z.json",
+        "cycle": 47,
+        "startedAt": "2026-05-24T17:43:55.421Z",
+        "finishedAt": "2026-05-24T17:48:18.900Z",
+        "trigger": {
+          "type": "mandatory",
+          "id": "regular_heartbeat",
+          "label": "30-minute heartbeat",
+          "intervalMinutes": 30,
+          "source": "schedule",
+          "action": "",
+          "reason": "Wake on the fixed repository control-plane rhythm even when no event fires."
+        },
+        "dryRun": false,
+        "totalSteps": 30,
+        "filesChangedCount": 7,
+        "result": "",
+        "digest": "5f2ebbc38ee789b4eed042850a3ce585e7d6827c94ea358229a3efb90d3d796f",
+        "signed": false,
+        "signer": null,
+        "signatureScheme": null,
+        "payloadHash": null
+      },
+      {
+        "path": "runtime/proofs/2026-05-24/2026-05-24T19-45-05-480Z.json",
+        "cycle": 48,
+        "startedAt": "2026-05-24T19:40:02.822Z",
+        "finishedAt": "2026-05-24T19:45:05.480Z",
+        "trigger": {
+          "type": "mandatory",
+          "id": "regular_heartbeat",
+          "label": "30-minute heartbeat",
+          "intervalMinutes": 30,
+          "source": "schedule",
+          "action": "",
+          "reason": "Wake on the fixed repository control-plane rhythm even when no event fires."
+        },
+        "dryRun": false,
+        "totalSteps": 28,
+        "filesChangedCount": 6,
+        "result": "",
+        "digest": "055708eaf386ec3b40fc5ee77fec2e1f423e2f91a72cc4dc11b8b1fa588e6586",
+        "signed": false,
+        "signer": null,
+        "signatureScheme": null,
+        "payloadHash": null
+      },
+      {
+        "path": "runtime/proofs/2026-05-24/2026-05-24T20-40-47-114Z.json",
+        "cycle": 49,
+        "startedAt": "2026-05-24T20:36:29.542Z",
+        "finishedAt": "2026-05-24T20:40:47.114Z",
+        "trigger": {
+          "type": "mandatory",
+          "id": "regular_heartbeat",
+          "label": "30-minute heartbeat",
+          "intervalMinutes": 30,
+          "source": "schedule",
+          "action": "",
+          "reason": "Wake on the fixed repository control-plane rhythm even when no event fires."
+        },
+        "dryRun": false,
+        "totalSteps": 27,
+        "filesChangedCount": 6,
+        "result": "",
+        "digest": "b7de149b86fbf3e389778bd4c810b253fa5ab819aa76ab228d07d1c0269b5237",
+        "signed": false,
+        "signer": null,
+        "signatureScheme": null,
+        "payloadHash": null
+      },
+      {
+        "path": "runtime/proofs/cycle-40.json",
+        "cycle": 40,
+        "startedAt": null,
+        "finishedAt": null,
+        "trigger": {
+          "type": "mandatory",
+          "id": "regular_heartbeat",
+          "label": "30-minute heartbeat"
+        },
+        "dryRun": false,
+        "totalSteps": 0,
+        "filesChangedCount": 5,
+        "result": "",
+        "digest": "db0d0dfa0e46914755c8d9ed495eaaa76cba419a5295d8ed347b5b942dc1afd9",
+        "signed": false,
+        "signer": null,
+        "signatureScheme": null,
+        "payloadHash": null
+      }
+    ]
   },
-  "digest": "0xcycle55-dashboard-sync"
+  "refusals": [],
+  "digest": "ff1ff49dc890e83a8e37cbf4b58ac4a6d74e32bc53748971e16d89c0b9e1fb8a"
 }
