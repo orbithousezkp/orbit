@@ -331,9 +331,18 @@ async function main() {
     { role: "user", content: buildUserPrompt(context), context }
   ];
 
+  // T-8: keep AI routing telemetry across cycles so auto-demote/promote
+  // logic can accumulate. Lives in memory/state.json under aiRouting.
+  state.aiRouting = state.aiRouting && typeof state.aiRouting === "object"
+    ? state.aiRouting
+    : { providers: {} };
+
   for (let step = 1; step <= config.maxSteps; step += 1) {
     log(`step ${step}/${config.maxSteps}`);
     const result = await infer(config, messages, TOOLS, state.aiRouting);
+    if (result.routing && typeof result.routing === "object") {
+      state.aiRouting = result.routing;
+    }
     if (!result.fallback && result.usage) {
       const aiRoute = result.provider && result.provider.route ? result.provider.route : privateAiRouteId({}, 0);
       const usage = recordAiUsage(config, config.repoRoot, result.usage, aiRoute, `cycle ${state.cycle} step ${step}`);

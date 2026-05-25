@@ -384,3 +384,37 @@ test("request byte limit defaults to a provider-safe cap", () => {
   assert.equal(requestMaxBytes({ aiRequestMaxBytes: 123 }, {}), 123);
   assert.equal(requestMaxBytes({ aiRequestMaxBytes: 123 }, { requestMaxBytes: 456 }), 456);
 });
+
+test("infer threads ai routing telemetry back through result.routing (T-8 persistence)", async () => {
+  const originalFetch = global.fetch;
+  global.fetch = async () => ({
+    ok: false,
+    status: 502,
+    async text() { return "gateway down"; }
+  });
+
+  try {
+    const routing = { providers: {} };
+    const result = await infer(config({
+      aiProviders: [
+        {
+          name: "first",
+          label: "First",
+          apiKey: "k",
+          apiBase: "https://first.example/v1",
+          model: "m",
+          chatPath: "/chat/completions",
+          priority: 1
+        }
+      ]
+    }), [
+      { role: "user", content: "ctx", context: {} }
+    ], [], routing);
+
+    assert.equal(result.fallback, true);
+    assert.equal(result.routing, routing, "result.routing must reference the passed-in routing state");
+    assert.equal(routing.providers.first.rollingFailures, 1, "failure must be recorded onto the caller's routing state for cross-cycle persistence");
+  } finally {
+    global.fetch = originalFetch;
+  }
+});
