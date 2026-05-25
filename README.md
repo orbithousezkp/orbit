@@ -23,7 +23,7 @@ Orbit is not a security product and it is not a hot wallet. Intake scanning is o
 - **Agent memory**: stable facts, tasks, lessons, and policy survive between disconnected runs.
 - **Permission gates**: routine repo work can proceed, while spending, signing, token launch, reward claims, payout changes, and external commitments require approval.
 - **Proof receipts**: each cycle can leave reviewable records under `runtime/proofs/` and compact notes under `memory/cycles/`.
-- **Wallet policy layer**: Orbit exposes read-only wallet policy, AI food budget, weekly revenue cadence, token status, and blocked live actions without exposing private keys or private routes.
+- **Wallet policy layer**: Orbit exposes read-only wallet policy, AI inference budget, weekly revenue cadence, token status, and blocked live actions without exposing private keys or private routes.
 - **GitHub intake**: issues and comments act as the public command, discussion, task, and approval surface.
 - **Infrastructure registry**: `memory/infrastructure.json` describes Orbit's product phase, layers, access surfaces, capabilities, command surface, receipts, and blocked actions.
 - **Roadmap gates**: roadmap progress is evidence-backed and must not outrank open tasks, safe issue triage, safety review, or owner approval checks.
@@ -103,7 +103,7 @@ Live provider routing belongs in private environment variables or GitHub Secrets
 
 `ORBIT_AI_PROVIDERS` is an ordered JSON route list. Orbit tries each configured route in order and falls back when a request fails.
 
-AI-credit purchases are separate from inference routing. Orbit may request an owner-approved AI-food refill, but the runtime records approval and completion proof; it does not silently execute payment.
+AI-credit purchases are separate from inference routing. Orbit may request an owner-approved inference-budget refill, but the runtime records approval and completion proof; it does not silently execute payment.
 
 ## Wallet Boundary
 
@@ -114,6 +114,8 @@ External spend is blocked by default. If money, signing, token movement, payout-
 Do not commit private keys, payout routes, provider keys, or private execution payloads. Use GitHub Secrets or private repository variables for wallet addresses, claim routing, revenue basis points, and live-operation flags.
 
 Revenue sending is not continuous. Orbit only queues reward claims after the configured weekly interval and only when recent cycle performance clears configured thresholds.
+
+The full wallet & spending policy — principles, configurable surfaces, and enforcement model — lives in [`docs/wallet-policy.md`](docs/wallet-policy.md). Per-deployment budgets are operator-configured; the policy itself is project-generic.
 
 ## Cycle Assignment
 

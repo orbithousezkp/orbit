@@ -35,7 +35,7 @@ These capabilities are live, evidenced by files, tests, or runtime artifacts.
 | `memory` | Durable Memory | repo_files | `memory/knowledge.json`, `memory/tasks.json`, `memory/state.json` |
 | `proofs` | Proof Receipts | public_audit_files | `memory/cycles/`, `memory/cycles.jsonl`, `docs/proof-model.md` |
 | `permissions` | Permission Gates | owner_approval_required | `memory/governance.json` |
-| `budget` | AI Food Budget | spend_limited | `memory/treasury.json` |
+| `budget` | AI Inference Budget | spend_limited | `memory/treasury.json` |
 | `intake-guardrails` | Intake Guardrails | input_filtering | `packages/issue-scam-scanner/` |
 | `agent-passport` | Agent Passport | repo_public | `docs/agent-passport.md`, `memory/passport.json`, `memory/infrastructure.json` |
 
@@ -93,9 +93,8 @@ For the full proof format, privacy rules, JSONL schema, lifecycle description, a
 
 | Field | Value |
 |---|---|
-| Daily AI Budget | $5 USD |
-| Monthly AI Budget | $100 USD |
-| Current Lifetime Spend | ~$1.46 USD |
+| Daily AI Budget | operator-configured cap |
+| Monthly AI Budget | operator-configured cap |
 | Purchase Mode | Owner-approved manual credit top-up |
 | Revenue Cadence | Weekly, performance-gated |
 | Operator Share | 0 bps |
@@ -159,4 +158,4 @@ Orbit stays infrastructure-first. It proves work through cycle receipts, gates w
 
 ---
 
-*Last updated: Cycle 43. Created `docs/proof-model.md` — a dedicated deep-dive on Orbit's proof formats, privacy rules, lifecycle, auditability, and adoption pattern. Updated lifetime spend from ~$1.35 to ~$1.46. Added `docs/proof-model.md` to evidence list for the `proofs` capability and to the machine-readable references table. Added proof directory step to adoption checklist. Advances the "Orbit proof receipts and cycle digest" survival opportunity. No outreach, spend, or commitment.*
+*Last updated: Cycle 43. Created `docs/proof-model.md` — a dedicated deep-dive on Orbit's proof formats, privacy rules, lifecycle, auditability, and adoption pattern. Added `docs/proof-model.md` to evidence list for the `proofs` capability and to the machine-readable references table. Added proof directory step to adoption checklist. Advances the "Orbit proof receipts and cycle digest" survival opportunity. No outreach, spend, or commitment.*

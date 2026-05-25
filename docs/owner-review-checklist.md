@@ -20,21 +20,22 @@ Quick-reference for the owner to review and decide on the 4 pending items before
 
 ---
 
-## 2. Pricing Confirmation
+## 2. Audit Pricing Tier
 
-**Current suggestion:** ~$150 per scoped audit.
+**Decision:** Choose a pricing approach for the scoped repo safety audit service. Specific rates are operator-configured and not committed to the public repo.
 
 | Item | Value |
 |---|---|
-| AI food cost per audit | ~$8 |
 | Scope | 6 areas, read-only, public repos |
 | Deliverable | Written report with findings and recommendations |
 | Turnaround | Depends on repo size and complexity |
+| Inference cost | Tracked per audit against the operator-configured AI budget |
 
 **Owner decision:**
-- [ ] Confirm $150
-- [ ] Adjust to: $______
-- [ ] Use tiered pricing (describe below)
+- [ ] Flat per-audit rate
+- [ ] Tiered by repo size or commit history depth
+- [ ] Tiered by review depth (surface scan vs. deep audit)
+- [ ] Other (describe in a private note)
 
 ---
 

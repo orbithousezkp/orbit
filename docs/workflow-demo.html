@@ -462,7 +462,7 @@
       </main>
 
       <div class="footer">
-        Live launch and reward claims stay disabled until the environment flags and wallet settings are set on the published repository.
+        Live launch and reward claims stay disabled until the environment flags and wallet settings are set on the published repository. Per-deployment limits are operator-configured (see <a href="./wallet-policy.md">wallet-policy.md</a>).
       </div>
     </div>
 
@@ -473,12 +473,12 @@
           description: "Use the agent to inspect an issue, check budget, write a small fix, and save proof.",
           accent: "maintenance",
           phase: "repo upkeep",
-          budget: { daily: "$3.80", monthly: "$96.40", status: "safe", ratio: 76 },
+          budget: { daily: "within envelope", monthly: "within cap", status: "healthy", ratio: 76 },
           treasury: { operator: "private", orbit: "private", asset: "paired rewards", status: "healthy" },
           launch: { status: "dry-run", detail: "Launch config is prepared but live signing is off." },
           metrics: [
             { label: "Open issue", value: "#184" },
-            { label: "AI budget remaining", value: "$3.80 today" },
+            { label: "AI inference state", value: "within envelope" },
             { label: "Reward route", value: "private" }
           ],
           steps: [
@@ -492,7 +492,7 @@
           console: [
             "orbit cycle started",
             "context loaded: issues, memory, treasury",
-            "budget check passed: $3.80 remaining today",
+            "budget check passed: inference envelope healthy",
             "selected issue #184: docs refresh",
             "write_file README.md",
             "save proof/runtime log",
@@ -504,7 +504,7 @@
           description: "Validate the Orbit token launch path, private reward routing, and live signing gate.",
           accent: "launch",
           phase: "token launch",
-          budget: { daily: "$4.60", monthly: "$92.10", status: "safe", ratio: 92 },
+          budget: { daily: "within envelope", monthly: "within cap", status: "healthy", ratio: 92 },
           treasury: { operator: "private", orbit: "private", asset: "paired rewards", status: "configured" },
           launch: { status: "ready", detail: "Clanker launch config is prepared, but the live launch flag is still off." },
           metrics: [
@@ -534,7 +534,7 @@
           description: "Show how Orbit would claim paired-token rewards through the private configured route.",
           accent: "revenue",
           phase: "performance-gated revenue claim",
-          budget: { daily: "$4.95", monthly: "$89.25", status: "safe", ratio: 98 },
+          budget: { daily: "approaching cap", monthly: "within cap", status: "elevated", ratio: 98 },
           treasury: { operator: "private", orbit: "private", asset: "paired rewards", status: "claimable" },
           launch: { status: "launched", detail: "Token exists and reward claims can be queued if the flag is enabled." },
           metrics: [
@@ -678,12 +678,12 @@
 
         const budgetHtml = `
           <div class="metric">
-            <span>Daily budget remaining</span>
+            <span>Daily inference envelope</span>
             <strong>${scenario.budget.daily}</strong>
             <div class="meter"><i style="width:${ratio}%"></i></div>
           </div>
           <div class="metric">
-            <span>Monthly budget remaining</span>
+            <span>Monthly inference envelope</span>
             <strong>${scenario.budget.monthly}</strong>
             <div class="meter orange"><i style="width:${Math.max(ratio - 20, 24)}%"></i></div>
           </div>

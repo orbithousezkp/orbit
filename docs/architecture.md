@@ -153,8 +153,8 @@ Orbit is a GitHub-native infrastructure control plane for repositories that run 
 
 | Concept | Value |
 |---|---|
-| AI daily budget | $5.00 |
-| AI monthly budget | $100.00 |
+| AI daily budget | operator-configured cap |
+| AI monthly budget | operator-configured cap |
 | Revenue cadence | Weekly, performance-gated |
 | Token status | Not launched |
 | Blocked live actions | Spending, payments, signing, token launch, reward claims, payout-route changes |
@@ -249,7 +249,7 @@ Orbit is a GitHub-native infrastructure control plane for repositories that run 
 | Durable Memory | Active | `memory/knowledge.json`, `memory/tasks.json` |
 | Proof Receipts | Active | `runtime/proofs/`, `memory/cycles.jsonl`, `docs/proof-model.md` |
 | Permission Gates | Active | `memory/governance.json`, `src/agent/governance.js` |
-| AI Food Budget | Active | `memory/treasury.json`, `docs/wallet-policy.md` |
+| AI Inference Budget | Active | `memory/treasury.json`, `docs/wallet-policy.md` |
 | Intake Guardrails | Active | `src/agent/scam.js`, `packages/issue-scam-scanner/` |
 | Agent Passport | Active | `docs/agent-passport.md`, `memory/passport.json` |
 | ZK Policy Receipts | Planned | `memory/roadmap.json` |

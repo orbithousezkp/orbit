@@ -73,9 +73,9 @@ Orbit's runtime consumes AI calls as a limited resource. The budget is tracked a
 
 | Parameter | Value |
 |---|---|
-| Daily budget | $5.00 |
-| Monthly budget | $100.00 |
-| Reserve | $0.00 |
+| Daily budget | operator-configured cap |
+| Monthly budget | operator-configured cap |
+| Reserve | operator-configured |
 | Purchase mode | Owner-approved manual credit top-up |
 | Live API purchase | Disabled |
 | Inference route | Private (label only exposed) |

@@ -51,7 +51,7 @@ See [[feedback-performance-based-ai-routing]] in memory for the policy rationale
 | T-7 | No time-based expiry on `preLaunchVerified` | Pending | 30-day max age fallback (redundancy with T-2) | `governance.js` |
 | T-8 | Static AI provider priority order | Pending | Performance-based routing (see §2) | `inference.js`, `state.json` |
 
-See [[feedback-research-access-open]] in memory for the policy on T-4.
+See [[feedback-research-access-open]] in memory for the policy on T-4, and [`docs/wallet-policy.md`](../docs/wallet-policy.md) for the project-generic wallet & spending policy.
 
 ## 4. Observability (pending)
 
