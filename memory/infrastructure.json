@@ -1,6 +1,6 @@
 {
-  "version": 1,
-  "updatedAt": "2026-05-24T14:30:00.000Z",
+  "version": 2,
+  "updatedAt": "2026-05-25T10:00:00.000Z",
   "product": {
     "name": "Orbit",
     "category": "GitHub-native agent infrastructure",
@@ -54,8 +54,8 @@
     {
       "id": "sdk-cli-access",
       "name": "SDK And CLI Access",
-      "status": "planned",
-      "description": "Local read-only entry points for other repos, agents, and dashboards come last."
+      "status": "active",
+      "description": "Zero-dependency SDK and CLI for reading Orbit's machine-readable state programmatically, plus MCP server for IDE and agent clients."
     }
   ],
   "surfaces": [
@@ -118,9 +118,16 @@
     {
       "id": "sdk-cli",
       "name": "SDK And CLI Surface",
-      "status": "planned",
-      "path": "src/cli/",
-      "description": "Local commands and future client helpers for reading Orbit status, receipts, capabilities, and installation checks."
+      "status": "active",
+      "path": "packages/orbit-sdk/",
+      "description": "Zero-dependency library and CLI for reading all 11 machine-readable files with 7 derived views and health checks."
+    },
+    {
+      "id": "mcp-server",
+      "name": "MCP Server Surface",
+      "status": "active",
+      "path": "packages/orbit-mcp-server/",
+      "description": "Model Context Protocol server wrapping the SDK. Exposes 6 read-only tools and 3 resource schemes for Claude Desktop, IDE extensions, and other MCP clients."
     },
     {
       "id": "integration-adapters",
@@ -222,6 +229,27 @@
       ]
     },
     {
+      "id": "sdk-cli-capability",
+      "name": "SDK And CLI",
+      "status": "active",
+      "mode": "local_package",
+      "evidence": [
+        "packages/orbit-sdk/",
+        "packages/orbit-sdk/cli.js",
+        "tests/orbit-sdk.test.js"
+      ]
+    },
+    {
+      "id": "mcp-server-capability",
+      "name": "MCP Server",
+      "status": "active",
+      "mode": "local_package",
+      "evidence": [
+        "packages/orbit-mcp-server/",
+        "packages/README.md"
+      ]
+    },
+    {
       "id": "zk-receipts",
       "name": "ZK Policy Receipts",
       "status": "planned",
@@ -233,24 +261,40 @@
   ],
   "commands": [
     {
-      "name": "@orbit status",
-      "status": "planned",
-      "description": "Summarize lifecycle, active phase, budget state, open blockers, and latest receipt."
+      "name": "orbit status",
+      "status": "active",
+      "description": "Summarize lifecycle, active phase, budget state, open blockers, and latest receipt.",
+      "evidence": "packages/orbit-sdk/cli.js"
     },
     {
-      "name": "@orbit capabilities",
-      "status": "planned",
-      "description": "Return the current capability registry and permission boundaries."
+      "name": "orbit capabilities",
+      "status": "active",
+      "description": "Return the current capability registry and permission boundaries.",
+      "evidence": "packages/orbit-sdk/cli.js"
     },
     {
-      "name": "@orbit receipt <cycle>",
-      "status": "planned",
-      "description": "Find the proof record for a cycle and explain the result."
+      "name": "orbit budget",
+      "status": "active",
+      "description": "Show AI-call budget summary including daily and monthly spend, limits, and remaining.",
+      "evidence": "packages/orbit-sdk/cli.js"
     },
     {
-      "name": "@orbit propose <work>",
-      "status": "planned",
-      "description": "Convert a safe public request into scoped repo work or an approval request."
+      "name": "orbit tasks",
+      "status": "active",
+      "description": "List open tasks with priority and status.",
+      "evidence": "packages/orbit-sdk/cli.js"
+    },
+    {
+      "name": "orbit blocked",
+      "status": "active",
+      "description": "List blocked live wallet actions and approval requirements.",
+      "evidence": "packages/orbit-sdk/cli.js"
+    },
+    {
+      "name": "orbit health",
+      "status": "active",
+      "description": "Verify all expected machine-readable files exist and are parseable.",
+      "evidence": "packages/orbit-sdk/cli.js"
     }
   ],
   "access": [
@@ -269,14 +313,20 @@
     {
       "id": "sdk",
       "name": "SDK",
-      "status": "planned",
-      "description": "Read-only client access for other repos, agents, and dashboards after the product shape is stable."
+      "status": "active",
+      "description": "Zero-dependency library for reading Orbit state files programmatically. Installed as a local package."
     },
     {
-      "id": "future-mcp-http",
-      "name": "MCP And HTTP Bridge",
+      "id": "mcp-bridge",
+      "name": "MCP Bridge",
+      "status": "active",
+      "description": "Model Context Protocol server for Claude Desktop, IDE extensions, and MCP clients."
+    },
+    {
+      "id": "future-http",
+      "name": "HTTP Bridge",
       "status": "research",
-      "description": "Future client bridge for external tools after permission and receipt rules are complete."
+      "description": "Future HTTP client bridge for external tools after permission and receipt rules are complete."
     }
   ],
   "wallet": {
@@ -326,18 +376,8 @@
       "token launch",
       "reward claims",
       "payout-route changes"
-    ],
-    "documentation": "docs/wallet-policy.md"
+    ]
   },
-  "walletMode": "owner_approval_required",
-  "walletBlockedLiveActions": [
-    "wallet spending",
-    "external payments",
-    "signing",
-    "token launch",
-    "reward claims",
-    "payout-route changes"
-  ],
   "receipts": {
     "current": "runtime/proofs/",
     "proofModelDoc": "docs/proof-model.md",
