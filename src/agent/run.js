@@ -21,6 +21,7 @@ const { drawNextTarget, evaluateSkip } = require("./skip-guard");
 const { assertStateWriteSafe } = require("./state-guard");
 const { exportBundle, projectForDashboard } = require("../../packages/orbit-sdk");
 const { projectForWellKnown } = require("./well-known");
+const revenueSummary = require("./revenue-summary");
 const { scanMissions, buildMissionsRecord } = require("./missions");
 const {
   processHandshakes,
@@ -114,14 +115,38 @@ function shortGitCommit(repoRoot) {
   }
 }
 
+function attachRevenueSliceToProjection(slim, config) {
+  // S-REVENUE-5 — surface the revenue framework state on the public
+  // dashboard. The slice is intentionally bucketed (categorical tiers,
+  // counts, archetype ids) — NO raw wei amounts that would leak our-money
+  // figures per feedback_no_money_on_github. Best-effort: dashboard
+  // generation must never fail because of this layer.
+  if (!slim || typeof slim !== "object") return slim;
+  try {
+    const repoRoot = config && config.repoRoot ? config.repoRoot : process.cwd();
+    const state = readJson(repoRoot, "memory/state.json", {});
+    const treasury = readJson(repoRoot, "memory/treasury.json", {});
+    const summary = revenueSummary.buildSummary(state, treasury, process.env, {
+      repoRoot,
+      now: new Date()
+    });
+    slim.revenue = revenueSummary.summaryToDashboardSlice(summary);
+  } catch (error) {
+    try { log(`dashboard revenue slice skipped: ${redactSecrets(error.message || String(error))}`); } catch {}
+  }
+  return slim;
+}
+
 function writeDashboardSnapshot(config) {
   const bundle = exportBundle(config.repoRoot, undefined, { receiptLimit: 10, includeMemory: false });
   const gitCommit = shortGitCommit(config.repoRoot);
   let slim = projectForDashboard(bundle, { gitCommit });
+  attachRevenueSliceToProjection(slim, config);
   let json = JSON.stringify(slim, null, 2);
 
   if (Buffer.byteLength(json) > DASHBOARD_MAX_BYTES) {
     slim = projectForDashboard(bundle, { gitCommit, receiptLimit: 5 });
+    attachRevenueSliceToProjection(slim, config);
     json = JSON.stringify(slim, null, 2);
   }
   if (Buffer.byteLength(json) > DASHBOARD_MAX_BYTES) {
