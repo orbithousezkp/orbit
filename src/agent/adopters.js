@@ -269,6 +269,26 @@ async function reverifyAdopters({ registry, fetchJson, now = Date.now() }) {
   };
 }
 
+// S-REVENUE-1 helper: expose a compact, read-only view of the registry
+// suitable for the market-signal collector. Returns one entry per VERIFIED
+// adopter ("verified" = status field, not "adopted" — the bus-factor gate
+// uses `adopted: true`, but for collecting signals we cast a slightly wider
+// net so a temporarily-offline adopter still contributes data). Each row:
+//   { fid, repo, lastSeen }
+// Where `fid` falls back to `repo` when no explicit Farcaster fid is stored.
+function listAdoptersForSignalCollection(adoptersState) {
+  if (!adoptersState || typeof adoptersState !== "object") return [];
+  const list = Array.isArray(adoptersState.adopters) ? adoptersState.adopters : [];
+  return list
+    .filter((a) => a && a.status === "verified")
+    .map((a) => ({
+      fid: typeof a.fid === "string" && a.fid.length > 0 ? a.fid : a.repo,
+      repo: a.repo,
+      publicUrl: a.publicUrl || null,
+      lastSeen: a.lastVerifiedAt || a.verifiedAt || null
+    }));
+}
+
 function projectAdoptersForDashboard(registry, options = {}) {
   const phase1Target = Number.isFinite(options.phase1Target) ? options.phase1Target : 5;
   const phase5Target = Number.isFinite(options.phase5Target) ? options.phase5Target : 50;
@@ -310,5 +330,6 @@ module.exports = {
   processHandshakes,
   reverifyAdopters,
   isCycleFreshEnough,
+  listAdoptersForSignalCollection,
   projectAdoptersForDashboard
 };

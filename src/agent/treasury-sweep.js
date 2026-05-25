@@ -318,6 +318,36 @@ function recordSweepExecution(state, { idem, sweepWeek, cycle, amounts, txHash, 
   return { ...base, treasurySweep: sweep };
 }
 
+// S-REVENUE-1 helper: expose the current and previous-observation Fee Receive
+// Safe balance snapshots from `state.treasurySweep` + `state.feeFloor` so the
+// market-signals collector can compute a 24h-ish WETH inflow signal without
+// reaching into either piece of state directly. This is read-only; it never
+// mutates state and never queries the chain. Returns:
+//   { currentWei: "string"|null, baselineWei: "string"|null,
+//     baselineSource: "feeFloor.weekStartBalanceWei"|null }
+// If neither half is available, returns nulls — the caller treats that as
+// "no signal yet" and skips this cycle's record.
+function getFeeReceiveSafeBalanceSnapshot(state) {
+  const sweep = state && state.treasurySweep;
+  const feeFloorState = state && state.feeFloor;
+  const currentRaw = sweep && sweep.lastObservedFeeReceiveBalanceWei;
+  const baselineRaw = feeFloorState && feeFloorState.weekStartBalanceWei;
+  const currentWei = (typeof currentRaw === "string" && /^\d+$/.test(currentRaw))
+    ? currentRaw
+    : null;
+  const baselineWei = (typeof baselineRaw === "string" && /^\d+$/.test(baselineRaw))
+    ? baselineRaw
+    : null;
+  return {
+    currentWei,
+    baselineWei,
+    baselineSource: baselineWei !== null ? "feeFloor.weekStartBalanceWei" : null,
+    weekStartedAt: feeFloorState && typeof feeFloorState.weekStartedAt === "string"
+      ? feeFloorState.weekStartedAt
+      : null
+  };
+}
+
 function projectTreasuryBuckets(state, balanceByEnv, env) {
   const e = env || {};
   const balances = balanceByEnv || {};
@@ -362,5 +392,6 @@ module.exports = {
   proposeTreasurySweep,
   recordSweepExecution,
   projectTreasuryBuckets,
-  tryStartNewWeek
+  tryStartNewWeek,
+  getFeeReceiveSafeBalanceSnapshot
 };

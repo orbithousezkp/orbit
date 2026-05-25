@@ -248,6 +248,68 @@ class GitHubClient {
     }));
   }
 
+  // S-REVENUE-1: fetch open issues + their reaction counts for ANY public
+  // repo (mothership OR adopter). Unlike listIssues() which targets the
+  // configured repository, this takes explicit owner/repo args so the
+  // market-signal collector can sweep across the adopter set. Catches
+  // per-issue failures and returns whatever it could gather.
+  //
+  // GitHub returns total reactions on each issue as `reactions.total_count`
+  // and per-emoji counts ("+1", "-1", laugh, hooray, confused, heart, rocket,
+  // eyes). The "reactions" endpoint requires the squirrel-girl preview
+  // header on older API versions but is part of the default schema as of
+  // 2022-11-28 (already pinned via X-GitHub-Api-Version).
+  async fetchIssueReactions(owner, repo, opts = {}) {
+    if (!owner || !repo) return [];
+    if (!this.configured()) return [];
+    const safeOwner = encodeURIComponent(String(owner));
+    const safeRepo = encodeURIComponent(String(repo));
+    const state = opts.state === "closed" || opts.state === "all" ? opts.state : "open";
+    const capped = Math.min(Number.parseInt(opts.perPage, 10) || 50, 100);
+    let issues;
+    try {
+      issues = await this.request(
+        `/repos/${safeOwner}/${safeRepo}/issues?state=${encodeURIComponent(state)}&per_page=${capped}`
+      );
+    } catch (err) {
+      // Per-repo failure: caller treats as zero data, keep going.
+      return { ok: false, error: err.message, issues: [] };
+    }
+    const filtered = Array.isArray(issues)
+      ? issues.filter((issue) => issue && !issue.pull_request)
+      : [];
+    const rows = [];
+    for (const issue of filtered) {
+      try {
+        const reactions = issue.reactions && typeof issue.reactions === "object" ? issue.reactions : {};
+        const labels = Array.isArray(issue.labels)
+          ? issue.labels.map((label) => (typeof label === "string" ? label : (label && label.name) || "")).filter(Boolean)
+          : [];
+        const byEmoji = {
+          "+1": typeof reactions["+1"] === "number" ? reactions["+1"] : 0,
+          "-1": typeof reactions["-1"] === "number" ? reactions["-1"] : 0,
+          laugh: typeof reactions.laugh === "number" ? reactions.laugh : 0,
+          hooray: typeof reactions.hooray === "number" ? reactions.hooray : 0,
+          confused: typeof reactions.confused === "number" ? reactions.confused : 0,
+          heart: typeof reactions.heart === "number" ? reactions.heart : 0,
+          rocket: typeof reactions.rocket === "number" ? reactions.rocket : 0,
+          eyes: typeof reactions.eyes === "number" ? reactions.eyes : 0
+        };
+        const total = typeof reactions.total_count === "number"
+          ? reactions.total_count
+          : Object.values(byEmoji).reduce((acc, n) => acc + n, 0);
+        rows.push({
+          number: issue.number,
+          labels,
+          reactions: { total, byEmoji }
+        });
+      } catch {
+        // skip the malformed issue, continue
+      }
+    }
+    return { ok: true, issues: rows };
+  }
+
   async search({ type, query, perPage = 10 }) {
     if (!this.configured()) return { configured: false, results: [] };
     const normalizedType = ["repositories", "issues", "code"].includes(type) ? type : "repositories";
