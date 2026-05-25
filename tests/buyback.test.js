@@ -202,6 +202,76 @@ test("proposeBuyback enforces weeklyMaxWeth ceiling", async () => {
   );
 });
 
+test("proposeBuyback uses context.env for Safe address resolution (no global mutation)", async () => {
+  const repoRoot = tempRepo();
+  const config = baseConfig(repoRoot);
+  const github = fakeGithub({ proposalIssueNumber: 91 });
+  // EIP-55 checksummed test address; addressOf accepts any single Safe env var.
+  const injectedSafe = "0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359";
+
+  // Sanity-check: ensure no real env var is bleeding into the test.
+  const previousProcessVal = process.env.ORBIT_BUYBACK_SAFE;
+  delete process.env.ORBIT_BUYBACK_SAFE;
+  try {
+    const result = await proposeBuyback(config, {
+      cycle: 42,
+      state: readyState({ cycle: 42 }),
+      github,
+      env: { ORBIT_BUYBACK_SAFE: injectedSafe },
+      now: new Date("2026-05-20T12:00:00Z")
+    }, { wethAmount: "0.1", rationale: "env injection test" });
+
+    assert.equal(result.ok, true);
+    assert.equal(github.created.length, 1);
+    const body = github.created[0].body || "";
+    assert.ok(
+      body.includes(`Buyback Safe (D-019 destination): \`${injectedSafe}\``),
+      "approval-issue body should carry the injected Safe address"
+    );
+    // process.env was not mutated by the call.
+    assert.equal(process.env.ORBIT_BUYBACK_SAFE, undefined);
+  } finally {
+    if (previousProcessVal === undefined) delete process.env.ORBIT_BUYBACK_SAFE;
+    else process.env.ORBIT_BUYBACK_SAFE = previousProcessVal;
+  }
+});
+
+test("proposeBuyback with explicit empty context.env suppresses Safe line (fail-closed)", async () => {
+  const repoRoot = tempRepo();
+  const config = baseConfig(repoRoot);
+  const github = fakeGithub({ proposalIssueNumber: 92 });
+  const injectedSafe = "0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359";
+
+  // Even if process.env carries a Safe address, an explicit context.env
+  // override must win — fail-closed behavior keeps tests deterministic.
+  const previousProcessVal = process.env.ORBIT_BUYBACK_SAFE;
+  process.env.ORBIT_BUYBACK_SAFE = injectedSafe;
+  try {
+    const result = await proposeBuyback(config, {
+      cycle: 42,
+      state: readyState({ cycle: 42 }),
+      github,
+      env: {},
+      now: new Date("2026-05-20T12:00:00Z")
+    }, { wethAmount: "0.1", rationale: "empty env override" });
+
+    assert.equal(result.ok, true);
+    assert.equal(github.created.length, 1);
+    const body = github.created[0].body || "";
+    assert.ok(
+      !body.includes("Buyback Safe (D-019 destination)"),
+      "explicit empty env must suppress Safe address line, not fall back to process.env"
+    );
+    assert.ok(
+      !body.includes(injectedSafe),
+      "process.env value must not leak when context.env is explicitly provided"
+    );
+  } finally {
+    if (previousProcessVal === undefined) delete process.env.ORBIT_BUYBACK_SAFE;
+    else process.env.ORBIT_BUYBACK_SAFE = previousProcessVal;
+  }
+});
+
 // ----- executeBuyback ----------------------------------------------------
 
 test("executeBuyback returns blocked without the orbit:approved label", async () => {

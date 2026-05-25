@@ -292,6 +292,17 @@ async function main() {
   // Snapshot the on-disk state before this cycle started so the state-guard
   // can detect rollback attempts at write time (S-LAUNCH-1 Layer 3).
   const stateBeforeCycle = JSON.parse(JSON.stringify(state));
+  // Snapshot treasury.json BEFORE any executeTool/saveTreasury call so the
+  // Layer 3 launchStatus rollback guard has a real "before" image to compare
+  // against. Reading once at end-of-cycle (after saveTreasury already ran
+  // inside actions.js) makes prev === next, which silently disarms the guard.
+  const treasuryPath = path.resolve(config.repoRoot, "memory/treasury.json");
+  let prevTreasury = null;
+  try {
+    prevTreasury = JSON.parse(fs.readFileSync(treasuryPath, "utf-8"));
+  } catch {
+    prevTreasury = null; // no treasury yet — fresh repo / pre-launch
+  }
 
   const skipDecision = evaluateSkip(config, state);
   if (skipDecision.skip) {
@@ -554,22 +565,15 @@ async function main() {
   if (onDiskState && onDiskState.launchOnceFired === true) {
     state.launchOnceFired = true;
   }
-  // Bug B: launchStatus lives in memory/treasury.json. Load BOTH snapshots
-  // (prev = on-disk, next = same on-disk since we don't rewrite treasury at
-  // this commit boundary; saveTreasury already ran inside actions.js) and
-  // pass them to the guard so launchStatus rollback is actually detected.
-  // If treasury.json is missing or unparseable we treat both as null —
-  // the guard then short-circuits to "no rollback to detect" which is the
-  // correct safe behavior pre-launch.
-  const treasuryPath = path.resolve(config.repoRoot, "memory/treasury.json");
-  let prevTreasury = null;
+  // Bug B: re-read treasury.json now to capture saveTreasury writes that
+  // happened during this cycle (e.g. clanker.launchNativeToken flipped
+  // launchStatus to "launched"). prevTreasury was snapshotted at the top of
+  // main() before any executeTool call ran, so prev/next are real distinct
+  // images and the launchStatus rollback guard can actually fire.
   let nextTreasury = null;
   try {
-    const bytes = fs.readFileSync(treasuryPath, "utf-8");
-    prevTreasury = JSON.parse(bytes);
-    nextTreasury = prevTreasury; // saveTreasury already ran; this write does not change it
+    nextTreasury = JSON.parse(fs.readFileSync(treasuryPath, "utf-8"));
   } catch {
-    prevTreasury = null;
     nextTreasury = null;
   }
   assertStateWriteSafe(onDiskState, state, { prevTreasury, nextTreasury });

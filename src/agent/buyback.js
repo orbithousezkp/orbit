@@ -230,7 +230,13 @@ async function proposeBuyback(config, context, params = {}) {
   }
 
   const title = `[orbit buyback] propose ${wethAmount.string} WETH ${dryRun ? "(DRY_RUN)" : ""}`.trim();
-  const buybackSafe = buybackSafeAddress(process.env);
+  // Fail-closed env resolution: if the caller supplies context.env, use it
+  // verbatim; only fall back to process.env when env is absent. This lets
+  // tests and programmatic callers inject without mutating global state.
+  const env = context && Object.prototype.hasOwnProperty.call(context, "env")
+    ? context.env
+    : process.env;
+  const buybackSafe = buybackSafeAddress(env);
   const body = buybackApprovalIssueBody({
     idem,
     wethAmount: wethAmount.string,
