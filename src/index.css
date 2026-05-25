@@ -577,6 +577,63 @@ a.cell:hover { background: rgba(255,255,255,0.86); border-color: var(--line-stro
 @media (max-width: 900px) { .inspect { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 560px) { .inspect { grid-template-columns: 1fr; overflow-y: auto; } }
 
+.inspect__missions {
+  margin-top: 1.5rem;
+  padding: 1rem 1.2rem;
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.inspect__missions-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.inspect__missions-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+.inspect__mission {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  border-top: 1px dashed var(--line);
+  padding-top: 0.5rem;
+}
+.inspect__mission:first-child { border-top: none; padding-top: 0; }
+.inspect__mission-link {
+  display: flex;
+  gap: 0.7rem;
+  align-items: baseline;
+  color: var(--ink-deep);
+  text-decoration: none;
+}
+.inspect__mission-link:hover .inspect__mission-title { text-decoration: underline; }
+.inspect__mission-num {
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+  flex-shrink: 0;
+}
+.inspect__mission-title {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+.inspect__mission-meta {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--ink-soft);
+  letter-spacing: 0.02em;
+}
+
 /* ============================================================
    footer (persistent across all routes)
    ============================================================ */

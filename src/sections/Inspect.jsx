@@ -23,6 +23,9 @@ export default function Inspect() {
   const signer = data?.signer ? `${data.signer.slice(0, 10)}…${data.signer.slice(-6)}` : '—';
   const refusalCount = Array.isArray(data?.refusals) ? data.refusals.length : '—';
   const gitCommit = data?.gitCommit ?? '—';
+  const missionsActive = data?.missions?.active ?? '—';
+  const missionsTotal = data?.missions?.total ?? null;
+  const missionsList = Array.isArray(data?.missions?.list) ? data.missions.list : [];
 
   return (
     <section id="inspect" className="section section--inspect">
@@ -58,6 +61,14 @@ export default function Inspect() {
         </div>
 
         <div className="cell">
+          <div className="cell__label">missions</div>
+          <div className="cell__value">{missionsActive}</div>
+          <div className="cell__hint">
+            {missionsTotal !== null ? `${missionsTotal} total · open on the board` : 'open on the board'}
+          </div>
+        </div>
+
+        <div className="cell">
           <div className="cell__label">build</div>
           <div className="cell__value mono">{gitCommit}</div>
           <div className="cell__hint">latest signed commit</div>
@@ -82,6 +93,34 @@ export default function Inspect() {
           </div>
         </a>
       </div>
+
+      {missionsList.length > 0 && (
+        <div className="inspect__missions">
+          <div className="inspect__missions-head">
+            <span className="cell__label">open missions</span>
+            <span className="cell__hint">labeled orbit:mission · lifted each cycle</span>
+          </div>
+          <ul className="inspect__missions-list">
+            {missionsList.slice(0, 5).map((m) => (
+              <li key={m.id || m.issueNumber} className="inspect__mission">
+                <a
+                  className="inspect__mission-link"
+                  href={m.issueUrl || '#'}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <span className="inspect__mission-num mono">#{m.issueNumber}</span>
+                  <span className="inspect__mission-title">{m.title}</span>
+                </a>
+                <span className="inspect__mission-meta">
+                  by {m.proposer}
+                  {m.deadline ? ` · by ${m.deadline}` : ''}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </section>
   );
 }
