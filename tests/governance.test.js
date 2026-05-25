@@ -55,7 +55,8 @@ test("feature catalog has 150+ features with 30 agent os and 50 frontier agentic
   assert.ok(summary.total >= 150);
   assert.equal(agentOs.length, 30);
   assert.equal(frontier.length, 50);
-  assert.equal(summary.statuses.planned, 80);
+  assert.equal(summary.statuses.planned, 79);
+  assert.ok((summary.statuses.spec || 0) >= 1);
 });
 
 test("scam scanner flags wallet-drain language", () => {

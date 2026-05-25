@@ -26,10 +26,10 @@
 ## CURRENT STATE
 
 ```
-LAST SESSION      : S-FINAL — Multi-session status sweep + Phase 1 close-out
-LAST UPDATED      : 2026-05-24
+LAST SESSION      : S-MB-1 — Public Mission Board spec (resume after API-quota interrupt of prior session)
+LAST UPDATED      : 2026-05-25
 CURRENT PHASE     : Phase 1 — Launch-Ready (Pre-Token) — engineering COMPLETE, owner-gated
-NEXT SESSION      : S-009 (closed-loop demo execution, owner-driven) or wait on S-GATE-1 owner punch list
+NEXT SESSION      : S-009 (closed-loop demo execution, owner-driven) or wait on S-GATE-1 owner punch list; S-MB-2 (mission board build) blocked behind S-GATE-3
 GATE STATUS       : S-GATE-1 OPEN — 7-item owner punch list (PLAN/SGATE_1.md)
 OPEN BLOCKERS     : Owner actions — enable GitHub Pages; set ORBIT_AGENT_SIGNER; provision Farcaster signer; deploy Treasury Safe; `npm publish --access public` (orbit-sdk + create-orbit-repo); set ORBIT_AI_PROVIDERS keys; verify 12h clean Actions stretch
 ```
@@ -62,6 +62,7 @@ OPEN BLOCKERS     : Owner actions — enable GitHub Pages; set ORBIT_AGENT_SIGNE
 | S-034 | S-PLAN | Holder utility — priority queue, premium rules spec | DONE 2026-05-24 | `PLAN/SPECS/HOLDER_UTILITY.md` |
 | S-035 | S-PLAN | Founder handoff narrative spec | DONE 2026-05-24 | `PLAN/SPECS/FOUNDER_HANDOFF.md` |
 | S-Phase4-5 | S-PLAN | Phase 4-5 outlook | DONE 2026-05-24 | `PLAN/SPECS/PHASE_4_5_OUTLOOK.md` |
+| S-MB-1 | S-PLAN | Public Mission Board protocol spec | DONE 2026-05-25 | `PLAN/SPECS/MISSION_BOARD.md` — 14-section spec; lifecycle (10 states), stake contract interface, verifier reuse from BOUNTY_MARKET §5 plus 3 new refusal codes, D-014 approval gate, D-018 + S-GATE-3 hard-block, federation hooks deferred to S-MB-3 |
 | S-024 | S-BUILD | Plugin/tool loader for `@orbit-house/tool-*` | DONE 2026-05-24 | `src/agent/plugin-loader.js` + `tests/plugin-loader.test.js` (31 tests); `PLAN/SPECS/PLUGIN_LOADER.md`; `packages/orbit-tool-example/` reference scaffold; capability allowlist + sanitizeToolResponse + ORBIT_ENABLE_PLUGINS gate |
 | S-029/S-030 | S-PLAN/S-BUILD | Multi-maintainer quorum | DONE 2026-05-24 | additive edits to `src/agent/governance.js` + `src/agent/config.js` (`computeThresholds`, `parseQuorumComments`, `evaluateQuorum`, `requiresQuorum`); `tests/governance-quorum.test.js` (26 tests); `PLAN/SPECS/MULTI_MAINTAINER_QUORUM.md`; existing `tests/governance.test.js` unchanged |
 | S-009 | S-BUILD | Closed-loop demo EXECUTION | OWNER-PENDING | needs live Actions cycle (runbook + test ready) |
