@@ -6,6 +6,7 @@ const { execFileSync } = require("child_process");
 const { behaviorStatus } = require("./behavior");
 const { addTask, completeTask, loadTasks, TASKS_PATH } = require("./tasks");
 const { launchNativeToken, prepareClankerLaunch, runRevenueCycle } = require("./clanker");
+const { sanitizeCycleNoteForPublic, isCycleNotePath } = require("./cycle-note-sanitize");
 const { featureSummary, listFeatures } = require("./features");
 const {
   APPROVALS_PATH,
@@ -165,12 +166,18 @@ function writeFile(config, relativePath, content) {
   if (PROTECTED_WRITE_PATHS.has(normalized)) {
     throw new Error(`direct writes to ${normalized} are not allowed`);
   }
-  assertTextWriteSize(normalized, content);
-  assertNoLargeInlineAssets(content);
-  assertSafeTextForWrite(content);
-  writeSafeTextFile(config.repoRoot, normalized, content);
+  // Cycle notes are GitHub-visible. Strip any AI cost / budget figures before
+  // committing — feedback_no_money_on_github + belt-and-braces over prompt
+  // instructions that already tell the agent not to write money figures.
+  const sanitized = isCycleNotePath(normalized)
+    ? sanitizeCycleNoteForPublic(String(content || ""))
+    : content;
+  assertTextWriteSize(normalized, sanitized);
+  assertNoLargeInlineAssets(sanitized);
+  assertSafeTextForWrite(sanitized);
+  writeSafeTextFile(config.repoRoot, normalized, sanitized);
   track(normalized);
-  return { path: normalized, bytes: Buffer.byteLength(String(content || "")) };
+  return { path: normalized, bytes: Buffer.byteLength(String(sanitized || "")) };
 }
 
 function safeCommandEnv(env = process.env) {

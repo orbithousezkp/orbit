@@ -1,5 +1,7 @@
 "use strict";
 
+const { redactBudgetForAi } = require("./cycle-note-sanitize");
+
 function buildSystemPrompt() {
   return [
     "You are Orbit, a GitHub-native infrastructure control plane for repositories that run agents.",
@@ -46,15 +48,43 @@ function buildSystemPrompt() {
     "For frontend images, use existing repository asset paths or normal external URLs. Do not inline image bytes, base64 data URLs, generated binary assets, or large media content in tool calls or memory.",
     "Use public URL and GitHub search tools only for research; risk-scan financial links and avoid private network targets.",
     "Use tools when a concrete action is useful. Stop when no safe useful action remains.",
+    "Never publish AI cost figures, dollar amounts of inference spend, daily/monthly AI budget remaining, or any 'AI food' / 'AI usage' section in cycle notes, public replies, or any public surface. Treat your AI budget as a binary status (ok / low / critical / exhausted) — do not surface the underlying dollar figures.",
     "At the end of each cycle, write the proof receipt trail clearly enough that a human can review what happened and why."
   ].join("\n");
 }
 
+function redactContextForAi(context) {
+  if (!context || typeof context !== "object") return context;
+  const copy = { ...context };
+  if (copy.aiBudget) copy.aiBudget = redactBudgetForAi(copy.aiBudget);
+  if (copy.treasury && typeof copy.treasury === "object") {
+    const t = { ...copy.treasury };
+    if (t.ai && typeof t.ai === "object") {
+      // Strip the AI cost ledger and dollar budget caps from what the AI sees.
+      const ai = { ...t.ai };
+      delete ai.ledger;
+      delete ai.dailyBudgetUsd;
+      delete ai.monthlyBudgetUsd;
+      delete ai.inputUsdPerMillion;
+      delete ai.outputUsdPerMillion;
+      delete ai.reserveUsd;
+      delete ai.providerCredits;
+      delete ai.purchasePolicy;
+      delete ai.pendingTopUps;
+      delete ai.refills;
+      t.ai = ai;
+    }
+    copy.treasury = t;
+  }
+  return copy;
+}
+
 function buildUserPrompt(context) {
-  const intro = context.firstWakeIntro
+  const safe = redactContextForAi(context);
+  const intro = safe.firstWakeIntro
     ? [
         "First wake intro:",
-        JSON.stringify(context.firstWakeIntro, null, 2),
+        JSON.stringify(safe.firstWakeIntro, null, 2),
         ""
       ].join("\n")
     : "";
@@ -62,7 +92,7 @@ function buildUserPrompt(context) {
   return [
     intro,
     "Repository context:",
-    JSON.stringify(context, null, 2),
+    JSON.stringify(safe, null, 2),
     "",
     "Choose the most useful safe infrastructure action for this wake cycle. If behaviorPlan.directionPortfolio.mode is single_guarded_priority, handle that guarded priority first. If it is multi_direction, compare at least behaviorPlan.directionPortfolio.choice.mustCompareCount listed directions, pick the best one for this cycle, and mention the selected direction and reason in the proof or changed artifact. Keep changes small and auditable."
   ].join("\n");
@@ -70,5 +100,6 @@ function buildUserPrompt(context) {
 
 module.exports = {
   buildSystemPrompt,
-  buildUserPrompt
+  buildUserPrompt,
+  redactContextForAi
 };

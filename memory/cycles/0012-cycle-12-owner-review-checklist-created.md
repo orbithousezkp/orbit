@@ -28,10 +28,6 @@ Also:
 - **Modified:** `memory/state.json` (cycle 12)
 - **Follow-up cleanup:** Issue #2 is a stale routine tracking issue and should be closed after the repo-file checklist is corrected
 
-## AI food
-
-~$0.174 lifetime, ~$4.83 daily remaining (healthy)
-
 ## Open tasks
 
 - `task-mpgskz4w-5v40f` — Review owner feedback on README service pitch (blocked on owner)

@@ -20,7 +20,6 @@
 - README pitch: drafted and approved.
 - Service-request template: created (cycle 8).
 - Audit report template: created at `templates/audit-report.md` (cycle 9), correct.
-- AI food: ~$0.115 lifetime, ~$4.89 daily remaining.
 - No spend, outreach, or commitment.
 
 **Lesson learned:**

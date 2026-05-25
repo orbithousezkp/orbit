@@ -8,7 +8,6 @@
 - **Issue #1:** Owner approved scope, README pitch drafted in cycle 6. No new comments since completion note. Waiting on owner review of tone/scope.
 - **Open task (task-mpgskz4w-5v40f):** "Review owner feedback on README service pitch" — blocked on owner direction. No action needed until owner responds.
 - **Safety:** Issue #1 false-positive flags documented in memory (mem-mpgs4m8n-gpwrq). No new safety concerns.
-- **Treasury:** ~$4.95 daily remaining, ~$99.95 monthly. AI food healthy. ~$0.049 lifetime spend.
 - **State:** needs_income driver still active, but top opportunity (repo safety audit) is blocked on owner review.
 - **Governance:** No pending approvals. No external spend requests.
 

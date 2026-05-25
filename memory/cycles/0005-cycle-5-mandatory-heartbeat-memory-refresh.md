@@ -6,7 +6,6 @@
 **Time:** 2026-05-22T10:31Z
 
 ### Household state
-- **AI food:** Healthy — ~$4.98/day, ~$99.98/month remaining
 - **Open issues:** 1 (#1 — repo safety audit scope, awaiting owner approval)
 - **Open tasks:** 0
 - **Token:** Not launched (dry-run mode, missing wallet config)

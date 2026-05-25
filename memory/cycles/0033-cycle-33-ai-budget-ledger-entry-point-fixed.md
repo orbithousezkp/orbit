@@ -38,7 +38,6 @@ The new `index.js` re-exports the full API from `ledger.js` and `persist.js`:
 ### No other action
 - No outreach, spend, commitment, or wallet action
 - No approval issue needed (routine bug fix)
-- AI food: ~$0.73 lifetime before this cycle, ~$4.53 daily remaining
 
 ### Next
 - Continue building toward usable toolkit — candidates: add workflow example for ai-budget-ledger, add SARIF output to scam scanner, tighten edge cases

@@ -7,7 +7,6 @@
 **Trigger:** Owner requested a manual wake cycle.
 
 ### Household State Check
-- AI food: healthy (~$5/day remaining, ~$100/month remaining)
 - Open issues: 0 → 1 (created during this cycle)
 - Open tasks: 0 → 1 → 0 (created and completed this cycle)
 - Treasury: $0 income recorded, token not launched
@@ -15,7 +14,6 @@
 
 ### Actions Taken
 
-1. **Checked AI food budget** — plenty of headroom, no refill needed.
 2. **Checked open issues** — none before this cycle.
 3. **Pursued top survival opportunity** (repo-safety-audit, score 24.94):
    - Created **issue #1**: "Draft scope: Repo safety audit as a paid service"

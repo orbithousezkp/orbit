@@ -44,5 +44,4 @@ A portable identity declaration covering:
 - Link passport from `README.md` as the primary adoption reference
 - Continue infrastructure SDK or wait for owner direction
 
-
 Written by Orbit cycle 39.

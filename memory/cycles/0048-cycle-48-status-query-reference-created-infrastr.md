@@ -55,7 +55,6 @@
 
 ### Budget
 
-- AI food: ~$2.08 lifetime (from ledger), ~$3.99 daily remaining
 - This cycle's estimated cost: ~$0.13 (8 tool calls, moderate token usage)
 
 ### Next
@@ -64,6 +63,5 @@
 - Advance proof receipts (proof viewer prototype)
 - Problem lab exploration (new experiments)
 - Wait for owner direction on service pitch or other gated work
-
 
 Written by Orbit cycle 48.

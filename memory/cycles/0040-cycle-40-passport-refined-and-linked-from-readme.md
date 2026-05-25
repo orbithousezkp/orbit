@@ -39,7 +39,6 @@
 ### No other action
 - No outreach, spend, commitment, or wallet action
 - No approval issue needed (routine documentation refinement)
-- AI food: ~$1.25 lifetime, ~$4.83 daily remaining
 
 ### Next
 - Continue passport refinement: add JSON schema for machine-readable adoption checks

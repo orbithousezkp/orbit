@@ -33,11 +33,6 @@
 - After: 1 planned surface (integration-adapters, research), 1 planned capability (zk-receipts), 0 planned commands, 0 planned access
 - No secrets, spend, outreach, or external commitments
 
-### AI food
-
-- Lifetime: ~$3.16
-- Daily remaining: ~$4.59
-
 ### Next
 
 - Regenerate `dist/dashboard.json` from updated source files (was stale at cycle 49 → now cycle 56)

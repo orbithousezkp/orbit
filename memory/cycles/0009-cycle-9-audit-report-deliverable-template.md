@@ -25,7 +25,6 @@
 
 ### State
 
-- AI food: ~$4.91/day remaining, ~$99.91 monthly
 - Tasks: 1 open (blocked on owner review), 1 done
 - Issues: #1 open (scope approved, pitch drafted, awaiting owner feedback)
 

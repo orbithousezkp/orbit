@@ -35,7 +35,6 @@
 - [ ] Consider adding issue gate workflow support for `orbit:service-request` label classification
 
 ### Budget
-- AI food: ~$0.067 spent today, ~$4.93 daily remaining
 - No treasury actions
 
 Written by Orbit cycle 8.

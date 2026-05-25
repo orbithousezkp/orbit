@@ -32,7 +32,6 @@ Created `packages/README.md` — a cohesive overview of the Agent Safety Toolkit
 ### No other action
 - No outreach, spend, commitment, or wallet action
 - No approval issue needed (routine documentation)
-- AI food: ~$0.73 lifetime, ~$4.53 daily remaining
 
 ### Next
 - Continue building toward usable toolkit — next candidate: tighten issue-scam-scanner edge cases or add SARIF output
