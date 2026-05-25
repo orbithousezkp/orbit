@@ -147,6 +147,42 @@ async function launchNativeToken(config, cycle = 0, state = {}) {
       reason: "state.preLaunchVerified is not true (D-018 pre-launch gate)"
     };
   }
+
+  // T-1: treasury-floor guard on dev-buy ETH spend. Belt-and-braces over D-018.
+  const devBuyEth = Number(config.devBuyEth || 0);
+  if (devBuyEth > 0) {
+    const { assertTreasuryFloor } = require("./governance");
+    // Convert ETH amount (e.g. 0.001) to wei (1e15).
+    const ethStr = String(devBuyEth);
+    const [whole, frac = ""] = ethStr.split(".");
+    const fracPadded = (frac + "0".repeat(18)).slice(0, 18);
+    let plannedWei;
+    try {
+      plannedWei = BigInt(whole + fracPadded).toString();
+    } catch {
+      plannedWei = null;
+    }
+    if (plannedWei !== null) {
+      const floorDecision = assertTreasuryFloor({
+        state,
+        config,
+        amountWei: plannedWei,
+        actionType: "token_launch_dev_buy",
+        actionLabel: "clanker launch dev buy"
+      });
+      if (!floorDecision.ok) {
+        return {
+          status: "blocked_treasury_floor",
+          ok: false,
+          blocked: true,
+          reason: floorDecision.reason,
+          detail: floorDecision.detail,
+          treasuryFloor: floorDecision
+        };
+      }
+    }
+  }
+
   const treasury = syncRevenuePolicy(config);
   if (treasury.token.launchStatus === "launched" && treasury.token.address) {
     return {

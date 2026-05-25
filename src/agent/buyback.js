@@ -2,6 +2,7 @@
 
 const crypto = require("crypto");
 const { isAddress } = require("./addresses");
+const { assertTreasuryFloor } = require("./governance");
 const {
   assertSafePublicReply,
   readSafeTextFile,
@@ -12,6 +13,20 @@ const BUYBACK_LEDGER_PATH = "memory/buybacks.json";
 const DEFAULT_PAIRED_WETH = "0x4200000000000000000000000000000000000006";
 const WETH_AMOUNT_PATTERN = /^\d+(\.\d{1,4})?$/;
 const MAX_SLIPPAGE_OVERRIDE_BPS = 500;
+const WEI_PER_ETH = 10n ** 18n;
+
+function wethAmountToWei(amount) {
+  if (amount === null || amount === undefined) return null;
+  const str = String(amount).trim();
+  if (!/^\d+(\.\d+)?$/.test(str)) return null;
+  const [whole, frac = ""] = str.split(".");
+  const fracPadded = (frac + "0".repeat(18)).slice(0, 18);
+  try {
+    return BigInt(whole + fracPadded);
+  } catch {
+    return null;
+  }
+}
 
 // --- ledger helpers ------------------------------------------------------
 
@@ -408,6 +423,35 @@ async function executeBuyback(config, context, params = {}) {
   entry.approved = true;
   entry.slippageBps = slippageBps;
   entry.approvedAt = new Date().toISOString();
+
+  // T-1: treasury-floor guard. Belt-and-braces over the approval gate — even
+  // an approved buyback is rejected if the planned WETH spend would breach the
+  // operator-configured per-cycle cap or post-spend floor.
+  const plannedWei = wethAmountToWei(entry.wethProposed);
+  if (plannedWei !== null) {
+    const floorDecision = assertTreasuryFloor({
+      state: (context && context.state) || {},
+      config,
+      amountWei: plannedWei.toString(),
+      actionType: "buyback",
+      actionLabel: `weekly buyback ${entry.idem}`
+    });
+    if (!floorDecision.ok) {
+      entry.status = "blocked_treasury_floor";
+      entry.treasuryFloorDecision = floorDecision;
+      entry.lastCheckedAt = new Date().toISOString();
+      saveBuybackLedger(config.repoRoot, ledger);
+      return {
+        ok: false,
+        blocked: true,
+        reason: floorDecision.reason,
+        detail: floorDecision.detail,
+        status: "blocked_treasury_floor",
+        treasuryFloor: floorDecision,
+        dryRun
+      };
+    }
+  }
 
   if (dryRun) {
     const txHash = syntheticDryRunTxHash(entry.idem);

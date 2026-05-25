@@ -490,11 +490,124 @@ function requiresQuorum(actionType, quorum) {
   return true;
 }
 
+// ── Treasury floor guard (T-1) ─────────────────────────────────────────────
+// Operator-configured hard cap on outbound on-chain spending. Defaults disable
+// the guard so existing deployments are unaffected; opt in by populating
+// state.treasury (or config.treasury) with `floorWei`, `balanceEstimateWei`,
+// `maxSpendPerCycleWei`, and/or `hardCapPerCycleWei`.
+
+function toBigInt(value) {
+  if (value === null || value === undefined || value === "") return null;
+  try {
+    if (typeof value === "bigint") return value;
+    if (typeof value === "number" && Number.isFinite(value)) return BigInt(Math.trunc(value));
+    const str = String(value).trim();
+    if (!/^-?\d+$/.test(str)) return null;
+    return BigInt(str);
+  } catch {
+    return null;
+  }
+}
+
+function treasuryPolicy(state, config) {
+  const fromState = (state && state.treasury) || {};
+  const fromConfig = (config && config.treasury) || {};
+  return {
+    floorWei: toBigInt(fromState.floorWei != null ? fromState.floorWei : fromConfig.floorWei),
+    balanceEstimateWei: toBigInt(
+      fromState.balanceEstimateWei != null
+        ? fromState.balanceEstimateWei
+        : fromConfig.balanceEstimateWei
+    ),
+    balanceEstimateAt: fromState.balanceEstimateAt || fromConfig.balanceEstimateAt || null,
+    maxSpendPerCycleWei: toBigInt(
+      fromState.maxSpendPerCycleWei != null
+        ? fromState.maxSpendPerCycleWei
+        : fromConfig.maxSpendPerCycleWei
+    ),
+    hardCapPerCycleWei: toBigInt(
+      fromState.hardCapPerCycleWei != null
+        ? fromState.hardCapPerCycleWei
+        : fromConfig.hardCapPerCycleWei
+    )
+  };
+}
+
+function assertTreasuryFloor({ state, config, amountWei, actionType, actionLabel } = {}) {
+  const planned = toBigInt(amountWei);
+  if (planned === null) {
+    return {
+      ok: false,
+      reason: "treasury_floor_invalid_amount",
+      detail: "spend amount must be a numeric wei value",
+      actionType: actionType || null
+    };
+  }
+  if (planned < 0n) {
+    return {
+      ok: false,
+      reason: "treasury_floor_invalid_amount",
+      detail: "spend amount cannot be negative",
+      actionType: actionType || null
+    };
+  }
+  const policy = treasuryPolicy(state, config);
+
+  if (policy.hardCapPerCycleWei !== null && planned > policy.hardCapPerCycleWei) {
+    return {
+      ok: false,
+      reason: "treasury_floor_hard_cap_exceeded",
+      detail: `${actionLabel || actionType || "spend"} ${planned.toString()} wei exceeds hard cap ${policy.hardCapPerCycleWei.toString()} wei`,
+      actionType: actionType || null,
+      plannedWei: planned.toString(),
+      hardCapPerCycleWei: policy.hardCapPerCycleWei.toString()
+    };
+  }
+  if (policy.maxSpendPerCycleWei !== null && planned > policy.maxSpendPerCycleWei) {
+    return {
+      ok: false,
+      reason: "treasury_floor_max_per_cycle_exceeded",
+      detail: `${actionLabel || actionType || "spend"} ${planned.toString()} wei exceeds per-cycle cap ${policy.maxSpendPerCycleWei.toString()} wei`,
+      actionType: actionType || null,
+      plannedWei: planned.toString(),
+      maxSpendPerCycleWei: policy.maxSpendPerCycleWei.toString()
+    };
+  }
+  if (policy.floorWei !== null && policy.balanceEstimateWei !== null) {
+    const after = policy.balanceEstimateWei - planned;
+    if (after < policy.floorWei) {
+      return {
+        ok: false,
+        reason: "treasury_floor_breach",
+        detail: `${actionLabel || actionType || "spend"} would leave treasury at ${after.toString()} wei, below floor ${policy.floorWei.toString()} wei`,
+        actionType: actionType || null,
+        plannedWei: planned.toString(),
+        balanceEstimateWei: policy.balanceEstimateWei.toString(),
+        balanceEstimateAt: policy.balanceEstimateAt,
+        floorWei: policy.floorWei.toString(),
+        projectedAfterWei: after.toString()
+      };
+    }
+  }
+  return {
+    ok: true,
+    plannedWei: planned.toString(),
+    floorWei: policy.floorWei !== null ? policy.floorWei.toString() : null,
+    balanceEstimateWei:
+      policy.balanceEstimateWei !== null ? policy.balanceEstimateWei.toString() : null,
+    maxSpendPerCycleWei:
+      policy.maxSpendPerCycleWei !== null ? policy.maxSpendPerCycleWei.toString() : null,
+    hardCapPerCycleWei:
+      policy.hardCapPerCycleWei !== null ? policy.hardCapPerCycleWei.toString() : null
+  };
+}
+
 module.exports = {
   ACTION_TIER_MAP,
   APPROVALS_PATH,
   GOVERNANCE_PATH,
   actionTier,
+  assertTreasuryFloor,
   checkOwnerApproval,
   classifySpend,
   evaluateQuorum,
