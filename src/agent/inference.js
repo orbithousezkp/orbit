@@ -1,11 +1,52 @@
 "use strict";
 
 const { planCycle } = require("./behavior");
-const { budgetStatus } = require("./treasury");
+const { budgetStatus, estimateUsageCostUsd, loadTreasury, saveTreasury } = require("./treasury");
 const { privateAiRoute, privateProviderErrors } = require("./provider-privacy");
 const { orderProviders, recordSuccess, recordFailure } = require("./ai-routing");
+const aiRoutingMargin = require("./ai-routing-margin");
 
 const DEFAULT_AI_REQUEST_MAX_BYTES = 2_500_000;
+const WEI_PER_USD = 10n ** 18n;
+
+// Best-effort: convert a USD float into a wei BigInt using the 1 USD = 1e18
+// unit-of-account convention shared with ai-routing-margin.js. Returns 0n for
+// non-positive or non-finite inputs.
+function usdToWei(usd) {
+  const num = Number(usd);
+  if (!Number.isFinite(num) || num <= 0) return 0n;
+  // Scale via micro-USD (1e6) to avoid Number-precision drift on small USD
+  // values: 0.000123 USD * 1e18 round-trips through Number cleanly via 1e6.
+  const microUsd = Math.round(num * 1_000_000);
+  if (microUsd <= 0) return 0n;
+  return BigInt(microUsd) * (WEI_PER_USD / 1_000_000n);
+}
+
+function recordRoutingMargin(config, provider, parsed) {
+  // Best-effort margin tracking. Never throw — the AI call already succeeded
+  // and accounting failures must not propagate to the caller.
+  try {
+    if (!config || !config.repoRoot) return;
+    const usage = parsed && parsed.usage ? parsed.usage : {};
+    const wholesaleUsd = estimateUsageCostUsd(config, usage);
+    const wholesaleCostWei = usdToWei(wholesaleUsd);
+    const env = (config && config.env && typeof config.env === "object") ? config.env : process.env;
+    const treasury = loadTreasury(config.repoRoot, config);
+    aiRoutingMargin.recordAiCall(treasury, env, {
+      provider: provider && provider.name ? provider.name : null,
+      model: provider && provider.model ? provider.model : null,
+      promptTokens: Number(usage.prompt_tokens || usage.input_tokens || 0),
+      completionTokens: Number(usage.completion_tokens || usage.output_tokens || 0),
+      wholesaleCostWei,
+      cycle: config && Number.isFinite(Number(config.cycle)) ? Number(config.cycle) : null,
+      adopterId: config && config.adopterId ? config.adopterId : null
+    });
+    saveTreasury(config.repoRoot, treasury);
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.warn("ai-routing-margin: failed to record", err && err.message ? err.message : err);
+  }
+}
 
 function selectedPlanDirection(plan) {
   const portfolio = plan.directionPortfolio && Array.isArray(plan.directionPortfolio.directions)
@@ -245,6 +286,12 @@ async function infer(config, messages, tools, routing) {
 
       const latencyMs = Date.now() - startedAt;
       recordSuccess(aiRouting, providerName, { latencyMs });
+
+      // Best-effort: record AI routing margin (5% default markup) into the
+      // treasury revenue stream. Wholesale spend accounting still happens
+      // separately via treasury.recordAiUsage in run.js — this is the
+      // revenue side, not the spend side. Throws are swallowed.
+      recordRoutingMargin(config, provider, parsed);
 
       return {
         fallback: false,

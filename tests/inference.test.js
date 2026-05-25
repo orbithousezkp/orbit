@@ -2,16 +2,25 @@
 
 const assert = require("node:assert/strict");
 const test = require("node:test");
+const fs = require("node:fs");
+const os = require("node:os");
+const path = require("node:path");
 const { infer } = require("../src/agent/inference");
+const aiRoutingMargin = require("../src/agent/ai-routing-margin");
+
+function mkTmpRepo() {
+  return fs.mkdtempSync(path.join(os.tmpdir(), "inference-test-"));
+}
 
 function config(overrides = {}) {
   return {
-    repoRoot: process.cwd(),
+    repoRoot: mkTmpRepo(),
     aiDailyBudgetUsd: 5,
     aiMonthlyBudgetUsd: 100,
     aiInputUsdPerMillion: 0.15,
     aiOutputUsdPerMillion: 0.6,
     publicBaseUrl: "",
+    env: { ORBIT_AI_ROUTING_MARGIN_BPS: "500" },
     ...overrides
   };
 }
@@ -416,5 +425,152 @@ test("infer threads ai routing telemetry back through result.routing (T-8 persis
     assert.equal(routing.providers.first.rollingFailures, 1, "failure must be recorded onto the caller's routing state for cross-cycle persistence");
   } finally {
     global.fetch = originalFetch;
+  }
+});
+
+test("ai-routing-margin: successful AI call records margin into the stream", async () => {
+  const originalFetch = global.fetch;
+  global.fetch = async () => ({
+    ok: true,
+    async json() {
+      return {
+        choices: [
+          {
+            message: { content: "ok", tool_calls: [] },
+            finish_reason: "stop"
+          }
+        ],
+        usage: { prompt_tokens: 1000, completion_tokens: 1000, total_tokens: 2000 }
+      };
+    }
+  });
+
+  const cfg = config({
+    aiProviders: [
+      {
+        name: "only",
+        label: "Only",
+        apiKey: "only-key",
+        apiBase: "https://only.example/v1",
+        model: "only-model",
+        chatPath: "/chat/completions",
+        priority: 1
+      }
+    ]
+  });
+
+  try {
+    const result = await infer(cfg, [
+      { role: "user", content: "context", context: {} }
+    ], []);
+
+    assert.equal(result.fallback, false);
+    const { loadTreasury } = require("../src/agent/treasury");
+    const treasury = loadTreasury(cfg.repoRoot, cfg);
+    assert.ok(Array.isArray(treasury.revenue.streams), "streams[] must exist");
+    const stream = treasury.revenue.streams.find((s) => s.id === aiRoutingMargin.STREAM_ID);
+    assert.ok(stream, "ai-routing-margin stream must exist");
+    assert.equal(stream.type, aiRoutingMargin.STREAM_TYPE);
+    assert.equal(stream.status, "experimental");
+    assert.equal(stream.unitEconomics.totalCallsBilled, 1);
+    assert.equal(stream.unitEconomics.marginBps, aiRoutingMargin.MARGIN_BPS_DEFAULT);
+    // Wholesale = (1000/1e6)*0.15 + (1000/1e6)*0.6 = 7.5e-4 USD = 750 micro-USD.
+    // Wei = 750 * (1e18 / 1e6) = 7.5e14. Margin = 7.5e14 * 500 / 10000 = 3.75e13.
+    assert.equal(stream.lifetimeRevenueWei, "37500000000000");
+    assert.equal(stream.unitEconomics.perCallSamples.length, 1);
+    assert.equal(stream.unitEconomics.perCallSamples[0].provider, "only");
+    assert.equal(stream.unitEconomics.perCallSamples[0].model, "only-model");
+  } finally {
+    global.fetch = originalFetch;
+  }
+});
+
+test("ai-routing-margin: failed AI call does NOT record margin", async () => {
+  const originalFetch = global.fetch;
+  global.fetch = async () => ({
+    ok: false,
+    status: 503,
+    async text() { return "down"; }
+  });
+
+  const cfg = config({
+    aiProviders: [
+      {
+        name: "only",
+        label: "Only",
+        apiKey: "only-key",
+        apiBase: "https://only.example/v1",
+        model: "only-model",
+        chatPath: "/chat/completions",
+        priority: 1
+      }
+    ]
+  });
+
+  try {
+    const result = await infer(cfg, [
+      { role: "user", content: "context", context: {} }
+    ], []);
+
+    assert.equal(result.fallback, true);
+    const { loadTreasury } = require("../src/agent/treasury");
+    const treasury = loadTreasury(cfg.repoRoot, cfg);
+    const streams = (treasury.revenue && treasury.revenue.streams) || [];
+    const stream = streams.find((s) => s.id === aiRoutingMargin.STREAM_ID);
+    assert.equal(stream, undefined, "no margin stream should be created on failure");
+  } finally {
+    global.fetch = originalFetch;
+  }
+});
+
+test("ai-routing-margin: tracking failure never fails the AI call", async () => {
+  const originalFetch = global.fetch;
+  global.fetch = async () => ({
+    ok: true,
+    async json() {
+      return {
+        choices: [
+          { message: { content: "ok", tool_calls: [] }, finish_reason: "stop" }
+        ],
+        usage: { prompt_tokens: 1, completion_tokens: 1, total_tokens: 2 }
+      };
+    }
+  });
+
+  // Force margin tracking to throw via an invalid env var.
+  // recordRoutingMargin must swallow the error and let the AI call succeed.
+  const cfg = config({
+    env: { ORBIT_AI_ROUTING_MARGIN_BPS: "-1" }, // invalid: throws inside loadMarginConfig
+    aiProviders: [
+      {
+        name: "only",
+        label: "Only",
+        apiKey: "only-key",
+        apiBase: "https://only.example/v1",
+        model: "only-model",
+        chatPath: "/chat/completions",
+        priority: 1
+      }
+    ]
+  });
+
+  const originalWarn = console.warn;
+  const warnings = [];
+  console.warn = (...args) => { warnings.push(args); };
+
+  try {
+    const result = await infer(cfg, [
+      { role: "user", content: "context", context: {} }
+    ], []);
+
+    assert.equal(result.fallback, false, "AI call must still succeed even if margin tracking throws");
+    assert.equal(result.content, "ok");
+    assert.ok(
+      warnings.some((args) => String(args[0] || "").includes("ai-routing-margin")),
+      "should warn when margin tracking fails"
+    );
+  } finally {
+    global.fetch = originalFetch;
+    console.warn = originalWarn;
   }
 });
