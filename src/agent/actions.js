@@ -69,6 +69,7 @@ const filesChanged = new Set();
 const PROTECTED_WRITE_PATHS = new Set([
   "memory/approvals.json",
   "memory/governance.json",
+  "memory/state.json",
   "memory/treasury.json"
 ]);
 const SECRET_ENV_PATTERNS = [
@@ -605,6 +606,49 @@ async function executeTool(config, github, cycle, name, input) {
     }
 
     case "launch_native_token": {
+      // Layer 2 of the S-LAUNCH-1 once-only guarantee. Refuses BEFORE any
+      // approval-issue work so a re-launch never even pings GitHub. Layer 0
+      // (treasury.token.launchStatus), Layer 1 (state.launchOnceFired in
+      // clanker.js), and Layer 3 (state-guard.js) back this up.
+      //
+      // Bug E: this layer MUST fail closed on a parse error. The old IIFE
+      // returned {} on catch which let launchOnceFired check evaluate to
+      // false and the launch proceeded — even though the on-disk state
+      // could have had launchOnceFired=true. We now refuse with
+      // reason="state_unreadable" instead.
+      let stateForLaunchCheck;
+      let stateUnreadableError = null;
+      try {
+        stateForLaunchCheck = JSON.parse(readSafeTextFile(config.repoRoot, "memory/state.json"));
+      } catch (err) {
+        // ENOENT is fine — first run before any state has been persisted.
+        // But any OTHER error (parse failure, permission denied, etc.) means
+        // we cannot verify launchOnceFired and MUST refuse.
+        if (err && err.code === "ENOENT") {
+          stateForLaunchCheck = {};
+        } else {
+          stateUnreadableError = err;
+        }
+      }
+      if (stateUnreadableError) {
+        return {
+          status: "blocked",
+          ok: false,
+          blocked: true,
+          reason: "state_unreadable",
+          detail: "Layer 2 refusing to launch — memory/state.json could not be parsed; cannot verify launchOnceFired flag",
+          error: stateUnreadableError.message
+        };
+      }
+      if (stateForLaunchCheck && stateForLaunchCheck.launchOnceFired === true) {
+        return {
+          status: "blocked",
+          ok: false,
+          blocked: true,
+          reason: "launch_already_fired",
+          detail: "state.launchOnceFired is true; D-019 + S-LAUNCH-1 once-only guarantee"
+        };
+      }
       const guard = await guardSpend(config, github, {
         category: "token_launch",
         purpose: "Launch Orbit native token through Clanker",

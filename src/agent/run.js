@@ -18,6 +18,7 @@ const { TREASURY_PATH, recordAiUsage } = require("./treasury");
 const { privateAiRouteId, privateAiRoutes, privateProviderErrors } = require("./provider-privacy");
 const { assertSignerMatches, signProof } = require("./proof-signing");
 const { drawNextTarget, evaluateSkip } = require("./skip-guard");
+const { assertStateWriteSafe } = require("./state-guard");
 const { exportBundle, projectForDashboard } = require("../../packages/orbit-sdk");
 const { projectForWellKnown } = require("./well-known");
 const { scanMissions, buildMissionsRecord } = require("./missions");
@@ -285,8 +286,12 @@ async function main() {
     cycle: 0,
     born: null,
     lastActive: null,
-    lastStatus: "initialized"
+    lastStatus: "initialized",
+    launchOnceFired: false
   });
+  // Snapshot the on-disk state before this cycle started so the state-guard
+  // can detect rollback attempts at write time (S-LAUNCH-1 Layer 3).
+  const stateBeforeCycle = JSON.parse(JSON.stringify(state));
 
   const skipDecision = evaluateSkip(config, state);
   if (skipDecision.skip) {
@@ -535,6 +540,39 @@ async function main() {
     log(`skip-guard target draw failed: ${redactSecrets(error.message)}`);
   }
 
+  // S-LAUNCH-1 Layer 3: refuse to write state if launchOnceFired or
+  // treasury.token.launchStatus would roll back. Throws explicitly so we
+  // can't silently lose the once-only guarantee.
+  // Re-read on-disk state in case actions.js wrote launchOnceFired during
+  // the cycle (launch_native_token persists it via clanker.js).
+  let onDiskState = stateBeforeCycle;
+  try {
+    onDiskState = JSON.parse(fs.readFileSync(path.resolve(config.repoRoot, "memory/state.json"), "utf-8"));
+  } catch {
+    onDiskState = stateBeforeCycle;
+  }
+  if (onDiskState && onDiskState.launchOnceFired === true) {
+    state.launchOnceFired = true;
+  }
+  // Bug B: launchStatus lives in memory/treasury.json. Load BOTH snapshots
+  // (prev = on-disk, next = same on-disk since we don't rewrite treasury at
+  // this commit boundary; saveTreasury already ran inside actions.js) and
+  // pass them to the guard so launchStatus rollback is actually detected.
+  // If treasury.json is missing or unparseable we treat both as null —
+  // the guard then short-circuits to "no rollback to detect" which is the
+  // correct safe behavior pre-launch.
+  const treasuryPath = path.resolve(config.repoRoot, "memory/treasury.json");
+  let prevTreasury = null;
+  let nextTreasury = null;
+  try {
+    const bytes = fs.readFileSync(treasuryPath, "utf-8");
+    prevTreasury = JSON.parse(bytes);
+    nextTreasury = prevTreasury; // saveTreasury already ran; this write does not change it
+  } catch {
+    prevTreasury = null;
+    nextTreasury = null;
+  }
+  assertStateWriteSafe(onDiskState, state, { prevTreasury, nextTreasury });
   writeJson(config.repoRoot, "memory/state.json", state);
   writeJson(config.repoRoot, proofPath, proof);
 
