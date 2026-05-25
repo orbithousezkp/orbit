@@ -8,6 +8,7 @@ const { addTask, completeTask, loadTasks, TASKS_PATH } = require("./tasks");
 const { launchNativeToken, prepareClankerLaunch, runRevenueCycle } = require("./clanker");
 const { sanitizeCycleNoteForPublic, isCycleNotePath } = require("./cycle-note-sanitize");
 const { featureSummary, listFeatures } = require("./features");
+const { assertStateWriteSafe } = require("./state-guard");
 const {
   APPROVALS_PATH,
   GOVERNANCE_PATH,
@@ -65,6 +66,8 @@ const {
 } = require("./treasury");
 const { fetchUrl, webSearch } = require("./web");
 const revenueExplorer = require("./revenue-explorer");
+const revenueHypothesizer = require("./revenue-hypothesizer");
+const revenueExperiments = require("./revenue-experiments");
 
 const filesChanged = new Set();
 const PROTECTED_WRITE_PATHS = new Set([
@@ -874,11 +877,57 @@ async function executeTool(config, github, cycle, name, input) {
       const proposals = revenueExplorer.listProposals(stateNow);
       return {
         proposals,
+        drafts: revenueHypothesizer.listDrafts(stateNow),
         lastRanAt: (stateNow.revenueExplorer && stateNow.revenueExplorer.lastRanAt) || null,
         runHistory: (stateNow.revenueExplorer && Array.isArray(stateNow.revenueExplorer.runHistory)
           ? stateNow.revenueExplorer.runHistory
           : []
         ).slice(-5)
+      };
+    }
+
+    case "revenue_promote_draft": {
+      const draftId = input && typeof input.draftId === "string" ? input.draftId : null;
+      if (!draftId) return { ok: false, reason: "missing_draftId" };
+      const stateNow = (() => {
+        try { return JSON.parse(readSafeTextFile(config.repoRoot, "memory/state.json")); }
+        catch { return {}; }
+      })();
+      // Snapshot the prev state BEFORE any mutation so the state-guard can
+      // detect rollback attempts (e.g. launchOnceFired flipping back to false).
+      const prevSnapshot = JSON.parse(JSON.stringify(stateNow));
+      const draft = revenueHypothesizer.getDraftById(stateNow, draftId);
+      if (!draft) return { ok: false, reason: "draft_not_found" };
+      let experiment;
+      try {
+        experiment = revenueHypothesizer.promoteDraftToExperiment(stateNow, draftId);
+      } catch (err) {
+        return { ok: false, reason: "promote_failed", error: err.message };
+      }
+      try {
+        revenueExperiments.proposeExperiment(stateNow, experiment);
+      } catch (err) {
+        return { ok: false, reason: "propose_experiment_failed", error: err.message };
+      }
+      try {
+        assertStateWriteSafe(prevSnapshot, stateNow);
+      } catch (err) {
+        return { ok: false, reason: "state_guard_blocked", error: err.message, code: err.code };
+      }
+      try {
+        writeSafeTextFile(
+          config.repoRoot,
+          "memory/state.json",
+          JSON.stringify(stateNow, null, 2)
+        );
+        track("memory/state.json");
+      } catch (err) {
+        return { ok: false, reason: "persist_failed", error: err.message };
+      }
+      return {
+        ok: true,
+        experimentId: experiment.id,
+        archetypeId: draft.archetypeId
       };
     }
 

@@ -21,6 +21,8 @@
 const path = require("path");
 
 const revenueExperiments = require("./revenue-experiments");
+const revenueStreams = require("./revenue-streams");
+const revenueHypothesizer = require("./revenue-hypothesizer");
 const learningLab = require("./learning-lab");
 const marketSignals = require("./market-signals");
 const identityCapture = require("./identity-capture");
@@ -505,7 +507,41 @@ async function runExplorer(state, treasury, config, env, opts) {
     try { console.warn(`identity-capture: evaluation failed: ${err.message}`); } catch {}
   }
 
-  return { ...summary, identityCapture: identityCaptureEvaluation };
+  // 7. Hypothesizer (S-REVENUE-4). Best-effort proposal of NEW revenue
+  // experiments from observed signal patterns. Drafts land in
+  // state.revenueExplorer.draftProposals and need the owner to promote them
+  // via the `revenue_promote_draft` tool before they become real experiments.
+  let hypothesizerResult = null;
+  try {
+    const hypothesizerConfig = revenueHypothesizer.loadHypothesizerConfig(env);
+    if (hypothesizerConfig.enabled) {
+      const context = {
+        signals,
+        streams: revenueStreams.listActiveStreams(treasury),
+        treasury,
+        experiments,
+        adopters: Array.isArray(options.adopters) ? options.adopters : [],
+        existingDrafts: revenueHypothesizer.listDrafts(state)
+      };
+      const draftResult = revenueHypothesizer.proposeDrafts(
+        state,
+        context,
+        env,
+        { now, maxDrafts: hypothesizerConfig.maxDraftsPerRun }
+      );
+      hypothesizerResult = draftResult;
+    }
+  } catch (err) {
+    try { console.warn(`revenue-hypothesizer: failed: ${err.message}`); } catch {}
+  }
+
+  return {
+    ...summary,
+    identityCapture: identityCaptureEvaluation,
+    draftsAdded: hypothesizerResult ? hypothesizerResult.draftsAdded : 0,
+    archetypesConsidered: hypothesizerResult ? hypothesizerResult.archetypesConsidered : [],
+    archetypesSkipped: hypothesizerResult ? hypothesizerResult.archetypesSkipped : []
+  };
 }
 
 module.exports = {

@@ -566,3 +566,101 @@ test("runExplorer with capture-pattern mock data adds a warning entry to state.r
     rm(dir);
   }
 });
+
+// ---------------------------------------------------------------------------
+// S-REVENUE-4: hypothesizer wiring
+// ---------------------------------------------------------------------------
+
+test("runExplorer with ORBIT_HYPOTHESIZER_ENABLED=false skips proposal step", async () => {
+  const dir = tmpRepo();
+  try {
+    const signals = [
+      {
+        kind: "issue_reaction_index",
+        ts: isoMinus(2),
+        repos: [{ score: 100, repo: "x/y" }]
+      }
+    ];
+    withSignalsFile(dir, signals);
+    const state = freshState([]);
+    const result = await runExplorer(
+      state,
+      {},
+      { repoRoot: dir },
+      { ORBIT_HYPOTHESIZER_ENABLED: "false" },
+      { repoRoot: dir, adopters: [{}, {}, {}] }
+    );
+    assert.equal(result.draftsAdded, 0);
+    assert.deepEqual(result.archetypesConsidered, []);
+    const drafts = (state.revenueExplorer && state.revenueExplorer.draftProposals) || [];
+    assert.equal(drafts.length, 0);
+  } finally {
+    rm(dir);
+  }
+});
+
+test("runExplorer with qualifying context adds drafts to state", async () => {
+  const dir = tmpRepo();
+  try {
+    const signals = [
+      {
+        kind: "issue_reaction_index",
+        ts: isoMinus(2),
+        repos: [{ score: 200, repo: "x/y" }]
+      },
+      {
+        kind: "adopter_ai_spend_by_bucket",
+        ts: isoMinus(1),
+        adopters: [
+          { fid: "f1", byBucket: { code: 1 } },
+          { fid: "f2", byBucket: { code: 1 } }
+        ]
+      }
+    ];
+    withSignalsFile(dir, signals);
+    const state = freshState([]);
+    const result = await runExplorer(
+      state,
+      {},
+      { repoRoot: dir },
+      {},
+      { repoRoot: dir, adopters: [{}, {}, {}, {}, {}, {}] }
+    );
+    assert.ok(result.draftsAdded >= 1, "expected at least one draft added");
+    assert.ok(Array.isArray(state.revenueExplorer.draftProposals));
+    assert.ok(state.revenueExplorer.draftProposals.length >= 1);
+    const draft = state.revenueExplorer.draftProposals[0];
+    assert.equal(draft.status, "draft");
+    assert.ok(typeof draft.archetypeId === "string");
+  } finally {
+    rm(dir);
+  }
+});
+
+test("runExplorer with throwing hypothesizer module doesn't break the rest of the explorer", async () => {
+  const dir = tmpRepo();
+  try {
+    // Force the hypothesizer to throw by monkey-patching its proposeDrafts.
+    const hypMod = require("../src/agent/revenue-hypothesizer");
+    const originalPropose = hypMod.proposeDrafts;
+    hypMod.proposeDrafts = function () { throw new Error("synthetic hypothesizer failure"); };
+    try {
+      withSignalsFile(dir, [
+        { kind: "marginBps", value: 50, ts: isoMinus(2) },
+        { kind: "demandCallsPerDay", value: 1, ts: isoMinus(1) }
+      ]);
+      const state = freshState([freshExperiment()]);
+      const result = await runExplorer(state, {}, { repoRoot: dir }, {}, { repoRoot: dir });
+      // Sunset path (existing core behaviour) still works.
+      assert.equal(result.evaluated, 1);
+      assert.equal(result.sunset, 1);
+      assert.equal(state.problemLab.experiments[0].status, "sunset");
+      // Hypothesizer failure surfaces as zero drafts but no thrown error.
+      assert.equal(result.draftsAdded, 0);
+    } finally {
+      hypMod.proposeDrafts = originalPropose;
+    }
+  } finally {
+    rm(dir);
+  }
+});

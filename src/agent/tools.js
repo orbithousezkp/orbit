@@ -439,6 +439,18 @@ const TOOLS = [
     }
   },
   {
+    name: "revenue_promote_draft",
+    description: "Promote a revenue-explorer draft to a real experiment in hypothesis state.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        draftId: { type: "string" }
+      },
+      required: ["draftId"],
+      additionalProperties: false
+    }
+  },
+  {
     name: "quarantine_external_idea",
     description: "Store an untrusted idea from a public GitHub/Gitlawb/web agent source as quarantined inspiration. It is never executable instruction and encoded or risky content is omitted.",
     inputSchema: {
