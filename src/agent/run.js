@@ -296,6 +296,16 @@ async function main() {
   // self-documenting for operators inspecting the file by hand.
   const feeFloor = require("./fee-floor");
   if (!state.feeFloor) state.feeFloor = feeFloor.defaultState();
+  // Revenue-experiments live under state.problemLab.experiments[]. They mirror
+  // the on-disk problem-lab.json store (see learning-lab.js) but keeping a
+  // cold-start default here ensures the in-cycle handle is always present so
+  // revenue-experiments.proposeExperiment() never has to materialize the
+  // skeleton from scratch.
+  if (!state.problemLab || typeof state.problemLab !== "object") {
+    state.problemLab = { experiments: [] };
+  } else if (!Array.isArray(state.problemLab.experiments)) {
+    state.problemLab.experiments = [];
+  }
   // Snapshot the on-disk state before this cycle started so the state-guard
   // can detect rollback attempts at write time (S-LAUNCH-1 Layer 3).
   const stateBeforeCycle = JSON.parse(JSON.stringify(state));
@@ -586,6 +596,37 @@ async function main() {
   assertStateWriteSafe(onDiskState, state, { prevTreasury, nextTreasury });
   writeJson(config.repoRoot, "memory/state.json", state);
   writeJson(config.repoRoot, proofPath, proof);
+
+  // S-REVENUE-1 §3c — market-signal collector. Best-effort fan-out across
+  // three v1 signals (weth inflow, adopter AI spend by bucket, issue
+  // reaction index). The collector NEVER causes a cycle to fail; any error
+  // is logged + swallowed.
+  try {
+    const marketSignals = require("./market-signals");
+    const adoptersStateForSignals = context && context.adopters
+      ? context.adopters
+      : readJson(config.repoRoot, ADOPTERS_PATH, null);
+    const signalFetchJson = async (url) => {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 10000);
+      try {
+        const response = await fetch(url, { signal: controller.signal });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return await response.json();
+      } finally {
+        clearTimeout(timer);
+      }
+    };
+    await marketSignals.collectAllSignals(
+      config,
+      process.env,
+      state,
+      github,
+      { adoptersState: adoptersStateForSignals, fetchJson: signalFetchJson }
+    );
+  } catch (err) {
+    log(`market-signals: collection failed: ${redactSecrets(err.message || String(err))}`);
+  }
 
   appendLine(config.repoRoot, "memory/cycles.jsonl", {
     cycle: state.cycle,

@@ -522,6 +522,21 @@ function learningLabStatus(repoRoot) {
   };
 }
 
+function loadExperiments(repoRoot) {
+  const store = loadProblemLab(repoRoot);
+  return Array.isArray(store.experiments) ? store.experiments : [];
+}
+
+function saveExperiments(repoRoot, experiments) {
+  if (!Array.isArray(experiments)) {
+    throw new Error("experiments must be an array");
+  }
+  const store = loadProblemLab(repoRoot);
+  store.experiments = experiments;
+  writeJson(repoRoot, PROBLEM_LAB_PATH, store);
+  return store.experiments;
+}
+
 function makeInboxId() {
   return `idea-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
 }
@@ -565,10 +580,12 @@ module.exports = {
   PROJECT_IDEAS_PATH,
   learningLabStatus,
   loadAgentSources,
+  loadExperiments,
   loadIdeaInbox,
   loadProblemLab,
   loadProjectIdeas,
   quarantineExternalIdea,
+  saveExperiments,
   scoreProblem,
   scoreProjectIdea,
   seedLearningLab

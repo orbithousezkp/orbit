@@ -2,6 +2,7 @@
 
 const { aiFoodPolicy, publicPurchaseProviderName } = require("./ai-food");
 const { assertSafeTextForWrite, readSafeTextFile, writeSafeTextFile } = require("./safety");
+const { ensureStreamsArray } = require("./revenue-streams");
 
 const TREASURY_PATH = "memory/treasury.json";
 const CYCLES_PATH = "memory/cycles.jsonl";
@@ -90,11 +91,16 @@ function deepMerge(base, override) {
 
 function loadTreasury(repoRoot, config) {
   const defaults = defaultTreasury(config);
+  let treasury;
   try {
-    return deepMerge(defaults, JSON.parse(readSafeTextFile(repoRoot, TREASURY_PATH)));
+    treasury = deepMerge(defaults, JSON.parse(readSafeTextFile(repoRoot, TREASURY_PATH)));
   } catch {
-    return defaults;
+    treasury = defaults;
   }
+  // Plural streams[] migration. Backwards-compatible: legacy revenue.* fields
+  // are preserved; on first read with empty streams[], promote the legacy
+  // single-stream shape into streams[0] (id "clanker-trading-fees").
+  return ensureStreamsArray(treasury);
 }
 
 function saveTreasury(repoRoot, treasury) {

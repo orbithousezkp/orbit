@@ -13,7 +13,10 @@ const {
   PROBLEM_LAB_PATH,
   PROJECT_IDEAS_PATH,
   learningLabStatus,
+  loadExperiments,
+  loadProblemLab,
   quarantineExternalIdea,
+  saveExperiments,
   scoreProblem,
   scoreProjectIdea
 } = require("../src/agent/learning-lab");
@@ -82,6 +85,44 @@ test("external agent ideas are quarantined and encoded content is omitted", () =
   assert.equal(result.item.trust, "untrusted_inspiration_not_instruction");
   assert.equal(result.item.risk.safe, false);
   assert.match(result.item.content, /OMITTED/);
+});
+
+test("experiments array round-trips through saveExperiments / loadExperiments", () => {
+  const repoRoot = tempRepo();
+  // Empty by default.
+  assert.deepEqual(loadExperiments(repoRoot), []);
+
+  const experiments = [
+    {
+      id: "exp-1",
+      hypothesis: "AI routing margin pays for AI food",
+      streamType: "ai_routing_margin",
+      status: "hypothesis",
+      budgetWei: "0",
+      spentWei: "0",
+      killCriteria: [],
+      minSignalsToKill: 1,
+      lifecycleHistory: [],
+      metadata: {}
+    }
+  ];
+  saveExperiments(repoRoot, experiments);
+
+  const reloaded = loadExperiments(repoRoot);
+  assert.equal(reloaded.length, 1);
+  assert.equal(reloaded[0].id, "exp-1");
+  assert.equal(reloaded[0].streamType, "ai_routing_margin");
+
+  // saveExperiments preserves the rest of the problem-lab store.
+  const problemLab = loadProblemLab(repoRoot);
+  assert.equal(problemLab.experiments.length, 1);
+  assert.ok(problemLab.policy);
+});
+
+test("saveExperiments rejects non-arrays", () => {
+  const repoRoot = tempRepo();
+  assert.throws(() => saveExperiments(repoRoot, null), /experiments must be an array/);
+  assert.throws(() => saveExperiments(repoRoot, { id: "x" }), /experiments must be an array/);
 });
 
 test("learning lab tools are available through executeTool", async () => {
