@@ -2,7 +2,11 @@
 
 > Repos that have adopted Orbit as their control plane. Each adopter is its own sovereign Orbit instance (own cron, own signer, own FID, own treasury). This file tracks them so the mothership can cross-cast milestones and S-GATE-1 criterion #5 (≥1 second adopter repo) has a public record.
 
-> **Sequencing rule.** No adopter work begins until the private-repo rehearsal of the public-ready Orbit has closed successfully (see `docs/REHEARSAL_RUNBOOK.md`). Entries below are planning artifacts only until the rehearsal closes.
+> **Source of truth for the count.** The machine-readable registry is `memory/adopters-registry.json`. The cycle auto-verifies the 3-criteria definition (green cycle 7d / dashboard reachable / well-known valid) on every run and writes `public/adopters.json`. This narrative page below stays as per-adopter detail; the table is illustrative.
+
+> **Sequencing rule.** No adopter work begins until the private-repo rehearsal of the public-ready Orbit has closed successfully (see `docs/REHEARSAL_RUNBOOK.md`). Entries below are planning artifacts until the rehearsal closes.
+
+> **Handshake protocol.** See `PLAN/SPECS/ADOPTER_HANDSHAKE.md` for how adopters self-register (one issue, no signing required — lineage backlink in their well-known is the proof). For manual seeding: `npm run orbit:adopter -- add --repo owner/name --well-known URL`.
 
 ## Adopter index
 

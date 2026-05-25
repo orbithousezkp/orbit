@@ -26,10 +26,10 @@
 ## CURRENT STATE
 
 ```
-LAST SESSION      : S-032 — MCP server build + onboarding artifacts + OWNER_ACTIONS surfacing
+LAST SESSION      : S-ADP-1 — Adopter handshake protocol + registry + auto-tracking
 LAST UPDATED      : 2026-05-25
 CURRENT PHASE     : Phase 1 — Launch-Ready (Pre-Token) — engineering COMPLETE, owner-gated
-NEXT SESSION      : Owner punch list (OWNER_ACTIONS.md) and S-009 closed-loop demo execution; S-016 outreach push using the new pitch/quickstart/templates
+NEXT SESSION      : Owner punch list (OWNER_ACTIONS.md); first adopter (gitty) handshake once scaffolder ships to npm
 GATE STATUS       : S-GATE-1 OPEN — 7-item owner punch list (PLAN/SGATE_1.md)
 OPEN BLOCKERS     : Owner actions — enable GitHub Pages; set ORBIT_AGENT_SIGNER; provision Farcaster signer; deploy Treasury Safe; `npm publish --access public` (orbit-sdk + create-orbit-repo); set ORBIT_AI_PROVIDERS keys; verify 12h clean Actions stretch
 ```
@@ -67,6 +67,7 @@ OPEN BLOCKERS     : Owner actions — enable GitHub Pages; set ORBIT_AGENT_SIGNE
 | S-032 | S-BUILD | MCP server (`@orbit-house/mcp-server`) | DONE 2026-05-25 | `packages/orbit-mcp-server/` — zero-dep stdio MCP server wrapping `@orbit-house/sdk`. 6 tools (`getCycles`/`getReceipt`/`getRefusals`/`getTreasury`/`getDashboardProjection`/`getFederationPeers`) + 3 resources (`cycle://N`, `receipt://N`, `dashboard://current`); `tests/mcp-server.test.js` (17 cases incl. end-to-end JSON-RPC). |
 | S-016-A | S-BUILD | Adopter onboarding artifacts | DONE 2026-05-25 | `PLAN/ADOPTER_PITCH.md` (1-page pitch), `PLAN/ADOPTER_QUICKSTART.md` (9-step recipe), `PLAN/OUTREACH_TEMPLATE.md` (5 templates + tracking schema). Outreach itself is human work. |
 | S-OWN-1 | S-PLAN | Owner-actions surfacing | DONE 2026-05-25 | `OWNER_ACTIONS.md` (top-level) — 7-item S-GATE-1 punch list with copy-paste commands and acceptance checks per item. |
+| S-ADP-1 | S-PLAN/S-BUILD | Adopter handshake + auto-tracking | DONE 2026-05-25 | `PLAN/SPECS/ADOPTER_HANDSHAKE.md`; `src/agent/adopters.js` (handshake intake + 3-criteria re-verification scanner; 22 cases in `tests/adopters.test.js`); `memory/adopters-registry.json` seeded with gitty; `src/cli/orbit-adopter.js` (add/list/verify/remove); SDK `projectForDashboard` exposes `adopters: { adopted, total, phase1Target, phase5Target, list }`; SPA cell shows X/5 toward Phase 1; lineage field added to `well-known.js`; scaffolder templates `memory/orbit-lineage.json.tpl` + `.github/workflows/orbit-onboard.yml.tpl` with `--handshake` flag (default opt-in=N). |
 | S-024 | S-BUILD | Plugin/tool loader for `@orbit-house/tool-*` | DONE 2026-05-24 | `src/agent/plugin-loader.js` + `tests/plugin-loader.test.js` (31 tests); `PLAN/SPECS/PLUGIN_LOADER.md`; `packages/orbit-tool-example/` reference scaffold; capability allowlist + sanitizeToolResponse + ORBIT_ENABLE_PLUGINS gate |
 | S-029/S-030 | S-PLAN/S-BUILD | Multi-maintainer quorum | DONE 2026-05-24 | additive edits to `src/agent/governance.js` + `src/agent/config.js` (`computeThresholds`, `parseQuorumComments`, `evaluateQuorum`, `requiresQuorum`); `tests/governance-quorum.test.js` (26 tests); `PLAN/SPECS/MULTI_MAINTAINER_QUORUM.md`; existing `tests/governance.test.js` unchanged |
 | S-009 | S-BUILD | Closed-loop demo EXECUTION | OWNER-PENDING | needs live Actions cycle (runbook + test ready) |

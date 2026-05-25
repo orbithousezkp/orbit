@@ -26,6 +26,11 @@ export default function Inspect() {
   const missionsActive = data?.missions?.active ?? '—';
   const missionsTotal = data?.missions?.total ?? null;
   const missionsList = Array.isArray(data?.missions?.list) ? data.missions.list : [];
+  const adoptersCount = data?.adopters?.adopted ?? '—';
+  const adoptersTarget = data?.adopters?.phase1Target ?? 5;
+  const adoptersProgress = typeof data?.adopters?.phase1Progress === 'number'
+    ? Math.round(data.adopters.phase1Progress * 100)
+    : null;
 
   return (
     <section id="inspect" className="section section--inspect">
@@ -65,6 +70,18 @@ export default function Inspect() {
           <div className="cell__value">{missionsActive}</div>
           <div className="cell__hint">
             {missionsTotal !== null ? `${missionsTotal} total · open on the board` : 'open on the board'}
+          </div>
+        </div>
+
+        <div className="cell">
+          <div className="cell__label">adopters</div>
+          <div className="cell__value">
+            {adoptersCount}{adoptersCount !== '—' ? ` / ${adoptersTarget}` : ''}
+          </div>
+          <div className="cell__hint">
+            {adoptersProgress !== null
+              ? `phase 1 target · ${adoptersProgress}%`
+              : 'phase 1 target'}
           </div>
         </div>
 

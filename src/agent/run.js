@@ -21,10 +21,19 @@ const { drawNextTarget, evaluateSkip } = require("./skip-guard");
 const { exportBundle, projectForDashboard } = require("../../packages/orbit-sdk");
 const { projectForWellKnown } = require("./well-known");
 const { scanMissions, buildMissionsRecord } = require("./missions");
+const {
+  processHandshakes,
+  reverifyAdopters,
+  buildEmptyRegistry,
+  readRegistry,
+  projectAdoptersForDashboard
+} = require("./adopters");
 
 const DASHBOARD_PATH = "public/dashboard.json";
 const WELL_KNOWN_PATH = "public/.well-known/orbit.json";
 const MISSIONS_PATH = "memory/missions.json";
+const ADOPTERS_PATH = "memory/adopters-registry.json";
+const PUBLIC_ADOPTERS_PATH = "public/adopters.json";
 const DASHBOARD_MAX_BYTES = 60_000;
 
 const REDACTED_PRIVATE_CONFIG = "[REDACTED_PRIVATE_CONFIG]";
@@ -323,6 +332,39 @@ async function main() {
     context.missions = missionsRecord;
   } catch (error) {
     log(`mission scan skipped: ${redactSecrets(error.message)}`);
+  }
+
+  // Adopter tracking — process handshake issues + re-verify the registry's
+  // existing entries. Updates memory/adopters-registry.json and writes a
+  // public projection at public/adopters.json. See src/agent/adopters.js.
+  try {
+    const rawIssues = Array.isArray(context.issues) ? context.issues : [];
+    const registry = readJson(config.repoRoot, ADOPTERS_PATH, buildEmptyRegistry());
+    const ownRepo = config.repoFullName || null;
+    const fetchJson = async (url) => {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 10000);
+      try {
+        const response = await fetch(url, { signal: controller.signal });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return await response.json();
+      } finally {
+        clearTimeout(timer);
+      }
+    };
+    const { registry: afterHandshakes } = await processHandshakes({
+      registry,
+      issues: rawIssues,
+      ownRepo,
+      fetchJson,
+      logRefusal: (entry) => log(`adopter refusal: ${entry.code} ${entry.repo || entry.issueNumber || ""}`)
+    });
+    const finalRegistry = await reverifyAdopters({ registry: afterHandshakes, fetchJson });
+    writeFile({ repoRoot: config.repoRoot }, ADOPTERS_PATH, `${JSON.stringify(finalRegistry, null, 2)}\n`);
+    writeFile({ repoRoot: config.repoRoot }, PUBLIC_ADOPTERS_PATH, `${JSON.stringify(projectAdoptersForDashboard(finalRegistry), null, 2)}\n`);
+    context.adopters = finalRegistry;
+  } catch (error) {
+    log(`adopter scan skipped: ${redactSecrets(error.message)}`);
   }
 
   const proof = {

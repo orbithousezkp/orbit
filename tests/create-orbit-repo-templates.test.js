@@ -15,7 +15,11 @@ const VARS = {
   APPROVAL_LABEL: "orbit:approval",
   APPROVAL_ACCEPTED_LABEL: "orbit:approved",
   APPROVAL_REJECTED_LABEL: "orbit:rejected",
-  NODE_VERSION: "24"
+  NODE_VERSION: "24",
+  MOTHERSHIP_REPO: "orbithousezkp/orbit",
+  HANDSHAKE_OPT_IN: "false",
+  ADOPTED_AT: "2026-05-25T00:00:00.000Z",
+  SCAFFOLDER_VERSION: "0.1.0"
 };
 
 function listTemplates() {
@@ -52,6 +56,7 @@ test("JSON templates parse after rendering", () => {
     "memory/governance.json.tpl",
     "memory/treasury.json.tpl",
     "memory/state.json.tpl",
+    "memory/orbit-lineage.json.tpl",
     "package.json.partial.json"
   ];
   for (const rel of jsonTemplates) {

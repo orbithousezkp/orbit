@@ -18,6 +18,9 @@ target              Directory path. Default: current dir if --here else prompt
 --dry-run           Print plan, write nothing
 --no-install        Skip \`npm install\` after scaffold
 --force             Overwrite existing files (NEVER default)
+--handshake         Opt in to mothership adopter handshake on first cycle (default off)
+--no-handshake      Explicit opt-out (this is the default)
+--mothership <repo> Override mothership repo for handshake (default: orbithousezkp/orbit)
 --help, -h          Show usage
 --version           Show version
 `;
@@ -34,7 +37,9 @@ function parseArgv(argv) {
     install: true,
     force: false,
     help: false,
-    version: false
+    version: false,
+    handshake: false,
+    mothership: null
   };
   for (let i = 0; i < argv.length; i += 1) {
     const a = argv[i];
@@ -45,12 +50,16 @@ function parseArgv(argv) {
     if (a === "--dry-run") { flags.dryRun = true; continue; }
     if (a === "--no-install") { flags.install = false; continue; }
     if (a === "--force") { flags.force = true; continue; }
+    if (a === "--handshake") { flags.handshake = true; continue; }
+    if (a === "--no-handshake") { flags.handshake = false; continue; }
     if (a === "--name") { flags.name = argv[++i] || null; continue; }
     if (a === "--owner") { flags.owner = argv[++i] || null; continue; }
     if (a === "--approval-label") { flags.approvalLabel = argv[++i] || null; continue; }
+    if (a === "--mothership") { flags.mothership = argv[++i] || null; continue; }
     if (a.startsWith("--name=")) { flags.name = a.slice("--name=".length); continue; }
     if (a.startsWith("--owner=")) { flags.owner = a.slice("--owner=".length); continue; }
     if (a.startsWith("--approval-label=")) { flags.approvalLabel = a.slice("--approval-label=".length); continue; }
+    if (a.startsWith("--mothership=")) { flags.mothership = a.slice("--mothership=".length); continue; }
     if (a.startsWith("--")) { throw new Error(`unknown option: ${a}`); }
     if (flags.target === null) { flags.target = a; continue; }
     throw new Error(`unexpected positional argument: ${a}`);
@@ -74,6 +83,8 @@ function resolveOptions(flags, cwd) {
     approvalLabel,
     approvalAcceptedLabel: approvalLabel === "orbit:approval" ? "orbit:approved" : `${approvalLabel}-accepted`,
     approvalRejectedLabel: approvalLabel === "orbit:approval" ? "orbit:rejected" : `${approvalLabel}-rejected`,
+    handshakeOptedIn: Boolean(flags.handshake),
+    mothershipRepo: flags.mothership || "orbithousezkp/orbit",
     yes: flags.yes,
     dryRun: flags.dryRun,
     install: flags.install,

@@ -29,6 +29,7 @@ const FILES = {
   infrastructure: 'memory/infrastructure.json',
   opportunities:  'memory/opportunities.json',
   missions:       'memory/missions.json',
+  adopters:       'memory/adopters-registry.json',
   cycles:         'memory/cycles.jsonl',
   approvals:      'memory/approvals.json',
 };
@@ -346,6 +347,9 @@ const DASHBOARD_SCHEMA = "orbit-dashboard/1";
 const DEFAULT_REFUSAL_LIMIT = 20;
 const DEFAULT_MISSION_LIMIT = 20;
 const MISSION_SCHEMA = "orbit-missions/1";
+const ADOPTERS_SCHEMA = "orbit-adopters/1";
+const PHASE_1_ADOPTER_TARGET = 5;
+const PHASE_5_ADOPTER_TARGET = 50;
 const REFUSAL_SUMMARY_MAX = 120;
 const RESULT_SUMMARY_MAX = 240;
 
@@ -426,6 +430,43 @@ function isSignedReceipt(receipt) {
   return Boolean(
     receipt && receipt.signature && receipt.signer && receipt.payloadHash
   );
+}
+
+function projectAdoptersSlim(adoptersRegistry, options) {
+  const opts = options || {};
+  const phase1Target = Number.isFinite(opts.phase1Target) ? opts.phase1Target : PHASE_1_ADOPTER_TARGET;
+  const phase5Target = Number.isFinite(opts.phase5Target) ? opts.phase5Target : PHASE_5_ADOPTER_TARGET;
+  const r = adoptersRegistry && typeof adoptersRegistry === "object" ? adoptersRegistry : null;
+  if (!r) {
+    return {
+      schema: ADOPTERS_SCHEMA,
+      total: 0,
+      adopted: 0,
+      phase1Target,
+      phase5Target,
+      phase1Progress: 0,
+      phase5Progress: 0,
+      list: [],
+    };
+  }
+  const adopters = Array.isArray(r.adopters) ? r.adopters : [];
+  const adoptedList = adopters.filter((a) => a && a.adopted);
+  return {
+    schema: r.schema || ADOPTERS_SCHEMA,
+    total: adopters.length,
+    adopted: adoptedList.length,
+    phase1Target,
+    phase5Target,
+    phase1Progress: Math.min(1, adoptedList.length / Math.max(1, phase1Target)),
+    phase5Progress: Math.min(1, adoptedList.length / Math.max(1, phase5Target)),
+    list: adoptedList.slice(0, 20).map((a) => ({
+      repo: a.repo || null,
+      publicUrl: a.publicUrl || null,
+      verifiedAt: a.verifiedAt || null,
+      lastVerifiedAt: a.lastVerifiedAt || null,
+      scaffolderVersion: a.scaffolderVersion || null,
+    })),
+  };
 }
 
 function projectMissionsSlim(missionsRecord, options) {
@@ -525,6 +566,7 @@ function exportBundle(repoRoot, _unused, options) {
     receipts: loadReceiptsSorted(root, limit),
     recordedCycles: readJsonl(path.join(root, FILES.cycles)).length,
     missions: readJson(path.join(root, FILES.missions)),
+    adopters: readJson(path.join(root, FILES.adopters)),
   };
   if (includeMemory) {
     bundle.memory = {
@@ -632,6 +674,7 @@ function projectForDashboard(bundle, options) {
     },
     refusals,
     missions: projectMissionsSlim(b.missions, opts),
+    adopters: projectAdoptersSlim(b.adopters, opts),
   };
 
   slim.digest = digestForObject({
@@ -644,6 +687,7 @@ function projectForDashboard(bundle, options) {
     latestPath: latest ? latest.path : null,
     refusalCount: refusals.length,
     missionActive: slim.missions ? slim.missions.active : 0,
+    adopterCount: slim.adopters ? slim.adopters.adopted : 0,
   });
 
   return slim;

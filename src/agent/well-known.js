@@ -39,6 +39,14 @@ function projectForWellKnown(bundle, options = {}) {
     mode: s.mode || null
   }));
 
+  const lineage = options.lineage && typeof options.lineage === "object"
+    ? {
+        parent: options.lineage.parent || null,
+        adoptedAt: options.lineage.adoptedAt || null,
+        scaffolderVersion: options.lineage.scaffolderVersion || null
+      }
+    : null;
+
   return {
     schema: WELL_KNOWN_SCHEMA,
     generatedAt: new Date().toISOString(),
@@ -53,6 +61,7 @@ function projectForWellKnown(bundle, options = {}) {
       farcaster: options.farcaster || null,
       signer: options.signer || null
     },
+    lineage,
     activePhase: activePhase
       ? {
           id: activePhase.id || null,

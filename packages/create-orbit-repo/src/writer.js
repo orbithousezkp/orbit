@@ -23,7 +23,11 @@ function templateVars(opts) {
     APPROVAL_LABEL: opts.approvalLabel || "orbit:approval",
     APPROVAL_ACCEPTED_LABEL: opts.approvalAcceptedLabel || "orbit:approved",
     APPROVAL_REJECTED_LABEL: opts.approvalRejectedLabel || "orbit:rejected",
-    NODE_VERSION: opts.nodeVersion || "24"
+    NODE_VERSION: opts.nodeVersion || "24",
+    MOTHERSHIP_REPO: opts.mothershipRepo || "orbithousezkp/orbit",
+    HANDSHAKE_OPT_IN: opts.handshakeOptedIn ? "true" : "false",
+    ADOPTED_AT: opts.adoptedAt || new Date().toISOString(),
+    SCAFFOLDER_VERSION: opts.scaffolderVersion || "0.1.0"
   };
 }
 
@@ -47,11 +51,13 @@ function buildPlan(opts) {
   const fileMap = [
     [".github/workflows/orbit-cycle.yml.tpl", ".github/workflows/orbit-cycle.yml", "template"],
     [".github/workflows/orbit-event.yml.tpl", ".github/workflows/orbit-event.yml", "template"],
+    [".github/workflows/orbit-onboard.yml.tpl", ".github/workflows/orbit-onboard.yml", "template"],
     ["memory/identity.md.tpl", "memory/identity.md", "template"],
     ["memory/tasks.json.tpl", "memory/tasks.json", "template"],
     ["memory/governance.json.tpl", "memory/governance.json", "template"],
     ["memory/treasury.json.tpl", "memory/treasury.json", "template"],
     ["memory/state.json.tpl", "memory/state.json", "template"],
+    ["memory/orbit-lineage.json.tpl", "memory/orbit-lineage.json", "template"],
     ["runtime/proofs/.gitkeep", "runtime/proofs/.gitkeep", "verbatim"],
     [".env.example.tpl", ".env.example", "template"]
   ];
