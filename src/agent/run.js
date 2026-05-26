@@ -14,6 +14,7 @@ const { normalizeTrigger } = require("./triggers");
 const { TOOLS } = require("./tools");
 const { executeTool, filesChanged, writeFile } = require("./actions");
 const { appendSafeTextFile, assertNoSymlinkPath, readSafeTextFile, redactSecrets } = require("./safety");
+const { logError } = require("./error-log");
 const { TREASURY_PATH, recordAiUsage } = require("./treasury");
 const { privateAiRouteId, privateAiRoutes, privateProviderErrors } = require("./provider-privacy");
 const { assertSignerMatches, signProof } = require("./proof-signing");
@@ -558,6 +559,17 @@ async function main() {
           tool: name,
           error: redactSecrets(error.message)
         });
+        // Persist tool failures so a maintainer can see WHICH tool kept
+        // breaking when they audit the log days later.
+        try {
+          logError(config.repoRoot, {
+            phase: "tool",
+            tool: name,
+            code: error.code,
+            error,
+            context: { step, toolCallId: toolCall.id }
+          });
+        } catch { /* best-effort */ }
       }
     }
 
@@ -806,6 +818,12 @@ function toolResultsUserMessage(summarizedToolResults) {
 if (require.main === module) {
   main().catch((error) => {
     console.error(redactSecrets(`[orbit:fatal] ${error.stack || error.message}`));
+    // Persist a structured record so a maintainer can debug after the
+    // runner is gone. Best-effort — logError never throws.
+    try {
+      const repoRoot = path.resolve(__dirname, "../..");
+      logError(repoRoot, { phase: "fatal", error });
+    } catch { /* ignore */ }
     process.exit(1);
   });
 }
