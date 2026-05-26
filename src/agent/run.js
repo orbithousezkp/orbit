@@ -12,8 +12,8 @@ const { buildFirstWakeIntro, shouldRunFirstWakeIntro } = require("./intro");
 const { buildSystemPrompt, buildUserPrompt } = require("./prompt");
 const { normalizeTrigger } = require("./triggers");
 const { TOOLS } = require("./tools");
-const { executeTool, filesChanged, writeFile } = require("./actions");
-const { appendSafeTextFile, assertNoSymlinkPath, readSafeTextFile, redactSecrets } = require("./safety");
+const { executeTool, filesChanged } = require("./actions");
+const { appendSafeTextFile, assertNoSymlinkPath, readSafeTextFile, redactSecrets, writeSafeTextFile } = require("./safety");
 const { logError } = require("./error-log");
 const { TREASURY_PATH, recordAiUsage } = require("./treasury");
 const { privateAiRouteId, privateAiRoutes, privateProviderErrors } = require("./provider-privacy");
@@ -91,7 +91,11 @@ function readJson(repoRoot, relativePath, fallback) {
 }
 
 function writeJson(repoRoot, relativePath, value) {
-  writeFile({ repoRoot }, relativePath, `${JSON.stringify(value, null, 2)}\n`);
+  // Orchestrator bookkeeping — bypasses actions.writeFile's PROTECTED_WRITE_PATHS
+  // guard, which exists to stop the LLM tool surface from clobbering ledger files.
+  // The orchestrator IS the owner of those ledgers.
+  const { normalized } = writeSafeTextFile(repoRoot, relativePath, `${JSON.stringify(value, null, 2)}\n`);
+  filesChanged.add(normalized);
 }
 
 function appendLine(repoRoot, relativePath, value) {
@@ -155,7 +159,8 @@ function writeDashboardSnapshot(config) {
     return { written: false, bytes: Buffer.byteLength(json), path: DASHBOARD_PATH };
   }
 
-  writeFile({ repoRoot: config.repoRoot }, DASHBOARD_PATH, `${json}\n`);
+  const { normalized: dashboardNormalized } = writeSafeTextFile(config.repoRoot, DASHBOARD_PATH, `${json}\n`);
+  filesChanged.add(dashboardNormalized);
 
   // Also refresh the federation discovery document so other orbits can read
   // this repo's capabilities + signer at a well-known location.
@@ -167,7 +172,7 @@ function writeDashboardSnapshot(config) {
       githubRepo: config.repoFullName || null,
       dashboardUrl: "/dashboard.json"
     });
-    writeFile({ repoRoot: config.repoRoot }, WELL_KNOWN_PATH, `${JSON.stringify(wellKnown, null, 2)}\n`);
+    writeJson(config.repoRoot, WELL_KNOWN_PATH, wellKnown);
   } catch (error) {
     log(`well-known refresh skipped: ${redactSecrets(error.message)}`);
   }
@@ -441,7 +446,7 @@ async function main() {
     const rawIssues = Array.isArray(context.issues) ? context.issues : [];
     const missionList = scanMissions(rawIssues);
     const missionsRecord = buildMissionsRecord(missionList, { cycle: state.cycle });
-    writeFile({ repoRoot: config.repoRoot }, MISSIONS_PATH, `${JSON.stringify(missionsRecord, null, 2)}\n`);
+    writeJson(config.repoRoot, MISSIONS_PATH, missionsRecord);
     context.missions = missionsRecord;
   } catch (error) {
     log(`mission scan skipped: ${redactSecrets(error.message)}`);
@@ -473,8 +478,8 @@ async function main() {
       logRefusal: (entry) => log(`adopter refusal: ${entry.code} ${entry.repo || entry.issueNumber || ""}`)
     });
     const finalRegistry = await reverifyAdopters({ registry: afterHandshakes, fetchJson });
-    writeFile({ repoRoot: config.repoRoot }, ADOPTERS_PATH, `${JSON.stringify(finalRegistry, null, 2)}\n`);
-    writeFile({ repoRoot: config.repoRoot }, PUBLIC_ADOPTERS_PATH, `${JSON.stringify(projectAdoptersForDashboard(finalRegistry), null, 2)}\n`);
+    writeJson(config.repoRoot, ADOPTERS_PATH, finalRegistry);
+    writeJson(config.repoRoot, PUBLIC_ADOPTERS_PATH, projectAdoptersForDashboard(finalRegistry));
     context.adopters = finalRegistry;
   } catch (error) {
     log(`adopter scan skipped: ${redactSecrets(error.message)}`);

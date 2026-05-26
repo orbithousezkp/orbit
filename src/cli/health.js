@@ -18,14 +18,7 @@ const requiredFiles = [
   "memory/identity.md",
   "memory/infrastructure.json",
   "memory/ai-providers.json",
-  "memory/knowledge.json",
-  "memory/opportunities.json",
-  "memory/problem-lab.json",
-  "memory/project-ideas.json",
-  "memory/agent-sources.json",
-  "memory/idea-inbox.json",
   "memory/tasks.json",
-  "memory/roadmap.json",
   "memory/treasury.json",
   "src/agent/clanker.js",
   "src/agent/features.js",
@@ -40,6 +33,16 @@ const requiredFiles = [
   "docs/feature-map.html",
   ".github/workflows/orbit-cycle.yml",
   ".github/workflows/orbit-event.yml"
+];
+
+const optionalLedgerFiles = [
+  "memory/knowledge.json",
+  "memory/opportunities.json",
+  "memory/problem-lab.json",
+  "memory/project-ideas.json",
+  "memory/agent-sources.json",
+  "memory/idea-inbox.json",
+  "memory/roadmap.json"
 ];
 
 function exists(relativePath) {
@@ -65,6 +68,14 @@ for (const file of requiredFiles) {
   });
 }
 
+for (const file of optionalLedgerFiles) {
+  results.push({
+    name: `file:${file}`,
+    ok: true,
+    detail: exists(file) ? "present" : "absent (will auto-create on first use)"
+  });
+}
+
 const pkg = JSON.parse(read("package.json"));
 results.push({
   name: "package-name",
@@ -86,7 +97,9 @@ results.push({
 });
 
 const sampleFiles = ["README.md", ".env.example", "memory/identity.md"];
-const secretHit = sampleFiles.find((file) => containsSecret(read(file)));
+const secretHit = sampleFiles
+  .filter((file) => exists(file))
+  .find((file) => containsSecret(read(file)));
 results.push({
   name: "secret-scan",
   ok: !secretHit,

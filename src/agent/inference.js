@@ -260,6 +260,10 @@ async function infer(config, messages, tools, routing) {
       model: provider.model,
       messages: apiMessages,
       temperature: 0.2,
+      // Bound the response so reasoning models (e.g. mimo-v2.5-pro)
+      // don't run away with the upstream connection. Provider can
+      // override via provider.maxTokens.
+      max_tokens: Number(provider.maxTokens || 4096),
       tools: toolsSchema
     };
 
@@ -330,6 +334,16 @@ async function infer(config, messages, tools, routing) {
       };
     } catch (error) {
       recordFailure(aiRouting, providerName, { reason: "AI route failed" });
+      // Log the actual error message (redacted) so dry-runs and ops can see
+      // WHY a provider failed. The provider-privacy layer keeps the
+      // public-facing surface generic ("AI route failed"); this is the
+      // local-only diagnostic.
+      try {
+        const { redactSecrets } = require("./safety");
+        const detail = redactSecrets(String(error && error.message || error));
+        const cause = error && error.cause ? redactSecrets(String(error.cause.message || error.cause)) : "";
+        console.error(`[orbit:ai] ${providerName} failed: ${detail}${cause ? ` (cause: ${cause})` : ""}`);
+      } catch {}
       providerErrors.push({
         ...privateAiRoute(provider, index),
         error: "AI route failed"

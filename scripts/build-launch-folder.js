@@ -67,6 +67,7 @@ const INCLUDE_TOP_LEVEL = [
   "postcss.config.js",
   ".gitignore",
   ".editorconfig",
+  ".env.example",
 
   // Public-facing memory + lore (subset; filtered below)
   "memory",

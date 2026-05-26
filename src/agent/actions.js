@@ -188,6 +188,12 @@ function writeFile(config, relativePath, content) {
   if (PROTECTED_WRITE_PATHS.has(normalized)) {
     throw new Error(`direct writes to ${normalized} are not allowed`);
   }
+  // CI surface is owner-only. The agent must not author or modify GitHub
+  // Actions workflows / actions / scripts — that would let the LLM
+  // escalate its own permissions. Owner edits these via PR.
+  if (normalized.startsWith(".github/workflows/") || normalized.startsWith(".github/actions/")) {
+    throw new Error(`direct writes to .github CI surface (${normalized}) are not allowed`);
+  }
   // Cycle notes are GitHub-visible. Strip any AI cost / budget figures before
   // committing — feedback_no_money_on_github + belt-and-braces over prompt
   // instructions that already tell the agent not to write money figures.

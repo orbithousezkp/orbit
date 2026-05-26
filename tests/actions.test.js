@@ -51,6 +51,21 @@ test("writeFile refuses to write protected paths", () => {
 // Patch Set AF: writeFile + readFileForTool must refuse secret-bearing
 // files at the path-normalizer layer. A real .env on disk should never
 // be reachable through the tool surface (defense in depth).
+test("writeFile refuses .github/workflows and .github/actions (CI surface)", () => {
+  const repoRoot = tempRepo();
+  for (const ciPath of [
+    ".github/workflows/foo.yml",
+    ".github/workflows/nested/bar.yaml",
+    ".github/actions/custom/action.yml"
+  ]) {
+    assert.throws(
+      () => writeFile({ repoRoot }, ciPath, "name: evil\n"),
+      /CI surface/,
+      `expected refusal for ${ciPath}`
+    );
+  }
+});
+
 test("writeFile refuses .env and credential files", () => {
   const repoRoot = tempRepo();
   for (const bad of [".env", ".env.local", ".npmrc", "id_rsa", "packages/foo/.env"]) {
