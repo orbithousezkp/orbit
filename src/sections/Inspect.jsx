@@ -31,6 +31,9 @@ export default function Inspect() {
   const adoptersProgress = typeof data?.adopters?.phase1Progress === 'number'
     ? Math.round(data.adopters.phase1Progress * 100)
     : null;
+  const approvalsPending = data?.approvals?.pending ?? null;
+  const approvalsTotal = data?.approvals?.total ?? null;
+  const approvalsList = Array.isArray(data?.approvals?.list) ? data.approvals.list : [];
 
   return (
     <section id="inspect" className="section section--inspect">
@@ -86,6 +89,20 @@ export default function Inspect() {
         </div>
 
         <div className="cell">
+          <div className="cell__label">pending approvals</div>
+          <div className="cell__value">{approvalsPending ?? '—'}</div>
+          <div className="cell__hint">
+            {approvalsPending === null
+              ? 'projection rebuilds next cycle'
+              : approvalsPending === 0
+                ? 'nothing waiting on the owner'
+                : approvalsTotal !== null
+                  ? `${approvalsTotal} total · oldest-first below`
+                  : 'oldest-first below'}
+          </div>
+        </div>
+
+        <div className="cell">
           <div className="cell__label">build</div>
           <div className="cell__value mono">{gitCommit}</div>
           <div className="cell__hint">latest signed commit</div>
@@ -132,6 +149,44 @@ export default function Inspect() {
                 <span className="inspect__mission-meta">
                   by {m.proposer}
                   {m.deadline ? ` · by ${m.deadline}` : ''}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {approvalsList.length > 0 && (
+        <div className="inspect__approvals">
+          <div className="inspect__approvals-head">
+            <span className="cell__label">stuck approvals</span>
+            <span className="cell__hint">oldest first · waiting on the owner</span>
+          </div>
+          <ul className="inspect__approvals-list">
+            {approvalsList.slice(0, 5).map((a) => (
+              <li key={a.id || a.issueNumber} className="inspect__approval">
+                <a
+                  className="inspect__approval-link"
+                  href={a.issueUrl || '#'}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <span className="inspect__approval-num mono">
+                    {a.issueNumber !== null ? `#${a.issueNumber}` : '—'}
+                  </span>
+                  <span className="inspect__approval-title">
+                    {a.category ? a.category.replace(/_/g, ' ') : 'approval'}
+                    {a.amount !== null && a.asset
+                      ? ` · ${a.amount} ${a.asset}`
+                      : a.amount === null && a.category
+                        ? ' · amount hidden'
+                        : ''}
+                  </span>
+                </a>
+                <span className="inspect__approval-meta">
+                  {a.pendingSinceHours !== null
+                    ? `pending ${a.pendingSinceHours}h`
+                    : 'pending'}
                 </span>
               </li>
             ))}
