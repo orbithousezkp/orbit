@@ -716,15 +716,35 @@ async function main() {
   }
 
   // Patch Set R: tick the founder-handoff lifecycle. No-op unless there's
-  // a TIMELOCK proposal whose timer has expired. The executor is NOT
-  // wired here — the on-chain Safe rotation primitive lives in
-  // Patch Set V; without it the handoff sits in EXECUTING with a
-  // clear marker until the owner runs the rotation tx. Best-effort.
+  // a TIMELOCK proposal whose timer has expired. Patch Set V wires an
+  // executor that produces a per-handoff "completion bundle" under
+  // runtime/handoff/ — the on-chain Safe rotation tx is NOT signed from
+  // CI (that's the founder's deliberate hand-off surface, not a silent
+  // cycle action). Best-effort: any throw is logged + persisted.
   try {
     const handoff = require("./handoff");
-    const tickResult = await handoff.tickHandoffs(config.repoRoot, { now: new Date() });
+    const { makeExecutor } = require("./handoff-executor");
+    // Only configure a real executor when we have a Safe address to
+    // target. Without one, tickHandoffs leaves expired proposals in
+    // EXECUTING with the "executing-no-executor" marker — which is
+    // safer than producing an unusable bundle.
+    const safeAddress = process.env.ORBIT_TREASURY_SAFE || (config.safes && config.safes.feeReceive);
+    const executor = safeAddress
+      ? makeExecutor(config.repoRoot, { safeAddress, threshold: 1 })
+      : undefined;
+    const tickResult = await handoff.tickHandoffs(config.repoRoot, {
+      now: new Date(),
+      executor
+    });
     if (tickResult.advanced.length || tickResult.errors.length) {
       filesChanged.add("memory/handoff.json");
+      // Bundle files land under runtime/handoff/ — surface them so the
+      // commit step picks them up.
+      for (const r of tickResult.advanced) {
+        if (r && r.id && r.status === "complete") {
+          filesChanged.add(`runtime/handoff/bundle-${r.id}.json`);
+        }
+      }
       log(`handoff tick: advanced=${tickResult.advanced.length} errors=${tickResult.errors.length}`);
     }
   } catch (err) {
