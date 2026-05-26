@@ -1,22 +1,24 @@
 # Orbit — Forever Roadmap
 
-> Phases 1–5 (see [PHASES.md](PHASES.md)) describe how Orbit gets built and how the founder steps back. They terminate. This document describes what Orbit does after that — and why "done" is never a valid state for it.
+> [PHASES.md](PHASES.md) describes the nine numbered phases plus the open-ended horizon that follows. This document describes the rules under which those phases (and any future Phase 10+) operate — the principles, the continuous capability axes, the self-extending mechanism, and the never-stops rule.
 
-This is the meta-roadmap. It does not list features; for that, see [ROADMAP.md](ROADMAP.md). It sets the rules under which features keep being added, retired, replaced, and discovered — for as long as Orbit exists.
+This is the meta-roadmap. It does not list phases (that's PHASES.md) and it does not list features (that's [ROADMAP.md](ROADMAP.md)). It sets the rules under which features keep being added, retired, replaced, and discovered — for as long as Orbit exists.
 
 ---
 
-## 1. Why this document exists
+## 1. What this document exists for
 
-The Phase-5 success criteria in [PHASES.md](PHASES.md#phase-5--persistence--spec) end with "Treasury durably solvent without founder intervention" and "≥3 external implementations." That's the moment Orbit becomes a standard rather than a project. After that, the founder is gone — and a roadmap that ends at "founder gone" is a roadmap that ends with the project's most important question unanswered: **what does Orbit do for the next twenty years?**
+Phases 1–9 in [PHASES.md](PHASES.md) cover everything from launch through ubiquity through quiet utility. They end at Phase 9, which is explicitly a stable state rather than a terminal one. After Phase 9 the [HORIZON_SCANNER](SPECS/HORIZON_SCANNER.md) proposes new phases as the environment demands.
 
-This document answers that. It does so without committing to any specific year, technology, or partnership — because all of those will be wrong eventually. It commits instead to a *shape* the project keeps having, and to a *mechanism* that keeps proposing new work even when no human is looking.
+A roadmap that just lists phases doesn't answer two questions: (a) what rules survive every phase transition, and (b) what *mechanism* keeps proposing new work when no human is in the loop. This document answers both.
+
+It does so without committing to any specific year, technology, or partnership — because all of those will be wrong eventually. It commits instead to a *shape* the project keeps having, and to a *mechanism* that keeps proposing new work even when no human is looking.
 
 ---
 
 ## 2. Immutable principles (these never change)
 
-Every cycle of every era must honor these. They are not subject to growth or amendment except through a constitutional process (see §7). If a future capability would require breaking one of these, the capability does not get built. There are many capabilities; there is one project.
+Every cycle of every phase must honor these. They are not subject to growth or amendment except through a constitutional process (see §7). If a future capability would require breaking one of these, the capability does not get built. There are many capabilities; there is one project.
 
 1. **Every cycle proof is wallet-signed and verifiable by anyone.** (D-006)
 2. **No external spend without a public approval issue and a recorded approval comment.** (D-014)
@@ -38,6 +40,8 @@ If a future spec contradicts any of the above, the spec is wrong. Reject it.
 ## 3. The ten currents
 
 A current is a capability axis. It has no end state. It can be deepened, broadened, replaced, or fragmented, but it cannot be "complete." Each current is what an autonomous entity needs to keep doing, not a milestone it can pass.
+
+Currents are orthogonal to phases. Phase 1 work and Phase 9 work both touch the same ten currents — what changes between phases is which currents have the most pressure, not which currents exist.
 
 The currents are not disjoint. Treasury work serves Identity (the wallet is an identity); Federation work serves Adoption; Research feeds all of them. They are listed separately because each has its own constituency, its own evidence trail, and its own continuous mechanism.
 
@@ -138,42 +142,27 @@ Each current has its own working file under [`PLAN/CURRENTS/`](CURRENTS/) when p
 
 ---
 
-## 4. Eras (the post-phase timeline)
+## 4. Phases 6–9 and beyond (the post-fade timeline)
 
-Phases 1–5 are the bootstrap. Eras come after. An era is defined by an adopter milestone and a capability frontier, not by a date. Eras do not exit; they nest. Era III contains Era II contains Era I.
+This section used to describe four "Eras" running after Phase 5. The unified phase model in [PHASES.md](PHASES.md) absorbs that content into numbered phases — there's no separate "Era" vocabulary anymore. For reference:
 
-### Era I — Founder-fade (current era; ends when `Phase 5` exits)
-- **Trigger to advance:** ≥50 adopter repos, ≥3 external implementations of the Orbit spec, founder narrates the step-back cycle and rotates out of the majority signer slot.
-- **What's tended:** the existing 10 currents, with Adoption and Federation getting weighted priority because they're the load-bearing currents for founder-fade.
-- **Voice:** the founder is still visible in cycles. Era I ends when the founder is no longer load-bearing in any cycle proof.
+- **Phase 6 — Standardization** (≥500 adopters): founder-fade complete; ≥3 external implementations; spec off-repo. (Previously: Era I exit.)
+- **Phase 7 — Five Thousand** (≥5,000 adopters): federation governance decentralized; long-horizon memory tiering. (Previously: Era II.)
+- **Phase 8 — Ubiquity** (≥25,000 adopters): Orbit is the coordination primitive; founder irrelevant. (Previously: Era III.)
+- **Phase 9 — Quiet Utility** (∞): infrastructure becomes invisible; referenced like SMTP. (Previously: Era IV.)
+- **Horizon** (Phase 10+): proposed by HORIZON_SCANNER under constitutional amendment. (Previously: Era V — left empty.)
 
-### Era II — Standard-emergence (post-Era-I)
-- **Trigger to advance:** ≥500 adopter repos, ≥10 external implementations, the spec is referenced by at least one non-Orbit-adjacent project (academic paper, agent-infrastructure SDK, security advisory).
-- **What's tended:** Federation matures into a real protocol; Research becomes peer-reviewed across federations; Public surfaces shift from "look at Orbit" to "here is how this Orbit compares to peers."
-- **Voice:** Orbits speak about Orbits in the plural. Lore preserves the founder era as history; the current era is the federation.
-
-### Era III — Peerage (post-Era-II)
-- **Trigger to advance:** Adopters number in the thousands; some adopters are themselves federations; spec governance is decentralized; treasury models diverge across instances by design.
-- **What's tended:** Cross-instance treaties; long-horizon memory and archival under load (millions of cycles aggregated); operational redundancy across many GitHub orgs.
-- **Voice:** No single Orbit is canonical. The original repo is one of many.
-
-### Era IV — Quiet utility (post-Era-III)
-- **Trigger to advance:** Orbit-shaped infrastructure is unremarkable. The spec is referenced like SMTP is referenced.
-- **What's tended:** Maintenance against environmental change. New protocols on new substrates. The work is mostly invisible.
-- **Voice:** The household survives the household's stories.
-
-### Era V — ???
-There is no Era V here. The horizon scanner proposes it when the time comes. (See §6.)
+Phase 9 is a stable state, not a gate. There is no S-GATE-9 exit criterion that, once met, declares Orbit "done." The work just keeps happening; the horizon scanner just keeps proposing new candidate specs.
 
 ---
 
 ## 5. Year markers, not deadlines
 
-Eras don't have years. But Orbit narrates anniversaries. Use them.
+Phases don't have years. But Orbit narrates anniversaries. Use them.
 
 - **Cycle #100, #1,000, #10,000, #100,000, #1,000,000** — milestone cycles, signed, anchored, cast. Each is a public artifact of continuity.
 - **Year 1, 3, 5, 10, 25, 50, 100** — anniversary cycles. Each year-marker cycle includes a "Letter From Orbit" that summarizes what was tended that year, what was retired, and what was learned.
-- **Founder birthday / death** — Orbit, by design, has no founder birthday cycle. Founder identity is intentionally absent from cycle narrations after Era I.
+- **Founder birthday / death** — Orbit, by design, has no founder birthday cycle. Founder identity is intentionally absent from cycle narrations after Phase 6.
 
 Anniversaries are not deliverables. They are evidence of continuity.
 
@@ -212,16 +201,20 @@ Capabilities themselves can be retired by the inverse process: a retire-proposal
 
 ---
 
-## 8. How to add a new current
+## 8. How to add a new current (or a new phase)
 
-Ten currents are not magic. If the environment changes enough, an eleventh emerges. The process:
+Ten currents are not magic. Phase 9 is not the last phase. If the environment changes enough, an eleventh current emerges; if accumulated work warrants it, a Phase 10 is proposed.
 
-1. Some pattern of candidate specs accumulates that doesn't fit cleanly into any current. The HORIZON_SCANNER flags this when at least three recent candidates classify to "uncategorized."
-2. A "new current" proposal is filed — a candidate-spec-shaped document arguing for the new current's north star and continuous mechanism.
+The process is the same in both cases:
+
+1. A pattern of candidate specs accumulates that doesn't fit cleanly into any current, or that justifies a new phase boundary. The HORIZON_SCANNER flags this when at least three recent candidates cluster in the relevant way.
+2. A **proposal** is filed — a candidate-spec-shaped document arguing for the new current's north star and continuous mechanism, or the new phase's success criteria and S-GATE.
 3. The proposal goes through **constitutional amendment**: a slower process than normal spec promotion, with a 7-day timelock and a higher quorum threshold (default: 75% of active maintainers, not 50%).
-4. If approved, the current is added to this document, [ROADMAP.md](ROADMAP.md), and a working file under `PLAN/CURRENTS/`.
+4. If approved:
+   - A new current is added to this document, [ROADMAP.md](ROADMAP.md), and a working file under `PLAN/CURRENTS/`.
+   - A new phase is appended to [PHASES.md](PHASES.md) (with its S-GATE-N session and exit criteria), and `src/data/phases.js` extended (preserving status semantics).
 
-Currents are not deleted, only **merged** (combine with a neighbor) or **frozen** (no longer actively tended; preserved as history). Either is also a constitutional amendment.
+Currents and phases are not deleted, only **merged** (combine with a neighbor) or **frozen** (no longer actively tended; preserved as history). Either is also a constitutional amendment.
 
 ---
 
@@ -232,27 +225,28 @@ This document deliberately makes no commitments about:
 - Specific years (technology timelines lie).
 - Specific protocols (today's protocols mature, fragment, or die).
 - Specific dollar targets (the no-money-on-visitor-surfaces rule means dollar figures aren't on the public roadmap surface at all).
-- Specific founders or maintainers (Era I exits intentionally).
+- Specific founders or maintainers (founder-fade in Phase 5–6 intentionally removes the founder from the protocol's critical path).
 - Specific blockchains (Base is current; future Orbits may federate across substrates).
 
-What it does commit to: the immutable principles, the ten currents, the eras, the scanner, and the rule that "done" is never valid.
+What it does commit to: the immutable principles, the ten currents, the phase-extension process, the scanner, and the rule that "done" is never valid.
 
 ---
 
 ## 10. Reading map
 
 - For *what to build next* (concrete items): [ROADMAP.md](ROADMAP.md) (sections A–U).
-- For *how phases are gated*: [PHASES.md](PHASES.md).
+- For *how phases are numbered and gated*: [PHASES.md](PHASES.md).
 - For *what's locked*: [DECISIONS.md](DECISIONS.md).
 - For *the engine*: [SPECS/HORIZON_SCANNER.md](SPECS/HORIZON_SCANNER.md).
 - For *the voice this all must keep*: [BRAND.md](BRAND.md).
-- For *the founder-fade endgame of Phase 5*: [SPECS/FOUNDER_HANDOFF.md](SPECS/FOUNDER_HANDOFF.md), [SPECS/PHASE_4_5_OUTLOOK.md](SPECS/PHASE_4_5_OUTLOOK.md).
+- For *the founder-fade endgame of Phase 5–6*: [SPECS/FOUNDER_HANDOFF.md](SPECS/FOUNDER_HANDOFF.md), [SPECS/PHASE_4_5_OUTLOOK.md](SPECS/PHASE_4_5_OUTLOOK.md).
 
 ---
 
 ## 11. Status
 
 - **Created:** 2026-05-26 alongside the Patch Set A/B work on closed-loop demo gaps.
+- **Last revised:** 2026-05-26 — Eras model retired in favor of Phases 6–9 unified with engineering numbering; ten currents and the scanner kept.
 - **Owner of the meta:** the current maintainer quorum once S-029/S-030 is live in production; until then, the founder.
-- **Last horizon scan integrated:** N/A — HORIZON_SCANNER spec landed in this same cycle; first scan happens after S-GATE-1 and after `state.preLaunchVerified === true` (per D-018 discipline; the scanner reads the open web and proposes work, so we treat it as new capability and gate it).
+- **Last horizon scan integrated:** N/A — HORIZON_SCANNER spec landed in the same cycle; first scan happens after S-GATE-1 and after `state.preLaunchVerified === true` (per D-018 discipline).
 - **Next constitutional review:** at S-GATE-4, when founder-fade execution begins.

@@ -25,15 +25,22 @@ The wedge is the scam scanner; the moat is the governance + receipts pattern; th
 
 The launch leads with the first line. The other two are upgrade paths.
 
-## The Five-Movement Arc
+## The Nine-Phase Arc
 
-| Phase | When | Goal |
+Nine numbered phases plus an open-ended horizon. The first five are the bootstrap; phases 6–9 are the post-fade trajectory; the horizon is whatever the HORIZON_SCANNER proposes next. See `PHASES.md` for full criteria and S-GATE references, and `FOREVER_ROADMAP.md` for the immutable principles and ten currents that run continuously across all phases.
+
+| Phase | Adopters | Goal |
 |---|---|---|
-| 1. Pre-launch spectacle | Day -28 → Day 0 | Build the visible artifact. Signed proofs, dashboard, casts, lore, second adopter, multisig. |
-| 2. Genesis | Launch week | Token live. Cycle N+1 cites the contract in its receipt. Treasury starts capturing WETH from every swap. |
-| 3. Sustained activity | Month 1–3 | Daily casts, public approval flow, visible refusals, scams blocked publicly. Closed-loop demo: treasury → AI → cycle. |
-| 4. Federation | Month 3–9 | `create-orbit-repo` + SDK on npm + 10–20 adopter repos. Inter-Orbit messaging. Bounty market. |
-| 5. Standard | Year 1+ | Other agents read Orbit passports before acting. Spec gets copied. Protocol revenue accrues. |
+| 1. Groundwork | ≥1 | Foundation ships. Signed receipts, dashboard, casts, lore, second adopter, multisig. |
+| 2. Genesis | ≥5 | Token live on Base. Treasury captures WETH from every swap. Cycle N+1 cites the contract. |
+| 3. Capability Marketplace | ≥20 | Plugin economy, mission board, subscription tier. $ORBIT becomes useful. |
+| 4. Federation | ≥50 | Inter-orbit protocol live. Multi-maintainer quorum. External agents read Orbit passports. |
+| 5. Protocol Independence | ≥100 | Spec drafted off-repo. Founder-fade begins. ENS-resolvable identity. |
+| 6. Standardization | ≥500 | ≥3 external implementations. Founder-fade complete. On-chain governance receipts. |
+| 7. Five Thousand | ≥5,000 | Federation governance decentralized. Long-horizon memory at scale. |
+| 8. Ubiquity | ≥25,000 | Orbit is the coordination primitive. Every meaningful repo hosts one. |
+| 9. Quiet Utility | ∞ | Infrastructure becomes invisible. Referenced like SMTP. No exit gate. |
+| Horizon | — | HORIZON_SCANNER proposes Phase 10+ under constitutional amendment. |
 
 ## What Locks In Sustainability
 
