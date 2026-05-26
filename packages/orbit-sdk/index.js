@@ -35,6 +35,8 @@ const FILES = {
   horizonSources:    'memory/horizon-sources.json',
   horizonCandidates: 'memory/horizon-candidates.json',
   horizonConfig:     'memory/horizon-config.json',
+  handoff:           'memory/handoff.json',
+  errors:            'memory/errors.jsonl',
 };
 
 /**
@@ -618,6 +620,91 @@ function projectHorizonSlim(horizonBundle, options) {
   };
 }
 
+const HANDOFF_SCHEMA = "orbit-handoff/1";
+const DEFAULT_HANDOFF_RECENT_LIMIT = 3;
+const ERRORS_SCHEMA = "orbit-errors/1";
+const DEFAULT_ERRORS_RECENT_LIMIT = 5;
+
+function projectHandoffSlim(handoffRecord, options) {
+  // Surfaces the lifecycle state of any active handoffs. No PII —
+  // proposal text and rationale stay in memory/handoff.json; only the
+  // status counts and the most-recent record's status + timelock end
+  // are exposed. Maintainer GitHub handles are NOT included (they
+  // appear in the underlying file, but the dashboard slice is
+  // intentionally identity-light per FOREVER_ROADMAP rule 9-adjacent).
+  const opts = options || {};
+  const recentLimit = Number.isFinite(opts.handoffRecentLimit)
+    ? opts.handoffRecentLimit
+    : DEFAULT_HANDOFF_RECENT_LIMIT;
+  const empty = {
+    schema: HANDOFF_SCHEMA,
+    total: 0,
+    byStatus: {},
+    mostRecent: null,
+    recent: [],
+  };
+  const handoffs = Array.isArray(handoffRecord && handoffRecord.handoffs)
+    ? handoffRecord.handoffs
+    : [];
+  if (handoffs.length === 0) return empty;
+  const byStatus = {};
+  for (const h of handoffs) {
+    if (!h || typeof h.status !== "string") continue;
+    byStatus[h.status] = (byStatus[h.status] || 0) + 1;
+  }
+  // Sort by createdAt descending — most recent first.
+  const sorted = handoffs
+    .filter((h) => h && typeof h.createdAt === "string")
+    .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+  const recent = sorted.slice(0, recentLimit).map((h) => ({
+    id: h.id || null,
+    type: h.type || null,
+    status: h.status || null,
+    timelockEndsAt: h.timelockEndsAt || null,
+    extensions: Number.isFinite(h.extensions) ? h.extensions : 0,
+  }));
+  return {
+    schema: HANDOFF_SCHEMA,
+    total: handoffs.length,
+    byStatus,
+    mostRecent: recent[0] || null,
+    recent,
+  };
+}
+
+function projectErrorsSlim(errorsList, options) {
+  // Recent error trail for the operator console. Entries are already
+  // redacted by error-log.logError before being persisted, but we
+  // also slice messages here as defense-in-depth. NO stack traces,
+  // NO context blobs — the dashboard is for awareness, not debugging.
+  // For full entries use `npm run orbit:errors show <n>`.
+  const opts = options || {};
+  const recentLimit = Number.isFinite(opts.errorsRecentLimit)
+    ? opts.errorsRecentLimit
+    : DEFAULT_ERRORS_RECENT_LIMIT;
+  const entries = Array.isArray(errorsList) ? errorsList : [];
+  const total = entries.length;
+  const byPhase = {};
+  for (const e of entries) {
+    if (!e || typeof e !== "object") continue;
+    const phase = typeof e.phase === "string" ? e.phase : "unknown";
+    byPhase[phase] = (byPhase[phase] || 0) + 1;
+  }
+  const recent = entries.slice(-recentLimit).reverse().map((e) => ({
+    ts: typeof e.ts === "string" ? e.ts : null,
+    phase: typeof e.phase === "string" ? e.phase : "unknown",
+    tool: e.tool || null,
+    code: e.code || null,
+    message: typeof e.message === "string" ? e.message.slice(0, 200) : null,
+  }));
+  return {
+    schema: ERRORS_SCHEMA,
+    total,
+    byPhase,
+    recent,
+  };
+}
+
 function projectReceipt(r) {
   return {
     path: r.path || null,
@@ -695,6 +782,8 @@ function exportBundle(repoRoot, _unused, options) {
       sources:    readJson(path.join(root, FILES.horizonSources)),
       candidates: readJson(path.join(root, FILES.horizonCandidates)),
     },
+    handoff: readJson(path.join(root, FILES.handoff)),
+    errors:  readJsonl(path.join(root, FILES.errors)),
   };
   if (includeMemory) {
     bundle.memory = {
@@ -805,6 +894,8 @@ function projectForDashboard(bundle, options) {
     adopters: projectAdoptersSlim(b.adopters, opts),
     approvals: projectApprovalsSlim(b.approvals, opts),
     horizon: projectHorizonSlim(b.horizon, opts),
+    handoff: projectHandoffSlim(b.handoff, opts),
+    errors: projectErrorsSlim(b.errors, opts),
   };
 
   slim.digest = digestForObject({
@@ -820,6 +911,8 @@ function projectForDashboard(bundle, options) {
     adopterCount: slim.adopters ? slim.adopters.adopted : 0,
     approvalsPending: slim.approvals ? slim.approvals.pending : 0,
     horizonPending: slim.horizon ? slim.horizon.pending : 0,
+    handoffTotal: slim.handoff ? slim.handoff.total : 0,
+    errorsTotal: slim.errors ? slim.errors.total : 0,
   });
 
   return slim;
@@ -848,5 +941,7 @@ module.exports = {
   createOrbitClient,
   exportBundle,
   projectForDashboard,
+  projectHandoffSlim,
+  projectErrorsSlim,
   FILES,
 };

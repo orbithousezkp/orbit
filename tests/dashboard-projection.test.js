@@ -343,6 +343,105 @@ test("projectForDashboard horizon slice tolerates missing files", () => {
   assert.deepEqual(slim.horizon.recent, []);
 });
 
+// === handoff slice (Patch Set S) =============================================
+
+test("projectForDashboard handoff slice tolerates missing files", () => {
+  const repoRoot = tempRepo();
+  const bundle = exportBundle(repoRoot, undefined, { receiptLimit: 10 });
+  const slim = projectForDashboard(bundle);
+  assert.equal(slim.handoff.schema, "orbit-handoff/1");
+  assert.equal(slim.handoff.total, 0);
+  assert.equal(slim.handoff.mostRecent, null);
+  assert.deepEqual(slim.handoff.recent, []);
+  assert.deepEqual(slim.handoff.byStatus, {});
+});
+
+test("projectForDashboard handoff slice surfaces status counts and most-recent", () => {
+  const repoRoot = tempRepo();
+  fs.writeFileSync(
+    path.join(repoRoot, "memory/handoff.json"),
+    JSON.stringify({
+      schema: "orbit-handoff/1",
+      handoffs: [
+        {
+          id: "h-001",
+          type: "signer-rotation",
+          status: "complete",
+          createdAt: "2026-06-01T00:00:00Z",
+          timelockEndsAt: "2026-06-08T00:00:00Z",
+          extensions: 0
+        },
+        {
+          id: "h-002",
+          type: "maintainer-list-change",
+          status: "timelock",
+          createdAt: "2026-06-15T00:00:00Z",
+          timelockEndsAt: "2026-06-22T00:00:00Z",
+          extensions: 1
+        }
+      ]
+    })
+  );
+  const bundle = exportBundle(repoRoot, undefined, { receiptLimit: 10 });
+  const slim = projectForDashboard(bundle);
+  assert.equal(slim.handoff.total, 2);
+  assert.deepEqual(slim.handoff.byStatus, { complete: 1, timelock: 1 });
+  // most-recent by createdAt
+  assert.equal(slim.handoff.mostRecent.id, "h-002");
+  assert.equal(slim.handoff.mostRecent.status, "timelock");
+  assert.equal(slim.handoff.mostRecent.extensions, 1);
+});
+
+// === errors slice (Patch Set S) ==============================================
+
+test("projectForDashboard errors slice tolerates missing log", () => {
+  const repoRoot = tempRepo();
+  const bundle = exportBundle(repoRoot, undefined, { receiptLimit: 10 });
+  const slim = projectForDashboard(bundle);
+  assert.equal(slim.errors.schema, "orbit-errors/1");
+  assert.equal(slim.errors.total, 0);
+  assert.deepEqual(slim.errors.byPhase, {});
+  assert.deepEqual(slim.errors.recent, []);
+});
+
+test("projectForDashboard errors slice surfaces phase counts and recent entries (no stack)", () => {
+  const repoRoot = tempRepo();
+  const lines = [
+    { ts: "2026-06-01T00:00:00Z", phase: "tool", tool: "create_issue", message: "rate limit", stack: "Error: 429\n  at fetch (...)" },
+    { ts: "2026-06-01T00:01:00Z", phase: "tool", tool: "github_search", message: "DNS hiccup", stack: "Error: ENOTFOUND" },
+    { ts: "2026-06-01T00:02:00Z", phase: "handoff-tick", message: "executor missing" }
+  ];
+  fs.writeFileSync(
+    path.join(repoRoot, "memory/errors.jsonl"),
+    lines.map((l) => JSON.stringify(l)).join("\n") + "\n"
+  );
+  const bundle = exportBundle(repoRoot, undefined, { receiptLimit: 10 });
+  const slim = projectForDashboard(bundle);
+  assert.equal(slim.errors.total, 3);
+  assert.deepEqual(slim.errors.byPhase, { tool: 2, "handoff-tick": 1 });
+  assert.equal(slim.errors.recent.length, 3);
+  // Newest first.
+  assert.equal(slim.errors.recent[0].phase, "handoff-tick");
+  // No stack on any entry — the slice is intentionally narrow.
+  for (const e of slim.errors.recent) {
+    assert.equal(e.stack, undefined);
+  }
+});
+
+test("projectForDashboard digest changes when handoff or errors change", () => {
+  // Drift detector: an empty handoff/errors and a populated one MUST
+  // produce different digests, or the dashboard fails to invalidate.
+  const repoA = tempRepo();
+  const repoB = tempRepo();
+  fs.writeFileSync(
+    path.join(repoB, "memory/handoff.json"),
+    JSON.stringify({ schema: "orbit-handoff/1", handoffs: [{ id: "h-001", status: "complete", createdAt: "2026-06-01T00:00:00Z" }] })
+  );
+  const digestA = projectForDashboard(exportBundle(repoA, undefined, { receiptLimit: 10 })).digest;
+  const digestB = projectForDashboard(exportBundle(repoB, undefined, { receiptLimit: 10 })).digest;
+  assert.notEqual(digestA, digestB);
+});
+
 function makeRefusalProof(overrides = {}) {
   return makeProof({
     cycle: overrides.cycle || 27,

@@ -372,6 +372,24 @@ async function main() {
   const cycleTrigger = normalizeTrigger(config);
 
   log(`cycle ${state.cycle} starting (${cycleTrigger.type}:${cycleTrigger.id})`);
+
+  // Patch Set S: if the previous cycle reached the on-chain launch but
+  // failed to persist Layer 1, the clanker wrote a marker file. Surface
+  // it every cycle until the operator clears it — silent alerts are
+  // not alerts. The marker check is cheap (one stat).
+  try {
+    const { hasLaunchPersistFailure } = require("./clanker");
+    if (hasLaunchPersistFailure(config.repoRoot)) {
+      log("alert: launched_but_persist_failed marker present — see memory/launch-persist-failure.json");
+      try {
+        require("./error-log").logError(config.repoRoot, {
+          phase: "launch-persist-failure",
+          code: "LAUNCH_PERSIST_FAILED",
+          message: "Layer 1 (state.launchOnceFired) did not persist after a token launch. Treasury layer 0 should still hold launchStatus=launched. See memory/launch-persist-failure.json."
+        });
+      } catch { /* error-log is best-effort */ }
+    }
+  } catch { /* clanker import shouldn't fail, but never break the cycle */ }
   const github = new GitHubClient(config);
   const context = await gatherContext(config);
   if (context.opportunities && context.opportunities.changed && context.opportunities.path) {

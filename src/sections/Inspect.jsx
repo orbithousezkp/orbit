@@ -38,6 +38,10 @@ export default function Inspect() {
   const horizonEnabledSources = data?.horizon?.enabledSources ?? null;
   const horizonTotalSources = data?.horizon?.totalSources ?? null;
   const horizonPending = data?.horizon?.pending ?? null;
+  const handoffTotal = data?.handoff?.total ?? null;
+  const handoffMostRecent = data?.handoff?.mostRecent ?? null;
+  const errorsTotal = data?.errors?.total ?? null;
+  const errorsRecent = Array.isArray(data?.errors?.recent) ? data.errors.recent : [];
 
   return (
     <section id="inspect" className="section section--inspect">
@@ -119,6 +123,34 @@ export default function Inspect() {
               : horizonDryRun
                 ? `dry-run · ${horizonPending ?? 0} candidate${(horizonPending ?? 0) === 1 ? '' : 's'} pending`
                 : `live · ${horizonPending ?? 0} candidate${(horizonPending ?? 0) === 1 ? '' : 's'} pending`}
+          </div>
+        </div>
+
+        <div className="cell">
+          <div className="cell__label">handoff</div>
+          <div className="cell__value">{handoffTotal ?? '—'}</div>
+          <div className="cell__hint">
+            {handoffTotal === null
+              ? 'projection rebuilds next cycle'
+              : handoffTotal === 0
+                ? 'no founder-handoff proposed'
+                : handoffMostRecent
+                  ? `${handoffMostRecent.id} · ${handoffMostRecent.status}`
+                  : 'see memory/handoff.json'}
+          </div>
+        </div>
+
+        <div className="cell">
+          <div className="cell__label">recent errors</div>
+          <div className="cell__value">{errorsTotal ?? '—'}</div>
+          <div className="cell__hint">
+            {errorsTotal === null
+              ? 'projection rebuilds next cycle'
+              : errorsTotal === 0
+                ? 'clean log · nothing logged'
+                : errorsRecent[0]
+                  ? `last: ${errorsRecent[0].phase}${errorsRecent[0].tool ? ' / ' + errorsRecent[0].tool : ''}`
+                  : 'see memory/errors.jsonl'}
           </div>
         </div>
 
