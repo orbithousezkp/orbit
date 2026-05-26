@@ -244,8 +244,10 @@ function proposeSpawn(repoRoot, input, deps = {}) {
 // code-fence + blockquote + indent skips (Patch Set Q).
 function parseSpawnComment(comment, idemKey, maintainers) {
   if (!comment || !idemKey) return null;
-  const author = String(comment.author || comment.user || "").toLowerCase();
+  const author = String(comment.author || comment.user || "").toLowerCase().trim();
   if (!author) return null;
+  // Patch Set AH: reject bot accounts (github-actions[bot] etc).
+  if (author.endsWith("[bot]") || author === "github-actions") return null;
   const allowed = new Set(
     (Array.isArray(maintainers) ? maintainers : []).map((m) => String(m || "").toLowerCase())
   );
@@ -259,7 +261,7 @@ function parseSpawnComment(comment, idemKey, maintainers) {
     if (/^`{3,}/.test(trimmed)) { inCodeFence = !inCodeFence; continue; }
     if (inCodeFence) continue;
     if (/^>/.test(trimmed)) continue;
-    if (/^ {4,}\S/.test(raw)) continue;
+    if (/^[ \t]{4,}\S/.test(raw)) continue;
     const m = trimmed.match(/^(APPROVE|REJECT)\s+ORBIT-SPAWN\s+(\S+)$/);
     if (m && m[2] === idem) {
       return { kind: m[1], author, createdAt: comment.createdAt || comment.created_at || null };

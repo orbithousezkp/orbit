@@ -74,7 +74,24 @@ const PROTECTED_WRITE_PATHS = new Set([
   "memory/approvals.json",
   "memory/governance.json",
   "memory/state.json",
-  "memory/treasury.json"
+  "memory/treasury.json",
+  // Patch Set AH: lifecycle ledgers must only be written through
+  // their own modules' atomic flows (handoff.saveHandoffs,
+  // spawn.saveSpawns/saveFamily, etc.), never through the LLM's
+  // write_file tool. Forgery via the tool surface would let the
+  // model fabricate quorum-approved proposals, family entries,
+  // or completed tasks.
+  "memory/handoff.json",
+  "memory/spawn-proposals.json",
+  "memory/family.json",
+  "memory/tasks.json",
+  "memory/knowledge.json",
+  "memory/roadmap.json",
+  "memory/cycles.jsonl",
+  "memory/errors.jsonl",
+  "memory/launch-persist-failure.json",
+  "memory/federation-inbox-ledger.json",
+  "memory/adopters-registry.json"
 ]);
 const SECRET_ENV_PATTERNS = [
   /TOKEN/i,

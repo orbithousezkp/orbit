@@ -189,8 +189,10 @@ function proposeHandoff(repoRoot, input, deps = {}) {
 // hardening as governance.parseQuorumComments (Patch Set Q).
 function parseHandoffComment(comment, idemKey, maintainers) {
   if (!comment || !idemKey) return null;
-  const author = String(comment.author || comment.user || "").toLowerCase();
+  const author = String(comment.author || comment.user || "").toLowerCase().trim();
   if (!author) return null;
+  // Patch Set AH: reject bot accounts (github-actions[bot] etc).
+  if (author.endsWith("[bot]") || author === "github-actions") return null;
   const allowed = new Set((Array.isArray(maintainers) ? maintainers : []).map((m) => String(m || "").toLowerCase()));
   if (!allowed.has(author)) return null;
   const idem = String(idemKey).trim();
@@ -205,7 +207,7 @@ function parseHandoffComment(comment, idemKey, maintainers) {
     }
     if (inCodeFence) continue;
     if (/^>/.test(trimmed)) continue;       // blockquote
-    if (/^ {4,}\S/.test(raw)) continue;     // indented code
+    if (/^[ \t]{4,}\S/.test(raw)) continue;     // indented code
     const m = trimmed.match(/^(APPROVE|REJECT|EXTEND)\s+ORBIT-HANDOFF\s+(\S+)$/);
     if (m && m[2] === idem) {
       return { kind: m[1], author, createdAt: comment.createdAt || comment.created_at || null };

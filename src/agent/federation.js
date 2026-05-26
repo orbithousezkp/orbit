@@ -475,6 +475,19 @@ async function signOutboundEnvelope(envelope, privateKey) {
   }
   const typed = buildTypedData(envelope);
   const account = privateKeyToAccount(privateKey);
+  // Patch Set AH: assert that the derived address actually matches
+  // the envelope's declared fromSigner. Without this, a misconfigured
+  // ORBIT_WALLET_PRIVATE_KEY (or a tampered config) could ship signed
+  // envelopes that the receiving Orbit's signature-recovery accepts
+  // but the fromSigner-binding rejects — wasted round-trip at best,
+  // confused-deputy attack at worst. Refuse to sign with the wrong key.
+  if (String(account.address).toLowerCase() !== String(envelope.fromSigner).toLowerCase()) {
+    const err = new Error(
+      `signOutboundEnvelope: privateKey derives ${account.address}, envelope.fromSigner is ${envelope.fromSigner}`
+    );
+    err.code = "SIGNER_MISMATCH";
+    throw err;
+  }
   const signature = await account.signTypedData(typed);
   return { ...envelope, signature };
 }

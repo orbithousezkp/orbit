@@ -271,11 +271,32 @@ function commentApproves(config, comment, id) {
   const owner = String(config.ownerUsername || "").trim();
   const body = comment.body || "";
   if (!owner) return null;
-  const fromOwner = author.toLowerCase() === owner.toLowerCase();
+
+  // Patch Set AH: reject bot accounts. The default GitHub Actions
+  // token posts as `github-actions[bot]`, but operators sometimes
+  // configure a PAT owned by themselves — without this guard,
+  // an LLM with create_issue + comment_issue could self-approve.
+  const a = String(author).toLowerCase().trim();
+  if (a.endsWith("[bot]") || a === "github-actions") return null;
+
+  const fromOwner = a === owner.toLowerCase();
   if (!fromOwner) return null;
-  const lines = body.split(/\r?\n/).map((line) => line.trim());
-  if (lines.includes(`APPROVE ORBIT-SPEND ${id}`)) return "approved";
-  if (lines.includes(`REJECT ORBIT-SPEND ${id}`)) return "rejected";
+
+  // Patch Set AH: same hardening as parseQuorumComments — skip lines
+  // inside ``` code fences, blockquotes, or 4+ space/tab indented
+  // code blocks. The maintainer's "here's how to approve, example:"
+  // demo must not register as a real approval.
+  const rawLines = body.split(/\r?\n/);
+  let inCodeFence = false;
+  for (const raw of rawLines) {
+    const trimmed = raw.trim();
+    if (/^`{3,}/.test(trimmed)) { inCodeFence = !inCodeFence; continue; }
+    if (inCodeFence) continue;
+    if (/^>/.test(trimmed)) continue;
+    if (/^[ \t]{4,}\S/.test(raw)) continue;
+    if (trimmed === `APPROVE ORBIT-SPEND ${id}`) return "approved";
+    if (trimmed === `REJECT ORBIT-SPEND ${id}`) return "rejected";
+  }
   return null;
 }
 
@@ -416,8 +437,14 @@ function parseQuorumComments(comments, idemKey, maintainers) {
 
   for (const comment of comments) {
     if (!comment) continue;
-    const author = String(comment.author || comment.user || "").toLowerCase();
-    if (!author || !allowed.has(author)) continue;
+    const author = String(comment.author || comment.user || "").toLowerCase().trim();
+    // Patch Set AH: bot guard. Reject github-actions[bot] and any
+    // future [bot]-suffixed account. The default GH Actions token
+    // posts as `github-actions[bot]`, but a misconfigured PAT may
+    // collide with a maintainer's handle — without this guard, the
+    // LLM could create_issue + comment_issue + self-approve.
+    if (!author || author.endsWith("[bot]") || author === "github-actions") continue;
+    if (!allowed.has(author)) continue;
     const body = String(comment.body || "");
     // Track markdown code-fence and blockquote state. Without this, a
     // maintainer can post a comment that LOOKS like documentation
@@ -441,7 +468,7 @@ function parseQuorumComments(comments, idemKey, maintainers) {
       // not a vote — strip it from consideration.
       if (/^>/.test(trimmed)) continue;
       // Indented code (4+ spaces in the RAW line).
-      if (/^ {4,}\S/.test(raw)) continue;
+      if (/^[ \t]{4,}\S/.test(raw)) continue;
       const approveMatch = trimmed.match(/^APPROVE\s+ORBIT-([A-Z0-9-]+)\s+(\S+)$/);
       const rejectMatch = trimmed.match(/^REJECT\s+ORBIT-([A-Z0-9-]+)\s+(\S+)$/);
       if (approveMatch && approveMatch[2] === idem) {

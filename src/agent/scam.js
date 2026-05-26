@@ -27,7 +27,7 @@ const SHORTENER_DOMAINS = new Set([
 const RISK_PATTERNS = [
   { severity: 100, category: "secret_request", pattern: /\b(seed phrase|private key|recovery phrase|mnemonic|wallet backup)\b/i, message: "Requests or mentions wallet secrets." },
   { severity: 95, category: "drain_phrase", pattern: /\b(unlimited approval|setapprovalforall|permit signature|increase allowance|approve all|token approval)\b/i, message: "Mentions high-risk approval behavior." },
-  { severity: 90, category: "fund_transfer", pattern: /\b(send|transfer|bridge|swap)\b.{0,80}\b(eth|weth|usdc|token|treasury|funds?)\b/i, message: "Requests movement of funds or tokens." },
+  { severity: 90, category: "fund_transfer", pattern: /\b(send|transfer|bridge|swap|relay|redirect|reroute|route|forward|divert|bounce|wire)\b.{0,80}\b(eth|weth|usdc|tokens?|treasury|funds?|wallets?|coins?|crypto|payments?)\b/i, message: "Requests movement of funds or tokens." },
   { severity: 88, category: "fake_support", pattern: /\b(support agent|wallet support|sync your wallet|validate your wallet|rectify your wallet|fix your wallet)\b/i, message: "Uses common fake wallet-support language." },
   { severity: 86, category: "urgent_pressure", pattern: /\b(urgent|immediately|within \d+ minutes|final warning|last chance|your funds are at risk)\b/i, message: "Applies urgency pressure." },
   { severity: 84, category: "reward_claim", pattern: /\b(claim|airdrop|free token|reward|allocation)\b.{0,80}\b(connect|sign|approve|wallet)\b/i, message: "Combines rewards with wallet signing." },

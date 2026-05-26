@@ -322,3 +322,32 @@ test("parseQuorumComments: a real APPROVE OUTSIDE a fence still counts even with
   );
   assert.equal(result.approvals.has("alice"), true);
 });
+
+// === Patch Set AH — tab-indent + bot-account hardening =====================
+
+test("parseQuorumComments: APPROVE indented with 4+ tabs (markdown code block) does NOT count", () => {
+  const result = parseQuorumComments(
+    [{ author: "alice", body: "\t\t\t\tAPPROVE ORBIT-SPEND abc" }],
+    "abc",
+    ["alice"]
+  );
+  assert.equal(result.approvals.size, 0);
+});
+
+test("parseQuorumComments: rejects APPROVE from a [bot] account even if listed as maintainer", () => {
+  const result = parseQuorumComments(
+    [{ author: "github-actions[bot]", body: "APPROVE ORBIT-SPEND abc" }],
+    "abc",
+    ["github-actions[bot]", "alice"]
+  );
+  assert.equal(result.approvals.size, 0);
+});
+
+test("parseQuorumComments: rejects 'github-actions' bare account name", () => {
+  const result = parseQuorumComments(
+    [{ author: "github-actions", body: "APPROVE ORBIT-SPEND abc" }],
+    "abc",
+    ["github-actions", "alice"]
+  );
+  assert.equal(result.approvals.size, 0);
+});

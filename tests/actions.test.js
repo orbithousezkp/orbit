@@ -26,7 +26,19 @@ test("writeFile refuses to write protected paths", () => {
     "memory/approvals.json",
     "memory/governance.json",
     "memory/state.json",
-    "memory/treasury.json"
+    "memory/treasury.json",
+    // Patch Set AH additions: lifecycle ledgers + content stores
+    "memory/handoff.json",
+    "memory/spawn-proposals.json",
+    "memory/family.json",
+    "memory/tasks.json",
+    "memory/knowledge.json",
+    "memory/roadmap.json",
+    "memory/cycles.jsonl",
+    "memory/errors.jsonl",
+    "memory/launch-persist-failure.json",
+    "memory/federation-inbox-ledger.json",
+    "memory/adopters-registry.json"
   ]) {
     assert.throws(
       () => writeFile({ repoRoot }, protectedPath, "{}\n"),
