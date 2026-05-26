@@ -90,7 +90,7 @@
 **Session:** S-001
 **Decision:** `packages/orbit-sdk` is published to npm under the scope `@orbit-house`. Currently `"private": true` — that flag is removed and the package is published before Phase 1 closes.
 **Why:** No external adoption possible without a published package. `@orbit-house` matches the household metaphor and is presumably available (verify before publish).
-**Implication:** Owner must register `@orbit-house` org on npm. `create-orbit-repo` is also published under same scope or as a standalone unscoped package.
+**Implication:** Owner must register `@orbit-house` org on npm. `create-orbit-house` is also published under same scope or as a standalone unscoped package.
 
 ---
 

@@ -26,7 +26,7 @@ export const phases = [
       'capability registry: declared, discoverable, machine-readable',
       'permission boundaries with owner approval gates',
       'prompt-injection guard, scam defence, deterministic fallback planner',
-      '@orbit-house/sdk · create-orbit-repo · verifier cli all published',
+      '@orbit-house/sdk · create-orbit-house · verifier cli all published',
     ],
   },
   {

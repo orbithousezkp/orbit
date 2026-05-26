@@ -5,7 +5,7 @@ const test = require("node:test");
 const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
-const detect = require("../packages/create-orbit-repo/src/detect");
+const detect = require("../packages/create-orbit-house/src/detect");
 
 test("parseNodeVersion handles v-prefix and plain", () => {
   assert.deepEqual(detect.parseNodeVersion("v20.10.1"), { major: 20, minor: 10, patch: 1 });

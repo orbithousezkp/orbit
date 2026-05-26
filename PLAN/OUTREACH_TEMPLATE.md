@@ -2,7 +2,7 @@
 
 > Drop-in copy for the S-016 push. Five repos is the Phase 1 target. Each template is short on purpose — adopters don't read long sales pitches from strangers.
 
-All templates assume the SDK + scaffolder are published to npm (S-GATE-1 item 5). Until then, swap `npx create-orbit-repo` for the clone instructions in `PLAN/ADOPTER_QUICKSTART.md` step 1.
+All templates assume the SDK + scaffolder are published to npm (S-GATE-1 item 5). Until then, swap `npx create-orbit-house` for the clone instructions in `PLAN/ADOPTER_QUICKSTART.md` step 1.
 
 ---
 
@@ -36,7 +36,7 @@ orbit is a github-native control plane for agents running inside a repo:
 - $0 hosting — github actions + pages
 
 5-minute scaffold:
-  npx create-orbit-repo {{their-repo-slug}}-orbit
+  npx create-orbit-house {{their-repo-slug}}-orbit
 
 mit licensed, no service, no telemetry. repo: github.com/orbithousezkp/orbit
 
@@ -71,7 +71,7 @@ It's not "another agent framework" — it's the bookkeeping layer underneath one
 
 If you have 5 minutes:
 
-    npx create-orbit-repo {{their-repo}}-orbit
+    npx create-orbit-house {{their-repo}}-orbit
 
 Even a "tried it, broken because X" issue back on [orbit](https://github.com/orbithousezkp/orbit) would be hugely useful.
 
@@ -88,12 +88,12 @@ Rules:
 ## 4. Conference / IRL — under 60 seconds
 
 ```
-"I work on a thing called Orbit. It's an agent control plane that lives entirely in a GitHub repo. Memory in JSON files, approval gates on every action, signed receipts that anyone can verify. No SaaS, no auth flow, $0 hosting. Five-minute setup with npx create-orbit-repo. I'm trying to get five repos running it by {{deadline}}. What's the smallest agent thing you do that hates its current bookkeeping?"
+"I work on a thing called Orbit. It's an agent control plane that lives entirely in a GitHub repo. Memory in JSON files, approval gates on every action, signed receipts that anyone can verify. No SaaS, no auth flow, $0 hosting. Five-minute setup with npx create-orbit-house. I'm trying to get five repos running it by {{deadline}}. What's the smallest agent thing you do that hates its current bookkeeping?"
 ```
 
 Rules:
 - Always end with a question that surfaces their pain point. Don't pitch first.
-- Have the scaffold command memorized: `npx create-orbit-repo <name>`. Don't fumble.
+- Have the scaffold command memorized: `npx create-orbit-house <name>`. Don't fumble.
 - If they care, hand them a sticker with `orbit.horse` and `github.com/orbithousezkp/orbit`. No business card.
 
 ---

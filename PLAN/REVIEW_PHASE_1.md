@@ -14,7 +14,7 @@ Phase 1 ships the full pre-launch product surface: signed cycle proofs, standalo
 | S-002 | Wallet-signed cycle proofs (D-006) | SHIPPED | PLAN/SPECS/PROOF_SIGNING.md |
 | S-003 | Public dashboard at orbit.horse (D-007) | SHIPPED | PLAN/SPECS/PUBLIC_DASHBOARD.md |
 | S-004 | Farcaster cast pipeline (D-008) | SHIPPED | PLAN/SPECS/FARCASTER_CAST_PIPELINE.md |
-| S-005 | Publish-ready @orbit-house/sdk + create-orbit-repo (D-009) | SHIPPED | PLAN/SPECS/CREATE_ORBIT_REPO.md |
+| S-005 | Publish-ready @orbit-house/sdk + create-orbit-house (D-009) | SHIPPED | PLAN/SPECS/CREATE_ORBIT_HOUSE.md |
 | S-006 | Closed-loop demo runbook + integration test | SHIPPED | PLAN/SPECS/CLOSED_LOOP_DEMO.md |
 | S-007 | Lore foundation (00-genesis, voice, cycles-of-note) | SHIPPED | lore/README.md |
 | S-008 | Treasury Safe deploy runbook | SHIPPED — owner runs deploy | PLAN/SPECS/TREASURY_SAFE_DEPLOY.md |
@@ -47,7 +47,7 @@ Phase 1 ships the full pre-launch product surface: signed cycle proofs, standalo
 2. **Set `ORBIT_AGENT_SIGNER` repo variable** — derive from `ORBIT_WALLET_PRIVATE_KEY`. Unblocks signed-proof verification chain.
 3. **Create Orbit Farcaster account + Neynar signer** — set `ORBIT_FARCASTER_NEYNAR_API_KEY` + `ORBIT_FARCASTER_SIGNER_UUID` secrets; flip `ORBIT_FARCASTER_DRY_RUN=false`. Unblocks daily-cast cadence.
 4. **Deploy Treasury Safe on Base** — follow PLAN/SPECS/TREASURY_SAFE_DEPLOY.md (8-item checklist). Unblocks D-018 #7 + Clanker fee config.
-5. **`npm publish --access public`** from `packages/orbit-sdk/` and `packages/create-orbit-repo/` — register `@orbit-house` npm org first.
+5. **`npm publish --access public`** from `packages/orbit-sdk/` and `packages/create-orbit-house/` — register `@orbit-house` npm org first.
 6. **Set AI provider keys** — `ORBIT_AI_PROVIDERS` + `ORBIT_AI_PROVIDER_KEYS` secrets. Unblocks D-018 #3.
 7. **Let cycles run 12+ hours via Actions** — observe ≥24 consecutive clean cycles, record `firstCleanCycle` / `lastCleanCycle` in `memory/state.json`, flip `state.preLaunchVerified = true`. Unblocks D-018 #4.
 
@@ -63,8 +63,8 @@ Phase 1 ships the full pre-launch product surface: signed cycle proofs, standalo
 | Projection cap | ≤30 KB (enforced in SDK `projectForDashboard`) |
 | `npm run health` | 34 OK / 0 FAIL |
 | New npm dependencies in Phase 1 | 0 |
-| Packages in `packages/` | 5 (orbit-sdk, orbit-verifier, create-orbit-repo, orbit-anchor, issue-scam-scanner) |
-| Specs in `PLAN/SPECS/` | 9 (proof signing, dashboard, farcaster, create-orbit-repo, closed-loop, treasury safe, merkle anchor, bounty, federation) |
+| Packages in `packages/` | 5 (orbit-sdk, orbit-verifier, create-orbit-house, orbit-anchor, issue-scam-scanner) |
+| Specs in `PLAN/SPECS/` | 9 (proof signing, dashboard, farcaster, create-orbit-house, closed-loop, treasury safe, merkle anchor, bounty, federation) |
 
 ## Risk Register Delta (vs S-001 RISKS.md)
 

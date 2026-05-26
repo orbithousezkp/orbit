@@ -246,7 +246,7 @@ The contributor surface.
 How users find and use Orbit.
 
 - Public dashboard at orbit.horse (Phase 1)
-- `create-orbit-repo` scaffolder (Phase 1)
+- `create-orbit-house` scaffolder (Phase 1)
 - npm-published SDK (Phase 1)
 - README badge (`[Orbit · cycle #N · last receipt ✓]`)
 - Marketplace listing (GitHub Marketplace for scanner)

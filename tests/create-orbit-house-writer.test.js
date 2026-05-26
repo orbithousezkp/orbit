@@ -5,7 +5,7 @@ const test = require("node:test");
 const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
-const writer = require("../packages/create-orbit-repo/src/writer");
+const writer = require("../packages/create-orbit-house/src/writer");
 
 function baseOpts(targetDir, overrides) {
   return Object.assign({

@@ -1,4 +1,4 @@
-# SPEC — create-orbit-repo scaffolder (S-007)
+# SPEC — create-orbit-house scaffolder (S-007)
 
 Status: ready-to-implement
 Refs: D-009, DEPLOY_PLAN.md env-var inventory
@@ -6,8 +6,8 @@ Refs: D-009, DEPLOY_PLAN.md env-var inventory
 ## 1. Package Structure
 
 ```
-packages/create-orbit-repo/
-  package.json              # name: create-orbit-repo, bin: ./bin.js
+packages/create-orbit-house/
+  package.json              # name: create-orbit-house, bin: ./bin.js
   bin.js                    # shebang + argv parser + main()
   src/
     index.js                # orchestrator
@@ -54,7 +54,7 @@ Hard rule: NO secrets, NO addresses, NO private keys in any template. All refere
 ## 3. CLI Argv Parsing
 
 ```
-npx create-orbit-repo [target] [options]
+npx create-orbit-house [target] [options]
 
 target              Directory path. Default: current dir if --here else prompt
                     Use "." for current directory
@@ -158,7 +158,7 @@ Plain text. No colors unless TTY. No emoji.
 | Workflow file in repo where Actions disabled | Detect via `.github/disabled` marker; write file but warn |
 | `--force` passed and backup write fails | Abort that file's overwrite, keep original |
 | Disk full mid-write | Roll back, exit 1 |
-| `npx` cache stale | Print current version vs installed at start; suggest `npm exec --yes create-orbit-repo@latest` |
+| `npx` cache stale | Print current version vs installed at start; suggest `npm exec --yes create-orbit-house@latest` |
 
 ## 7. Test Plan
 
@@ -177,17 +177,17 @@ CI matrix: Node 18, 20, 22 on ubuntu-latest and macos-latest.
 
 Run after D-009 prerequisites (npm `@orbit-house` org registered):
 
-1. Bump version in `packages/create-orbit-repo/package.json` to `0.1.0`
-2. Verify `name` is `create-orbit-repo` (UNSCOPED — so `npx create-orbit-repo` works directly without org prefix)
+1. Bump version in `packages/create-orbit-house/package.json` to `0.1.0`
+2. Verify `name` is `create-orbit-house` (UNSCOPED — so `npx create-orbit-house` works directly without org prefix)
 3. Verify `bin.js` has `#!/usr/bin/env node`, executable bit set
-4. `npm pack --dry-run` from packages/create-orbit-repo, confirm files list contains: bin.js, src/, templates/, README.md, LICENSE, package.json — excludes node_modules, tests, .DS_Store
+4. `npm pack --dry-run` from packages/create-orbit-house, confirm files list contains: bin.js, src/, templates/, README.md, LICENSE, package.json — excludes node_modules, tests, .DS_Store
 5. Add `files` field to package.json to whitelist
 6. Add `.npmignore` if needed
-7. Local smoke: `npm pack && cd /tmp && mkdir t && cd t && npx /path/to/create-orbit-repo-0.1.0.tgz . --dry-run`
+7. Local smoke: `npm pack && cd /tmp && mkdir t && cd t && npx /path/to/create-orbit-house-0.1.0.tgz . --dry-run`
 8. `npm login` (owner machine)
 9. `npm publish --access public` (unscoped public; no auth scope conflict)
-10. Verify: `npx create-orbit-repo@0.1.0 --version` from clean shell
-11. Tag commit: `git tag create-orbit-repo-v0.1.0 && git push --tags`
+10. Verify: `npx create-orbit-house@0.1.0 --version` from clean shell
+11. Tag commit: `git tag create-orbit-house-v0.1.0 && git push --tags`
 12. Add row to STATUS.md showing publish hash + timestamp
 
 For subsequent versions, gate publish behind a GitHub Action that runs full test suite first; manual `npm publish` only after green CI.

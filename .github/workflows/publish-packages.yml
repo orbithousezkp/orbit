@@ -1,0 +1,85 @@
+name: Publish Packages
+
+# Publishes @orbit-house/sdk or create-orbit-house to npm when a matching
+# tag is pushed. The owner cuts a release by:
+#
+#   # sdk
+#   git tag sdk-v0.2.0 && git push origin sdk-v0.2.0
+#
+#   # scaffolder
+#   git tag create-orbit-house-v0.2.0 && git push origin create-orbit-house-v0.2.0
+#
+# A repo secret `NPM_TOKEN` (an automation token, not a publish-only one)
+# must be set. The tag name determines which package is published; the
+# version is taken from the package.json on the tagged commit, so bump
+# the version BEFORE tagging.
+
+on:
+  push:
+    tags:
+      - "sdk-v*"
+      - "create-orbit-house-v*"
+  workflow_dispatch:
+    inputs:
+      package:
+        description: "Which package to publish"
+        required: true
+        type: choice
+        options:
+          - sdk
+          - create-orbit-house
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Resolve target package
+        id: target
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            case "${{ github.event.inputs.package }}" in
+              sdk) echo "dir=packages/orbit-sdk" >> "$GITHUB_OUTPUT" ;;
+              create-orbit-house) echo "dir=packages/create-orbit-house" >> "$GITHUB_OUTPUT" ;;
+              *) echo "unknown package: ${{ github.event.inputs.package }}" >&2; exit 1 ;;
+            esac
+          else
+            case "${GITHUB_REF_NAME}" in
+              sdk-v*) echo "dir=packages/orbit-sdk" >> "$GITHUB_OUTPUT" ;;
+              create-orbit-house-v*) echo "dir=packages/create-orbit-house" >> "$GITHUB_OUTPUT" ;;
+              *) echo "unrecognized tag: ${GITHUB_REF_NAME}" >&2; exit 1 ;;
+            esac
+          fi
+
+      - name: Dry-run pack (sanity)
+        working-directory: ${{ steps.target.outputs.dir }}
+        run: npm pack --dry-run
+
+      - name: Publish to npm
+        working-directory: ${{ steps.target.outputs.dir }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --provenance --access public

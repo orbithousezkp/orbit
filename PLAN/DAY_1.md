@@ -56,13 +56,13 @@ Everything below is implementable with what exists today. No new dependencies, n
 
 **Effort:** ~2 hours owner writing + agent drafting
 
-### 6. SDK npm Publish + create-orbit-repo
+### 6. SDK npm Publish + create-orbit-house
 
 **What:**
 - Remove `"private": true` from `packages/orbit-sdk/package.json`
 - Add LICENSE, README, publish to npm as `@orbit-house/sdk`
-- New `packages/create-orbit-repo/` — small bin that scaffolds `.github/workflows/`, `memory/`, `governance.json`, `treasury.json` defaults
-- Publish as `create-orbit-repo` so `npx create-orbit-repo` works
+- New `packages/create-orbit-house/` — small bin that scaffolds `.github/workflows/`, `memory/`, `governance.json`, `treasury.json` defaults
+- Publish as `create-orbit-house` so `npx create-orbit-house` works
 
 **Effort:** ~3 hours
 
@@ -169,7 +169,7 @@ End of Day 1, the repo state shows:
 - [ ] At least one Farcaster cast from Orbit's account
 - [ ] `lore/00-genesis.md` exists
 - [ ] `@orbit-house/sdk` is published to npm
-- [ ] `create-orbit-repo` is published to npm
+- [ ] `create-orbit-house` is published to npm
 - [ ] Treasury Safe deployed on Base with all signers
 - [ ] One closed-loop demo run end-to-end with public receipt
 

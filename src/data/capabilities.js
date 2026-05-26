@@ -50,7 +50,7 @@ export const capabilities = [
   {
     n: '10',
     name: 'sdk + scaffolder',
-    desc: '@orbit-house/sdk · create-orbit-repo · verifier cli — adopt the layer from a single command.',
+    desc: '@orbit-house/sdk · create-orbit-house · verifier cli — adopt the layer from a single command.',
   },
   {
     n: '11',

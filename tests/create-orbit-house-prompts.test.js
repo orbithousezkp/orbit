@@ -3,7 +3,7 @@
 const assert = require("node:assert/strict");
 const test = require("node:test");
 const path = require("node:path");
-const { parseArgv, resolveOptions } = require("../packages/create-orbit-repo/src/index");
+const { parseArgv, resolveOptions } = require("../packages/create-orbit-house/src/index");
 
 test("parseArgv collects target and flags", () => {
   const f = parseArgv(["./out", "--yes", "--no-install", "--name", "agent", "--owner", "me"]);

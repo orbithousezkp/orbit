@@ -1,4 +1,4 @@
-# create-orbit-repo
+# create-orbit-house
 
 _Part of [Orbit](https://github.com/orbithousezkp/orbit) — the control plane for agent memory and infrastructure inside any GitHub repo._
 
@@ -9,13 +9,13 @@ Scaffolder for new Orbit repos. Adds GitHub Actions workflows, memory files, gov
 No install required.
 
 ```
-npx create-orbit-repo my-orbit-repo
+npx create-orbit-house my-orbit-repo
 ```
 
 ## Usage
 
 ```
-npx create-orbit-repo [target] [options]
+npx create-orbit-house [target] [options]
 
 target              Directory path. Default: current dir if --here else prompt
                     Use "." for current directory

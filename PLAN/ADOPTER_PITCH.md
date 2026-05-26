@@ -33,7 +33,7 @@ Orbit pushes the opposite direction. **Every artifact lives in your repo.** Memo
 ## What You Get In 5 Minutes
 
 ```
-npx create-orbit-repo my-orbit
+npx create-orbit-house my-orbit
 cd my-orbit
 gh repo create --public --source .
 git push -u origin main

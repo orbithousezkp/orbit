@@ -88,7 +88,7 @@ ORBIT_OPS_RUNWAY_SAFE           = 0x...  ( 500 bps; gas + RPC + infra)
 
 ## 5. Publish SDK and scaffolder to npm
 
-**Why.** `@orbit-house/sdk` and `create-orbit-repo` are publish-ready (8KB and 11-template tarballs respectively). Until they're on npm, adopters can only consume Orbit by cloning the repo — the S-016 onboarding push is impossible.
+**Why.** `@orbit-house/sdk` and `create-orbit-house` are publish-ready (8KB and 11-template tarballs respectively). Until they're on npm, adopters can only consume Orbit by cloning the repo — the S-016 onboarding push is impossible.
 
 **Do.**
 ```
@@ -98,7 +98,7 @@ npm whoami   # verify
 cd packages/orbit-sdk
 npm publish --access public
 
-cd ../create-orbit-repo
+cd ../create-orbit-house
 npm publish --access public
 
 cd ../orbit-verifier
@@ -109,7 +109,7 @@ cd ../orbit-anchor && npm publish --access public
 cd ../orbit-tool-example && npm publish --access public
 ```
 
-**Acceptance.** Each package resolves at `https://www.npmjs.com/package/@orbit-house/<name>`. `npx create-orbit-repo demo-orbit` succeeds in a clean directory.
+**Acceptance.** Each package resolves at `https://www.npmjs.com/package/@orbit-house/<name>`. `npx create-orbit-house demo-orbit` succeeds in a clean directory.
 
 ---
 

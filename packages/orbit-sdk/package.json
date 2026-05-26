@@ -6,6 +6,15 @@
   "bin": {
     "orbit": "./cli.js"
   },
+  "files": [
+    "index.js",
+    "cli.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "test": "node --test ../../tests/orbit-sdk.test.js"
   },
@@ -18,6 +27,17 @@
     "agent-passport",
     "governance"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/orbithousezkp/orbit",
+    "directory": "packages/orbit-sdk"
+  },
+  "homepage": "https://github.com/orbithousezkp/orbit/tree/main/packages/orbit-sdk#readme",
+  "bugs": {
+    "url": "https://github.com/orbithousezkp/orbit/issues"
+  },
   "license": "MIT",
-  "private": true
+  "publishConfig": {
+    "access": "public"
+  }
 }

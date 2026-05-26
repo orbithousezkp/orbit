@@ -73,7 +73,7 @@ In priority order, see `DAY_1.md` and `PHASES.md` for detail:
 2. **Public dashboard** at `orbit.horse` (cycle counter, latest receipt, treasury, last 10 actions)
 3. **Farcaster casting** integration in cycle loop
 4. **Lore directory** + agent voice guide
-5. **`create-orbit-repo` scaffolder** + SDK npm publish
+5. **`create-orbit-house` scaffolder** + SDK npm publish
 6. **Treasury multisig** (Safe on Base)
 7. **One second adopter repo**
 8. **Closed-loop self-funding demo** (one public run before launch)

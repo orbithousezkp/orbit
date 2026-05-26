@@ -31,7 +31,7 @@ LAST UPDATED      : 2026-05-25
 CURRENT PHASE     : Phase 1 — Launch-Ready (Pre-Token) — engineering COMPLETE, owner-gated
 NEXT SESSION      : Owner punch list (OWNER_ACTIONS.md item 4 expanded: deploy 7 Safes); first adopter (gitty) handshake once scaffolder ships to npm
 GATE STATUS       : S-GATE-1 OPEN — 7-item owner punch list (PLAN/SGATE_1.md)
-OPEN BLOCKERS     : Owner actions — enable GitHub Pages; set ORBIT_AGENT_SIGNER; provision Farcaster signer; deploy Treasury Safe; `npm publish --access public` (orbit-sdk + create-orbit-repo); set ORBIT_AI_PROVIDERS keys; verify 12h clean Actions stretch
+OPEN BLOCKERS     : Owner actions — enable GitHub Pages; set ORBIT_AGENT_SIGNER; provision Farcaster signer; deploy Treasury Safe; `npm publish --access public` (orbit-sdk + create-orbit-house); set ORBIT_AI_PROVIDERS keys; verify 12h clean Actions stretch
 ```
 
 ---
@@ -44,7 +44,7 @@ OPEN BLOCKERS     : Owner actions — enable GitHub Pages; set ORBIT_AGENT_SIGNE
 | S-002 | S-BUILD | Wallet-signed cycle proofs (D-006) | DONE 2026-05-24 | EIP-712 signing on every cycle; `src/agent/proof-signing.js` + `proof-canonical.js`; `@orbit-house/verifier` package; signed proofs verifiable via verifier CLI |
 | S-003 | S-BUILD | Public dashboard for orbit.horse (D-007) | DONE 2026-05-24 | `projectForDashboard` SDK helper; cycle writes `public/dashboard.json` (≤60KB cap); React Dashboard renders all spec sections; bundle 66.5KB gz; GitHub Pages workflow `deploy-dashboard.yml` + `public/CNAME` shipped |
 | S-004 | S-BUILD | Farcaster cast pipeline (D-008) | DONE 2026-05-24 | `src/agent/farcaster.js` (pickTemplate, renderCast, scanOutbound, publishCast, postCycleCast); `cast_to_farcaster` tool + handler; cycle posts at end of `main()` (dry-run default TRUE); workflow env in orbit-cycle.yml + orbit-event.yml |
-| S-005 | S-BUILD | Publish-ready @orbit-house/sdk + create-orbit-repo (D-009) | DONE 2026-05-24 | `packages/orbit-sdk` publish-ready (8KB tarball, 14 exports, MIT LICENSE); `packages/create-orbit-repo` full scaffolder (bin.js + 11 templates, atomic rollback, path-traversal guard) |
+| S-005 | S-BUILD | Publish-ready @orbit-house/sdk + create-orbit-house (D-009) | DONE 2026-05-24 | `packages/orbit-sdk` publish-ready (8KB tarball, 14 exports, MIT LICENSE); `packages/create-orbit-house` full scaffolder (bin.js + 11 templates, atomic rollback, path-traversal guard) |
 | S-006 | S-BUILD | Closed-loop demo runbook + integration test | DONE 2026-05-24 | `PLAN/SPECS/CLOSED_LOOP_DEMO.md` + `tests/closed-loop-demo.test.js` covering refill-request → approval → record → next-call chain |
 | S-007 | S-BUILD | Lore foundation (00-genesis, voice, cycles-of-note) | DONE 2026-05-24 | `lore/00-genesis.md`, `lore/voice.md`, `lore/cycles-of-note/`, `lore/README.md` |
 | S-008 | S-PLAN | Treasury Safe deploy runbook | DONE 2026-05-24 | `PLAN/SPECS/TREASURY_SAFE_DEPLOY.md` (8-item checklist) — owner runs deploy |
@@ -118,7 +118,7 @@ OPEN BLOCKERS     : Owner actions — enable GitHub Pages; set ORBIT_AGENT_SIGNE
 2. Set `ORBIT_AGENT_SIGNER` repo variable
 3. Provision Farcaster signer (Neynar)
 4. Deploy Treasury Safe on Base
-5. `npm publish --access public` for `@orbit-house/sdk` and `create-orbit-repo`
+5. `npm publish --access public` for `@orbit-house/sdk` and `create-orbit-house`
 6. Configure AI provider keys
 7. Verify 12-hour clean Actions cron stretch
 
@@ -135,7 +135,7 @@ Do NOT propose token-launch work (S-011+) until owner closes those items.
 | Build | 215.61 KB raw / 66.54 KB gz (CSS 29.45 / 7.11 gz) — under 80 KB budget |
 | Health | 34 OK / 0 FAIL (runtime-config flags ORBIT_AI_PROVIDERS not yet set — expected) |
 | Specs in `PLAN/SPECS/` | 18 |
-| Packages in `packages/` | 5 (orbit-sdk, orbit-verifier, create-orbit-repo, orbit-anchor, issue-scam-scanner) |
+| Packages in `packages/` | 5 (orbit-sdk, orbit-verifier, create-orbit-house, orbit-anchor, issue-scam-scanner) |
 
 ---
 

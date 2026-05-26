@@ -5,7 +5,7 @@ const test = require("node:test");
 const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
-const { main } = require("../packages/create-orbit-repo/src/index");
+const { main } = require("../packages/create-orbit-house/src/index");
 
 test("e2e: scaffold into empty temp dir via main()", async () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "orbit-e2e-"));

@@ -55,7 +55,7 @@
 **Description:** Despite ship plan, no second repo runs Orbit in first 60 days. Project reads as one-repo stunt.
 **Mitigation:**
 - Pre-launch: owner personally onboards 2 friends to use Orbit. Contrived is fine.
-- `create-orbit-repo` must be genuinely friction-free — test with someone unfamiliar with the project
+- `create-orbit-house` must be genuinely friction-free — test with someone unfamiliar with the project
 - Adoption incentive: first 10 adopters get a special role/recognition in the registry
 - Cast every new adopter as a milestone
 - If 30 days with 0 organic adopters: rethink positioning, possibly pivot harder toward narrative

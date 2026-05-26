@@ -2,7 +2,7 @@
 
 const assert = require("node:assert/strict");
 const test = require("node:test");
-const merge = require("../packages/create-orbit-repo/src/merge");
+const merge = require("../packages/create-orbit-house/src/merge");
 
 test("mergePackageJson preserves existing scripts and deps", () => {
   const existing = JSON.stringify({

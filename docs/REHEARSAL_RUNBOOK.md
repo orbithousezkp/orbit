@@ -15,7 +15,7 @@ Tick each before starting:
 - [ ] A throwaway Farcaster signer + FID via Neynar (or skip casting by leaving `ORBIT_FARCASTER_DRY_RUN=true`).
 - [ ] A throwaway Base RPC URL (Alchemy/QuickNode free tier is fine).
 - [ ] An AI provider key for `ORBIT_AI_PROVIDERS` + `ORBIT_AI_PROVIDER_KEYS` (the same Anthropic key as production is fine — small workload).
-- [ ] The npm packages `@orbit-house/sdk` + `@orbit-house/create-orbit-repo` + `@orbit-house/verifier` published (S-GATE-1 #5). Without this, you cannot scaffold an external adopter — but for the rehearsal we **clone this repo verbatim** instead of scaffolding, so this prerequisite is **optional** for the rehearsal itself.
+- [ ] The npm packages `@orbit-house/sdk` + `@orbit-house/create-orbit-house` + `@orbit-house/verifier` published (S-GATE-1 #5). Without this, you cannot scaffold an external adopter — but for the rehearsal we **clone this repo verbatim** instead of scaffolding, so this prerequisite is **optional** for the rehearsal itself.
 
 ---
 

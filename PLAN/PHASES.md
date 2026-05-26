@@ -36,7 +36,7 @@ Nine phases plus a horizon. Each phase is gated by concrete deliverables, not da
 | S-004 | S-BUILD | Farcaster caster integration | `src/agent/farcaster.js` + tool entry |
 | S-005 | S-BUILD | Public dashboard at orbit.horse | `apps/dashboard/` deployed |
 | S-006 | S-BUILD | Lore foundation + voice guide | `lore/` directory populated |
-| S-007 | S-BUILD | SDK npm publish + `create-orbit-repo` scaffolder | Both packages live on npm |
+| S-007 | S-BUILD | SDK npm publish + `create-orbit-house` scaffolder | Both packages live on npm |
 | S-008 | S-PLAN | Treasury Safe + recipient wallet setup | Addresses recorded in DEPLOY_PLAN.md |
 | S-009 | S-BUILD | Closed-loop self-funding demo | Public receipt of one full cycle |
 | S-010 | S-REVIEW | Phase 1 review + 14-day stabilization | Punch list cleared |
@@ -339,7 +339,7 @@ S-001 (this PLAN) → S-002 (signing) → S-003 (verifier) → S-007 (npm publis
 
 Phase 1 schedule pressure: if Phase 1 takes longer than 2 weeks, the things that come out (in order):
 1. Verifier CLI (defer — can launch with signed proofs and ship verifier later)
-2. `create-orbit-repo` polish (ship rough version, polish later)
+2. `create-orbit-house` polish (ship rough version, polish later)
 3. Lore beyond genesis (add over time)
 4. Second adopter (force it pre-launch via friend; polish post-launch)
 

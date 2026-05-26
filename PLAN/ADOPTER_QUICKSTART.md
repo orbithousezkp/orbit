@@ -26,7 +26,7 @@ export ORBIT_REPO="my-orbit"
 ## 1. Scaffold
 
 ```bash
-npx create-orbit-repo "$ORBIT_REPO"
+npx create-orbit-house "$ORBIT_REPO"
 cd "$ORBIT_REPO"
 ```
 

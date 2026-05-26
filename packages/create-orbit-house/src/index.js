@@ -5,7 +5,7 @@ const fs = require("fs");
 
 const PACKAGE_VERSION = require("../package.json").version;
 
-const HELP = `npx create-orbit-repo [target] [options]
+const HELP = `npx create-orbit-house [target] [options]
 
 target              Directory path. Default: current dir if --here else prompt
                     Use "." for current directory
