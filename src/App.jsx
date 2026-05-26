@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import Nav from './components/Nav.jsx';
-import BackgroundOrbit from './components/BackgroundOrbit.jsx';
-import CursorMoon from './components/CursorMoon.jsx';
 import Footer from './components/Footer.jsx';
 import Hero from './sections/Hero.jsx';
 import Live from './sections/Live.jsx';
@@ -65,8 +63,6 @@ export default function App() {
 
   return (
     <div className="app">
-      <BackgroundOrbit />
-      <CursorMoon />
       <Nav active={section} />
       <main className="stage" key={section}>
         <Panel />

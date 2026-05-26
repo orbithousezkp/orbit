@@ -5,10 +5,10 @@
 export const principles = [
   { n: '01', name: 'signed cycles', body: 'every cycle proof is wallet-signed and verifiable by anyone (D-006).' },
   { n: '02', name: 'approval gates', body: 'no external spend without a public approval issue and a recorded approval comment (D-014).' },
-  { n: '03', name: 'weth floor', body: 'treasury accrues in WETH; operator stream is 5% in WETH (D-017).' },
+  { n: '03', name: 'stable base asset', body: 'the treasury denominates value in a non-self-issued base asset. maintainer compensation, if any, is paid in that same asset.' },
   { n: '04', name: 'launch gate', body: 'no on-chain token operation without state.preLaunchVerified === true (D-018).' },
   { n: '05', name: 'six-safe split', body: 'treasury splits across the six topology Safes; no funds escape that topology (D-019).' },
-  { n: '06', name: 'no token rewards', body: 'no recipient takes rewards in $ORBIT — fees accrue in WETH (D-002, locked).' },
+  { n: '06', name: 'no self-issued payments', body: 'the project does not pay anyone in a token it issues itself. rewards flow in the base asset.' },
   { n: '07', name: 'github-only infra', body: 'no vercel, netlify, aws. if github disappears, orbit federates and re-anchors; it does not migrate to a vendor.' },
   { n: '08', name: 'no money on visitor surfaces', body: 'dashboards show counts, ratios, category labels. never the operator wallet balance.' },
   { n: '09', name: 'research access open', body: 'no domain allowlist on fetch tools. defense lives at the content-trust layer, not the network layer.' },

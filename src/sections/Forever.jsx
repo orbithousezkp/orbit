@@ -2,9 +2,9 @@ import React from 'react';
 import { principles, currents, horizon } from '../data/forever.js';
 
 /**
- * Forever — the meta-roadmap on a public surface. principles never change,
- * currents deepen forever, the horizon-scanner proposes whatever comes next.
- * see PLAN/FOREVER_ROADMAP.md for the prose version.
+ * Forever — the meta-roadmap on a public surface. Principles never
+ * change. Currents deepen forever. The horizon-scanner proposes
+ * whatever comes next. Read-only data; no interactions.
  */
 export default function Forever() {
   return (
@@ -19,54 +19,44 @@ export default function Forever() {
         </p>
       </header>
 
-      <div className="forever__group">
-        <div className="forever__group-head">
-          <span className="cell__label">immutable principles</span>
-          <span className="cell__hint">survive every phase transition · only changeable via constitutional amendment</span>
-        </div>
-        <div className="forever__principles">
-          {principles.map((p) => (
-            <article className="principle" key={p.n}>
-              <div className="principle__num">·{p.n}·</div>
-              <h3 className="principle__name">{p.name}</h3>
-              <p className="principle__body">{p.body}</p>
-            </article>
-          ))}
-        </div>
-      </div>
-
-      <div className="forever__group">
-        <div className="forever__group-head">
-          <span className="cell__label">the ten currents</span>
-          <span className="cell__hint">capability axes that never end · each runs across every phase</span>
-        </div>
-        <div className="forever__currents">
-          {currents.map((c) => (
-            <article className="current" key={c.n}>
-              <div className="current__head">
-                <span className="current__num mono">·{c.n}·</span>
-                <h3 className="current__name">{c.name}</h3>
-              </div>
-              <p className="current__star">{c.star}</p>
-              <p className="current__inflight"><span className="current__tag">in flight ·</span> {c.inflight}</p>
-            </article>
-          ))}
-        </div>
-      </div>
-
-      <div className="forever__group">
-        <div className="forever__group-head">
-          <span className="cell__label">horizon · phase 10 and beyond</span>
-          <span className="cell__hint">the engine that makes the roadmap self-extending</span>
-        </div>
-        <div className="forever__horizon">
-          <p className="forever__horizon-blurb">{horizon.blurb}</p>
-          <ul className="forever__horizon-list">
-            {horizon.bullets.map((b, i) => (
-              <li key={i}>{b}</li>
+      <div className="forever">
+        <section>
+          <h3 className="forever__block-head">immutable principles · only changeable via constitutional amendment</h3>
+          <ol className="principles">
+            {principles.map((p) => (
+              <li className="principle" key={p.n}>
+                <div className="principle__num">·{p.n}·</div>
+                <div className="principle__name">{p.name}</div>
+                <div className="principle__body">{p.body}</div>
+              </li>
             ))}
-          </ul>
-        </div>
+          </ol>
+        </section>
+
+        <section>
+          <h3 className="forever__block-head">the ten currents · capability axes that never end</h3>
+          <div className="currents">
+            {currents.map((c) => (
+              <article className="current" key={c.n}>
+                <div className="current__name">·{c.n}· {c.name}</div>
+                <p className="current__pitch">{c.star}</p>
+                <p className="current__pitch"><span className="mono">in flight ·</span> {c.inflight}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section>
+          <h3 className="forever__block-head">horizon · phase 10 and beyond</h3>
+          <div className="horizon">
+            <p>{horizon.blurb}</p>
+            <ul style={{ margin: '0.8rem 0 0', padding: '0 0 0 1.2rem', fontSize: '0.85rem', color: 'var(--ink-mid)' }}>
+              {horizon.bullets.map((b, i) => (
+                <li key={i} style={{ marginBottom: '0.3rem' }}>{b}</li>
+              ))}
+            </ul>
+          </div>
+        </section>
       </div>
     </section>
   );

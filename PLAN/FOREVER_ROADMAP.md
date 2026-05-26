@@ -22,10 +22,10 @@ Every cycle of every phase must honor these. They are not subject to growth or a
 
 1. **Every cycle proof is wallet-signed and verifiable by anyone.** (D-006)
 2. **No external spend without a public approval issue and a recorded approval comment.** (D-014)
-3. **Treasury accrues in WETH; the operator stream is 5% in WETH.** (D-017)
+3. **The treasury denominates value in a non-self-issued base asset.** Maintainer compensation, if any, is paid in that same asset. The specific implementation (WETH on Base; 5% maintainer stream) is described in D-017, but the abstract principle is what's immutable: don't peg your treasury to a token you mint yourself, and don't pay your maintainers in your own narrative.
 4. **No on-chain token operation without `state.preLaunchVerified === true`.** (D-018)
 5. **Treasury splits across the six topology Safes; no funds escape that topology.** (D-019)
-6. **No recipient takes rewards in $ORBIT.** (D-002, locked)
+6. **The project does not pay anyone in a token it issues itself.** Rewards, fees, and maintainer compensation flow in the base asset (D-002, locked). This protects against self-dealing dressed up as governance.
 7. **Infrastructure stays on GitHub.** No Vercel, Netlify, AWS, or other hosted dependency for the operational path. If GitHub disappears, Orbit federates and re-anchors; it does not migrate to a vendor.
 8. **No specific dollar figures from Orbit's operating accounts appear on GitHub-visitor surfaces.** Dashboards may show counts, ratios, and category labels; not the operator's wallet balance.
 9. **Research access is open.** No domain allowlist on fetch tools. Defense lives at the content-trust layer (provenance tagging, untrusted-input envelopes, risk scoring), not at the network layer.
