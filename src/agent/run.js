@@ -697,6 +697,39 @@ async function main() {
     log(`revenue-explorer: failed: ${redactSecrets(err.message || String(err))}`);
   }
 
+  // Patch Set R: tick the founder-handoff lifecycle. No-op unless there's
+  // a TIMELOCK proposal whose timer has expired. The executor is NOT
+  // wired here — the on-chain Safe rotation primitive lives in
+  // Patch Set V; without it the handoff sits in EXECUTING with a
+  // clear marker until the owner runs the rotation tx. Best-effort.
+  try {
+    const handoff = require("./handoff");
+    const tickResult = await handoff.tickHandoffs(config.repoRoot, { now: new Date() });
+    if (tickResult.advanced.length || tickResult.errors.length) {
+      filesChanged.add("memory/handoff.json");
+      log(`handoff tick: advanced=${tickResult.advanced.length} errors=${tickResult.errors.length}`);
+    }
+  } catch (err) {
+    log(`handoff tick: failed: ${redactSecrets(err.message || String(err))}`);
+    try { require("./error-log").logError(config.repoRoot, { phase: "handoff-tick", error: err }); } catch { /* ignore */ }
+  }
+
+  // Patch Set R: horizon scan. Defaults to dry-run mode (writes to
+  // runtime/horizon/dry/, never to PLAN/SPECS/CANDIDATES/), so this is
+  // inert pre-launch. Live mode is guarded by state.preLaunchVerified
+  // (Patch Set I). With no fetcher/classifier wired here, the default
+  // ones return zero items and the scan completes in a few ms.
+  try {
+    const horizon = require("./horizon-scanner");
+    const summary = await horizon.runHorizonScan(config.repoRoot, {}, { now: new Date() });
+    if (summary.candidatesDrafted > 0 || summary.guarded) {
+      log(`horizon: drafted=${summary.candidatesDrafted}${summary.guarded ? " GUARDED" : ""}`);
+    }
+  } catch (err) {
+    log(`horizon tick: failed: ${redactSecrets(err.message || String(err))}`);
+    try { require("./error-log").logError(config.repoRoot, { phase: "horizon-tick", error: err }); } catch { /* ignore */ }
+  }
+
   appendLine(config.repoRoot, "memory/cycles.jsonl", {
     cycle: state.cycle,
     timestamp: finishedAt,
