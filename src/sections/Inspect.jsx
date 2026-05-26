@@ -170,14 +170,14 @@ export default function Inspect() {
           className="cell"
           href="https://www.npmjs.com/package/@orbit-house/sdk"
           target="_blank"
-          rel="noreferrer"
+          rel="noreferrer noopener"
         >
           <div className="cell__label">sdk</div>
           <div className="cell__value">@orbit-house/sdk</div>
           <div className="cell__hint">projectForDashboard · exportBundle · verifier cli</div>
         </a>
 
-        <a className="cell" href="/dashboard.json" target="_blank" rel="noreferrer">
+        <a className="cell" href="/dashboard.json" target="_blank" rel="noreferrer noopener">
           <div className="cell__label">snapshot</div>
           <div className="cell__value mono">/dashboard.json</div>
           <div className="cell__hint">
@@ -199,7 +199,7 @@ export default function Inspect() {
                   className="inspect__mission-link"
                   href={m.issueUrl || '#'}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noreferrer noopener"
                 >
                   <span className="inspect__mission-num mono">#{m.issueNumber}</span>
                   <span className="inspect__mission-title">{m.title}</span>
@@ -227,7 +227,7 @@ export default function Inspect() {
                   className="inspect__approval-link"
                   href={a.issueUrl || '#'}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noreferrer noopener"
                 >
                   <span className="inspect__approval-num mono">
                     {a.issueNumber !== null ? `#${a.issueNumber}` : '—'}

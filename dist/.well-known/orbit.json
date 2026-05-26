@@ -1,17 +1,18 @@
 {
   "schema": "orbit-well-known/1",
-  "generatedAt": "2026-05-25T05:54:11.901Z",
+  "generatedAt": "2026-05-25T12:49:43.385Z",
   "product": {
     "name": "Orbit",
     "category": "GitHub-native agent infrastructure"
   },
   "identity": {
     "brand": "Orbit",
-    "repo": "github.com/orbithousezkp/orbit",
-    "publicUrl": "https://orbit.horse",
+    "repo": null,
+    "publicUrl": null,
     "farcaster": null,
     "signer": null
   },
+  "lineage": null,
   "activePhase": {
     "id": "foundation-control-plane",
     "name": "Foundation Control Plane",
@@ -65,6 +66,18 @@
       "name": "Agent Passport",
       "surface": null,
       "mode": "repo_public"
+    },
+    {
+      "id": "sdk-cli-capability",
+      "name": "SDK And CLI",
+      "surface": null,
+      "mode": "local_package"
+    },
+    {
+      "id": "mcp-server-capability",
+      "name": "MCP Server",
+      "surface": null,
+      "mode": "local_package"
     }
   ],
   "surfaces": [
@@ -119,7 +132,13 @@
     {
       "id": "sdk-cli",
       "name": "SDK And CLI Surface",
-      "url": "src/cli/",
+      "url": "packages/orbit-sdk/",
+      "mode": null
+    },
+    {
+      "id": "mcp-server",
+      "name": "MCP Server Surface",
+      "url": "packages/orbit-mcp-server/",
       "mode": null
     },
     {
@@ -146,7 +165,7 @@
     "schemaUrl": "https://orbit.horse/.well-known/orbit.json",
     "acceptsEnvelopes": false,
     "contact": {
-      "github": "github.com/orbithousezkp/orbit",
+      "github": null,
       "farcaster": null
     }
   },

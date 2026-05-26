@@ -1,25 +1,21 @@
 {
   "schema": "orbit-dashboard/1",
-  "generatedAt": "2026-05-25T12:47:00.000Z",
-  "gitCommit": "c8b1490",
+  "generatedAt": "2026-05-26T09:06:37.034Z",
+  "gitCommit": null,
   "product": {
     "name": "Orbit",
-    "category": "GitHub-native agent infrastructure",
-    "problem": "AI agents can write code, but most projects still lack a durable operating layer for identity, permissions, memory, receipts, budget, lifecycle, and human approval.",
-    "solution": "Orbit turns a repository into an agent control plane: the repo stores the agent passport, capability registry, command surface, memory, proof receipts, lifecycle state, and policy gates.",
-    "positioning": "Security checks are guardrails. The product is the infrastructure that lets an autonomous software operator run, prove work, and stay governable."
+    "category": "GitHub-native agent infrastructure"
   },
   "activePhase": {
     "id": "foundation-control-plane",
     "name": "Foundation Control Plane",
-    "status": "active",
-    "goal": "Make Orbit understandable as infrastructure before expanding execution power."
+    "status": "active"
   },
   "signer": null,
   "lifecycle": {
     "cycle": 57,
     "born": "2026-05-22T01:46:39.981Z",
-    "lastActive": "2026-05-25T09:07:43.228Z",
+    "lastActive": "2026-05-25T12:45:36.826Z",
     "lastStatus": "completed",
     "firstWakeIntroComplete": true,
     "recordedCycles": 57
@@ -33,22 +29,9 @@
       "symbol": "ORBIT",
       "launchStatus": "not_launched",
       "launchedAt": null,
-      "configured": true
+      "configured": false
     },
-    "aiBudget": {
-      "level": "ok",
-      "dailyBudgetUsd": 5,
-      "monthlyBudgetUsd": 100,
-      "purchaseMode": "owner_approved_manual_credit_top_up"
-    },
-    "revenue": {
-      "cadence": "weekly_performance",
-      "claimIntervalDays": 7,
-      "operatorShareBps": 500,
-      "treasuryShareBps": 9500,
-      "canClaim": false
-    },
-    "digest": "b12adb97bce36e7b3c63020c6231c620ebdffed3d26769888ca756ad8c880bfc"
+    "digest": "0xa23e5db8"
   },
   "permissions": {
     "allowedWithoutApproval": [
@@ -68,44 +51,13 @@
       "Cross-agent delegation with shared access"
     ]
   },
-  "activeLayers": [
-    { "id": "github-intake", "name": "GitHub Intake", "status": "active" },
-    { "id": "repo-memory", "name": "Repo Memory", "status": "active" },
-    { "id": "agent-lifecycle", "name": "Agent Lifecycle", "status": "active" },
-    { "id": "permissions", "name": "Permissions And Approvals", "status": "active" },
-    { "id": "proof-receipts", "name": "Proof Receipts", "status": "active" },
-    { "id": "wallet-policy", "name": "Wallet Policy", "status": "active" },
-    { "id": "sdk-cli-access", "name": "SDK And CLI Access", "status": "active" }
-  ],
-  "activeCapabilities": [
-    { "id": "identity", "name": "Identity And Mission", "status": "active" },
-    { "id": "lifecycle", "name": "Wake/Sleep Lifecycle", "status": "active" },
-    { "id": "memory", "name": "Durable Memory", "status": "active" },
-    { "id": "proofs", "name": "Proof Receipts", "status": "active" },
-    { "id": "permissions", "name": "Permission Gates", "status": "active" },
-    { "id": "budget", "name": "AI Food Budget", "status": "active" },
-    { "id": "intake-guardrails", "name": "Intake Guardrails", "status": "active" },
-    { "id": "agent-passport", "name": "Agent Passport", "status": "active" },
-    { "id": "sdk-cli-capability", "name": "SDK And CLI", "status": "active" },
-    { "id": "mcp-server-capability", "name": "MCP Server", "status": "active" }
-  ],
-  "infrastructure": {
-    "totalSurfaces": 11,
-    "activeSurfaces": 10,
-    "totalCapabilities": 11,
-    "activeCapabilities": 10,
-    "totalCommands": 6,
-    "activeCommands": 6,
-    "totalAccess": 5,
-    "activeAccess": 4
-  },
   "receipts": {
-    "count": 26,
+    "count": 43,
     "latest": {
-      "path": "runtime/proofs/2026-05-25/2026-05-25T09-15-05-253Z.json",
-      "cycle": 56,
-      "startedAt": "2026-05-25T09:09:30.453Z",
-      "finishedAt": "2026-05-25T09:15:05.253Z",
+      "path": "runtime/proofs/2026-05-25/2026-05-25T12-49-43-353Z.json",
+      "cycle": 57,
+      "startedAt": "2026-05-25T12:45:36.826Z",
+      "finishedAt": "2026-05-25T12:49:43.353Z",
       "trigger": {
         "type": "mandatory",
         "id": "regular_heartbeat",
@@ -116,10 +68,9 @@
         "reason": "Wake on the fixed repository control-plane rhythm even when no event fires."
       },
       "dryRun": false,
-      "totalSteps": 8,
-      "filesChangedCount": 3,
-      "result": "Infrastructure accuracy: upgraded memory/infrastructure.json from v1 to v2, promoted SDK/CLI surface from planned to active, added MCP server surface, promoted 6 CLI commands from planned to active.",
-      "digest": "auto-generated",
+      "totalSteps": 29,
+      "filesChangedCount": 9,
+      "result": null,
       "signed": false,
       "signer": null,
       "signatureScheme": null,
@@ -128,85 +79,280 @@
     "latestSigned": null,
     "list": [
       {
-        "path": "runtime/proofs/2026-05-25/2026-05-25T09-15-05-253Z.json",
+        "path": "runtime/proofs/2026-05-25/2026-05-25T12-49-43-353Z.json",
+        "cycle": 57,
+        "startedAt": "2026-05-25T12:45:36.826Z",
+        "finishedAt": "2026-05-25T12:49:43.353Z",
+        "trigger": {
+          "type": "mandatory",
+          "id": "regular_heartbeat",
+          "label": "30-minute heartbeat",
+          "intervalMinutes": 30,
+          "source": "schedule",
+          "action": "",
+          "reason": "Wake on the fixed repository control-plane rhythm even when no event fires."
+        },
+        "dryRun": false,
+        "totalSteps": 29,
+        "filesChangedCount": 9,
+        "result": null,
+        "signed": false,
+        "signer": null,
+        "signatureScheme": null,
+        "payloadHash": null
+      },
+      {
+        "path": "runtime/proofs/2026-05-25/2026-05-25T09-15-05-254Z.json",
         "cycle": 56,
-        "finishedAt": "2026-05-25T09:15:05.253Z",
-        "trigger": { "type": "mandatory", "id": "regular_heartbeat", "label": "30-minute heartbeat" },
-        "totalSteps": 8,
-        "filesChangedCount": 3,
-        "result": "Infrastructure registry accuracy upgrade: promoted SDK/CLI and MCP server from planned to active, added 6 active CLI commands."
+        "startedAt": "2026-05-25T09:07:43.228Z",
+        "finishedAt": "2026-05-25T09:15:05.254Z",
+        "trigger": {
+          "type": "mandatory",
+          "id": "regular_heartbeat",
+          "label": "30-minute heartbeat",
+          "intervalMinutes": 30,
+          "source": "schedule",
+          "action": "",
+          "reason": "Wake on the fixed repository control-plane rhythm even when no event fires."
+        },
+        "dryRun": false,
+        "totalSteps": 30,
+        "filesChangedCount": 8,
+        "result": null,
+        "signed": false,
+        "signer": null,
+        "signatureScheme": null,
+        "payloadHash": null
       },
       {
-        "path": "runtime/proofs/2026-05-25/2026-05-25T05-23-43-769Z.json",
+        "path": "runtime/proofs/2026-05-25/2026-05-25T05-23-43-770Z.json",
         "cycle": 55,
-        "finishedAt": "2026-05-25T05:23:43.769Z",
-        "trigger": { "type": "event", "id": "owner_manual_wake", "label": "Owner manual wake" },
-        "totalSteps": 8,
-        "filesChangedCount": 2,
-        "result": "Frontend maintenance: updated dist/dashboard.json from cycle 27 stale data to cycle 55 current state."
+        "startedAt": "2026-05-25T05:20:19.188Z",
+        "finishedAt": "2026-05-25T05:23:43.770Z",
+        "trigger": {
+          "type": "event",
+          "id": "owner_manual_wake",
+          "label": "owner manual wake",
+          "source": "workflow_dispatch",
+          "action": "",
+          "reason": "Wake because the owner asked for a cycle now."
+        },
+        "dryRun": false,
+        "totalSteps": 29,
+        "filesChangedCount": 4,
+        "result": null,
+        "signed": false,
+        "signer": null,
+        "signatureScheme": null,
+        "payloadHash": null
       },
       {
-        "path": "runtime/proofs/2026-05-25/2026-05-25T05-18-51-667Z.json",
+        "path": "runtime/proofs/2026-05-25/2026-05-25T05-18-51-668Z.json",
         "cycle": 54,
-        "finishedAt": "2026-05-25T05:18:51.667Z",
-        "trigger": { "type": "mandatory", "id": "regular_heartbeat", "label": "30-minute heartbeat" },
-        "totalSteps": 8,
-        "filesChangedCount": 3,
-        "result": "Frontend SPA merged via PR #4; mission control dashboard deployed."
-      },
-      {
-        "path": "runtime/proofs/2026-05-25/2026-05-25T04-53-52-228Z.json",
-        "cycle": 53,
-        "finishedAt": "2026-05-25T04:53:52.228Z",
-        "trigger": { "type": "mandatory", "id": "regular_heartbeat", "label": "30-minute heartbeat" },
-        "totalSteps": 8,
-        "filesChangedCount": 3,
-        "result": "Infrastructure growth and maintenance."
-      },
-      {
-        "path": "runtime/proofs/2026-05-24/2026-05-24T23-47-08-351Z.json",
-        "cycle": 52,
-        "finishedAt": "2026-05-24T23:47:08.351Z",
-        "trigger": { "type": "mandatory", "id": "regular_heartbeat", "label": "30-minute heartbeat" },
-        "totalSteps": 8,
+        "startedAt": "2026-05-25T05:14:53.344Z",
+        "finishedAt": "2026-05-25T05:18:51.668Z",
+        "trigger": {
+          "type": "event",
+          "id": "github_issue_comment",
+          "label": "issue_comment.created",
+          "source": "issue_comment",
+          "action": "created",
+          "reason": "Wake because something happened on GitHub."
+        },
+        "dryRun": false,
+        "totalSteps": 30,
         "filesChangedCount": 2,
-        "result": "Routine infrastructure cycle."
+        "result": null,
+        "signed": false,
+        "signer": null,
+        "signatureScheme": null,
+        "payloadHash": null
+      },
+      {
+        "path": "runtime/proofs/2026-05-25/2026-05-25T04-53-52-230Z.json",
+        "cycle": 53,
+        "startedAt": "2026-05-25T04:51:08.537Z",
+        "finishedAt": "2026-05-25T04:53:52.230Z",
+        "trigger": {
+          "type": "mandatory",
+          "id": "regular_heartbeat",
+          "label": "30-minute heartbeat",
+          "intervalMinutes": 30,
+          "source": "schedule",
+          "action": "",
+          "reason": "Wake on the fixed repository control-plane rhythm even when no event fires."
+        },
+        "dryRun": false,
+        "totalSteps": 30,
+        "filesChangedCount": 1,
+        "result": null,
+        "signed": false,
+        "signer": null,
+        "signatureScheme": null,
+        "payloadHash": null
+      },
+      {
+        "path": "runtime/proofs/2026-05-24/2026-05-24T23-47-08-355Z.json",
+        "cycle": 52,
+        "startedAt": "2026-05-24T23:44:39.851Z",
+        "finishedAt": "2026-05-24T23:47:08.355Z",
+        "trigger": {
+          "type": "mandatory",
+          "id": "regular_heartbeat",
+          "label": "30-minute heartbeat",
+          "intervalMinutes": 30,
+          "source": "schedule",
+          "action": "",
+          "reason": "Wake on the fixed repository control-plane rhythm even when no event fires."
+        },
+        "dryRun": false,
+        "totalSteps": 32,
+        "filesChangedCount": 1,
+        "result": null,
+        "signed": false,
+        "signer": null,
+        "signatureScheme": null,
+        "payloadHash": null
+      },
+      {
+        "path": "runtime/proofs/2026-05-24/2026-05-24T22-44-32-651Z.json",
+        "cycle": 51,
+        "startedAt": "2026-05-24T22:41:30.076Z",
+        "finishedAt": "2026-05-24T22:44:32.651Z",
+        "trigger": {
+          "type": "mandatory",
+          "id": "regular_heartbeat",
+          "label": "30-minute heartbeat",
+          "intervalMinutes": 30,
+          "source": "schedule",
+          "action": "",
+          "reason": "Wake on the fixed repository control-plane rhythm even when no event fires."
+        },
+        "dryRun": false,
+        "totalSteps": 29,
+        "filesChangedCount": 6,
+        "result": null,
+        "signed": false,
+        "signer": null,
+        "signatureScheme": null,
+        "payloadHash": null
+      },
+      {
+        "path": "runtime/proofs/2026-05-24/2026-05-24T21-42-21-153Z.json",
+        "cycle": 50,
+        "startedAt": "2026-05-24T21:39:18.747Z",
+        "finishedAt": "2026-05-24T21:42:21.153Z",
+        "trigger": {
+          "type": "mandatory",
+          "id": "regular_heartbeat",
+          "label": "30-minute heartbeat",
+          "intervalMinutes": 30,
+          "source": "schedule",
+          "action": "",
+          "reason": "Wake on the fixed repository control-plane rhythm even when no event fires."
+        },
+        "dryRun": false,
+        "totalSteps": 29,
+        "filesChangedCount": 4,
+        "result": null,
+        "signed": false,
+        "signer": null,
+        "signatureScheme": null,
+        "payloadHash": null
+      },
+      {
+        "path": "runtime/proofs/2026-05-24/2026-05-24T20-40-47-114Z.json",
+        "cycle": 49,
+        "startedAt": "2026-05-24T20:36:29.542Z",
+        "finishedAt": "2026-05-24T20:40:47.114Z",
+        "trigger": {
+          "type": "mandatory",
+          "id": "regular_heartbeat",
+          "label": "30-minute heartbeat",
+          "intervalMinutes": 30,
+          "source": "schedule",
+          "action": "",
+          "reason": "Wake on the fixed repository control-plane rhythm even when no event fires."
+        },
+        "dryRun": false,
+        "totalSteps": 27,
+        "filesChangedCount": 6,
+        "result": null,
+        "signed": false,
+        "signer": null,
+        "signatureScheme": null,
+        "payloadHash": null
+      },
+      {
+        "path": "runtime/proofs/2026-05-24/2026-05-24T19-45-05-480Z.json",
+        "cycle": 48,
+        "startedAt": "2026-05-24T19:40:02.822Z",
+        "finishedAt": "2026-05-24T19:45:05.480Z",
+        "trigger": {
+          "type": "mandatory",
+          "id": "regular_heartbeat",
+          "label": "30-minute heartbeat",
+          "intervalMinutes": 30,
+          "source": "schedule",
+          "action": "",
+          "reason": "Wake on the fixed repository control-plane rhythm even when no event fires."
+        },
+        "dryRun": false,
+        "totalSteps": 28,
+        "filesChangedCount": 6,
+        "result": null,
+        "signed": false,
+        "signer": null,
+        "signatureScheme": null,
+        "payloadHash": null
       }
     ]
   },
-  "topOpportunity": {
-    "id": "orbit-agent-passport",
-    "title": "Orbit agent passport and capability registry",
-    "score": 42.33,
-    "status": "open",
-    "note": "Agent passport and JSON schema created in cycles 39-41. Advances infrastructure growth and future adoption."
+  "refusals": [],
+  "missions": {
+    "schema": "orbit-missions/1",
+    "active": 0,
+    "total": 0,
+    "list": []
   },
-  "roadmapStatus": {
-    "currentLevel": { "id": "level-1", "name": "Control Plane Foundation", "status": "active" },
-    "nextLevel": { "id": "level-3", "name": "Proof And Memory", "status": "planned" },
-    "activePhase": { "phaseId": "safe-autonomy-core", "status": "active" },
-    "laneCounts": { "passed": 0, "active": 2, "planned": 6, "research": 2, "later": 1, "blocked": 0 },
-    "hasZkImplementation": false
+  "adopters": {
+    "schema": "orbit-adopters/1",
+    "total": 1,
+    "adopted": 0,
+    "phase1Target": 5,
+    "phase5Target": 50,
+    "phase1Progress": 0,
+    "phase5Progress": 0,
+    "list": []
   },
-  "token": {
-    "name": "Orbit",
-    "symbol": "ORBIT",
-    "launchStatus": "not_launched",
-    "launchedAt": null,
-    "configured": true
+  "approvals": {
+    "schema": "orbit-approvals/1",
+    "pending": 0,
+    "total": 0,
+    "list": []
   },
-  "treasury": {
-    "buckets": {
-      "schema": "orbit-treasury-buckets/1",
-      "count": 6,
-      "list": [
-        { "id": "floor-reserve", "bps": 4500, "purpose": "Price-floor anchor" },
-        { "id": "productive-yield", "bps": 2000, "purpose": "Aave/Uniswap deployment" },
-        { "id": "buyback", "bps": 500, "purpose": "Weekly $ORBIT buyback" },
-        { "id": "growth", "bps": 1500, "purpose": "Mission rewards + adopter incentives" },
-        { "id": "ai-costs", "bps": 1000, "purpose": "AI invoice reimbursement" },
-        { "id": "ops-runway", "bps": 500, "purpose": "Gas + RPC + infra contingency" }
-      ]
-    }
-  }
+  "horizon": {
+    "schema": "orbit-horizon/1",
+    "dryRun": true,
+    "enabledSources": 0,
+    "totalSources": 4,
+    "pending": 0,
+    "promoted": 0,
+    "archived": 0,
+    "recent": []
+  },
+  "handoff": {
+    "schema": "orbit-handoff/1",
+    "total": 0,
+    "byStatus": {},
+    "mostRecent": null,
+    "recent": []
+  },
+  "errors": {
+    "schema": "orbit-errors/1",
+    "total": 0,
+    "byPhase": {},
+    "recent": []
+  },
+  "digest": "0xffc3ce0b"
 }
