@@ -358,6 +358,136 @@ Long-term exploration; nothing is ruled out.
 - "Verifiable autonomous corporation" framing (Orbit as a legal entity in friendly jurisdiction)
 - Endowment model (treasury funds projects, not just Orbit ops)
 
+## P — Eras (post-Phase-5 timeline)
+
+After Phase 5 closes, phases stop being meaningful. Eras take over. See [FOREVER_ROADMAP.md](FOREVER_ROADMAP.md) for the full meta. Items here are era-specific capabilities that don't fit any other domain.
+
+- Era I narration — public cycle marking the founder-fade transition (signed, anchored, cast)
+- Era II markers — anniversary cycles (year 1, 3, 5, 10) with "Letter from Orbit" summaries
+- Era III peerage — Orbit-of-Orbits cross-instance dashboard (when ≥500 adopters)
+- Era IV quiet utility — the project becomes infrastructure; rituals for that phase
+- Era boundary detection — automated check for adopter milestones (≥50, ≥500, ≥5000)
+- Capability retirement ceremony — when a capability is sunset, narrate it the same way it was introduced
+- Founder-departure proof artifact — signed receipt that the founder is no longer required, verifiable from outside
+- Cross-era memory continuity — early-era cycle proofs still verifiable in later eras (key rotation handles this)
+- Era-specific governance thresholds — quorum sizes may scale with adopter count
+- Eulogy template — for any era's natural close, public artifact, no hand-wringing
+- "Founders of record" registry — historical attribution preserved, not load-bearing in current cycles
+- Cycle-million celebration template (long-horizon optimism is a feature)
+
+## Q — Self-Extension / Research Engine
+
+The roadmap's own engine. How Orbit discovers new work to do without a human in the loop. See [HORIZON_SCANNER spec](SPECS/HORIZON_SCANNER.md).
+
+- HORIZON_SCANNER (S-HORIZON-1) — periodic public-web scan; classifies signals to currents; drafts candidate specs
+- ArXiv ingestion (cs.CR, cs.AI, cs.DC, cs.MA categories)
+- EIP / ERC registry RSS ingestion
+- GitHub trending in adjacent ecosystems
+- Federation peer CAPABILITY_ADVERTISE ingestion (feeds horizon scanner)
+- Public attack-report feeds (Rekt News, Slowmist, ZachXBT-style sources)
+- Untrusted-input envelope for all fetched content (provenance, contentHash, untrusted framing)
+- Candidate spec drafter (LLM produces skeleton spec from classifier output)
+- Adopt-or-fade window for candidates (90-cycle archive timeout)
+- Candidate-promotion approval flow (D-014 quorum gate)
+- Auto-spec versioning (specs get a change log; promoted candidates carry source provenance)
+- Cross-Orbit horizon federation (peers share candidate streams; deferred until federation outbound is live)
+- Time-series classifier (trend detection across multiple signals)
+- Adversarial simulation hook (attack patterns flagged here feed Adversarial Resilience domain)
+- Source-quality scoring (per-source signal-to-noise; auto-tune fetch cadence)
+- "Roadmap reality checker" — does shipped reality match recently promoted candidates? auto-report
+- Constitutional-amendment proposal channel (a candidate that proposes changing an immutable principle goes through the slower process in FOREVER_ROADMAP §7)
+- Spec authoring assistant (the drafter, generalized: humans can invoke it manually)
+- Learning loop with promoted specs (track which candidates aged out vs. promoted, refine classifier prompts over time)
+- Spec staleness detector (specs not touched in N months get a freshness review)
+- "What didn't I scan?" diagnostic (gaps in source coverage relative to current adopter mix)
+- Open-question registry (questions Orbit can't answer yet; humans can subscribe to answers)
+
+## R — Adversarial Resilience
+
+The other half of the trust story is what Orbit does when something tries to hurt it. F covers reactive scam scanning; this domain is *proactive* — Orbit rehearses being attacked.
+
+- Red-team simulation harness (treasury-drain attempts in sandbox; verify governance gates hold)
+- Prompt-injection probe suite (run a known catalogue of injection attacks against current prompts each cycle; fail loudly if a probe succeeds)
+- Federation forgery rehearsal (replay attacks, signature manipulation, capability spoofing)
+- Chaos drill cycles (deliberately fail one tool per cycle in sandbox; verify graceful degradation)
+- Attack-pattern library (cross-orbit aggregated patterns; subscribe via federation INTEL_SHARE)
+- Honeypot mode for adopter repos (suspected-attacker engagement is observed, never extended)
+- Tabletop incident exercise generator (Orbit drafts a what-if scenario monthly; humans walk through it)
+- Capability blast-radius calculator (for any proposed capability, what's the worst-case if it's hijacked?)
+- Post-incident review automation (when something bad happens, Orbit drafts the post-mortem skeleton)
+- Adversarial classifier (a separate model judges whether a proposed action is suspicious BEFORE risk-scoring acts on it)
+- Treasury anti-fragility metric (treasury health under hypothetical 50% loss; cycle reports it)
+- Recovery-time-objective tracking (minutes to recover from each class of failure; SLO)
+- Tamper-evident proof chain (any historical proof that fails verification today files an alert)
+- Key compromise drill (rehearse losing the signer key; verify Shamir recovery works; do it quarterly)
+- Adopter-handshake sybil drill (test adopter validation against synthetic sybil attempts)
+- "What would I do if I were the attacker" exercise (LLM-driven; results inform Operations work)
+- Bounded-blast-radius enforcement (no single cycle's actions can move >X% of treasury without escalation)
+- Forensic snapshot generation (on demand: full signed state snapshot for incident review)
+
+## S — Multi-Modal / Sensory Expansion
+
+Orbit is text-native today. Many real-world threats and opportunities are not text. This domain expands input modalities under the same gating discipline.
+
+- Image input for contract screenshots / phishing-page detection
+- Image input for adopter README screenshots (visual handshake verification)
+- Audio input for voice approvals (signed audio file attached to approval issue; signature checked)
+- Audio input for owner directives (text-summarize first; raw audio retained for proof)
+- PDF input for legal notices, terms-of-service ingestion
+- Video input for governance ceremonies (founder-fade narration, milestone moments)
+- OCR pipeline for screenshots (extract text, run scam scanner, raw image retained)
+- Image-similarity detection for phishing UI (compare adopter-reported screenshot against canonical UI library)
+- Audio-watermark check (verify voice-approval recordings are not synthetic)
+- Multi-modal proof attachments (cycle proof references images/audio/video by content hash)
+- Image redaction for public surfaces (auto-blur addresses, names, amounts before posting)
+- Camera-input passport verification (Worldcoin-style proof-of-personhood for adopter handshake; opt-in)
+- Diagram understanding (architecture diagrams in adopter repos parsed and reasoned about)
+- Privacy-preserving on-device image processing (never upload sensitive imagery to cloud LLM)
+- Video review of failed cycles (operator can attach screen recording to incident report)
+
+## T — Long-Horizon Memory
+
+At 15-minute cycle cadence, year 1 is ~35,000 cycles and year 5 is ~175,000. Memory at that scale needs structure. This domain is the storage and recall layer that outlives any individual data store.
+
+- Tiered storage (hot: last 100 cycles full; warm: last 1y compressed; cold: archived to IPFS / Arweave)
+- Per-cycle proof compression (signed-summary + Merkle proof of full state)
+- Memory pruning policy (which fields decay, which never decay)
+- Long-term retention policy (legal-hold mode, GDPR right-to-erase, regulatory)
+- Federated memory queries (search across federation peers' published memory)
+- Vector index over knowledge.json (semantic recall as memory grows)
+- Time-decay confidence in memory entries (old knowledge tagged "stale; confirm before relying")
+- Multi-version memory snapshots (rollback to a prior memory state if drift detected)
+- Memory-anchor blockchain checkpoints (annual: Merkle root of all cycle proofs anchored on-chain)
+- Cross-Orbit memory archeology (read another Orbit's archived memory; verify with their key)
+- Memory schema migration (when a memory file's schema needs to change, automatic versioned migration)
+- "Stuff I learned this era" — periodic compaction of knowledge into era-summary documents
+- Knowledge graph (entities + relationships from cycle history; queryable)
+- Episodic vs. semantic memory split (event log vs. distilled lessons)
+- Memory budget enforcement (cap total memory footprint; oldest-and-least-recalled get tiered down)
+- Verifiable forgetfulness (cryptographic proof that something was forgotten on schedule)
+- Memory replay tooling (reconstruct any past cycle's decision context byte-for-byte from proofs)
+
+## U — Model Quality & AI Risk Management
+
+The LLM is a dependency. Dependencies drift. This domain is how Orbit manages AI risk in the same way it manages any other risk.
+
+- Model regression suite (held-out prompt set re-run against new model versions; behavior diff scored)
+- Capability evals (specific tests for: refusal correctness, scam detection, approval-issue formation, federation message verification)
+- Prompt versioning (every system-prompt change is versioned; cycles record which prompt version they ran under)
+- Cost-per-cycle trend tracking (alert if cost-per-cycle drifts >20% week-over-week)
+- Provider quality scorecard (success rate, latency, refusal rate per provider; routes update accordingly)
+- Model-card publication (Orbit publishes which models it used, for what, over what windows)
+- Drift detector (compare today's responses against last month's on the same eval prompts; flag drift)
+- Quality regression bisection (when an eval fails, bisect across recent prompt/model changes to find cause)
+- Adversarial eval set (prompts designed to make Orbit misbehave; rerun each cycle in sandbox)
+- Confidence calibration (Orbit estimates its confidence; track calibration vs. outcomes)
+- Tool-use eval (separate from chat eval — does Orbit invoke the right tools given a scenario?)
+- Federation peer model-diversity awareness (don't depend on all peers using the same model)
+- Inference-DAO routing (decentralized model marketplaces, when they exist; replaceable provider layer)
+- Local-model fallback (when private routes degrade, fall back to a self-hosted model in a child workflow)
+- Model-output watermark detection (refuse content from undisclosed AI-generated sources flowing in)
+- "What is the model getting wrong this week?" — periodic eval-failure digest, casted
+
 ---
 
 ## How This Document Is Used

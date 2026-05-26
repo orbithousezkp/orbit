@@ -154,6 +154,7 @@ We optimize for the $30M+ ceiling but plan budget around the $3M floor.
 - For the *fee mechanics* — `CLANKER_FEE_STRATEGY.md`
 - For *what to ship first* — `DAY_1.md`
 - For *what comes next* — `PHASES.md`
+- For *beyond founder-fade* — `FOREVER_ROADMAP.md`
 - For *everything else* — `ROADMAP.md`
 - For *infrastructure setup* — `DEPLOY_PLAN.md`
 - For *voice and lore* — `BRAND.md`

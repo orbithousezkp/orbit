@@ -160,6 +160,20 @@ Sessions for this phase will be planned at S-GATE-4. Likely areas:
 
 ---
 
+## Beyond Phase 5 — Eras
+
+Phases 1–5 describe the *bootstrap* (everything up to and including founder-fade). After S-GATE-5, phases no longer fit — there is no "Phase 6 success criteria" that makes sense for a project intended to outlive any single roadmap horizon.
+
+What replaces phases after S-GATE-5: **eras** and **currents**, defined in [FOREVER_ROADMAP.md](FOREVER_ROADMAP.md).
+
+- **Currents** are continuous capability axes that deepen forever. Ten of them, listed in FOREVER_ROADMAP §3.
+- **Eras** are nested epochs marked by adopter milestones, not dates. Era I (founder-fade) ends when Phase 5 exits. There is no terminal era.
+- **The HORIZON_SCANNER** (see [SPECS/HORIZON_SCANNER.md](SPECS/HORIZON_SCANNER.md)) makes the roadmap literally self-extending — it scans the open web on a slower cadence and proposes new candidate specs under approval-gated promotion.
+
+The phase model in this document remains load-bearing for everything up to Phase 5. Do not edit phases retroactively to reflect post-Phase-5 thinking; that's what FOREVER_ROADMAP exists for.
+
+---
+
 ## Phase Transition Gates
 
 Each `S-GATE-N` session must:
