@@ -12,7 +12,8 @@ const {
   containsSecret,
   normalizeRelativePath,
   safeJoin,
-  scoreIssueSafety
+  scoreIssueSafety,
+  writeSafeTextFile
 } = require("../src/agent/safety");
 
 test("normalizes safe relative paths", () => {
@@ -157,5 +158,64 @@ test("run command scrubs secret env vars before execution", () => {
     else process.env.GITHUB_TOKEN = previous.GITHUB_TOKEN;
     if (previous.ORBIT_WALLET_PRIVATE_KEY === undefined) delete process.env.ORBIT_WALLET_PRIVATE_KEY;
     else process.env.ORBIT_WALLET_PRIVATE_KEY = previous.ORBIT_WALLET_PRIVATE_KEY;
+  }
+});
+
+// === atomic write safety =====================================================
+
+test("writeSafeTextFile leaves no temp files behind on success", () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "orbit-atomic-"));
+  try {
+    writeSafeTextFile(root, "memory/state.json", "{\"cycle\": 1}\n");
+    const entries = fs.readdirSync(path.join(root, "memory"));
+    assert.deepEqual(entries, ["state.json"]);
+    assert.equal(
+      fs.readFileSync(path.join(root, "memory/state.json"), "utf-8"),
+      "{\"cycle\": 1}\n"
+    );
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("writeSafeTextFile preserves the previous file when rename fails", () => {
+  // Simulate a rename failure by making the destination a directory that
+  // cannot be replaced by a rename of a regular file. The original content
+  // must survive untouched, and no temp file may be left in the tree.
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "orbit-atomic-fail-"));
+  try {
+    fs.mkdirSync(path.join(root, "memory"), { recursive: true });
+    // Pre-create the target as a directory — rename(file, dir) errors on POSIX.
+    fs.mkdirSync(path.join(root, "memory/state.json"));
+    assert.throws(
+      () => writeSafeTextFile(root, "memory/state.json", "{\"cycle\": 2}\n"),
+      /EISDIR|ENOTEMPTY|EEXIST|directory|not empty|exists/i
+    );
+    // Original (directory) is intact.
+    assert.equal(fs.statSync(path.join(root, "memory/state.json")).isDirectory(), true);
+    // No orphaned .tmp.* sibling remained.
+    const leftovers = fs.readdirSync(path.join(root, "memory")).filter((n) => n !== "state.json");
+    assert.deepEqual(leftovers, []);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("writeSafeTextFile is durable across many overwrites", () => {
+  // Final content must equal the LAST write — even if temp file naming
+  // collisions were possible. (Atomic rename + per-write random suffix.)
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "orbit-atomic-loop-"));
+  try {
+    for (let i = 0; i < 25; i++) {
+      writeSafeTextFile(root, "memory/state.json", `{"cycle":${i}}\n`);
+    }
+    assert.equal(
+      fs.readFileSync(path.join(root, "memory/state.json"), "utf-8"),
+      "{\"cycle\":24}\n"
+    );
+    const entries = fs.readdirSync(path.join(root, "memory"));
+    assert.deepEqual(entries, ["state.json"]);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
   }
 });

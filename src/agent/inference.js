@@ -7,6 +7,7 @@ const { orderProviders, recordSuccess, recordFailure } = require("./ai-routing")
 const aiRoutingMargin = require("./ai-routing-margin");
 
 const DEFAULT_AI_REQUEST_MAX_BYTES = 2_500_000;
+const DEFAULT_AI_REQUEST_TIMEOUT_MS = 60_000;
 const WEI_PER_USD = 10n ** 18n;
 
 // Best-effort: convert a USD float into a wei BigInt using the 1 USD = 1e18
@@ -195,6 +196,11 @@ function requestMaxBytes(config = {}, provider = {}) {
   return Number.isFinite(configured) && configured > 0 ? configured : DEFAULT_AI_REQUEST_MAX_BYTES;
 }
 
+function requestTimeoutMs(config = {}, provider = {}) {
+  const configured = Number(provider.timeoutMs || config.aiRequestTimeoutMs || DEFAULT_AI_REQUEST_TIMEOUT_MS);
+  return Number.isFinite(configured) && configured > 0 ? configured : DEFAULT_AI_REQUEST_TIMEOUT_MS;
+}
+
 async function infer(config, messages, tools, routing) {
   const contextMessage = messages.find((message) => message.role === "user");
   const context = contextMessage && contextMessage.context ? contextMessage.context : {};
@@ -267,11 +273,29 @@ async function infer(config, messages, tools, routing) {
       }
 
       const chatPath = provider.chatPath || "/chat/completions";
-      const response = await fetch(`${provider.apiBase}${chatPath.startsWith("/") ? chatPath : `/${chatPath}`}`, {
-        method: "POST",
-        headers: providerHeaders(config, provider),
-        body: serialized
-      });
+      // Bounded request: AbortController kills a hung provider after the
+      // configured timeout (default 60s). Without this, a stalled
+      // connection would block the cycle for ~15 min until the
+      // GitHub Actions runner timeout fires.
+      const timeoutMs = requestTimeoutMs(config, provider);
+      const aborter = new AbortController();
+      const timer = setTimeout(() => aborter.abort(), timeoutMs);
+      let response;
+      try {
+        response = await fetch(`${provider.apiBase}${chatPath.startsWith("/") ? chatPath : `/${chatPath}`}`, {
+          method: "POST",
+          headers: providerHeaders(config, provider),
+          body: serialized,
+          signal: aborter.signal
+        });
+      } catch (fetchError) {
+        if (fetchError && fetchError.name === "AbortError") {
+          throw new Error(`AI API timeout after ${timeoutMs}ms`);
+        }
+        throw fetchError;
+      } finally {
+        clearTimeout(timer);
+      }
 
       if (!response.ok) {
         const text = await response.text();
@@ -325,5 +349,6 @@ module.exports = {
   authHeaders,
   providerHeaders,
   requestMaxBytes,
+  requestTimeoutMs,
   safeExtraHeaders
 };

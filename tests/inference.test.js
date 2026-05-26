@@ -574,3 +574,49 @@ test("ai-routing-margin: tracking failure never fails the AI call", async () => 
     console.warn = originalWarn;
   }
 });
+
+// === provider timeout ========================================================
+
+test("hung AI provider aborts at the configured timeout and falls through", async () => {
+  const originalFetch = global.fetch;
+  let aborted = false;
+
+  global.fetch = (_url, options) => new Promise((_resolve, reject) => {
+    // Never resolves — simulates a hung provider. Listen for the abort
+    // signal so we can confirm the test setup observed the abort.
+    if (options && options.signal) {
+      options.signal.addEventListener("abort", () => {
+        aborted = true;
+        const err = new Error("aborted");
+        err.name = "AbortError";
+        reject(err);
+      });
+    }
+  });
+
+  try {
+    const start = Date.now();
+    const result = await infer(config({
+      aiRequestTimeoutMs: 50,
+      aiProviders: [
+        {
+          name: "hung",
+          label: "Hung",
+          apiKey: "k",
+          apiBase: "https://hung.example/v1",
+          model: "m",
+          chatPath: "/chat/completions",
+          priority: 1
+        }
+      ]
+    }), [{ role: "user", content: "ctx", context: {} }], []);
+    const elapsed = Date.now() - start;
+    // The abort fires near 50ms; allow a generous ceiling so this isn't
+    // flaky under load. The point is it doesn't hang for minutes.
+    assert.ok(elapsed < 5000, `expected fast abort, got ${elapsed}ms`);
+    assert.equal(aborted, true, "AbortController must have fired");
+    assert.equal(result.fallback, true, "should fall through to deterministic");
+  } finally {
+    global.fetch = originalFetch;
+  }
+});

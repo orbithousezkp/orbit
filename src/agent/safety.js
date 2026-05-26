@@ -101,7 +101,28 @@ function readSafeTextFile(root, relativePath) {
 function writeSafeTextFile(root, relativePath, content) {
   const { normalized, resolved } = assertNoSymlinkPath(root, relativePath);
   fs.mkdirSync(path.dirname(resolved), { recursive: true });
-  fs.writeFileSync(resolved, content, "utf-8");
+  // Atomic write: write to a sibling temp file, fsync, then rename. POSIX
+  // rename on the same filesystem is atomic, so a crash mid-write leaves
+  // either the old file or the new file — never a torn half-write that
+  // would brick state.json or treasury.json. Without this, a power loss
+  // or SIGKILL between bytes is unrecoverable.
+  const tmpName = `.${path.basename(resolved)}.tmp.${process.pid}.${Date.now()}.${Math.random().toString(36).slice(2, 8)}`;
+  const tmpPath = path.join(path.dirname(resolved), tmpName);
+  let fd;
+  try {
+    fd = fs.openSync(tmpPath, "w");
+    fs.writeSync(fd, content, 0, "utf-8");
+    fs.fsyncSync(fd);
+    fs.closeSync(fd);
+    fd = null;
+    fs.renameSync(tmpPath, resolved);
+  } catch (error) {
+    if (fd != null) {
+      try { fs.closeSync(fd); } catch { /* ignore */ }
+    }
+    try { fs.unlinkSync(tmpPath); } catch { /* tmp may not exist */ }
+    throw error;
+  }
   return { normalized, resolved };
 }
 
