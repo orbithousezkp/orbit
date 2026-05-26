@@ -37,6 +37,8 @@ const FILES = {
   horizonConfig:     'memory/horizon-config.json',
   handoff:           'memory/handoff.json',
   errors:            'memory/errors.jsonl',
+  spawn:             'memory/spawn-proposals.json',
+  family:            'memory/family.json',
 };
 
 /**
@@ -623,7 +625,86 @@ function projectHorizonSlim(horizonBundle, options) {
 const HANDOFF_SCHEMA = "orbit-handoff/1";
 const DEFAULT_HANDOFF_RECENT_LIMIT = 3;
 const ERRORS_SCHEMA = "orbit-errors/1";
+const SPAWN_SCHEMA = "orbit-spawn/1";
+const FAMILY_SCHEMA = "orbit-family/1";
+const DEFAULT_SPAWN_RECENT_LIMIT = 5;
+const DEFAULT_FAMILY_RECENT_LIMIT = 8;
 const DEFAULT_ERRORS_RECENT_LIMIT = 5;
+
+function projectSpawnSlim(spawnRecord, options) {
+  // Spawn proposals are the lifecycle ledger (proposed/voting/
+  // approved/executing/complete/rejected/failed). No human-supplied
+  // rationale or maintainer handles leak through this slice — only
+  // structural counts + the recent record stubs.
+  const opts = options || {};
+  const recentLimit = Number.isFinite(opts.spawnRecentLimit)
+    ? opts.spawnRecentLimit
+    : DEFAULT_SPAWN_RECENT_LIMIT;
+  const empty = { schema: SPAWN_SCHEMA, total: 0, byStatus: {}, recent: [] };
+  const spawns = Array.isArray(spawnRecord && spawnRecord.spawns) ? spawnRecord.spawns : [];
+  if (spawns.length === 0) return empty;
+  const byStatus = {};
+  for (const s of spawns) {
+    if (!s || typeof s.status !== "string") continue;
+    byStatus[s.status] = (byStatus[s.status] || 0) + 1;
+  }
+  const sorted = spawns
+    .filter((s) => s && typeof s.createdAt === "string")
+    .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+  const recent = sorted.slice(0, recentLimit).map((s) => ({
+    id: s.id || null,
+    name: s.name || null,
+    type: s.type || null,
+    status: s.status || null,
+    visibility: s.visibility || null,
+    createdAt: s.createdAt || null,
+    childUrl: s.childUrl || null,
+  }));
+  return {
+    schema: SPAWN_SCHEMA,
+    total: spawns.length,
+    byStatus,
+    recent
+  };
+}
+
+function projectFamilySlim(familyRecord, options) {
+  // Surfaces the live children — name, type, url, bornAt. The URL is
+  // a public github.com link, so this is intentionally shown on the
+  // dashboard. Dry-run entries are marked so observers don't think
+  // those are real repos.
+  const opts = options || {};
+  const recentLimit = Number.isFinite(opts.familyRecentLimit)
+    ? opts.familyRecentLimit
+    : DEFAULT_FAMILY_RECENT_LIMIT;
+  const empty = { schema: FAMILY_SCHEMA, total: 0, byType: {}, recent: [] };
+  const kids = Array.isArray(familyRecord && familyRecord.children) ? familyRecord.children : [];
+  if (kids.length === 0) return empty;
+  const byType = {};
+  for (const k of kids) {
+    if (!k || typeof k.type !== "string") continue;
+    byType[k.type] = (byType[k.type] || 0) + 1;
+  }
+  const sorted = kids
+    .filter((k) => k && typeof k.bornAt === "string")
+    .sort((a, b) => String(b.bornAt).localeCompare(String(a.bornAt)));
+  const recent = sorted.slice(0, recentLimit).map((k) => ({
+    id: k.id || null,
+    name: k.name || null,
+    type: k.type || null,
+    status: k.status || "live",
+    url: k.url || null,
+    fullName: k.fullName || null,
+    bornAt: k.bornAt || null,
+    dryRun: Boolean(k.dryRun)
+  }));
+  return {
+    schema: FAMILY_SCHEMA,
+    total: kids.length,
+    byType,
+    recent
+  };
+}
 
 function projectHandoffSlim(handoffRecord, options) {
   // Surfaces the lifecycle state of any active handoffs. No PII —
@@ -784,6 +865,8 @@ function exportBundle(repoRoot, _unused, options) {
     },
     handoff: readJson(path.join(root, FILES.handoff)),
     errors:  readJsonl(path.join(root, FILES.errors)),
+    spawn:   readJson(path.join(root, FILES.spawn)),
+    family:  readJson(path.join(root, FILES.family)),
   };
   if (includeMemory) {
     bundle.memory = {
@@ -895,6 +978,8 @@ function projectForDashboard(bundle, options) {
     approvals: projectApprovalsSlim(b.approvals, opts),
     horizon: projectHorizonSlim(b.horizon, opts),
     handoff: projectHandoffSlim(b.handoff, opts),
+    spawn: projectSpawnSlim(b.spawn, opts),
+    family: projectFamilySlim(b.family, opts),
     errors: projectErrorsSlim(b.errors, opts),
   };
 
@@ -913,6 +998,8 @@ function projectForDashboard(bundle, options) {
     horizonPending: slim.horizon ? slim.horizon.pending : 0,
     handoffTotal: slim.handoff ? slim.handoff.total : 0,
     errorsTotal: slim.errors ? slim.errors.total : 0,
+    spawnTotal: slim.spawn ? slim.spawn.total : 0,
+    familyTotal: slim.family ? slim.family.total : 0,
   });
 
   return slim;
@@ -942,6 +1029,8 @@ module.exports = {
   exportBundle,
   projectForDashboard,
   projectHandoffSlim,
+  projectSpawnSlim,
+  projectFamilySlim,
   projectErrorsSlim,
   FILES,
 };

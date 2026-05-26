@@ -58,6 +58,7 @@ export default function Hero() {
   const refusalsCount = Array.isArray(data?.refusals) ? data.refusals.length : '—';
   const adoptersAdopted = data?.adopters?.adopted ?? 0;
   const adoptersTarget = data?.adopters?.phase1Target ?? 5;
+  const familyTotal = data?.family?.total ?? null;
 
   const statusKind = cycleStatus === 'completed' ? 'ok' : cycleStatus === 'running' ? 'next' : 'idle';
 
@@ -119,6 +120,10 @@ export default function Hero() {
           <div className="hero__panel-row">
             <dt>adopters</dt>
             <dd className="mono tnum">{adoptersAdopted} / {adoptersTarget}</dd>
+          </div>
+          <div className="hero__panel-row">
+            <dt>family</dt>
+            <dd className="mono tnum">{familyTotal ?? '—'}</dd>
           </div>
           <div className="hero__panel-row">
             <dt>last cycle</dt>

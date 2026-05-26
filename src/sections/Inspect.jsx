@@ -48,6 +48,11 @@ export default function Inspect() {
   const errorsRecent = Array.isArray(data?.errors?.recent) ? data.errors.recent : [];
   const receipts = Array.isArray(data?.receipts?.list) ? data.receipts.list : [];
   const lastActive = data?.lifecycle?.lastActive ?? data?.generatedAt ?? null;
+  const familyTotal = data?.family?.total ?? null;
+  const familyRecent = Array.isArray(data?.family?.recent) ? data.family.recent : [];
+  const spawnTotal = data?.spawn?.total ?? null;
+  const spawnByStatus = data?.spawn?.byStatus ?? {};
+  const spawnRecent = Array.isArray(data?.spawn?.recent) ? data.spawn.recent : [];
 
   return (
     <section id="inspect" className="section section--inspect">
@@ -170,6 +175,30 @@ export default function Inspect() {
         </div>
 
         <div className="cell">
+          <div className="cell__label">family</div>
+          <div className="cell__value tnum">{familyTotal ?? '—'}</div>
+          <div className="cell__hint">
+            {familyTotal === null
+              ? 'projection rebuilds next cycle'
+              : familyTotal === 0
+              ? 'no children yet · spawn from approved spec'
+              : `live children · spawned under the org`}
+          </div>
+        </div>
+
+        <div className="cell">
+          <div className="cell__label">spawn proposals</div>
+          <div className="cell__value tnum">{spawnTotal ?? '—'}</div>
+          <div className="cell__hint">
+            {spawnTotal === null
+              ? 'projection rebuilds next cycle'
+              : spawnTotal === 0
+              ? 'none · APPROVE ORBIT-SPAWN to propose'
+              : Object.entries(spawnByStatus).map(([k, v]) => `${k}:${v}`).join(' · ')}
+          </div>
+        </div>
+
+        <div className="cell">
           <div className="cell__label">last cycle</div>
           <div className="cell__value mono">{timeAgo(lastActive)}</div>
           <div className="cell__hint">{lastActive ? lastActive.replace('T', ' ').replace(/\.\d+Z$/, ' UTC') : '—'}</div>
@@ -275,6 +304,90 @@ export default function Inspect() {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {(familyRecent.length > 0 || spawnRecent.length > 0) && (
+        <div className="inspect__table-block">
+          <div className="inspect__table-head">
+            <span className="cell__label">family · spawned children</span>
+            <span className="cell__hint">
+              {familyRecent.length} live · {spawnRecent.length} proposal{spawnRecent.length === 1 ? '' : 's'}
+            </span>
+          </div>
+          {familyRecent.length > 0 && (
+            <table className="table" aria-label="live family">
+              <thead>
+                <tr>
+                  <th style={{ width: '4rem' }}>id</th>
+                  <th>name</th>
+                  <th style={{ width: '7rem' }}>type</th>
+                  <th style={{ width: '8rem' }}>status</th>
+                  <th style={{ width: '8rem' }}>born</th>
+                </tr>
+              </thead>
+              <tbody>
+                {familyRecent.map((k) => (
+                  <tr key={k.id || k.name}>
+                    <td className="table__num">{k.id || '—'}</td>
+                    <td>
+                      {k.url ? (
+                        <a
+                          href={k.url}
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          style={{ color: 'var(--accent)' }}
+                        >
+                          {k.fullName || k.name}
+                          {k.dryRun ? ' · dry-run' : ''}
+                        </a>
+                      ) : (
+                        <span>{k.name}{k.dryRun ? ' · dry-run' : ''}</span>
+                      )}
+                    </td>
+                    <td>{k.type || '—'}</td>
+                    <td><Pill status={k.dryRun ? 'future' : 'ok'}>{k.dryRun ? 'dry-run' : 'live'}</Pill></td>
+                    <td>{timeAgo(k.bornAt)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+          {spawnRecent.length > 0 && (
+            <table className="table" aria-label="spawn proposals" style={{ borderTop: '1px solid var(--line)' }}>
+              <thead>
+                <tr>
+                  <th style={{ width: '4rem' }}>id</th>
+                  <th>proposal</th>
+                  <th style={{ width: '7rem' }}>type</th>
+                  <th style={{ width: '8rem' }}>status</th>
+                  <th style={{ width: '8rem' }}>created</th>
+                </tr>
+              </thead>
+              <tbody>
+                {spawnRecent.map((s) => (
+                  <tr key={s.id}>
+                    <td className="table__num">{s.id}</td>
+                    <td>{s.name}</td>
+                    <td>{s.type}</td>
+                    <td>
+                      <Pill
+                        status={
+                          s.status === 'complete' ? 'ok'
+                          : s.status === 'approved' || s.status === 'executing' ? 'next'
+                          : s.status === 'rejected' || s.status === 'failed' ? 'danger'
+                          : 'future'
+                        }
+                      >
+                        {s.status}
+                      </Pill>
+                    </td>
+                    <td>{timeAgo(s.createdAt)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       )}
     </section>

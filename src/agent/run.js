@@ -801,6 +801,27 @@ async function main() {
     try { require("./error-log").logError(config.repoRoot, { phase: "horizon-tick", error: err }); } catch { /* ignore */ }
   }
 
+  // Patch Set AD: tick the spawn lifecycle. No-op unless there's an
+  // APPROVED proposal waiting. Live executor needs ORBIT_SPAWN_TOKEN
+  // and ORBIT_SPAWN_ORG; without them, executor runs in dry-run mode
+  // (scaffold under runtime/spawn/dry/<name>/). Best-effort.
+  try {
+    const spawn = require("./spawn");
+    const { makeExecutor } = require("./spawn-executor");
+    const executor = makeExecutor(config.repoRoot, process.env);
+    const tickResult = await spawn.tickSpawns(config.repoRoot, { now: new Date(), executor });
+    if (tickResult.advanced.length || tickResult.errors.length) {
+      filesChanged.add("memory/spawn-proposals.json");
+      for (const r of tickResult.advanced) {
+        if (r && r.status === "complete") filesChanged.add("memory/family.json");
+      }
+      log(`spawn tick: advanced=${tickResult.advanced.length} errors=${tickResult.errors.length}`);
+    }
+  } catch (err) {
+    log(`spawn tick: failed: ${redactSecrets(err.message || String(err))}`);
+    try { require("./error-log").logError(config.repoRoot, { phase: "spawn-tick", error: err }); } catch { /* ignore */ }
+  }
+
   appendLine(config.repoRoot, "memory/cycles.jsonl", {
     cycle: state.cycle,
     timestamp: finishedAt,
