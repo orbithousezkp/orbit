@@ -124,20 +124,36 @@ test("governance template wires approval labels", () => {
   assert.equal(parsed.ownerUsername, "test-owner");
 });
 
-test(".env.example template lists all required env var names with empty values", () => {
+test(".env.example template lists adopter-relevant env var names (no token-launch surface — D-020)", () => {
   const raw = fs.readFileSync(path.join(TEMPLATES_DIR, ".env.example.tpl"), "utf8");
   const required = [
     "ORBIT_AI_PROVIDERS=",
     "ORBIT_AI_PROVIDER_KEYS=",
     "ORBIT_WALLET_PRIVATE_KEY=",
-    "ORBIT_BASE_RPC_URL=",
-    "ORBIT_TREASURY_ADDRESS=",
-    "ORBIT_OPERATOR_REVENUE_ADDRESS=",
     "ORBIT_OWNER_USERNAME=",
     "ORBIT_FARCASTER_NEYNAR_API_KEY=",
     "ORBIT_PUBLIC_URL="
   ];
   for (const line of required) {
     assert.ok(raw.includes(line), `.env.example missing ${line}`);
+  }
+  // D-020: token-launch / treasury / operator-revenue env vars MUST
+  // NOT appear in the adopter scaffold. Adopters who choose to
+  // launch a token do so independently; the scaffold ships no
+  // surface for it.
+  const forbidden = [
+    "ORBIT_TOKEN_ADMIN_ADDRESS",
+    "ORBIT_TREASURY_ADDRESS",
+    "ORBIT_OPERATOR_REVENUE_ADDRESS",
+    "ORBIT_OPERATOR_REVENUE_BPS",
+    "ORBIT_BASE_RPC_URL",
+    "ORBIT_ENABLE_TOKEN_LAUNCH",
+    "ORBIT_ENABLE_REVENUE_CLAIMS"
+  ];
+  for (const banned of forbidden) {
+    assert.equal(
+      raw.includes(banned), false,
+      `.env.example must not ship token-launch surface "${banned}" (D-020)`
+    );
   }
 });

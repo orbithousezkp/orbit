@@ -86,7 +86,10 @@ test("projectForDashboard returns slim shape with schema and digest", () => {
   assert.equal(slim.lifecycle.lastStatus, "completed");
   assert.equal(slim.walletPolicy.approvalMode, "owner_approval_required");
   assert.equal(slim.walletPolicy.publicViewOnly, true);
-  assert.equal(slim.walletPolicy.token.symbol, "ORBIT");
+  // D-020: token state is not in the SDK projection. Adopters
+  // don't ship a token-launch surface and the parent's token
+  // status is not surfaced through @orbit-house/sdk.
+  assert.equal(slim.walletPolicy.token, undefined);
   assert.deepEqual(slim.permissions.allowedWithoutApproval, ["gas", "ai_call"]);
   assert.deepEqual(slim.permissions.blockedUntilApproved, ["Live wallet signing"]);
   assert.equal(slim.receipts.count, 1);

@@ -149,8 +149,6 @@ function create(repoRoot) {
       currentLevel: roadmap.currentLevel ? roadmap.currentLevel.name : 'unknown',
       currentLevelStatus: roadmap.currentLevel ? roadmap.currentLevel.status : 'unknown',
       activeLane: roadmap.activeLane ? roadmap.activeLane.name : 'unknown',
-      tokenSymbol: token.symbol || null,
-      tokenLaunchStatus: token.launchStatus || 'unknown',
       openTaskCount: openTasks.length,
       completedTaskCount: doneTasks.length,
       dailyBudgetUsd: ai.dailyBudgetUsd || 0,
@@ -949,13 +947,6 @@ function projectForDashboard(bundle, options) {
       approvalMode: externalSpend.mode || "owner_approval_required",
       publicViewOnly: true,
       noPrivateKeys: true,
-      token: {
-        name: token.name || null,
-        symbol: token.symbol || null,
-        launchStatus: token.launchStatus || "planned",
-        launchedAt: token.launchedAt || null,
-        configured: Boolean(token.address),
-      },
       digest: walletDigest,
     },
     permissions: {

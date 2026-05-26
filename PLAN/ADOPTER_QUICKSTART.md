@@ -2,6 +2,8 @@
 
 > Get a new GitHub repo running its first Orbit cycle in under five minutes. No wallet, no token, no on-chain action required.
 
+> **Sovereignty note (D-020).** Your Orbit is yours. The scaffold ships nothing related to token launches and `@orbit-house/sdk` exports nothing token-related. If you decide to launch a token from your Orbit later, you do so independently — the upstream project provides no code, no help, no support, and does not track your token activity. Your wallet, your risk, your call.
+
 This recipe assumes:
 - You have `npx`, `git`, and `gh` (GitHub CLI) installed
 - You have a GitHub account

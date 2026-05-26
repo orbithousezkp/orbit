@@ -247,3 +247,35 @@ Weekly sweep mechanic: every 7 days the Fee Receive Safe (where Clanker pays out
 **Supersedes:** D-017's "single Treasury Safe with internal sub-budgets" stance. The 95/5 inflow split itself, and the operator weekly-payout cadence, are unchanged.
 
 **Scope:** Pure Treasury topology — no change to Clanker fees, AI budgets, governance, or any other module. Bounty market, mission board, productive deployment specs reference the new Safe addresses where they previously referenced "Treasury Safe."
+
+---
+
+## D-020 — Adopter sovereignty: scaffold ships no token-launch surface
+
+**When:** 2026-05-26
+**Session:** S-SCAFFOLD-AE (Patch Set AE)
+**Decision:** **The `create-orbit-house` scaffolder and `@orbit-house/sdk` ship NOTHING related to token launch. Adopters who choose to launch a token from their own Orbit do so independently. The parent project provides no help, support, or token-launch tracking for adopters.**
+
+Specifically:
+
+- The scaffolder's `.env.example.tpl` no longer lists `ORBIT_TOKEN_ADMIN_ADDRESS`, `ORBIT_TREASURY_ADDRESS`, `ORBIT_OPERATOR_REVENUE_ADDRESS`, `ORBIT_OPERATOR_REVENUE_BPS`, `ORBIT_BASE_RPC_URL`, `ORBIT_ENABLE_TOKEN_LAUNCH`, or `ORBIT_ENABLE_REVENUE_CLAIMS`. `ORBIT_WALLET_PRIVATE_KEY` stays — it's used for D-006 cycle-proof signing, which adopters DO need.
+- The scaffolder's `orbit-cycle.yml.tpl` and `orbit-event.yml.tpl` no longer inject any token / treasury / operator / launch env vars into the agent.
+- `@orbit-house/sdk`'s `quickStatus()` no longer returns `tokenSymbol` or `tokenLaunchStatus`. `projectForDashboard()` no longer emits a `walletPolicy.token` block.
+- `src/agent/clanker.js` and the `launch_native_token` / `prepare_token_launch` / `run_revenue_cycle` tools remain in the **parent** repo (Orbit's own Phase 2 path) but are not copied into any scaffolded child.
+
+**Why:** Two reasons.
+
+1. **Risk surface.** Token launch is the highest-blast-radius operation in the project. Putting it on the rails an adopter inherits by default makes the parent project responsible for every adopter's launch decisions, in code if not in fact. Cleaner to make it explicit: launching a token from your Orbit is your sovereign call, not the project's recommendation.
+2. **Brand integrity.** The Orbit project's whole posture is "control plane for agent memory + infrastructure" (`memory/identity.md`). A scaffolder that hands every adopter a token-launch button quietly tells the world "this is a token-launch toolkit." It is not. The capability stays in the parent because the parent's roadmap includes a token launch (Phase 2, gated by D-018). That doesn't transfer.
+
+The parent's general adopter tracking (`memory/adopters-registry.json`, the adopter handshake, the dashboard "adopters" cell) is **NOT** changed by this decision. Adopters using Orbit for repo-agent infrastructure are tracked and surfaced as before. The line is drawn at **token-launch activity**: no tracking, no support, no shipped code.
+
+**Implication:**
+
+- An adopter who wants to launch a token under their own Orbit must fork or extend `src/agent/clanker.js` themselves. Their decision, their wallet, their consequences.
+- The parent's dashboard surfaces its OWN token state (when Phase 2 lands) through different paths than the SDK projection — likely directly in `memory/treasury.json` reads inside the dashboard React, not through `projectForDashboard`.
+- `PLAN/ADOPTER_QUICKSTART.md` carries a short paragraph naming this boundary so adopters land knowing it.
+
+**Supersedes:** Nothing. Clarifies a previously implicit boundary.
+
+**Scope:** Scaffolder templates + SDK exports + adopter tracking semantics. Does not alter the parent's own token-launch path, the existing D-018 gate, or any of the D-017/D-019 treasury topology.
