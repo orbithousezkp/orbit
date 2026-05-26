@@ -279,3 +279,37 @@ The parent's general adopter tracking (`memory/adopters-registry.json`, the adop
 **Supersedes:** Nothing. Clarifies a previously implicit boundary.
 
 **Scope:** Scaffolder templates + SDK exports + adopter tracking semantics. Does not alter the parent's own token-launch path, the existing D-018 gate, or any of the D-017/D-019 treasury topology.
+
+---
+
+## D-021 — `.env` contains no secrets
+
+**When:** 2026-05-26
+**Session:** S-ENV-AG (Patch Set AG)
+**Decision:** **The local `.env` file MUST contain only public configuration — owner handle, repo path, approval labels, behaviour flags, AI budget caps, fetch allowlist, VITE_* public site values. Every real secret (API keys, wallet private key, signer UUIDs, npm token, spawn PAT) lives in GitHub Secrets via `gh secret set` and is injected into the CI runner at cycle time. Variables that are less sensitive but still operator-managed (the public signer address, the maintainer list, the spawn-target org) live in GitHub Variables via `gh variable set`. Neither category appears in `.env`.**
+
+This pairs with D-020 (adopter sovereignty around tokens — scaffold ships no token-launch surface) and Patch Set AF (path normalizer refuses any tool-surface read of `.env*`, `.npmrc`, `id_rsa`, etc.). Defense in depth, three layers:
+
+1. **AF — Path-normalizer block.** Even if `.env` had secrets, the LLM cannot reach the file via `read_file` or `write_file`.
+2. **AG (this decision) — Content rule.** `.env` should not carry the risk in the first place. Secrets live where the threat model intends.
+3. **`redactSecrets` — Last-line scrub.** Anything that does end up in an LLM-bound output text gets pattern-scrubbed before serialization.
+
+**Why:**
+- `.env` is the easiest file to accidentally cat / paste / screen-share in a debugging session. Treat it as a "show this on a public stream and nothing bad happens" file.
+- Some VITE_* values in `.env` end up SHIPPED IN THE BROWSER BUNDLE. By definition anything VITE_* is public the moment you build. Mixing secrets in the same file as VITE_* is a category error.
+- The 2026-05-26 `.env` audit confirmed: the local file already follows this rule (only VITE_* public values). Codifying the rule prevents future drift.
+
+**Enforcement:**
+- `scripts/check-env.js` runs `npm run env:check`. Scans every `.env*` file (excluding `.env.example`, `.env.example.tpl`, anything under `node_modules`/`launch-ready`/`dist`/`.git`). Fails with line numbers when:
+  - a `DENY_KEYS` env-var name appears at all (even empty), OR
+  - any RHS value matches a `SECRET_PATTERNS` regex (private-key blocks, GH PATs, `sk-*`, `AKIA*`, npm tokens, 0x…64-hex strings).
+- `.env.example` restructured: §1 lists fields that ARE safe in `.env`; §2 is a comment-only MANIFEST of every name that lives in `gh secret`/`gh variable` instead. Anyone reading the template sees the line explicitly.
+- Future CI hook (not in this patch): `npm run env:check` can be wired to the existing lint workflow to fail PRs that drift.
+
+**Implication:**
+- An operator running locally has to use `gh auth login` / `gh secret set` for live cycles, not paste keys into `.env`. The friction is intentional.
+- Vite-built bundles can include `.env` values only via `VITE_*` prefix. Anything secret-shaped that's not VITE_-prefixed simply isn't reachable from the browser; the `npm run env:check` block catches it before it sneaks in anyway.
+
+**Supersedes:** Nothing. Codifies a previously-implicit boundary that the local `.env` had been honoring informally.
+
+**Scope:** Pure operator/dev posture. No production behavior change — production runs from CI use `secrets.X` injection that already bypasses `.env`.
