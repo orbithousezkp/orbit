@@ -1,5 +1,7 @@
 "use strict";
 
+const { isBudgetLow } = require("./opportunities");
+
 const BEHAVIOR_VERSION = 3;
 
 const ACTIVITY_CONTRACT = [
@@ -161,6 +163,8 @@ function summarizeBudget(aiBudget) {
   if (!aiBudget || typeof aiBudget !== "object") {
     return {
       canUseAi: false,
+      dailyBudgetUsd: 0,
+      monthlyBudgetUsd: 0,
       dailyRemainingUsd: 0,
       monthlyRemainingUsd: 0
     };
@@ -168,6 +172,8 @@ function summarizeBudget(aiBudget) {
 
   return {
     canUseAi: Boolean(aiBudget.canUseAi),
+    dailyBudgetUsd: Number(aiBudget.dailyBudgetUsd || 0),
+    monthlyBudgetUsd: Number(aiBudget.monthlyBudgetUsd || 0),
     dailyRemainingUsd: Number(aiBudget.dailyRemainingUsd || 0),
     monthlyRemainingUsd: Number(aiBudget.monthlyRemainingUsd || 0)
   };
@@ -767,7 +773,7 @@ function planCycle(context = {}) {
     ));
   }
 
-  if (!budget.canUseAi || budget.dailyRemainingUsd <= 1 || budget.monthlyRemainingUsd <= 5) {
+  if (isBudgetLow(budget)) {
     steps.push(makeStep(
       "budget_review",
       "treasury",

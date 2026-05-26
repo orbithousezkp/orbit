@@ -4,6 +4,7 @@ const assert = require("node:assert/strict");
 const test = require("node:test");
 const {
   deriveDrivers,
+  isBudgetLow,
   opportunityDriverFit,
   scoreOpportunity,
   summarizeSurvival
@@ -64,6 +65,69 @@ test("summarizes low food as critical survival state", () => {
   });
 
   assert.equal(result.survivalState, "food_low");
+});
+
+test("isBudgetLow uses fraction of budget when total is known", () => {
+  // $1.85 of $2 daily = 92.5% remaining → NOT low
+  assert.equal(isBudgetLow({
+    canUseAi: true,
+    dailyBudgetUsd: 2,
+    dailyRemainingUsd: 1.85,
+    monthlyBudgetUsd: 20,
+    monthlyRemainingUsd: 19.85
+  }), false);
+
+  // $0.20 of $2 daily = 10% remaining → low
+  assert.equal(isBudgetLow({
+    canUseAi: true,
+    dailyBudgetUsd: 2,
+    dailyRemainingUsd: 0.2,
+    monthlyBudgetUsd: 20,
+    monthlyRemainingUsd: 18
+  }), true);
+
+  // Daily healthy but monthly below 25% → low
+  assert.equal(isBudgetLow({
+    canUseAi: true,
+    dailyBudgetUsd: 2,
+    dailyRemainingUsd: 1.9,
+    monthlyBudgetUsd: 20,
+    monthlyRemainingUsd: 4
+  }), true);
+
+  // canUseAi false → always low regardless of remaining
+  assert.equal(isBudgetLow({
+    canUseAi: false,
+    dailyBudgetUsd: 2,
+    dailyRemainingUsd: 2,
+    monthlyBudgetUsd: 20,
+    monthlyRemainingUsd: 20
+  }), true);
+
+  // Budget total unknown → fallback to absolute floors (back-compat)
+  assert.equal(isBudgetLow({
+    canUseAi: true,
+    dailyRemainingUsd: 0.5,
+    monthlyRemainingUsd: 100
+  }), true);
+});
+
+test("summarizeSurvival stays stable when budget is 85% remaining", () => {
+  const result = summarizeSurvival({
+    aiBudget: {
+      canUseAi: true,
+      dailyBudgetUsd: 2,
+      dailyRemainingUsd: 1.85,
+      monthlyBudgetUsd: 20,
+      monthlyRemainingUsd: 19.85
+    },
+    treasury: {
+      token: { launchStatus: "launched" },
+      revenue: { lastClaimResult: { amountUsd: 100 } }
+    }
+  });
+
+  assert.equal(result.survivalState, "stable");
 });
 
 test("mandatory heartbeat is selected when the control plane is otherwise stable", () => {

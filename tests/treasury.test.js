@@ -235,3 +235,37 @@ test("revenue claim dry run only queues after weekly and performance gates pass"
   assert.equal(result.status, "dry_run");
   assert.equal(result.claimStatus.canClaim, true);
 });
+
+test("loadTreasury reconciles env-configured budgets over stored values", () => {
+  const cfg = config({ aiDailyBudgetUsd: 1, aiMonthlyBudgetUsd: 10 });
+  // First load writes treasury with $1 / $10 budgets, then a ledger entry.
+  let treasury = loadTreasury(cfg.repoRoot, cfg);
+  treasury.ai.ledger.push({
+    timestamp: new Date().toISOString(),
+    note: "seed",
+    promptTokens: 1000,
+    completionTokens: 100,
+    totalTokens: 1100,
+    estimatedUsd: 0.0005
+  });
+  saveTreasury(cfg.repoRoot, treasury);
+
+  // Owner doubles the daily budget in env; monthly stays the same.
+  const newCfg = { ...cfg, aiDailyBudgetUsd: 2 };
+  const reloaded = loadTreasury(newCfg.repoRoot, newCfg);
+
+  assert.equal(reloaded.ai.dailyBudgetUsd, 2, "env override should win");
+  assert.equal(reloaded.ai.monthlyBudgetUsd, 10, "unchanged env should not affect monthly");
+  assert.equal(reloaded.ai.ledger.length, 1, "ledger is state — must be preserved");
+  assert.equal(reloaded.ai.ledger[0].note, "seed");
+});
+
+test("loadTreasury does not blow away stored budget when env is unset (0)", () => {
+  const cfg = config({ aiDailyBudgetUsd: 5, aiMonthlyBudgetUsd: 50 });
+  saveTreasury(cfg.repoRoot, loadTreasury(cfg.repoRoot, cfg));
+
+  // Subsequent load with env unset (0) — must NOT overwrite stored $5 with 0.
+  const reloaded = loadTreasury(cfg.repoRoot, { ...cfg, aiDailyBudgetUsd: 0, aiMonthlyBudgetUsd: 0 });
+  assert.equal(reloaded.ai.dailyBudgetUsd, 5);
+  assert.equal(reloaded.ai.monthlyBudgetUsd, 50);
+});

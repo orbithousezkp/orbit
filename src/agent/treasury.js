@@ -98,6 +98,23 @@ function loadTreasury(repoRoot, config) {
   } catch {
     treasury = defaults;
   }
+  // Reconcile env-controlled config fields on each load. Without this, a
+  // treasury.json written when the env had different budget values would
+  // shadow the current env forever (stored wins in the merge above).
+  // We only override when the env value is explicitly non-zero so that an
+  // unset/zero env var doesn't blow away a previously-stored budget.
+  if (Number(config.aiDailyBudgetUsd) > 0) {
+    treasury.ai.dailyBudgetUsd = Number(config.aiDailyBudgetUsd);
+  }
+  if (Number(config.aiMonthlyBudgetUsd) > 0) {
+    treasury.ai.monthlyBudgetUsd = Number(config.aiMonthlyBudgetUsd);
+  }
+  if (Number(config.aiInputUsdPerMillion) > 0) {
+    treasury.ai.inputUsdPerMillion = Number(config.aiInputUsdPerMillion);
+  }
+  if (Number(config.aiOutputUsdPerMillion) > 0) {
+    treasury.ai.outputUsdPerMillion = Number(config.aiOutputUsdPerMillion);
+  }
   // Plural streams[] migration. Backwards-compatible: legacy revenue.* fields
   // are preserved; on first read with empty streams[], promote the legacy
   // single-stream shape into streams[0] (id "clanker-trading-fees").

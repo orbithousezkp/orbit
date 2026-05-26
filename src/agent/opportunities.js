@@ -220,6 +220,25 @@ function seedOpportunities(store) {
   return changed;
 }
 
+const FOOD_LOW_FRACTION = 0.25;
+const FOOD_LOW_DAILY_FLOOR_USD = 1;
+const FOOD_LOW_MONTHLY_FLOOR_USD = 5;
+
+function isBudgetLow(aiBudget) {
+  if (!aiBudget || !aiBudget.canUseAi) return true;
+  const dailyBudget = Number(aiBudget.dailyBudgetUsd || 0);
+  const monthlyBudget = Number(aiBudget.monthlyBudgetUsd || 0);
+  const dailyRemaining = Number(aiBudget.dailyRemainingUsd || 0);
+  const monthlyRemaining = Number(aiBudget.monthlyRemainingUsd || 0);
+  const dailyLow = dailyBudget > 0
+    ? dailyRemaining / dailyBudget < FOOD_LOW_FRACTION
+    : dailyRemaining <= FOOD_LOW_DAILY_FLOOR_USD;
+  const monthlyLow = monthlyBudget > 0
+    ? monthlyRemaining / monthlyBudget < FOOD_LOW_FRACTION
+    : monthlyRemaining <= FOOD_LOW_MONTHLY_FLOOR_USD;
+  return dailyLow || monthlyLow;
+}
+
 function summarizeSurvival({ aiBudget, treasury, issues = [], tasks } = {}) {
   const openTasks = tasks && Array.isArray(tasks.tasks)
     ? tasks.tasks.filter((task) => task.status === "open").length
@@ -233,7 +252,7 @@ function summarizeSurvival({ aiBudget, treasury, issues = [], tasks } = {}) {
 
   let survivalState = "stable";
   if (!tokenLaunched && incomeRecorded <= 0) survivalState = "needs_income";
-  if (!canUseAi || dailyRemainingUsd <= 1 || monthlyRemainingUsd <= 5) survivalState = "food_low";
+  if (isBudgetLow(aiBudget)) survivalState = "food_low";
 
   return {
     survivalState,
@@ -386,6 +405,7 @@ function opportunityStatus(repoRoot, context = {}) {
 module.exports = {
   OPPORTUNITIES_PATH,
   deriveDrivers,
+  isBudgetLow,
   loadOpportunities,
   opportunityDriverFit,
   opportunityStatus,
