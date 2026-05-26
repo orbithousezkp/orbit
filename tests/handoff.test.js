@@ -353,6 +353,33 @@ test("parseHandoffComment must be the FULL line, not inside prose", () => {
   assert.equal(parsed, null);
 });
 
+test("parseHandoffComment: APPROVE inside ``` code fence does NOT count (Patch Set Q hardening)", () => {
+  const parsed = parseHandoffComment(
+    comment("alice", "syntax example:\n```\nAPPROVE ORBIT-HANDOFF abc\n```\nbut not actually voting"),
+    "abc",
+    ["alice"]
+  );
+  assert.equal(parsed, null);
+});
+
+test("parseHandoffComment: APPROVE in a blockquote does NOT count", () => {
+  const parsed = parseHandoffComment(
+    comment("alice", "> APPROVE ORBIT-HANDOFF abc\nQuoting the spec."),
+    "abc",
+    ["alice"]
+  );
+  assert.equal(parsed, null);
+});
+
+test("parseHandoffComment: APPROVE in 4-space-indented code does NOT count", () => {
+  const parsed = parseHandoffComment(
+    comment("alice", "Example:\n    APPROVE ORBIT-HANDOFF abc\nend example"),
+    "abc",
+    ["alice"]
+  );
+  assert.equal(parsed, null);
+});
+
 test("parseHandoffComment is case-insensitive on author but case-sensitive on the keyword", () => {
   // "approve" lowercase is not enough — the protocol requires uppercase APPROVE.
   const lowered = parseHandoffComment(

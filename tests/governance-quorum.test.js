@@ -263,3 +263,62 @@ test("loadConfig: ORBIT_MAINTAINERS env var activates quorum mode", () => {
   assert.equal(config.quorum.maintainers.length, 3);
   assert.deepEqual(config.quorum.thresholds, computeThresholds(3));
 });
+
+// === code-fence / blockquote bypass hardening (Patch Set Q) ==================
+// Pentest 2026-05-26 showed an APPROVE line inside a markdown code block
+// was counted as a real vote. These tests pin the fence/quote/indent skips.
+
+test("parseQuorumComments: APPROVE inside ``` code fence does NOT count", () => {
+  const result = parseQuorumComments(
+    [{ author: "alice", body: "example syntax:\n```\nAPPROVE ORBIT-SPEND abc\n```\nbut don't actually approve" }],
+    "abc",
+    ["alice", "bob"]
+  );
+  assert.equal(result.approvals.size, 0);
+});
+
+test("parseQuorumComments: APPROVE inside ```js (with language tag) does NOT count", () => {
+  const result = parseQuorumComments(
+    [{ author: "alice", body: "```js\nAPPROVE ORBIT-SPEND abc\n```" }],
+    "abc",
+    ["alice"]
+  );
+  assert.equal(result.approvals.size, 0);
+});
+
+test("parseQuorumComments: APPROVE in a blockquote does NOT count", () => {
+  const result = parseQuorumComments(
+    [{ author: "alice", body: "> APPROVE ORBIT-SPEND abc\nI'm quoting the spec, not voting." }],
+    "abc",
+    ["alice"]
+  );
+  assert.equal(result.approvals.size, 0);
+});
+
+test("parseQuorumComments: APPROVE in 4-space-indented code does NOT count", () => {
+  const result = parseQuorumComments(
+    [{ author: "alice", body: "Example:\n    APPROVE ORBIT-SPEND abc\n(end example)" }],
+    "abc",
+    ["alice"]
+  );
+  assert.equal(result.approvals.size, 0);
+});
+
+test("parseQuorumComments: a real APPROVE OUTSIDE a fence still counts even with a code block above it", () => {
+  const result = parseQuorumComments(
+    [{
+      author: "alice",
+      body: [
+        "Looks good. The spec language is:",
+        "```",
+        "APPROVE ORBIT-SPEND <idem>",
+        "```",
+        "Voting for real now:",
+        "APPROVE ORBIT-SPEND abc"
+      ].join("\n")
+    }],
+    "abc",
+    ["alice"]
+  );
+  assert.equal(result.approvals.has("alice"), true);
+});

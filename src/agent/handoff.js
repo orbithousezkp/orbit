@@ -181,6 +181,12 @@ function proposeHandoff(repoRoot, input, deps = {}) {
 
 // Parse APPROVE/REJECT/EXTEND lines from a single comment. Returns null
 // if no recognized line matched, otherwise the kind + author.
+//
+// Skips lines inside markdown fenced code blocks, blockquotes, and
+// indented code — without this, a maintainer can demonstrate the
+// approval syntax in a comment ("here's how it'll look: ```...```")
+// and the line-anchored regex would count it as a real vote. Same
+// hardening as governance.parseQuorumComments (Patch Set Q).
 function parseHandoffComment(comment, idemKey, maintainers) {
   if (!comment || !idemKey) return null;
   const author = String(comment.author || comment.user || "").toLowerCase();
@@ -189,9 +195,18 @@ function parseHandoffComment(comment, idemKey, maintainers) {
   if (!allowed.has(author)) return null;
   const idem = String(idemKey).trim();
   if (!idem) return null;
-  const lines = String(comment.body || "").split(/\r?\n/).map((l) => l.trim());
-  for (const line of lines) {
-    const m = line.match(/^(APPROVE|REJECT|EXTEND)\s+ORBIT-HANDOFF\s+(\S+)$/);
+  const rawLines = String(comment.body || "").split(/\r?\n/);
+  let inCodeFence = false;
+  for (const raw of rawLines) {
+    const trimmed = raw.trim();
+    if (/^`{3,}/.test(trimmed)) {
+      inCodeFence = !inCodeFence;
+      continue;
+    }
+    if (inCodeFence) continue;
+    if (/^>/.test(trimmed)) continue;       // blockquote
+    if (/^ {4,}\S/.test(raw)) continue;     // indented code
+    const m = trimmed.match(/^(APPROVE|REJECT|EXTEND)\s+ORBIT-HANDOFF\s+(\S+)$/);
     if (m && m[2] === idem) {
       return { kind: m[1], author, createdAt: comment.createdAt || comment.created_at || null };
     }

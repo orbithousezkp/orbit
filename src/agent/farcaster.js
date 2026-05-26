@@ -413,13 +413,15 @@ function loadCastLedger(repoRoot) {
 function saveCastLedger(repoRoot, ledger) {
   if (!repoRoot) return LEDGER_PATH;
   const full = ledgerAbsPath(repoRoot);
-  fs.mkdirSync(path.dirname(full), { recursive: true });
   const payload = `${JSON.stringify(
     { casts: Array.isArray(ledger && ledger.casts) ? ledger.casts : [] },
     null,
     2
   )}\n`;
-  fs.writeFileSync(full, payload, "utf8");
+  // Atomic — Patch Set Q. Concurrent cast logging could otherwise
+  // partially erase the ledger.
+  const { atomicWriteFile } = require("./safety");
+  atomicWriteFile(full, payload);
   return LEDGER_PATH;
 }
 

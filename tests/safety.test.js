@@ -9,6 +9,7 @@ const { runCommand, safeCommandEnv, writeFile } = require("../src/agent/actions"
 const {
   assertNoSymlinkPath,
   assertSafePublicReply,
+  atomicWriteFile,
   containsSecret,
   normalizeRelativePath,
   safeJoin,
@@ -215,6 +216,44 @@ test("writeSafeTextFile is durable across many overwrites", () => {
     );
     const entries = fs.readdirSync(path.join(root, "memory"));
     assert.deepEqual(entries, ["state.json"]);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+// === atomicWriteFile (Patch Set Q — used by federation/farcaster/horizon) ===
+
+test("atomicWriteFile writes content and leaves no temp file", () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "orbit-aw-"));
+  try {
+    const target = path.join(root, "sub/dir/data.json");
+    atomicWriteFile(target, '{"hello":"world"}\n');
+    assert.equal(fs.readFileSync(target, "utf-8"), '{"hello":"world"}\n');
+    const dirEntries = fs.readdirSync(path.dirname(target));
+    assert.deepEqual(dirEntries, ["data.json"]);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("atomicWriteFile creates parent directories that don't exist", () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "orbit-aw-mkdir-"));
+  try {
+    atomicWriteFile(path.join(root, "a/b/c/d.txt"), "x");
+    assert.equal(fs.readFileSync(path.join(root, "a/b/c/d.txt"), "utf-8"), "x");
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("atomicWriteFile cleans up the temp file when rename fails (target is a dir)", () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "orbit-aw-fail-"));
+  try {
+    const target = path.join(root, "blocker");
+    fs.mkdirSync(target);    // rename(file, dir) errors on POSIX
+    assert.throws(() => atomicWriteFile(target, "y"));
+    const leftovers = fs.readdirSync(root).filter((n) => n !== "blocker");
+    assert.deepEqual(leftovers, [], "no temp file should remain");
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }

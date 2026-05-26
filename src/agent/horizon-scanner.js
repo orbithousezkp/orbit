@@ -76,9 +76,10 @@ function readJson(filePath, fallback) {
 }
 
 function writeJson(filePath, value) {
-  const dir = path.dirname(filePath);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(filePath, JSON.stringify(value, null, 2) + "\n");
+  // Atomic: temp+fsync+rename. Patch Set Q. Two writers (cycle + event
+  // worker firing concurrently) cannot leave a torn candidates.json.
+  const { atomicWriteFile } = require("./safety");
+  atomicWriteFile(filePath, JSON.stringify(value, null, 2) + "\n");
 }
 
 function loadSources(repoRoot) {
@@ -291,10 +292,9 @@ function draftCandidate(repoRoot, classification, item, source, options = {}) {
 
   const body = buildCandidateSpecBody(classification, item, source, now);
   const absPath = path.join(repoRoot, filePath);
-  if (!fs.existsSync(path.dirname(absPath))) {
-    fs.mkdirSync(path.dirname(absPath), { recursive: true });
-  }
-  fs.writeFileSync(absPath, body);
+  // Atomic write — Patch Set Q. See writeJson above.
+  const { atomicWriteFile } = require("./safety");
+  atomicWriteFile(absPath, body);
 
   const ageOutAt = new Date(now.getTime() + (config.archiveAfterCycles || 90) * 30 * 60_000)
     .toISOString();

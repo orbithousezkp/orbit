@@ -98,16 +98,15 @@ function readSafeTextFile(root, relativePath) {
   return fs.readFileSync(resolved, "utf-8");
 }
 
-function writeSafeTextFile(root, relativePath, content) {
-  const { normalized, resolved } = assertNoSymlinkPath(root, relativePath);
-  fs.mkdirSync(path.dirname(resolved), { recursive: true });
-  // Atomic write: write to a sibling temp file, fsync, then rename. POSIX
-  // rename on the same filesystem is atomic, so a crash mid-write leaves
-  // either the old file or the new file — never a torn half-write that
-  // would brick state.json or treasury.json. Without this, a power loss
-  // or SIGKILL between bytes is unrecoverable.
-  const tmpName = `.${path.basename(resolved)}.tmp.${process.pid}.${Date.now()}.${Math.random().toString(36).slice(2, 8)}`;
-  const tmpPath = path.join(path.dirname(resolved), tmpName);
+// Atomic write to an absolute path. Used by writeSafeTextFile (which
+// adds symlink/path safety) and by callers that already have a
+// known-safe absolute path (federation/farcaster/horizon ledgers).
+// Without this, a power loss or SIGKILL between bytes can leave a
+// torn JSON file that the next cycle cannot parse.
+function atomicWriteFile(absPath, content) {
+  fs.mkdirSync(path.dirname(absPath), { recursive: true });
+  const tmpName = `.${path.basename(absPath)}.tmp.${process.pid}.${Date.now()}.${Math.random().toString(36).slice(2, 8)}`;
+  const tmpPath = path.join(path.dirname(absPath), tmpName);
   let fd;
   try {
     fd = fs.openSync(tmpPath, "w");
@@ -115,7 +114,7 @@ function writeSafeTextFile(root, relativePath, content) {
     fs.fsyncSync(fd);
     fs.closeSync(fd);
     fd = null;
-    fs.renameSync(tmpPath, resolved);
+    fs.renameSync(tmpPath, absPath);
   } catch (error) {
     if (fd != null) {
       try { fs.closeSync(fd); } catch { /* ignore */ }
@@ -123,6 +122,11 @@ function writeSafeTextFile(root, relativePath, content) {
     try { fs.unlinkSync(tmpPath); } catch { /* tmp may not exist */ }
     throw error;
   }
+}
+
+function writeSafeTextFile(root, relativePath, content) {
+  const { normalized, resolved } = assertNoSymlinkPath(root, relativePath);
+  atomicWriteFile(resolved, content);
   return { normalized, resolved };
 }
 
@@ -183,6 +187,7 @@ function assertSafePublicReply(text) {
 module.exports = {
   assertSafePublicReply,
   assertSafeTextForWrite,
+  atomicWriteFile,
   containsSecret,
   normalizeRelativePath,
   redactSecrets,

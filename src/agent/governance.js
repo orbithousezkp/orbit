@@ -419,11 +419,31 @@ function parseQuorumComments(comments, idemKey, maintainers) {
     const author = String(comment.author || comment.user || "").toLowerCase();
     if (!author || !allowed.has(author)) continue;
     const body = String(comment.body || "");
-    const lines = body.split(/\r?\n/).map((line) => line.trim());
+    // Track markdown code-fence and blockquote state. Without this, a
+    // maintainer can post a comment that LOOKS like documentation
+    // ("here's an example: ```APPROVE ORBIT-SPEND abc```") and the
+    // line-anchored regex would still match the inner line — counting
+    // a docs example as a real vote. See pentest 2026-05-26 §quorum.
+    const rawLines = body.split(/\r?\n/);
+    let inCodeFence = false;
     let voted = false;
-    for (const line of lines) {
-      const approveMatch = line.match(/^APPROVE\s+ORBIT-([A-Z0-9-]+)\s+(\S+)$/);
-      const rejectMatch = line.match(/^REJECT\s+ORBIT-([A-Z0-9-]+)\s+(\S+)$/);
+    for (const raw of rawLines) {
+      const trimmed = raw.trim();
+      // A bare ``` (or ```lang) toggles fence state. Indented code blocks
+      // (4+ leading spaces) on the raw line also count as code per
+      // GitHub Markdown — skip those too.
+      if (/^`{3,}/.test(trimmed)) {
+        inCodeFence = !inCodeFence;
+        continue;
+      }
+      if (inCodeFence) continue;
+      // Quoted text (a "> "-prefix line) is also semantically a quote,
+      // not a vote — strip it from consideration.
+      if (/^>/.test(trimmed)) continue;
+      // Indented code (4+ spaces in the RAW line).
+      if (/^ {4,}\S/.test(raw)) continue;
+      const approveMatch = trimmed.match(/^APPROVE\s+ORBIT-([A-Z0-9-]+)\s+(\S+)$/);
+      const rejectMatch = trimmed.match(/^REJECT\s+ORBIT-([A-Z0-9-]+)\s+(\S+)$/);
       if (approveMatch && approveMatch[2] === idem) {
         approvals.add(author);
         voted = true;

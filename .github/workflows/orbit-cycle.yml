@@ -19,6 +19,14 @@ concurrency:
 
 jobs:
   cycle:
+    # Defense-in-depth: scheduled runs always execute; workflow_dispatch
+    # only runs for the configured owner. A maintainer with write access
+    # can still modify code/workflow, but cannot trigger a one-off cycle
+    # to test secret-exfiltration vectors without a code change that's
+    # visible in git history. Cron has no actor, so we allow it.
+    if: >-
+      github.event_name == 'schedule' ||
+      (github.event_name == 'workflow_dispatch' && github.actor == vars.ORBIT_OWNER_USERNAME)
     runs-on: ubuntu-latest
     timeout-minutes: 15
 

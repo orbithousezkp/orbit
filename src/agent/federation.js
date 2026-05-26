@@ -417,9 +417,12 @@ function loadInboxLedger(repoRoot) {
 
 function saveInboxLedger(repoRoot, ledger) {
   const file = ledgerPath(repoRoot);
-  fs.mkdirSync(path.dirname(file), { recursive: true });
   const safe = { nonces: ledger && ledger.nonces && typeof ledger.nonces === "object" ? ledger.nonces : {} };
-  fs.writeFileSync(file, JSON.stringify(safe, null, 2) + "\n", "utf8");
+  // Atomic — Patch Set Q. Without this, two cycles ingesting federated
+  // messages concurrently could leave a half-written ledger and lose
+  // nonce state, allowing replay.
+  const { atomicWriteFile } = require("./safety");
+  atomicWriteFile(file, JSON.stringify(safe, null, 2) + "\n");
   return file;
 }
 
