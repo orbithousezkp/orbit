@@ -362,6 +362,36 @@ async function main() {
     return;
   }
 
+  // Patch Set W: failure backoff. If the previous cycle hard-failed
+  // (state.lastStatus left as "running" after a crash), increment a
+  // consecutive-failure counter and back off the next attempt with
+  // exponential delay capped at 24h. Independent of the HMAC-signed
+  // skip-guard above so we don't need to re-sign.
+  const cycleBackoff = require("./cycle-backoff");
+  if (cycleBackoff.detectPriorFailure(state, { now: new Date() })) {
+    const tripped = cycleBackoff.applyBackoff(state, { now: new Date() });
+    log(`prior cycle hard-failed (lastStatus=running). consecutiveFailures=${tripped.consecutiveFailures}${tripped.tripped ? ` backoff_until=${tripped.until}` : ""}`);
+    if (tripped.tripped) {
+      try {
+        require("./error-log").logError(config.repoRoot, {
+          phase: "cycle-backoff",
+          code: "CYCLE_HARD_FAILURE",
+          message: `cycle hard-failed ${tripped.consecutiveFailures}x consecutively; backing off until ${tripped.until}`
+        });
+      } catch { /* best-effort */ }
+    }
+  }
+  const backoff = cycleBackoff.isBackedOff(state, { now: new Date() });
+  if (backoff.skip) {
+    const minutes = Math.round(backoff.remainingMs / 60_000);
+    log(`cycle ${state.cycle + 1} skipped (reason=failure-backoff consecutiveFailures=${backoff.consecutiveFailures} remaining=${minutes}m)`);
+    // Persist the bumped counter so successive cron firings see the
+    // same state. Use writeJson directly — assertStateWriteSafe is
+    // overkill here (we haven't touched launchOnceFired/treasury).
+    try { writeJson(config.repoRoot, "memory/state.json", state); } catch { /* ignore */ }
+    return;
+  }
+
   state.cycle += 1;
   state.born = state.born || new Date().toISOString();
   state.lastActive = new Date().toISOString();
@@ -597,6 +627,9 @@ async function main() {
   }
 
   state.lastStatus = "completed";
+  // Patch Set W: cycle completed cleanly — clear any failure backoff
+  // so the next cron firing resumes at normal cadence.
+  require("./cycle-backoff").clearBackoff(state);
   if (firstWakeIntro) {
     state.firstWakeIntroComplete = true;
     state.firstWakeIntroAt = firstWakeIntro.timestamp;
