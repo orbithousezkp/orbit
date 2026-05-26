@@ -369,3 +369,193 @@ test("C-3: verifyEnvelopeSignature fails closed when viem is unavailable", () =>
   const out = execFileSync(process.execPath, ["-e", script], { encoding: "utf8" });
   assert.equal(out, "OK");
 });
+
+// === outbound / sendMessage (S-026, Patch Set U) =============================
+
+const {
+  buildOutboundEnvelope,
+  generateNonce,
+  sanitizePayloadForType,
+  sendMessage,
+  signOutboundEnvelope,
+  loadOutboxIndex,
+  envelopeShapeIssue
+} = require("../src/agent/federation");
+
+function tempRepoOut() {
+  return fs.mkdtempSync(path.join(os.tmpdir(), "orbit-fed-out-"));
+}
+
+const TEST_SIGNER_PK = "0x" + "1".repeat(64);
+function testSignerAddress() {
+  return privateKeyToAccount(TEST_SIGNER_PK).address;
+}
+
+test("sanitizePayloadForType strips fields not in the per-type whitelist", () => {
+  const out = sanitizePayloadForType("HELLO", {
+    repo: "alice/orbit",
+    signer: "0x" + "a".repeat(40),
+    secretKey: "should not survive",
+    capabilities: ["bounty-referral"]
+  });
+  assert.deepEqual(Object.keys(out).sort(), ["capabilities", "repo", "signer"]);
+  assert.equal(out.secretKey, undefined);
+});
+
+test("sanitizePayloadForType returns null on unknown type or bad shape", () => {
+  assert.equal(sanitizePayloadForType("WORLD_DOMINATION", { x: 1 }), null);
+  assert.equal(sanitizePayloadForType("HELLO", null), null);
+  assert.equal(sanitizePayloadForType("HELLO", "string"), null);
+});
+
+test("buildOutboundEnvelope produces a canonical envelope that passes envelopeShapeIssue", () => {
+  const envelope = buildOutboundEnvelope({
+    type: "HELLO",
+    payload: { repo: "alice/orbit", signer: testSignerAddress(), capabilities: ["x"] },
+    fromRepo: "alice/orbit",
+    fromSigner: testSignerAddress(),
+    now: new Date("2026-06-01T00:00:00Z")
+  });
+  assert.equal(envelopeShapeIssue(envelope), null);
+  assert.equal(envelope.version, "1");
+  assert.equal(envelope.type, "HELLO");
+  assert.ok(/^2026/.test(envelope.nonce), `nonce should sort-prefix by year, got ${envelope.nonce}`);
+});
+
+test("buildOutboundEnvelope rejects unknown type, bad fromRepo, bad fromSigner, empty payload", () => {
+  assert.throws(
+    () => buildOutboundEnvelope({ type: "BOGUS", payload: {}, fromRepo: "a/b", fromSigner: testSignerAddress() }),
+    (err) => err.code === "UNKNOWN_TYPE"
+  );
+  assert.throws(
+    () => buildOutboundEnvelope({ type: "HELLO", payload: { repo: "a/b" }, fromRepo: "noslash", fromSigner: testSignerAddress() }),
+    (err) => err.code === "FROM_REPO_INVALID"
+  );
+  assert.throws(
+    () => buildOutboundEnvelope({ type: "HELLO", payload: { repo: "a/b" }, fromRepo: "a/b", fromSigner: "0xnothex" }),
+    (err) => err.code === "FROM_SIGNER_INVALID"
+  );
+  assert.throws(
+    () => buildOutboundEnvelope({ type: "HELLO", payload: {}, fromRepo: "a/b", fromSigner: testSignerAddress() }),
+    (err) => err.code === "PAYLOAD_INVALID"
+  );
+});
+
+test("generateNonce produces a string matching the NONCE_REGEX with a date prefix", () => {
+  const nonce = generateNonce(new Date("2026-06-01T00:00:00Z"));
+  assert.match(nonce, /^[A-Za-z0-9_.:-]{4,128}$/);
+  assert.ok(nonce.startsWith("20260601"));
+});
+
+test("signOutboundEnvelope round-trips via verifyEnvelopeSignature", async () => {
+  const envelope = buildOutboundEnvelope({
+    type: "HELLO",
+    payload: { repo: "alice/orbit", signer: testSignerAddress(), capabilities: ["x"] },
+    fromRepo: "alice/orbit",
+    fromSigner: testSignerAddress(),
+    now: new Date("2026-06-01T00:00:00Z")
+  });
+  const signed = await signOutboundEnvelope(envelope, TEST_SIGNER_PK);
+  assert.match(signed.signature, /^0x[0-9a-fA-F]{130}$/);
+  const verified = await Promise.resolve(verifyEnvelopeSignature(signed));
+  assert.equal(verified.ok, true, JSON.stringify(verified));
+  assert.equal(verified.recoveredSigner.toLowerCase(), testSignerAddress().toLowerCase());
+});
+
+test("sendMessage writes to runtime/federation/outbox/dry/ when federation is disabled", async () => {
+  const repoRoot = tempRepoOut();
+  const result = await sendMessage(repoRoot, {
+    type: "HELLO",
+    payload: { repo: "alice/orbit", signer: testSignerAddress(), capabilities: ["bounty-referral"] }
+  }, {
+    config: { githubRepository: "alice/orbit", agentSigner: testSignerAddress(), federation: false },
+    state: { preLaunchVerified: false },
+    privateKey: TEST_SIGNER_PK,
+    now: new Date("2026-06-01T00:00:00Z")
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.dryRun, true);
+  assert.ok(result.path.includes("runtime/federation/outbox/dry"));
+  assert.ok(fs.existsSync(result.path), "envelope file must exist");
+  const onDisk = JSON.parse(fs.readFileSync(result.path, "utf-8"));
+  assert.match(onDisk.signature, /^0x[0-9a-fA-F]{130}$/);
+
+  // Dry-run index updated.
+  const dryIndex = loadOutboxIndex(repoRoot, { dryRun: true });
+  assert.deepEqual(dryIndex.nonces, [result.envelope.nonce]);
+  // Live index untouched.
+  const liveIndex = loadOutboxIndex(repoRoot, { dryRun: false });
+  assert.deepEqual(liveIndex.nonces, []);
+});
+
+test("sendMessage writes to live outbox when federation is enabled AND preLaunchVerified", async () => {
+  const repoRoot = tempRepoOut();
+  const result = await sendMessage(repoRoot, {
+    type: "INTEL_SHARE",
+    payload: { topic: "buyback", summary: "executed weekly", tags: ["treasury"] }
+  }, {
+    config: { githubRepository: "alice/orbit", agentSigner: testSignerAddress(), federation: true },
+    state: { preLaunchVerified: true },
+    privateKey: TEST_SIGNER_PK,
+    now: new Date("2026-07-01T00:00:00Z")
+  });
+
+  assert.equal(result.dryRun, false);
+  assert.ok(result.path.includes("runtime/federation/outbox"));
+  assert.ok(!result.path.includes("/dry/"), "live mode must not write to dry/");
+  const liveIndex = loadOutboxIndex(repoRoot, { dryRun: false });
+  assert.deepEqual(liveIndex.nonces, [result.envelope.nonce]);
+});
+
+test("sendMessage trims the outbox index to the most recent 100 entries", async () => {
+  const repoRoot = tempRepoOut();
+  // Seed an index with 100 prior nonces.
+  const dir = path.join(repoRoot, "runtime/federation/outbox/dry");
+  fs.mkdirSync(dir, { recursive: true });
+  const seedNonces = Array.from({ length: 100 }, (_, i) => `seed-${i.toString().padStart(3, "0")}`);
+  fs.writeFileSync(
+    path.join(dir, "index.json"),
+    JSON.stringify({ schema: "orbit-federation-outbox/1", nonces: seedNonces })
+  );
+
+  const result = await sendMessage(repoRoot, {
+    type: "HELLO",
+    payload: { repo: "alice/orbit", signer: testSignerAddress(), capabilities: [] }
+  }, {
+    config: { githubRepository: "alice/orbit", agentSigner: testSignerAddress(), federation: false },
+    state: { preLaunchVerified: false },
+    privateKey: TEST_SIGNER_PK,
+    now: new Date("2026-06-01T00:00:00Z")
+  });
+
+  const index = loadOutboxIndex(repoRoot, { dryRun: true });
+  assert.equal(index.nonces.length, 100, "index must be capped at 100");
+  assert.equal(index.nonces[index.nonces.length - 1], result.envelope.nonce, "newest entry preserved");
+  assert.equal(index.nonces[0], "seed-001", "oldest dropped");
+});
+
+test("sendMessage strips disallowed payload fields before signing", async () => {
+  const repoRoot = tempRepoOut();
+  const result = await sendMessage(repoRoot, {
+    type: "HELLO",
+    payload: {
+      repo: "alice/orbit",
+      signer: testSignerAddress(),
+      capabilities: [],
+      privateKey: "0x" + "f".repeat(64),     // MUST be stripped
+      walletAddress: "0xabc"                  // MUST be stripped
+    }
+  }, {
+    config: { githubRepository: "alice/orbit", agentSigner: testSignerAddress(), federation: false },
+    state: { preLaunchVerified: false },
+    privateKey: TEST_SIGNER_PK,
+    now: new Date("2026-06-01T00:00:00Z")
+  });
+  const onDisk = JSON.parse(fs.readFileSync(result.path, "utf-8"));
+  assert.equal(onDisk.payload.privateKey, undefined);
+  assert.equal(onDisk.payload.walletAddress, undefined);
+  // Stringified file MUST NOT contain those leaked values either.
+  const raw = fs.readFileSync(result.path, "utf-8");
+  assert.ok(!raw.includes("0xffffff"), "no key fragment in serialized envelope");
+});

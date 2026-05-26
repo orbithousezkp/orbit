@@ -390,6 +390,191 @@ function isFederationEnabled(config = {}, state = {}) {
   return { ok: true };
 }
 
+// -------- outbound (S-026) --------
+
+// Per-type allowed payload field whitelist. Anything else is stripped
+// before persisting. FEDERATION.md §3 + §8 ("PII leak" row) require
+// this — only declared fields cross the wire.
+const ALLOWED_PAYLOAD_FIELDS = {
+  HELLO: ["repo", "signer", "capabilities", "publicUrl"],
+  INTEL_SHARE: ["topic", "summary", "sourceUrl", "tags"],
+  CAPABILITY_ADVERTISE: ["capability", "version", "summary", "endpoint"]
+};
+
+function sanitizePayloadForType(type, payload) {
+  if (!payload || typeof payload !== "object") return null;
+  const allowed = ALLOWED_PAYLOAD_FIELDS[type];
+  if (!Array.isArray(allowed)) return null;
+  const out = {};
+  for (const key of allowed) {
+    if (Object.prototype.hasOwnProperty.call(payload, key) && payload[key] !== undefined) {
+      out[key] = payload[key];
+    }
+  }
+  return out;
+}
+
+function generateNonce(now) {
+  const d = now instanceof Date ? now : new Date();
+  // Year-prefix + random hex. Stays well within NONCE_REGEX (4–128 of
+  // [A-Za-z0-9_.:-]) and is sortable by send time.
+  return `${d.getUTCFullYear()}${String(d.getUTCMonth() + 1).padStart(2, "0")}${String(d.getUTCDate()).padStart(2, "0")}-${require("node:crypto").randomBytes(8).toString("hex")}`;
+}
+
+function buildOutboundEnvelope(input) {
+  const type = String(input && input.type || "").toUpperCase();
+  if (!MESSAGE_TYPES.includes(type)) {
+    const err = new Error(`buildOutboundEnvelope: unknown type ${input && input.type}`);
+    err.code = "UNKNOWN_TYPE";
+    throw err;
+  }
+  const payload = sanitizePayloadForType(type, input.payload);
+  if (!payload || Object.keys(payload).length === 0) {
+    const err = new Error(`buildOutboundEnvelope: payload missing or has no allowed fields for type ${type}`);
+    err.code = "PAYLOAD_INVALID";
+    throw err;
+  }
+  if (typeof input.fromRepo !== "string" || !input.fromRepo.includes("/")) {
+    const err = new Error("buildOutboundEnvelope: fromRepo must be owner/repo");
+    err.code = "FROM_REPO_INVALID";
+    throw err;
+  }
+  if (typeof input.fromSigner !== "string" || !ADDRESS_REGEX.test(input.fromSigner)) {
+    const err = new Error("buildOutboundEnvelope: fromSigner must be a 0x-EVM address");
+    err.code = "FROM_SIGNER_INVALID";
+    throw err;
+  }
+  const now = input.now instanceof Date ? input.now : new Date();
+  const nonce = input.nonce ? String(input.nonce) : generateNonce(now);
+  return {
+    version: ENVELOPE_VERSION,
+    type,
+    fromRepo: input.fromRepo,
+    fromSigner: input.fromSigner,
+    sentAt: now.toISOString(),
+    nonce,
+    payload
+  };
+}
+
+async function signOutboundEnvelope(envelope, privateKey) {
+  if (!privateKey) {
+    const err = new Error("signOutboundEnvelope: privateKey required");
+    err.code = "NO_PRIVATE_KEY";
+    throw err;
+  }
+  // privateKeyToAccount lives in viem/accounts (subpath), not the main
+  // viem package — that's why tryViem() doesn't expose it.
+  let privateKeyToAccount;
+  try {
+    ({ privateKeyToAccount } = require("viem/accounts"));
+  } catch {
+    const err = new Error("signOutboundEnvelope: viem/accounts unavailable — cannot sign");
+    err.code = "VIEM_UNAVAILABLE";
+    throw err;
+  }
+  const typed = buildTypedData(envelope);
+  const account = privateKeyToAccount(privateKey);
+  const signature = await account.signTypedData(typed);
+  return { ...envelope, signature };
+}
+
+function outboxBaseDir(repoRoot, dryRun) {
+  return path.join(repoRoot, "runtime", "federation", "outbox", dryRun ? "dry" : "");
+}
+
+function loadOutboxIndex(repoRoot, options = {}) {
+  const dir = outboxBaseDir(repoRoot, Boolean(options.dryRun));
+  const indexPath = path.join(dir, "index.json");
+  try {
+    return JSON.parse(fs.readFileSync(indexPath, "utf-8"));
+  } catch {
+    return { schema: "orbit-federation-outbox/1", nonces: [] };
+  }
+}
+
+function saveOutboxIndex(repoRoot, index, options = {}) {
+  const { atomicWriteFile } = require("./safety");
+  const dir = outboxBaseDir(repoRoot, Boolean(options.dryRun));
+  fs.mkdirSync(dir, { recursive: true });
+  const indexPath = path.join(dir, "index.json");
+  atomicWriteFile(
+    indexPath,
+    JSON.stringify({ schema: "orbit-federation-outbox/1", nonces: index.nonces || [] }, null, 2) + "\n"
+  );
+  return indexPath;
+}
+
+// sendMessage(repoRoot, { type, payload }, deps)
+//   deps: { config, state, privateKey, now, nonce, fromRepo, fromSigner }
+// Returns { ok, envelope, path, dryRun, reason? }.
+async function sendMessage(repoRoot, message, deps = {}) {
+  if (!repoRoot) {
+    const err = new Error("sendMessage: repoRoot required");
+    err.code = "NO_REPO_ROOT";
+    throw err;
+  }
+  const config = deps.config || {};
+  const state = deps.state || {};
+  const enabled = isFederationEnabled(config, state);
+  const dryRun = !enabled.ok;
+
+  const fromRepo = deps.fromRepo || config.githubRepository;
+  const fromSigner = deps.fromSigner || config.agentSigner;
+  const envelope = buildOutboundEnvelope({
+    type: message.type,
+    payload: message.payload,
+    fromRepo,
+    fromSigner,
+    now: deps.now,
+    nonce: deps.nonce
+  });
+
+  // Refuse if the envelope's own shape gate would reject this. Saves a
+  // signing round-trip and gives a clearer error than the signer would.
+  const shapeIssue = envelopeShapeIssue(envelope);
+  if (shapeIssue) {
+    const err = new Error(`sendMessage: envelope shape invalid: ${shapeIssue}`);
+    err.code = "SHAPE_INVALID";
+    throw err;
+  }
+
+  // In dry-run mode we still sign — the proof + nonce should be
+  // identical to what live mode would produce, just persisted in the
+  // dry sub-directory and never committed by the cycle. This makes
+  // it possible to test the full pipeline pre-launch.
+  let signed;
+  if (deps.privateKey) {
+    signed = await signOutboundEnvelope(envelope, deps.privateKey);
+  } else {
+    // No signer wired (typical in tests). Persist an unsigned envelope
+    // so the test can still verify the shape + storage flow.
+    signed = envelope;
+  }
+
+  const { atomicWriteFile } = require("./safety");
+  const dir = outboxBaseDir(repoRoot, dryRun);
+  fs.mkdirSync(dir, { recursive: true });
+  const file = path.join(dir, `${signed.nonce}.json`);
+  atomicWriteFile(file, JSON.stringify(signed, null, 2) + "\n");
+
+  // Update the per-mode outbox index.
+  const index = loadOutboxIndex(repoRoot, { dryRun });
+  const next = Array.isArray(index.nonces) ? index.nonces : [];
+  if (!next.includes(signed.nonce)) next.push(signed.nonce);
+  // Keep most recent 100 — the on-disk envelopes are the source of truth.
+  const trimmed = next.slice(-100);
+  saveOutboxIndex(repoRoot, { nonces: trimmed }, { dryRun });
+
+  return {
+    ok: true,
+    envelope: signed,
+    path: file,
+    dryRun,
+    reason: dryRun ? enabled.reason : null
+  };
+}
+
 // -------- ledger / peer I/O --------
 
 function ledgerPath(repoRoot) {
@@ -467,18 +652,26 @@ module.exports = {
   MESSAGE_TYPES,
   PRIMARY_TYPE,
   TYPES,
+  ALLOWED_PAYLOAD_FIELDS,
+  buildOutboundEnvelope,
   buildTypedData,
   canonicalEnvelope,
   classifyPayload,
   computeEnvelopeHash,
   envelopeShapeIssue,
+  generateNonce,
   isFederationEnabled,
   loadInboxLedger,
+  loadOutboxIndex,
   loadPeers,
   ledgerPath,
   peersPath,
   quarantineDecision,
   recordLedgerDecision,
+  sanitizePayloadForType,
   saveInboxLedger,
+  saveOutboxIndex,
+  sendMessage,
+  signOutboundEnvelope,
   verifyEnvelopeSignature
 };
