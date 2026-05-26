@@ -103,6 +103,44 @@ Nothing about Step 6 is engineering — it's a sequenced ceremony the owner runs
 
 ---
 
+## Step 7 — Hand over the finalised folder
+
+Before pushing to the public repo, run:
+
+```bash
+npm run launch:build
+```
+
+The script (`scripts/build-launch-folder.js`) produces `launch-ready/` containing **only** what should be in the public artifact. It is the deliverable for "give me the finalised folder."
+
+**What's in the folder:**
+- `src/`, `packages/`, `tests/`, `scripts/` — all source.
+- `.github/` — CI workflows.
+- `docs/` — user-facing documentation only.
+- `public/` — dashboard.json, .well-known, CNAME, robots, sitemap.
+- `README.md`, `LICENSE`, `PUBLISHING.md`.
+- `memory/identity.md`, `memory/infrastructure.json`, `memory/ai-providers.json` — the public surface.
+- `memory/state.json`, `treasury.json`, `governance.json`, `tasks.json`, `orbit-lineage.json` — **clean template stubs** rendered from `packages/create-orbit-house/templates/`, identical to what `npx create-orbit-house` would produce.
+- `lore/00-genesis.md`, `voice.md`, `README.md`, `cycles-of-note/README.md`.
+
+**What's stripped:**
+- `PLAN/` (this directory — internal planning + sequencing).
+- `OWNER_ACTIONS.md` (operator runbook).
+- `.remember/`, `.claude/` (session memory).
+- `runtime/` (per-instance signed proofs, federation outbox).
+- All live `memory/*` state: `state.json` (live), `treasury.json` (live), `cycles.jsonl`, `approvals.json`, `adopters-registry.json`, `knowledge.json`, `opportunities.json`, `missions.json`, `horizon-*.json`, `errors.jsonl`, `passport.json`, `feed-cache.json`, `idea-inbox.json`, `agent-sources.json`, `problem-lab.json`, `project-ideas.json`, `roadmap.json`, `buyback-ledger.json`, etc. — 19 files in total.
+- `lore/cycles-of-note/<specific-entries>` (per-instance milestones).
+- Build artifacts (`dist/`, `node_modules/`), env files.
+
+**Audit hook:** the script runs a post-check that exits 1 if anything on the strip list leaks into the output. Adding a file to the whitelist is a deliberate, code-reviewable change.
+
+Current stats (run 2026-05-26 after Patch Set Y):
+- 337 files, 3.4 MB.
+- `memory/`: 3 kept, 5 templated, 19 stripped.
+- `lore/`: 4 kept, 0 specific entries to strip yet.
+
+---
+
 ## Status snapshot — what's already true
 
 | Capability | Status | Evidence |
