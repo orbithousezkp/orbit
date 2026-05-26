@@ -73,6 +73,19 @@ test("signProof round-trips with verifyProof", async () => {
   assert.equal(result.signer, ADDRESS_A);
 });
 
+// Regression: cast is appended to the proof AFTER signing (see run.js
+// farcaster block). It must NOT participate in the canonical body, or
+// re-verification mid-pipeline would fail with a hash mismatch.
+test("verifyProof accepts proofs with post-signing `cast` metadata", async () => {
+  const proof = baseProof();
+  const envelope = await signProof(proof, KEY_A);
+  const signed = { ...proof, ...envelope };
+  // Simulate what farcaster.js does — attach cast metadata after signing.
+  signed.cast = { ok: true, hash: "0xabc", kind: "milestone", idem: "deadbeef", blocked: false, dryRun: false, status: 200, ledgerPath: "memory/farcaster-casts.json" };
+  const result = await verifyProof(signed);
+  assert.equal(result.verified, true, `verification should ignore 'cast': ${JSON.stringify(result)}`);
+});
+
 test("verifyProof rejects payload tampering in steps", async () => {
   const proof = baseProof();
   const envelope = await signProof(proof, KEY_A);

@@ -7,7 +7,12 @@ const SIGNATURE_ENVELOPE_KEYS = [
   "signer",
   "signedAt",
   "signatureScheme",
-  "payloadHash"
+  "payloadHash",
+  // `cast` is appended to the proof AFTER signing (see farcaster block
+  // in run.js). It's post-signing metadata: editing it must not invalidate
+  // the signature, and re-verification must not include it in the hash.
+  // Cast integrity is the farcaster ledger's job, not the cycle proof's.
+  "cast"
 ];
 
 const MAX_CANONICAL_BYTES = 2 * 1024 * 1024;

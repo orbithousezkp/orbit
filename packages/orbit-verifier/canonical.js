@@ -7,7 +7,12 @@ const SIGNATURE_ENVELOPE_KEYS = [
   "signer",
   "signedAt",
   "signatureScheme",
-  "payloadHash"
+  "payloadHash",
+  // `cast` is appended to the proof AFTER signing (farcaster block in
+  // src/agent/run.js). Verifiers must strip it before recomputing the
+  // canonical body — otherwise the hash diverges and verification
+  // falsely fails. Keep this list in sync with src/agent/proof-canonical.js.
+  "cast"
 ];
 
 const MAX_CANONICAL_BYTES = 2 * 1024 * 1024;
