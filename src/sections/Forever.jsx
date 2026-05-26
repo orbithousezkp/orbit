@@ -1,5 +1,6 @@
 import React from 'react';
 import { principles, currents, horizon } from '../data/forever.js';
+import AsciiRule from '../components/AsciiRule.jsx';
 
 /**
  * Forever — the meta-roadmap on a public surface. Principles never
@@ -33,26 +34,34 @@ export default function Forever() {
           </ol>
         </section>
 
+        <AsciiRule chars={96} />
+
         <section>
           <h3 className="forever__block-head">the ten currents · capability axes that never end</h3>
           <div className="currents">
             {currents.map((c) => (
               <article className="current" key={c.n}>
                 <div className="current__name">·{c.n}· {c.name}</div>
-                <p className="current__pitch">{c.star}</p>
-                <p className="current__pitch"><span className="mono">in flight ·</span> {c.inflight}</p>
+                {c.star && <p className="current__pitch">{c.star}</p>}
+                {c.inflight && (
+                  <p className="current__inflight">
+                    <span className="current__tag">in flight ·</span> {c.inflight}
+                  </p>
+                )}
               </article>
             ))}
           </div>
         </section>
 
+        <AsciiRule chars={96} />
+
         <section>
           <h3 className="forever__block-head">horizon · phase 10 and beyond</h3>
           <div className="horizon">
             <p>{horizon.blurb}</p>
-            <ul style={{ margin: '0.8rem 0 0', padding: '0 0 0 1.2rem', fontSize: '0.85rem', color: 'var(--ink-mid)' }}>
+            <ul className="horizon__list">
               {horizon.bullets.map((b, i) => (
-                <li key={i} style={{ marginBottom: '0.3rem' }}>{b}</li>
+                <li key={i}>{b}</li>
               ))}
             </ul>
           </div>

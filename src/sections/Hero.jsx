@@ -1,13 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { identity } from '../data/identity.js';
+import { timeAgo, truncHash } from '../lib/format.js';
+import CopyButton from '../components/CopyButton.jsx';
+import Pill from '../components/Pill.jsx';
 
 /**
- * Hero — left column is the brand statement.
- * Right column is a system-status panel: real dashboard.json data
- * surfaced as a tech-rich code-block readout. No decorative glyph.
+ * Hero — left column is the brand statement. Right column is a
+ * system-status panel pulling real data from /dashboard.json:
+ * cycle counter with count-up animation, copy-on-click signer +
+ * commit, relative-time "generated", tabular-nums for stable column
+ * widths.
  */
 export default function Hero() {
   const [data, setData] = useState(null);
+  const [cycleDisplay, setCycleDisplay] = useState(0);
+  const animFrameRef = useRef(0);
 
   useEffect(() => {
     const ac = new AbortController();
@@ -18,20 +25,41 @@ export default function Hero() {
         if (e.name === 'AbortError') return;
         console.warn('dashboard.json fetch failed:', e.message);
       });
-    return () => ac.abort();
+    return () => {
+      ac.abort();
+      cancelAnimationFrame(animFrameRef.current);
+    };
   }, []);
 
-  const cycle = data?.lifecycle?.cycle ?? '—';
-  const cycleStatus = data?.lifecycle?.lastStatus ?? '—';
-  const gitCommit = data?.gitCommit ?? '—';
-  const signer = data?.signer
-    ? `${data.signer.slice(0, 10)}…${data.signer.slice(-6)}`
-    : '—';
-  const generatedAt = data?.generatedAt
-    ? data.generatedAt.replace('T', ' ').replace(/\.\d+Z$/, ' UTC')
-    : '—';
+  // count-up the cycle number once dashboard.json loads
+  useEffect(() => {
+    const target = Number(data?.lifecycle?.cycle);
+    if (!Number.isFinite(target) || target <= 0) {
+      setCycleDisplay(0);
+      return;
+    }
+    const start = performance.now();
+    const duration = Math.min(900, 30 * Math.log2(target + 1));
+    const ease = (t) => 1 - Math.pow(1 - t, 3);
+    const tick = (now) => {
+      const t = Math.min(1, (now - start) / duration);
+      setCycleDisplay(Math.round(ease(t) * target));
+      if (t < 1) animFrameRef.current = requestAnimationFrame(tick);
+    };
+    animFrameRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(animFrameRef.current);
+  }, [data]);
+
+  const cycleStatus = data?.lifecycle?.lastStatus ?? 'idle';
+  const gitCommit = data?.gitCommit ?? null;
+  const signer = data?.signer ?? null;
+  const lastActive = data?.lifecycle?.lastActive ?? data?.generatedAt ?? null;
   const receiptsCount = data?.receipts?.count ?? '—';
   const refusalsCount = Array.isArray(data?.refusals) ? data.refusals.length : '—';
+  const adoptersAdopted = data?.adopters?.adopted ?? 0;
+  const adoptersTarget = data?.adopters?.phase1Target ?? 5;
+
+  const statusKind = cycleStatus === 'completed' ? 'ok' : cycleStatus === 'running' ? 'next' : 'idle';
 
   return (
     <section id="home" className="section hero">
@@ -50,38 +78,51 @@ export default function Hero() {
         </div>
       </div>
 
-      <aside className="hero__panel">
+      <aside className="hero__panel" aria-label="orbit system status">
         <div className="hero__panel-head">
           <span className="hero__panel-label">system</span>
-          <span className="hero__panel-status">
-            <span className="status-dot" data-status={cycleStatus === 'completed' ? 'ok' : 'idle'} />
-            {cycleStatus}
-          </span>
+          <Pill status={statusKind}>{cycleStatus}</Pill>
         </div>
         <dl className="hero__panel-list">
           <div className="hero__panel-row">
             <dt>cycle</dt>
-            <dd className="mono">#{cycle}</dd>
+            <dd className="mono tnum">#{cycleDisplay}</dd>
           </div>
           <div className="hero__panel-row">
             <dt>commit</dt>
-            <dd className="mono">{gitCommit}</dd>
+            <dd className="mono">
+              {gitCommit ? (
+                <CopyButton value={gitCommit} display={truncHash(gitCommit, 7, 0)} label="copy commit" />
+              ) : (
+                <span>—</span>
+              )}
+            </dd>
           </div>
           <div className="hero__panel-row">
             <dt>signer</dt>
-            <dd className="mono">{signer}</dd>
+            <dd className="mono">
+              {signer ? (
+                <CopyButton value={signer} display={truncHash(signer, 8, 6)} label="copy signer" />
+              ) : (
+                <span>—</span>
+              )}
+            </dd>
           </div>
           <div className="hero__panel-row">
             <dt>receipts</dt>
-            <dd className="mono">{receiptsCount}</dd>
+            <dd className="mono tnum">{receiptsCount}</dd>
           </div>
           <div className="hero__panel-row">
             <dt>refusals</dt>
-            <dd className="mono">{refusalsCount}</dd>
+            <dd className="mono tnum">{refusalsCount}</dd>
           </div>
           <div className="hero__panel-row">
-            <dt>generated</dt>
-            <dd className="mono">{generatedAt}</dd>
+            <dt>adopters</dt>
+            <dd className="mono tnum">{adoptersAdopted} / {adoptersTarget}</dd>
+          </div>
+          <div className="hero__panel-row">
+            <dt>last cycle</dt>
+            <dd className="mono">{timeAgo(lastActive)}</dd>
           </div>
         </dl>
       </aside>

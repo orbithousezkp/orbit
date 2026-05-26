@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { timeAgo, truncHash } from '../lib/format.js';
+import CopyButton from '../components/CopyButton.jsx';
+import Pill from '../components/Pill.jsx';
 
 export default function Inspect() {
   const [data, setData] = useState(null);
-  const [err, setErr] = useState(null);
+  const [err, setErr] = useState(false);
 
   useEffect(() => {
     const ac = new AbortController();
@@ -11,9 +14,6 @@ export default function Inspect() {
       .then((d) => setData(d))
       .catch((e) => {
         if (e.name === 'AbortError') return;
-        // Keep the real error visible to operators via the console; the
-        // visible cell hint stays generic so a transient blip doesn't
-        // leak diagnostics to public visitors.
         console.warn('dashboard.json fetch failed:', e.message);
         setErr(true);
       });
@@ -24,20 +24,20 @@ export default function Inspect() {
   const approvalLabel =
     approvalMode && approvalMode !== '—' ? String(approvalMode).replace(/_/g, ' ') : '—';
   const publicViewOnly = data?.walletPolicy?.publicViewOnly ?? true;
-  const signer = data?.signer ? `${data.signer.slice(0, 10)}…${data.signer.slice(-6)}` : '—';
-  const refusalCount = Array.isArray(data?.refusals) ? data.refusals.length : '—';
-  const gitCommit = data?.gitCommit ?? '—';
+  const signer = data?.signer ?? null;
+  const refusals = Array.isArray(data?.refusals) ? data.refusals : [];
+  const refusalCount = refusals.length;
+  const gitCommit = data?.gitCommit ?? null;
   const missionsActive = data?.missions?.active ?? '—';
   const missionsTotal = data?.missions?.total ?? null;
-  const missionsList = Array.isArray(data?.missions?.list) ? data.missions.list : [];
   const adoptersCount = data?.adopters?.adopted ?? '—';
   const adoptersTarget = data?.adopters?.phase1Target ?? 5;
-  const adoptersProgress = typeof data?.adopters?.phase1Progress === 'number'
-    ? Math.round(data.adopters.phase1Progress * 100)
-    : null;
+  const adoptersProgress =
+    typeof data?.adopters?.phase1Progress === 'number'
+      ? Math.round(data.adopters.phase1Progress * 100)
+      : null;
   const approvalsPending = data?.approvals?.pending ?? null;
   const approvalsTotal = data?.approvals?.total ?? null;
-  const approvalsList = Array.isArray(data?.approvals?.list) ? data.approvals.list : [];
   const horizonDryRun = data?.horizon?.dryRun;
   const horizonEnabledSources = data?.horizon?.enabledSources ?? null;
   const horizonTotalSources = data?.horizon?.totalSources ?? null;
@@ -46,6 +46,8 @@ export default function Inspect() {
   const handoffMostRecent = data?.handoff?.mostRecent ?? null;
   const errorsTotal = data?.errors?.total ?? null;
   const errorsRecent = Array.isArray(data?.errors?.recent) ? data.errors.recent : [];
+  const receipts = Array.isArray(data?.receipts?.list) ? data.receipts.list : [];
+  const lastActive = data?.lifecycle?.lastActive ?? data?.generatedAt ?? null;
 
   return (
     <section id="inspect" className="section section--inspect">
@@ -72,19 +74,25 @@ export default function Inspect() {
 
         <div className="cell">
           <div className="cell__label">signer</div>
-          <div className="cell__value mono">{signer}</div>
+          <div className="cell__value mono">
+            {signer ? (
+              <CopyButton value={signer} display={truncHash(signer, 8, 6)} label="copy signer" />
+            ) : (
+              '—'
+            )}
+          </div>
           <div className="cell__hint">eip-712 · wallet-signed · verifiable</div>
         </div>
 
         <div className="cell">
           <div className="cell__label">refusals</div>
-          <div className="cell__value">{refusalCount}</div>
+          <div className="cell__value tnum">{refusalCount}</div>
           <div className="cell__hint">recorded, not silenced</div>
         </div>
 
         <div className="cell">
           <div className="cell__label">missions</div>
-          <div className="cell__value">{missionsActive}</div>
+          <div className="cell__value tnum">{missionsActive}</div>
           <div className="cell__hint">
             {missionsTotal !== null ? `${missionsTotal} total · open on the board` : 'open on the board'}
           </div>
@@ -92,8 +100,9 @@ export default function Inspect() {
 
         <div className="cell">
           <div className="cell__label">adopters</div>
-          <div className="cell__value">
-            {adoptersCount}{adoptersCount !== '—' ? ` / ${adoptersTarget}` : ''}
+          <div className="cell__value tnum">
+            {adoptersCount}
+            {adoptersCount !== '—' ? ` / ${adoptersTarget}` : ''}
           </div>
           <div className="cell__hint">
             {adoptersProgress !== null
@@ -104,21 +113,21 @@ export default function Inspect() {
 
         <div className="cell">
           <div className="cell__label">pending approvals</div>
-          <div className="cell__value">{approvalsPending ?? '—'}</div>
+          <div className="cell__value tnum">{approvalsPending ?? '—'}</div>
           <div className="cell__hint">
             {approvalsPending === null
               ? 'projection rebuilds next cycle'
               : approvalsPending === 0
-                ? 'nothing waiting on the owner'
-                : approvalsTotal !== null
-                  ? `${approvalsTotal} total · oldest-first below`
-                  : 'oldest-first below'}
+              ? 'nothing waiting on the owner'
+              : approvalsTotal !== null
+              ? `${approvalsTotal} total · oldest-first below`
+              : 'oldest-first below'}
           </div>
         </div>
 
         <div className="cell">
           <div className="cell__label">horizon scanner</div>
-          <div className="cell__value">
+          <div className="cell__value tnum">
             {horizonEnabledSources === null
               ? '—'
               : `${horizonEnabledSources}${horizonTotalSources !== null ? `/${horizonTotalSources}` : ''}`}
@@ -127,42 +136,54 @@ export default function Inspect() {
             {horizonEnabledSources === null
               ? 'projection rebuilds next cycle'
               : horizonDryRun
-                ? `dry-run · ${horizonPending ?? 0} candidate${(horizonPending ?? 0) === 1 ? '' : 's'} pending`
-                : `live · ${horizonPending ?? 0} candidate${(horizonPending ?? 0) === 1 ? '' : 's'} pending`}
+              ? `dry-run · ${horizonPending ?? 0} candidate${(horizonPending ?? 0) === 1 ? '' : 's'} pending`
+              : `live · ${horizonPending ?? 0} candidate${(horizonPending ?? 0) === 1 ? '' : 's'} pending`}
           </div>
         </div>
 
         <div className="cell">
           <div className="cell__label">handoff</div>
-          <div className="cell__value">{handoffTotal ?? '—'}</div>
+          <div className="cell__value tnum">{handoffTotal ?? '—'}</div>
           <div className="cell__hint">
             {handoffTotal === null
               ? 'projection rebuilds next cycle'
               : handoffTotal === 0
-                ? 'no founder-handoff proposed'
-                : handoffMostRecent
-                  ? `${handoffMostRecent.id} · ${handoffMostRecent.status}`
-                  : 'see memory/handoff.json'}
+              ? 'no founder-handoff proposed'
+              : handoffMostRecent
+              ? `${handoffMostRecent.id} · ${handoffMostRecent.status}`
+              : 'see memory/handoff.json'}
           </div>
         </div>
 
         <div className="cell">
           <div className="cell__label">recent errors</div>
-          <div className="cell__value">{errorsTotal ?? '—'}</div>
+          <div className="cell__value tnum">{errorsTotal ?? '—'}</div>
           <div className="cell__hint">
             {errorsTotal === null
               ? 'projection rebuilds next cycle'
               : errorsTotal === 0
-                ? 'clean log · nothing logged'
-                : errorsRecent[0]
-                  ? `last: ${errorsRecent[0].phase}${errorsRecent[0].tool ? ' / ' + errorsRecent[0].tool : ''}`
-                  : 'see memory/errors.jsonl'}
+              ? 'clean log · nothing logged'
+              : errorsRecent[0]
+              ? `last: ${errorsRecent[0].phase}${errorsRecent[0].tool ? ' / ' + errorsRecent[0].tool : ''}`
+              : 'see memory/errors.jsonl'}
           </div>
         </div>
 
         <div className="cell">
+          <div className="cell__label">last cycle</div>
+          <div className="cell__value mono">{timeAgo(lastActive)}</div>
+          <div className="cell__hint">{lastActive ? lastActive.replace('T', ' ').replace(/\.\d+Z$/, ' UTC') : '—'}</div>
+        </div>
+
+        <div className="cell">
           <div className="cell__label">build</div>
-          <div className="cell__value mono">{gitCommit}</div>
+          <div className="cell__value mono">
+            {gitCommit ? (
+              <CopyButton value={gitCommit} display={truncHash(gitCommit, 7, 0)} label="copy commit" />
+            ) : (
+              '—'
+            )}
+          </div>
           <div className="cell__hint">latest signed commit</div>
         </div>
 
@@ -177,7 +198,12 @@ export default function Inspect() {
           <div className="cell__hint">projectForDashboard · exportBundle · verifier cli</div>
         </a>
 
-        <a className="cell" href="/dashboard.json" target="_blank" rel="noreferrer noopener">
+        <a
+          className="cell"
+          href="/dashboard.json"
+          target="_blank"
+          rel="noreferrer noopener"
+        >
           <div className="cell__label">snapshot</div>
           <div className="cell__value mono">/dashboard.json</div>
           <div className="cell__hint">
@@ -186,69 +212,69 @@ export default function Inspect() {
         </a>
       </div>
 
-      {missionsList.length > 0 && (
-        <div className="inspect__missions">
-          <div className="inspect__missions-head">
-            <span className="cell__label">open missions</span>
-            <span className="cell__hint">labeled orbit:mission · lifted each cycle</span>
+      {receipts.length > 0 && (
+        <div className="inspect__table-block">
+          <div className="inspect__table-head">
+            <span className="cell__label">recent receipts</span>
+            <span className="cell__hint">{receipts.length} of {data?.receipts?.count ?? '?'} · newest first</span>
           </div>
-          <ul className="inspect__missions-list">
-            {missionsList.slice(0, 5).map((m) => (
-              <li key={m.id || m.issueNumber} className="inspect__mission">
-                <a
-                  className="inspect__mission-link"
-                  href={m.issueUrl || '#'}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                >
-                  <span className="inspect__mission-num mono">#{m.issueNumber}</span>
-                  <span className="inspect__mission-title">{m.title}</span>
-                </a>
-                <span className="inspect__mission-meta">
-                  by {m.proposer}
-                  {m.deadline ? ` · by ${m.deadline}` : ''}
-                </span>
-              </li>
-            ))}
-          </ul>
+          <table className="table" aria-label="recent receipts">
+            <thead>
+              <tr>
+                <th style={{ width: '4rem' }}>cycle</th>
+                <th style={{ width: '7rem' }}>signed</th>
+                <th>result</th>
+                <th style={{ width: '4rem', textAlign: 'right' }}>files</th>
+                <th style={{ width: '6rem' }}>time</th>
+              </tr>
+            </thead>
+            <tbody>
+              {receipts.slice(0, 10).map((r, i) => (
+                <tr key={r.cycle ?? i} data-flag={r.signed ? 'signed' : ''}>
+                  <td className="table__num">#{r.cycle ?? '?'}</td>
+                  <td>
+                    {r.signed ? (
+                      <Pill status="ok">signed</Pill>
+                    ) : (
+                      <Pill status="future">unsigned</Pill>
+                    )}
+                  </td>
+                  <td>{r.result || '—'}</td>
+                  <td className="tnum" style={{ textAlign: 'right' }}>{r.filesChangedCount ?? '—'}</td>
+                  <td>{timeAgo(r.finishedAt || r.startedAt)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 
-      {approvalsList.length > 0 && (
-        <div className="inspect__approvals">
-          <div className="inspect__approvals-head">
-            <span className="cell__label">stuck approvals</span>
-            <span className="cell__hint">oldest first · waiting on the owner</span>
+      {refusals.length > 0 && (
+        <div className="inspect__table-block">
+          <div className="inspect__table-head">
+            <span className="cell__label">recent refusals</span>
+            <span className="cell__hint">{refusals.length} recorded · public, not silenced</span>
           </div>
-          <ul className="inspect__approvals-list">
-            {approvalsList.slice(0, 5).map((a) => (
-              <li key={a.id || a.issueNumber} className="inspect__approval">
-                <a
-                  className="inspect__approval-link"
-                  href={a.issueUrl || '#'}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                >
-                  <span className="inspect__approval-num mono">
-                    {a.issueNumber !== null ? `#${a.issueNumber}` : '—'}
-                  </span>
-                  <span className="inspect__approval-title">
-                    {a.category ? a.category.replace(/_/g, ' ') : 'approval'}
-                    {a.amount !== null && a.asset
-                      ? ` · ${a.amount} ${a.asset}`
-                      : a.amount === null && a.category
-                        ? ' · amount hidden'
-                        : ''}
-                  </span>
-                </a>
-                <span className="inspect__approval-meta">
-                  {a.pendingSinceHours !== null
-                    ? `pending ${a.pendingSinceHours}h`
-                    : 'pending'}
-                </span>
-              </li>
-            ))}
-          </ul>
+          <table className="table" aria-label="recent refusals">
+            <thead>
+              <tr>
+                <th style={{ width: '4rem' }}>cycle</th>
+                <th style={{ width: '8rem' }}>category</th>
+                <th>reason</th>
+                <th style={{ width: '6rem' }}>time</th>
+              </tr>
+            </thead>
+            <tbody>
+              {refusals.slice(0, 8).map((r, i) => (
+                <tr key={i} data-flag="refused">
+                  <td className="table__num">#{r.cycle ?? '?'}</td>
+                  <td>{r.category || r.risk?.category || '—'}</td>
+                  <td>{r.reason || r.refusalReason || '—'}</td>
+                  <td>{timeAgo(r.finishedAt || r.recordedAt)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </section>

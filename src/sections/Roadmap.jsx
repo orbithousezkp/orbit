@@ -1,9 +1,11 @@
 import React from 'react';
 import { phases } from '../data/phases.js';
+import Pill from '../components/Pill.jsx';
 
 /**
  * Roadmap — every phase rendered in full, vertically stacked. No
- * clickable rail, no decorative orbital map. The data is the surface.
+ * clickable rail. Each phase shows its session-gate ID (S-GATE-N)
+ * and adopter target as inline data.
  */
 export default function Roadmap() {
   return (
@@ -24,7 +26,15 @@ export default function Roadmap() {
             <header className="phase__head">
               <span className="phase__num mono">·{p.n}·</span>
               <h3 className="phase__name">{p.name}</h3>
-              <span className="phase__scale" data-status={p.status}>{p.scale}</span>
+              <div className="phase__badges">
+                {p.gate && (
+                  <span className="phase__gate mono">{p.gate}</span>
+                )}
+                {p.adopters && (
+                  <span className="phase__adopters mono">{p.adopters}</span>
+                )}
+                <Pill status={p.status}>{p.scale}</Pill>
+              </div>
             </header>
             <p className="phase__pitch">{p.pitch}</p>
             {Array.isArray(p.bullets) && p.bullets.length > 0 && (
