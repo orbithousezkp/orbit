@@ -11,7 +11,11 @@ export default function Inspect() {
       .then((d) => setData(d))
       .catch((e) => {
         if (e.name === 'AbortError') return;
-        setErr(e.message);
+        // Keep the real error visible to operators via the console; the
+        // visible cell hint stays generic so a transient blip doesn't
+        // leak diagnostics to public visitors.
+        console.warn('dashboard.json fetch failed:', e.message);
+        setErr(true);
       });
     return () => ac.abort();
   }, []);
@@ -60,7 +64,9 @@ export default function Inspect() {
           <div className="cell__label">approval posture</div>
           <div className="cell__value">{approvalLabel}</div>
           <div className="cell__hint">
-            {publicViewOnly ? 'public view only · keys gated' : 'public view only · keys gated'}
+            {publicViewOnly
+              ? 'public view only · keys gated'
+              : 'gated · approval-issue required for external spend'}
           </div>
         </div>
 
@@ -175,7 +181,7 @@ export default function Inspect() {
           <div className="cell__label">snapshot</div>
           <div className="cell__value mono">/dashboard.json</div>
           <div className="cell__hint">
-            the raw projection orbit emits{err ? ` · ${err}` : ''}
+            {err ? 'data unavailable · retry shortly' : 'the raw projection orbit emits'}
           </div>
         </a>
       </div>

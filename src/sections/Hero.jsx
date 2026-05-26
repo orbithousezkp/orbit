@@ -8,7 +8,7 @@ export default function Hero() {
       <div className="hero__col-text">
         <h1 className="hero__brand">orbit</h1>
         <p className="hero__tagline">
-          the agent memory<br />and infrastructure layer<br />for github <em>repositories</em>.
+          the control plane<br />for agent memory and<br />infrastructure inside any<br />github <em>repository</em>.
         </p>
         <p className="hero__desc">{identity.description}</p>
         <p className="hero__motto">built to outlive its founder.</p>

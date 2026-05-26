@@ -26,7 +26,16 @@ export ORBIT_REPO="my-orbit"
 ## 1. Scaffold
 
 ```bash
+# Once create-orbit-house is on npm (see PUBLISHING.md):
 npx create-orbit-house "$ORBIT_REPO"
+cd "$ORBIT_REPO"
+```
+
+Until the package is published, clone this repo and run the scaffolder locally:
+
+```bash
+git clone https://github.com/orbithousezkp/orbit.git
+node orbit/packages/create-orbit-house/bin.js "$ORBIT_REPO"
 cd "$ORBIT_REPO"
 ```
 

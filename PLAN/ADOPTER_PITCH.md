@@ -74,12 +74,15 @@ You can run Orbit with no wallet key, no token, no Farcaster account. Those unlo
 
 | Phase | Status | What ships |
 |---|---|---|
-| 1 — Launch-Ready | Engineering complete, owner-gated | Cycles, proofs, dashboard, federation, intake scanner |
-| 2 — Token Launch | Hard-blocked behind D-018 | $ORBIT on Base, Treasury Safe, buyback automation |
-| 3 — Coordination Markets | Specs ready, behind S-GATE-2/3 | Bounty market, mission board staking |
-| 4–5 — Federation | Specs ready, behind earlier phases | Cross-orbit bounties, productive treasury, founder fade |
+| 1 — Groundwork (Pre-Token) | Engineering complete, owner-gated by `S-GATE-1` | Signed cycles, proofs, dashboard, lore, closed-loop demo, second-adopter |
+| 2 — Genesis | Hard-blocked behind D-018 | $ORBIT on Base via Clanker v4, Treasury Safe funded, buyback automation, daily Merkle anchor |
+| 3 — Capability Marketplace | Specs drafted | Plugin economy, bounty market, federation inbound, per-repo subscription tier |
+| 4 — Federation | Specs drafted | External agent implementations read passport, protocol-fee revenue, multi-maintainer quorum live |
+| 5 — Protocol Independence | Specs drafted | ENS-portable identity, 100 adopters, founder-fade execution |
+| 6 — Standardization | Open | ≥3 external implementations, founder-fade complete, constitutional amendment process |
+| 7–9 — Federation at scale → ubiquity → quiet utility | Open | Beyond 5,000 adopters; no terminal stage written here |
 
-The full roadmap is in `PLAN/PHASES.md`. Decisions are tracked in `PLAN/DECISIONS.md`.
+The full nine-phase plan is in `PLAN/PHASES.md`. After Phase 9, the horizon scanner proposes Phase 10+. Decisions are tracked in `PLAN/DECISIONS.md`.
 
 ---
 
