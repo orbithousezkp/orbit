@@ -156,13 +156,14 @@ test("request_ai_food_refill creates approval and pending configured-provider to
 test("records completed AI-credit refill without executing payment", () => {
   const repoRoot = tempRepo();
   const cfg = config(repoRoot);
-  const entry = recordAiCreditRefill(cfg, repoRoot, {
+  const { entry, created } = recordAiCreditRefill(cfg, repoRoot, {
     amountUsd: 15,
     approvalId: "abc123",
     proof: "owner bought credits through configured provider"
   });
 
   const treasury = loadTreasury(repoRoot, cfg);
+  assert.equal(created, true);
   assert.equal(entry.provider, "configured-ai-credit-provider");
   assert.equal(treasury.ai.refills.length, 1);
   assert.equal(treasury.ai.refills[0].amountUsd, 15);
@@ -188,7 +189,9 @@ test("record_ai_food_refill tool blocks until owner approval exists", async () =
     proof: "owner bought credits through configured provider"
   });
 
-  assert.equal(result.status, "blocked_pending_owner_approval");
+  // Unknown approvalId now surfaces as not_found (distinct from
+  // blocked_pending_owner_approval), but the recorder still refuses.
+  assert.equal(result.status, "not_found");
   assert.equal(result.approvalStatus.status, "not_found");
 });
 

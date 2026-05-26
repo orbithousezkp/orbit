@@ -580,6 +580,22 @@ async function executeTool(config, github, cycle, name, input) {
       const approvalStatus = await checkOwnerApproval(config, github, input.approvalId, { forceRemote: true });
       track(APPROVALS_PATH);
       if (approvalStatus.status !== "approved") {
+        if (approvalStatus.status === "rejected") {
+          return {
+            status: "rejected",
+            approval: approvalStatus.approval || null,
+            approvalStatus,
+            message: "Owner rejected this approval. Start a fresh request with a different amount to change the fingerprint."
+          };
+        }
+        if (approvalStatus.status === "not_found") {
+          return {
+            status: "not_found",
+            approval: null,
+            approvalStatus,
+            message: "No approval exists for this approvalId. Call request_ai_food_refill first to create one."
+          };
+        }
         return {
           status: "blocked_pending_owner_approval",
           approval: approvalStatus.approval || null,
@@ -587,16 +603,19 @@ async function executeTool(config, github, cycle, name, input) {
           message: "AI-credit refill completion can only be recorded after the owner approval is approved."
         };
       }
-      const entry = recordAiCreditRefill(config, config.repoRoot, {
+      const { entry, created } = recordAiCreditRefill(config, config.repoRoot, {
         amountUsd,
         approvalId: input.approvalId,
         proof: input.proof
       });
-      track(TREASURY_PATH);
+      if (created) track(TREASURY_PATH);
       return {
         status: "recorded",
         entry,
-        message: "Recorded completed AI-credit purchase. This tool does not execute payment."
+        created,
+        message: created
+          ? "Recorded completed AI-credit purchase. This tool does not execute payment."
+          : "This approval was already recorded; returning the existing entry."
       };
     }
 

@@ -9,6 +9,7 @@ const CYCLES_PATH = "memory/cycles.jsonl";
 const DAY_MS = 86_400_000;
 const MAX_LEDGER_ENTRIES = 500;
 const MAX_REFILL_ENTRIES = 100;
+const RECORDED_ID_CAP = 1000;
 const CREDIT_PURCHASE_MODE = "owner_approved_manual_credit_top_up";
 const REVENUE_CADENCE = "weekly_performance";
 
@@ -370,13 +371,31 @@ function recordAiCreditRefill(config, repoRoot, refill) {
   treasury.ai.refills = Array.isArray(treasury.ai.refills) ? treasury.ai.refills : [];
   treasury.ai.providerCredits = Array.isArray(treasury.ai.providerCredits) ? treasury.ai.providerCredits : [];
   treasury.ai.pendingTopUps = Array.isArray(treasury.ai.pendingTopUps) ? treasury.ai.pendingTopUps : [];
+  treasury.ai.recordedRefillIds = Array.isArray(treasury.ai.recordedRefillIds) ? treasury.ai.recordedRefillIds : [];
   const purchaseProvider = publicPurchaseProviderName();
+
+  // Idempotency: a refill carrying an approvalId we have already recorded
+  // returns the existing entry without re-pushing or bumping balance.
+  // Protects against double-fire in retried cycles. (Gap 6.6 / CLOSED_LOOP_DEMO.md §9.)
+  // recordedRefillIds is a longer-lived ring (RECORDED_ID_CAP) so dedupe still
+  // holds after refills has been truncated to MAX_REFILL_ENTRIES.
+  const approvalId = refill.approvalId || null;
+  if (approvalId) {
+    const existing = treasury.ai.refills.find((item) => item && item.approvalId === approvalId);
+    if (existing) return { entry: existing, created: false };
+    if (treasury.ai.recordedRefillIds.includes(approvalId)) {
+      // Aged out of refills[] but still in the dedupe ring — no entry to
+      // return, but we must not record again. Surface the prior approvalId
+      // so callers can disambiguate from a fresh record.
+      return { entry: { approvalId, agedOut: true }, created: false };
+    }
+  }
 
   const entry = {
     provider: purchaseProvider,
     creditsUrl: "",
     amountUsd: Number(amountUsd.toFixed(2)),
-    approvalId: refill.approvalId || null,
+    approvalId,
     proof: refill.proof || "",
     recordedAt: new Date().toISOString()
   };
@@ -406,10 +425,14 @@ function recordAiCreditRefill(config, repoRoot, refill) {
         ? { ...item, status: "recorded_complete", completedAt: entry.recordedAt }
         : item
     ));
+    if (!treasury.ai.recordedRefillIds.includes(entry.approvalId)) {
+      treasury.ai.recordedRefillIds.push(entry.approvalId);
+      treasury.ai.recordedRefillIds = treasury.ai.recordedRefillIds.slice(-RECORDED_ID_CAP);
+    }
   }
 
   saveTreasury(repoRoot, treasury);
-  return entry;
+  return { entry, created: true };
 }
 
 module.exports = {

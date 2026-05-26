@@ -239,3 +239,173 @@ test("closed-loop demo — non-owner APPROVE comment cannot close the loop", asy
   assert.ok(credit);
   assert.equal(credit.balanceUsd, null);
 });
+
+// Patch Set A — gap fixes documented in PLAN/SPECS/CLOSED_LOOP_DEMO.md §9
+
+test("closed-loop demo — record returns status=rejected when owner posted REJECT", async () => {
+  const repoRoot = tempRepo();
+  const config = makeConfig(repoRoot);
+  const github = makeFakeGithub();
+
+  const requestResult = await executeTool(config, github, 1, "request_ai_food_refill", {
+    amountUsd: 25,
+    reason: "rejection path"
+  });
+  const approvalId = requestResult.approval.id;
+  const approvalIssue = github.issues[0];
+
+  github._postComment(approvalIssue.number, {
+    author: "owner",
+    body: `REJECT ORBIT-SPEND ${approvalId}`
+  });
+
+  const recordResult = await executeTool(config, github, 2, "record_ai_food_refill", {
+    amountUsd: 25,
+    approvalId,
+    proof: "https://provider.example/receipts/rej-1"
+  });
+
+  // Gap 1: the public status must distinguish rejected from pending.
+  assert.equal(recordResult.status, "rejected");
+  assert.equal(recordResult.approvalStatus.status, "rejected");
+
+  // And nothing is written to treasury when rejected.
+  const treasury = loadTreasury(repoRoot, config);
+  assert.equal(treasury.ai.refills.length, 0);
+});
+
+test("closed-loop demo — record is idempotent on duplicate approvalId", async () => {
+  const repoRoot = tempRepo();
+  const config = makeConfig(repoRoot);
+  const github = makeFakeGithub();
+
+  const requestResult = await executeTool(config, github, 1, "request_ai_food_refill", {
+    amountUsd: 25,
+    reason: "idempotency path"
+  });
+  const approvalId = requestResult.approval.id;
+  const approvalIssue = github.issues[0];
+
+  github._postComment(approvalIssue.number, {
+    author: "owner",
+    body: `APPROVE ORBIT-SPEND ${approvalId}`
+  });
+
+  const proofString = "https://provider.example/receipts/dup-1";
+  const first = await executeTool(config, github, 2, "record_ai_food_refill", {
+    amountUsd: 25,
+    approvalId,
+    proof: proofString
+  });
+  const second = await executeTool(config, github, 3, "record_ai_food_refill", {
+    amountUsd: 25,
+    approvalId,
+    proof: proofString
+  });
+
+  assert.equal(first.status, "recorded");
+  assert.equal(second.status, "recorded");
+  // Gap 2: second call must return the existing entry, not append a duplicate
+  // and not double-bump the balance.
+  assert.equal(first.entry.recordedAt, second.entry.recordedAt);
+
+  const treasury = loadTreasury(repoRoot, config);
+  assert.equal(treasury.ai.refills.length, 1);
+  const credit = treasury.ai.providerCredits.find(
+    (entry) => entry.provider === "configured-ai-credit-provider"
+  );
+  assert.equal(credit.balanceUsd, 25);
+});
+
+test("closed-loop demo — approval issue body links the configured purchase URL", async () => {
+  const repoRoot = tempRepo();
+  const baseConfig = makeConfig(repoRoot);
+  const config = {
+    ...baseConfig,
+    aiFoodPurchaseUrl: "https://provider.example/buy-credits"
+  };
+  const github = makeFakeGithub();
+
+  await executeTool(config, github, 1, "request_ai_food_refill", {
+    amountUsd: 25,
+    reason: "purchase url path"
+  });
+
+  const issue = github.issues[0];
+  // Gap 3: owner needs a click-target to the provider in the approval issue.
+  assert.match(issue.body, /Purchase URL: https:\/\/provider\.example\/buy-credits/);
+});
+
+test("closed-loop demo — record returns status=not_found when approvalId is unknown", async () => {
+  const repoRoot = tempRepo();
+  const config = makeConfig(repoRoot);
+  const github = makeFakeGithub();
+
+  const recordResult = await executeTool(config, github, 1, "record_ai_food_refill", {
+    amountUsd: 25,
+    approvalId: "never-existed-0xdeadbeef",
+    proof: "https://provider.example/receipts/no-approval"
+  });
+
+  // Review L3: not_found is its own status, separate from blocked_pending_owner_approval.
+  assert.equal(recordResult.status, "not_found");
+  assert.equal(recordResult.approvalStatus.status, "not_found");
+  assert.equal(recordResult.approval, null);
+});
+
+test("closed-loop demo — idempotent record returns created=false and does not redirty treasury", async () => {
+  const repoRoot = tempRepo();
+  const config = makeConfig(repoRoot);
+  const github = makeFakeGithub();
+
+  const requestResult = await executeTool(config, github, 1, "request_ai_food_refill", {
+    amountUsd: 25,
+    reason: "idempotency created flag"
+  });
+  const approvalId = requestResult.approval.id;
+  github._postComment(github.issues[0].number, {
+    author: "owner",
+    body: `APPROVE ORBIT-SPEND ${approvalId}`
+  });
+
+  const first = await executeTool(config, github, 2, "record_ai_food_refill", {
+    amountUsd: 25,
+    approvalId,
+    proof: "https://provider.example/receipts/created-flag-1"
+  });
+  const second = await executeTool(config, github, 3, "record_ai_food_refill", {
+    amountUsd: 25,
+    approvalId,
+    proof: "https://provider.example/receipts/created-flag-1"
+  });
+
+  // Review L1: first call creates, second is the dedup branch.
+  assert.equal(first.created, true);
+  assert.equal(second.created, false);
+  // Treasury still has exactly one refill entry and one balance bump.
+  const treasury = loadTreasury(repoRoot, config);
+  assert.equal(treasury.ai.refills.length, 1);
+  const credit = treasury.ai.providerCredits.find(
+    (entry) => entry.provider === "configured-ai-credit-provider"
+  );
+  assert.equal(credit.balanceUsd, 25);
+  // Review L2: the approvalId is mirrored into the long-lived dedupe ring.
+  assert.ok(Array.isArray(treasury.ai.recordedRefillIds));
+  assert.ok(treasury.ai.recordedRefillIds.includes(approvalId));
+});
+
+test("closed-loop demo — approval issue body omits the URL row when none configured", async () => {
+  const repoRoot = tempRepo();
+  const config = makeConfig(repoRoot); // no aiFoodPurchaseUrl
+  const github = makeFakeGithub();
+
+  await executeTool(config, github, 1, "request_ai_food_refill", {
+    amountUsd: 25,
+    reason: "no purchase url path"
+  });
+
+  const issue = github.issues[0];
+  // No URL row should be emitted at all when nothing is configured — the
+  // owner shouldn't see a "Purchase URL: " row with empty content.
+  assert.doesNotMatch(issue.body, /Purchase URL:/);
+});

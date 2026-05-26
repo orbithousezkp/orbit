@@ -165,15 +165,22 @@ function upsertApproval(repoRoot, approval) {
 }
 
 function approvalIssueBody(approval) {
-  return [
+  const request = approval.classification.request;
+  const purchaseUrl = typeof request.url === "string" ? request.url.trim() : "";
+  const lines = [
     "Orbit is blocking an external or risky spend request until owner approval is public.",
     "",
     `Approval ID: \`${approval.id}\``,
-    `Category: \`${approval.classification.request.category}\``,
-    `Asset: \`${approval.classification.request.asset}\``,
-    `Amount: \`${approval.classification.request.amount ?? "unspecified"}\``,
-    `Recipient: \`${approval.classification.request.recipient || "none"}\``,
-    `Purpose: ${approval.classification.request.purpose}`,
+    `Category: \`${request.category}\``,
+    `Asset: \`${request.asset}\``,
+    `Amount: \`${request.amount ?? "unspecified"}\``,
+    `Recipient: \`${request.recipient || "none"}\``,
+    `Purpose: ${request.purpose}`
+  ];
+  if (purchaseUrl) {
+    lines.push(`Purchase URL: ${purchaseUrl}`);
+  }
+  lines.push(
     "",
     "Risk flags:",
     approval.classification.risk.flags.length
@@ -187,7 +194,8 @@ function approvalIssueBody(approval) {
     "To reject, the configured owner must add this exact standalone comment:",
     "",
     `\`REJECT ORBIT-SPEND ${approval.id}\``
-  ].join("\n");
+  );
+  return lines.join("\n");
 }
 
 async function requestOwnerApproval(config, github, rawRequest = {}) {

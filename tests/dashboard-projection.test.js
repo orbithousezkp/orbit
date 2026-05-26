@@ -159,6 +159,58 @@ test("client.projectForDashboard returns the same shape as the module function",
   assert.equal(slim.receipts.latest.signed, true);
 });
 
+test("projectForDashboard surfaces pending approvals with pendingSinceHours", () => {
+  // Gap 4: stuck approvals should be visible on the dashboard so a closed-loop
+  // failure does not require anyone to watch the issue list.
+  const repoRoot = tempRepo();
+  const now = new Date("2026-05-24T12:00:00.000Z");
+  writeJson(repoRoot, "memory/approvals.json", {
+    approvals: [
+      {
+        id: "abc123",
+        status: "pending",
+        issueNumber: 7,
+        issueUrl: "https://github.com/owner/orbit/issues/7",
+        createdAt: "2026-05-23T12:00:00.000Z", // 24h ago
+        updatedAt: "2026-05-23T12:00:00.000Z",
+        classification: {
+          request: { category: "ai_food_refill", amount: 25, asset: "USD credits" }
+        }
+      },
+      {
+        id: "def456",
+        status: "approved",
+        issueNumber: 8,
+        createdAt: "2026-05-22T12:00:00.000Z",
+        classification: { request: { category: "ai_food_refill", amount: 30, asset: "USD credits" } }
+      }
+    ]
+  });
+
+  const bundle = exportBundle(repoRoot, undefined, { receiptLimit: 10 });
+  const slim = projectForDashboard(bundle, { now });
+
+  assert.equal(slim.approvals.schema, "orbit-approvals/1");
+  assert.equal(slim.approvals.pending, 1, "only pending approvals are counted");
+  assert.equal(slim.approvals.total, 2);
+  assert.equal(slim.approvals.list.length, 1);
+  const [entry] = slim.approvals.list;
+  assert.equal(entry.id, "abc123");
+  assert.equal(entry.issueNumber, 7);
+  assert.equal(entry.category, "ai_food_refill");
+  assert.equal(entry.pendingSinceHours, 24);
+});
+
+test("projectForDashboard tolerates a missing approvals file", () => {
+  const repoRoot = tempRepo();
+  const bundle = exportBundle(repoRoot, undefined, { receiptLimit: 10 });
+  const slim = projectForDashboard(bundle);
+  assert.equal(slim.approvals.schema, "orbit-approvals/1");
+  assert.equal(slim.approvals.pending, 0);
+  assert.equal(slim.approvals.total, 0);
+  assert.deepEqual(slim.approvals.list, []);
+});
+
 function makeRefusalProof(overrides = {}) {
   return makeProof({
     cycle: overrides.cycle || 27,

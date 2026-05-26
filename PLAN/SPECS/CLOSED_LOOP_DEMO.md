@@ -263,9 +263,11 @@ CI runs the same via the existing `npm test`. No new dependencies.
 
 ## 9. Gaps logged for future patches
 
-These are noted here, NOT patched in this session. Each is a small follow-up the agent or owner can pick up later.
+Patch Set A (closed 2026-05-26) addressed the four originally-logged gaps:
 
-- `src/agent/actions.js::record_ai_food_refill` should distinguish `rejected` from `pending` in its public `status` field instead of collapsing both to `blocked_pending_owner_approval`. The truth is already in `result.approvalStatus.status`; surface it.
-- `src/agent/treasury.js::recordAiCreditRefill` should dedupe by `approvalId` (skip or upsert if `ai.refills.some(r => r.approvalId === refill.approvalId)`) to make accidental double-records non-destructive.
-- `src/agent/governance.js::requestOwnerApproval` could include the configured purchase URL (when set) in the approval issue body so the owner has a click-target. Currently the body lists category/asset/amount/recipient and the APPROVE/REJECT instructions but no link to the provider.
-- No public timeout for stuck approvals. Consider adding a `pendingSinceHours` counter that the dashboard surfaces, so closed-loop fails are visible without anyone watching the issue list.
+- `src/agent/actions.js::record_ai_food_refill` — now returns `status: "rejected"` and `status: "not_found"` as distinct public statuses, rather than collapsing both into `blocked_pending_owner_approval`. `result.approvalStatus.status` continues to carry the underlying truth.
+- `src/agent/treasury.js::recordAiCreditRefill` — dedupes by `approvalId`. A repeat call returns `{ entry, created: false }` and does not re-append to `ai.refills[]` or re-bump `providerCredits[*].balanceUsd`. A long-lived ring (`ai.recordedRefillIds`, capped at 1000) keeps dedupe correct even after `refills[]` has been truncated.
+- `src/agent/governance.js::requestOwnerApproval` — when `aiFoodPurchaseUrl` is configured, the approval issue body now includes a `Purchase URL:` row so the owner has a click-target to the provider. The row is omitted entirely when no URL is configured.
+- `packages/orbit-sdk/index.js::projectForDashboard` — exposes an `approvals` slice (`orbit-approvals/1`) with `pending`, `total`, and a per-approval `pendingSinceHours` counter, sorted oldest-first. Stuck approvals are now visible on the public dashboard without anyone watching the issue list.
+
+No open gaps from the original list. New follow-ups, if any, should be appended below this block with a date.

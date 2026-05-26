@@ -78,6 +78,7 @@ function buildAiFoodRefillRequest(config, treasury, input = {}) {
   const amountUsd = normalizeUsdAmount(input.amountUsd);
   const policy = aiFoodPolicy(config, treasury);
   const configuredProvider = configuredInferenceProvider(config);
+  const purchaseUrl = configuredCreditUrl(config);
 
   return {
     category: "ai_food_refill",
@@ -85,7 +86,7 @@ function buildAiFoodRefillRequest(config, treasury, input = {}) {
     asset: "USD credits",
     amount: amountUsd,
     recipient: provider,
-    url: "",
+    url: purchaseUrl,
     notes: [
       "Purchase target is restricted to the configured owner-approved AI-credit provider.",
       "Inference route order remains separate from credit purchases.",

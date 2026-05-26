@@ -346,7 +346,9 @@ function create(repoRoot) {
 const DASHBOARD_SCHEMA = "orbit-dashboard/1";
 const DEFAULT_REFUSAL_LIMIT = 20;
 const DEFAULT_MISSION_LIMIT = 20;
+const DEFAULT_APPROVAL_LIMIT = 20;
 const MISSION_SCHEMA = "orbit-missions/1";
+const APPROVALS_SCHEMA = "orbit-approvals/1";
 const ADOPTERS_SCHEMA = "orbit-adopters/1";
 const PHASE_1_ADOPTER_TARGET = 5;
 const PHASE_5_ADOPTER_TARGET = 50;
@@ -496,6 +498,46 @@ function projectMissionsSlim(missionsRecord, options) {
   };
 }
 
+function projectApprovalsSlim(approvalsRecord, options) {
+  const opts = options || {};
+  const limit = Number.isFinite(opts.approvalLimit) ? opts.approvalLimit : DEFAULT_APPROVAL_LIMIT;
+  const now = opts.now instanceof Date ? opts.now : new Date();
+  const record = approvalsRecord && typeof approvalsRecord === "object" ? approvalsRecord : null;
+  const empty = { schema: APPROVALS_SCHEMA, pending: 0, total: 0, list: [] };
+  if (!record) return empty;
+  const list = Array.isArray(record.approvals) ? record.approvals : [];
+  const pending = list.filter((a) => a && a.status === "pending");
+  // Sort oldest-first so the most-stuck approval is the most visible entry.
+  pending.sort((a, b) => {
+    const at = Date.parse(a && (a.createdAt || a.updatedAt) || "") || 0;
+    const bt = Date.parse(b && (b.createdAt || b.updatedAt) || "") || 0;
+    return at - bt;
+  });
+  const projected = pending.slice(0, limit).map((a) => {
+    const since = Date.parse(a.createdAt || a.updatedAt || "") || null;
+    const pendingSinceHours = since
+      ? Math.max(0, Math.round((now.getTime() - since) / 3_600_000))
+      : null;
+    const req = (a.classification && a.classification.request) || {};
+    return {
+      id: a.id || null,
+      issueNumber: typeof a.issueNumber === "number" ? a.issueNumber : null,
+      issueUrl: a.issueUrl || null,
+      category: req.category || null,
+      amount: typeof req.amount === "number" ? req.amount : null,
+      asset: req.asset || null,
+      createdAt: a.createdAt || null,
+      pendingSinceHours,
+    };
+  });
+  return {
+    schema: APPROVALS_SCHEMA,
+    pending: pending.length,
+    total: list.length,
+    list: projected,
+  };
+}
+
 function projectReceipt(r) {
   return {
     path: r.path || null,
@@ -567,6 +609,7 @@ function exportBundle(repoRoot, _unused, options) {
     recordedCycles: readJsonl(path.join(root, FILES.cycles)).length,
     missions: readJson(path.join(root, FILES.missions)),
     adopters: readJson(path.join(root, FILES.adopters)),
+    approvals: readJson(path.join(root, FILES.approvals)),
   };
   if (includeMemory) {
     bundle.memory = {
@@ -675,6 +718,7 @@ function projectForDashboard(bundle, options) {
     refusals,
     missions: projectMissionsSlim(b.missions, opts),
     adopters: projectAdoptersSlim(b.adopters, opts),
+    approvals: projectApprovalsSlim(b.approvals, opts),
   };
 
   slim.digest = digestForObject({
@@ -688,6 +732,7 @@ function projectForDashboard(bundle, options) {
     refusalCount: refusals.length,
     missionActive: slim.missions ? slim.missions.active : 0,
     adopterCount: slim.adopters ? slim.adopters.adopted : 0,
+    approvalsPending: slim.approvals ? slim.approvals.pending : 0,
   });
 
   return slim;
