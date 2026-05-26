@@ -11,6 +11,7 @@ export default function Hero() {
           the agent memory<br />and infrastructure layer<br />for github <em>repositories</em>.
         </p>
         <p className="hero__desc">{identity.description}</p>
+        <p className="hero__motto">built to outlive its founder.</p>
         <div className="hero__chips">
           <span className="chip">memory</span>
           <span className="chip">permissions</span>

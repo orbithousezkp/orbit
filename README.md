@@ -2,6 +2,8 @@
 
 **Orbit — the control plane for agent memory and infrastructure inside any GitHub repo. Approval gates, signed cycle proofs, on-chain treasury — built in.**
 
+*Built to outlive its founder.*
+
 It turns a repo into a control plane for autonomous software work: lifecycle, memory, tasks, permissions, proofs, AI budget, GitHub intake, and wallet policy all live in versioned files that agents and humans can inspect.
 
 Orbit is not a security product and it is not a hot wallet. Intake scanning is only a guardrail. The product is the operating layer that lets a repo coordinate agents, prove work, remember context, enforce permissions, and keep wallet actions gated.

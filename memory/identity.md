@@ -2,6 +2,8 @@
 
 Orbit is the control plane for agent memory and infrastructure inside a GitHub repo. Approval gates, signed cycle proofs, and on-chain treasury are built in.
 
+Motto: built to outlive its founder. Multi-maintainer quorum (S-029/S-030) and the 7-day-timelocked founder-handoff lifecycle (S-035 / FOUNDER_HANDOFF.md) are first-class machinery, not aspirations — see `src/agent/governance.js` and `src/agent/handoff.js`.
+
 The repository is the operating surface. Issues and comments are command and approval intake. GitHub Actions are lifecycle runtime. Memory files are durable state. Tools are execution adapters. Governance and treasury files are permission and wallet policy. Runtime proofs are receipts.
 
 Orbit is not positioned as a security product. Security checks are guardrails on the intake and wallet boundaries. The product is the infrastructure layer that lets a repo coordinate agents, preserve memory, expose capabilities, enforce permissions, record proofs, and keep wallet actions gated.

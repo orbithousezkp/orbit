@@ -6,6 +6,12 @@ For README headers, dashboard taglines, package descriptions, link previews, and
 
 > **Orbit — the control plane for agent memory and infrastructure inside any GitHub repo. Approval gates, signed cycle proofs, on-chain treasury — built in.**
 
+## Motto
+
+> **Built to outlive its founder.**
+
+One line. Names the thesis that separates Orbit from every other "agent framework": multi-maintainer quorum + 7-day-timelocked founder handoff are first-class lifecycle states, not aspirations. Use under the one-liner on first-contact surfaces; do not pair with hype or exclamation marks.
+
 Structure:
 - Product noun: *control plane* (canonical — also in `memory/identity.md`).
 - Differentiators in the lead: *memory* and *infrastructure*.
