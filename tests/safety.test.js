@@ -28,6 +28,50 @@ test("rejects unsafe paths", () => {
   assert.throws(() => normalizeRelativePath("node_modules/pkg/index.js"));
 });
 
+// === secret-bearing files locked out of the tool surface (Patch Set AF)
+
+test("normalizeRelativePath blocks .env at the root and nested", () => {
+  assert.throws(() => normalizeRelativePath(".env"), /secret-bearing/);
+  assert.throws(() => normalizeRelativePath(".env.local"), /secret-bearing/);
+  assert.throws(() => normalizeRelativePath(".env.production"), /secret-bearing/);
+  assert.throws(() => normalizeRelativePath(".env.development"), /secret-bearing/);
+  assert.throws(() => normalizeRelativePath(".env.test"), /secret-bearing/);
+  assert.throws(() => normalizeRelativePath("packages/foo/.env"), /secret-bearing/);
+  assert.throws(() => normalizeRelativePath("a/b/c/.env"), /secret-bearing/);
+});
+
+test("normalizeRelativePath blocks credential + private-key files", () => {
+  assert.throws(() => normalizeRelativePath(".npmrc"), /secret-bearing/);
+  assert.throws(() => normalizeRelativePath(".netrc"), /secret-bearing/);
+  assert.throws(() => normalizeRelativePath(".pypirc"), /secret-bearing/);
+  assert.throws(() => normalizeRelativePath("id_rsa"), /secret-bearing/);
+  assert.throws(() => normalizeRelativePath("id_ed25519"), /secret-bearing/);
+  assert.throws(() => normalizeRelativePath("id_ecdsa"), /secret-bearing/);
+  assert.throws(() => normalizeRelativePath("id_dsa"), /secret-bearing/);
+});
+
+test("normalizeRelativePath case-insensitive on the leaf block", () => {
+  // .ENV / .Env / .nPmRc all blocked — attacker can't sneak past via casing.
+  assert.throws(() => normalizeRelativePath(".ENV"), /secret-bearing/);
+  assert.throws(() => normalizeRelativePath(".Env"), /secret-bearing/);
+  assert.throws(() => normalizeRelativePath(".nPmRc"), /secret-bearing/);
+});
+
+test("normalizeRelativePath ALLOWS .env.example (it's a doc placeholder)", () => {
+  // Adopters read .env.example to know what to configure. Must NOT
+  // be blocked (it has no real secrets).
+  assert.equal(normalizeRelativePath(".env.example"), ".env.example");
+  assert.equal(normalizeRelativePath("packages/foo/.env.example"), "packages/foo/.env.example");
+});
+
+test("normalizeRelativePath ALLOWS the scaffolder's .env.example.tpl", () => {
+  // Scaffolder template file ends in .tpl — different basename, not blocked.
+  assert.equal(
+    normalizeRelativePath("packages/create-orbit-house/templates/.env.example.tpl"),
+    "packages/create-orbit-house/templates/.env.example.tpl"
+  );
+});
+
 test("safe join resolves relative roots before escape check", () => {
   const joined = safeJoin(".", "README.md");
   assert.equal(joined.normalized, "README.md");

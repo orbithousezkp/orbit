@@ -5,6 +5,35 @@ const path = require("path");
 
 const BLOCKED_PATH_SEGMENTS = new Set([".git", "node_modules"]);
 
+// Secret-bearing files the tool surface (read_file / write_file)
+// MUST never touch. The LLM has no legitimate reason to read an env
+// file or a private-key blob, and many of these are not in
+// PROTECTED_WRITE_PATHS (which only covers a few memory/*.json
+// records). Blocking at the path-normalizer layer means every
+// downstream (readSafeTextFile, writeSafeTextFile, appendSafeText-
+// File, atomicWriteFile via writeSafeTextFile, the tool-surface
+// readFileForTool + writeFile) inherits the protection. Defense
+// at one chokepoint, not five.
+//
+// Exact-match against the basename (case-insensitive). `.env.example`
+// is intentionally NOT in this list — it's a placeholder doc that
+// adopters read.
+const BLOCKED_LEAF_NAMES = new Set([
+  ".env",
+  ".env.local",
+  ".env.development",
+  ".env.test",
+  ".env.production",
+  ".env.staging",
+  ".npmrc",
+  ".netrc",
+  ".pypirc",
+  "id_rsa",
+  "id_ed25519",
+  "id_ecdsa",
+  "id_dsa"
+]);
+
 const SECRET_PATTERNS = [
   /-----BEGIN (?:RSA |EC |OPENSSH |PGP )?PRIVATE KEY-----/i,
   /\bgh[pousr]_[A-Za-z0-9_]{30,}\b/g,
@@ -54,6 +83,14 @@ function normalizeRelativePath(input) {
   const parts = normalized.split("/");
   if (parts.some((part) => part === ".." || BLOCKED_PATH_SEGMENTS.has(part))) {
     throw new Error("path includes a blocked segment");
+  }
+
+  // Secret-bearing leaf names (.env, .npmrc, id_rsa, ...) are blocked
+  // at every depth — root or nested. Case-insensitive match against
+  // the basename so .ENV / .Env can't sneak past.
+  const leaf = parts[parts.length - 1].toLowerCase();
+  if (BLOCKED_LEAF_NAMES.has(leaf)) {
+    throw new Error("path includes a secret-bearing file (.env / credentials / private key)");
   }
 
   return normalized;

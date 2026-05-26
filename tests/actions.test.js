@@ -36,6 +36,44 @@ test("writeFile refuses to write protected paths", () => {
   }
 });
 
+// Patch Set AF: writeFile + readFileForTool must refuse secret-bearing
+// files at the path-normalizer layer. A real .env on disk should never
+// be reachable through the tool surface (defense in depth).
+test("writeFile refuses .env and credential files", () => {
+  const repoRoot = tempRepo();
+  for (const bad of [".env", ".env.local", ".npmrc", "id_rsa", "packages/foo/.env"]) {
+    assert.throws(
+      () => writeFile({ repoRoot }, bad, "TOKEN=ghp_attacker\n"),
+      /secret-bearing/,
+      `expected secret-bearing refusal for ${bad}`
+    );
+  }
+});
+
+test("readFileForTool refuses .env and credential files (even if on disk)", () => {
+  const repoRoot = tempRepo();
+  // Plant a fake .env locally — readFileForTool must still refuse.
+  fs.writeFileSync(path.join(repoRoot, ".env"), "ORBIT_WALLET_PRIVATE_KEY=0xdeadbeef\n");
+  fs.writeFileSync(path.join(repoRoot, ".npmrc"), "//registry.npmjs.org/:_authToken=npm_secret\n");
+  assert.throws(
+    () => readFileForTool({ repoRoot }, ".env"),
+    /secret-bearing/
+  );
+  assert.throws(
+    () => readFileForTool({ repoRoot }, ".npmrc"),
+    /secret-bearing/
+  );
+});
+
+test("readFileForTool ALLOWS .env.example (placeholder doc)", () => {
+  const repoRoot = tempRepo();
+  fs.writeFileSync(
+    path.join(repoRoot, ".env.example"),
+    "# placeholder vars only\nFAKE_KEY=replace-me\n"
+  );
+  assert.doesNotThrow(() => readFileForTool({ repoRoot }, ".env.example"));
+});
+
 test("writeFile rejects binary asset extensions", () => {
   const repoRoot = tempRepo();
   for (const binPath of [
