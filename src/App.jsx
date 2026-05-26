@@ -7,6 +7,7 @@ import Hero from './sections/Hero.jsx';
 import Live from './sections/Live.jsx';
 import Roadmap from './sections/Roadmap.jsx';
 import Inspect from './sections/Inspect.jsx';
+import Forever from './sections/Forever.jsx';
 
 const SECTION_FOR_PATH = {
   '/': 'home',
@@ -14,6 +15,7 @@ const SECTION_FOR_PATH = {
   '/live': 'live',
   '/roadmap': 'roadmap',
   '/inspect': 'inspect',
+  '/forever': 'forever',
 };
 
 function sectionFromPath(pathname) {
@@ -26,6 +28,7 @@ const PANELS = {
   live: Live,
   roadmap: Roadmap,
   inspect: Inspect,
+  forever: Forever,
 };
 
 export default function App() {

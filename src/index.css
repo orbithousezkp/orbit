@@ -837,3 +837,174 @@ a.cell:hover { background: rgba(255,255,255,0.86); border-color: var(--line-stro
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ============================================================
+   forever — meta-roadmap: principles · currents · horizon
+   ============================================================ */
+
+.section--forever {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  overflow-y: auto;
+  padding-bottom: 2rem;
+}
+
+.forever__group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.forever__group-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.forever__principles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.9rem 1.4rem;
+}
+
+.principle {
+  position: relative;
+  padding: 0.85rem 0 0;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.principle::before {
+  content: "";
+  position: absolute; left: 0; top: -1px;
+  height: 1px; width: 1.6rem;
+  background: var(--ink-deep);
+}
+.principle__num {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  color: var(--ink-soft);
+}
+.principle__name {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1rem;
+  line-height: 1.15;
+  color: var(--ink-deep);
+  margin: 0;
+}
+.principle__body {
+  font-size: 0.74rem;
+  line-height: 1.42;
+  color: var(--ink-mid);
+  margin: 0;
+}
+
+.forever__currents {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem 1.4rem;
+}
+
+.current {
+  position: relative;
+  padding: 0.9rem 0 0;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.current::before {
+  content: "";
+  position: absolute; left: 0; top: -1px;
+  height: 1px; width: 2.4rem;
+  background: var(--ink-deep);
+}
+.current__head {
+  display: flex;
+  gap: 0.6rem;
+  align-items: baseline;
+}
+.current__num {
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  color: var(--ink-soft);
+}
+.current__name {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.15rem;
+  line-height: 1.15;
+  color: var(--ink-deep);
+  margin: 0;
+}
+.current__star {
+  font-size: 0.82rem;
+  line-height: 1.42;
+  color: var(--ink-mid);
+  margin: 0;
+}
+.current__inflight {
+  font-size: 0.7rem;
+  line-height: 1.4;
+  color: var(--ink-soft);
+  margin: 0;
+}
+.current__tag {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
+  color: var(--ink-deep);
+}
+
+.forever__horizon {
+  padding: 1rem 1.2rem;
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+.forever__horizon-blurb {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.05rem;
+  line-height: 1.35;
+  color: var(--ink-deep);
+  margin: 0;
+}
+.forever__horizon-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.forever__horizon-list li {
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--ink-mid);
+  padding-left: 1.1rem;
+  position: relative;
+}
+.forever__horizon-list li::before {
+  content: "·";
+  position: absolute;
+  left: 0;
+  color: var(--ink-deep);
+  font-family: var(--font-mono);
+}
+
+@media (max-width: 1100px) {
+  .forever__principles { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 760px) {
+  .forever__principles { grid-template-columns: 1fr; }
+  .forever__currents { grid-template-columns: 1fr; }
+}
