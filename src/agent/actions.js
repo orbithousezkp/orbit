@@ -609,13 +609,23 @@ async function executeTool(config, github, cycle, name, input) {
         proof: input.proof
       });
       if (created) track(TREASURY_PATH);
+      if (!created) {
+        const agedOut = Boolean(entry && entry.agedOut);
+        return {
+          status: "already_recorded",
+          entry,
+          created: false,
+          agedOut,
+          message: agedOut
+            ? "This approval was recorded previously and has aged out of the refill log; not re-recording."
+            : "This approval was already recorded; returning the existing entry."
+        };
+      }
       return {
         status: "recorded",
         entry,
-        created,
-        message: created
-          ? "Recorded completed AI-credit purchase. This tool does not execute payment."
-          : "This approval was already recorded; returning the existing entry."
+        created: true,
+        message: "Recorded completed AI-credit purchase. This tool does not execute payment."
       };
     }
 

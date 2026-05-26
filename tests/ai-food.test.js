@@ -169,6 +169,44 @@ test("records completed AI-credit refill without executing payment", () => {
   assert.equal(treasury.ai.refills[0].amountUsd, 15);
 });
 
+test("recordAiCreditRefill seeds recordedRefillIds from existing refills on first load", () => {
+  // Review B-1: a treasury upgraded from pre-ring state has existing refills
+  // but no recordedRefillIds. The lazy-init must seed the ring from those
+  // existing approvalIds so dedupe holds even after MAX_REFILL_ENTRIES
+  // truncation evicts the original entry.
+  const repoRoot = tempRepo();
+  const cfg = config(repoRoot);
+  const treasuryPath = path.join(repoRoot, "memory", "treasury.json");
+  // Hand-write a pre-ring treasury: two existing refills, no recordedRefillIds.
+  fs.writeFileSync(treasuryPath, JSON.stringify({
+    revenue: { ledger: [], policy: {} },
+    ai: {
+      refills: [
+        { provider: "configured-ai-credit-provider", approvalId: "old-1", amountUsd: 10, recordedAt: "2026-05-01T00:00:00.000Z" },
+        { provider: "configured-ai-credit-provider", approvalId: "old-2", amountUsd: 20, recordedAt: "2026-05-02T00:00:00.000Z" }
+      ],
+      providerCredits: [],
+      pendingTopUps: []
+      // recordedRefillIds intentionally absent
+    }
+  }, null, 2));
+
+  // A fresh record triggers the lazy-init path.
+  recordAiCreditRefill(cfg, repoRoot, {
+    amountUsd: 5,
+    approvalId: "new-1",
+    proof: "https://provider.example/receipts/seed-test"
+  });
+
+  const treasury = loadTreasury(repoRoot, cfg);
+  assert.ok(Array.isArray(treasury.ai.recordedRefillIds));
+  // All three approvalIds should be in the ring: the two pre-existing
+  // seeded from refills[] and the newly-recorded one.
+  assert.ok(treasury.ai.recordedRefillIds.includes("old-1"));
+  assert.ok(treasury.ai.recordedRefillIds.includes("old-2"));
+  assert.ok(treasury.ai.recordedRefillIds.includes("new-1"));
+});
+
 test("credit refill ledger rejects secret-like proof content", () => {
   const repoRoot = tempRepo();
   const cfg = config(repoRoot);

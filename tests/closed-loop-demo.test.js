@@ -304,10 +304,14 @@ test("closed-loop demo — record is idempotent on duplicate approvalId", async 
   });
 
   assert.equal(first.status, "recorded");
-  assert.equal(second.status, "recorded");
-  // Gap 2: second call must return the existing entry, not append a duplicate
-  // and not double-bump the balance.
+  // Gap 2 + Review B-2: the duplicate call now surfaces as a distinct
+  // status so callers don't mistake a dedupe for a fresh record.
+  assert.equal(second.status, "already_recorded");
+  assert.equal(second.created, false);
+  // The entry returned by the dedupe path must still be the original entry
+  // (not a stub) so any caller that cares about recordedAt/amount still works.
   assert.equal(first.entry.recordedAt, second.entry.recordedAt);
+  assert.equal(second.entry.amountUsd, 25);
 
   const treasury = loadTreasury(repoRoot, config);
   assert.equal(treasury.ai.refills.length, 1);

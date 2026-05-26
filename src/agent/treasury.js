@@ -371,7 +371,15 @@ function recordAiCreditRefill(config, repoRoot, refill) {
   treasury.ai.refills = Array.isArray(treasury.ai.refills) ? treasury.ai.refills : [];
   treasury.ai.providerCredits = Array.isArray(treasury.ai.providerCredits) ? treasury.ai.providerCredits : [];
   treasury.ai.pendingTopUps = Array.isArray(treasury.ai.pendingTopUps) ? treasury.ai.pendingTopUps : [];
-  treasury.ai.recordedRefillIds = Array.isArray(treasury.ai.recordedRefillIds) ? treasury.ai.recordedRefillIds : [];
+  if (!Array.isArray(treasury.ai.recordedRefillIds)) {
+    // Seed the dedupe ring from existing refills so treasuries written before
+    // the ring existed still dedupe after MAX_REFILL_ENTRIES truncation
+    // evicts the original entry. (Review L1.)
+    treasury.ai.recordedRefillIds = treasury.ai.refills
+      .map((r) => r && r.approvalId)
+      .filter(Boolean)
+      .slice(-RECORDED_ID_CAP);
+  }
   const purchaseProvider = publicPurchaseProviderName();
 
   // Idempotency: a refill carrying an approvalId we have already recorded

@@ -211,6 +211,49 @@ test("projectForDashboard tolerates a missing approvals file", () => {
   assert.deepEqual(slim.approvals.list, []);
 });
 
+test("projectForDashboard hides amount/asset for non-allowlisted approval categories", () => {
+  // Review B-3: the public dashboard must not surface dollar amounts for
+  // approval categories that aren't on the allowlist (e.g. a future
+  // operator-revenue or treasury-spend approval). The pending counter and
+  // issue link still show — only the number is suppressed.
+  const repoRoot = tempRepo();
+  const now = new Date("2026-05-24T12:00:00.000Z");
+  writeJson(repoRoot, "memory/approvals.json", {
+    approvals: [
+      {
+        id: "safe1",
+        status: "pending",
+        issueNumber: 11,
+        createdAt: "2026-05-24T10:00:00.000Z",
+        classification: {
+          request: { category: "ai_food_refill", amount: 25, asset: "USD credits" }
+        }
+      },
+      {
+        id: "leak1",
+        status: "pending",
+        issueNumber: 12,
+        createdAt: "2026-05-24T11:00:00.000Z",
+        classification: {
+          request: { category: "operator_revenue_payout", amount: 4200, asset: "USD" }
+        }
+      }
+    ]
+  });
+
+  const bundle = exportBundle(repoRoot, undefined, { receiptLimit: 10 });
+  const slim = projectForDashboard(bundle, { now });
+  const safe = slim.approvals.list.find((e) => e.id === "safe1");
+  const leak = slim.approvals.list.find((e) => e.id === "leak1");
+  assert.equal(safe.amount, 25);
+  assert.equal(safe.asset, "USD credits");
+  // Category is still visible (it's the safety signal), but the dollar
+  // figure is stripped.
+  assert.equal(leak.category, "operator_revenue_payout");
+  assert.equal(leak.amount, null);
+  assert.equal(leak.asset, null);
+});
+
 function makeRefusalProof(overrides = {}) {
   return makeProof({
     cycle: overrides.cycle || 27,

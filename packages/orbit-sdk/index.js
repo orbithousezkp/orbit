@@ -507,10 +507,9 @@ function projectApprovalsSlim(approvalsRecord, options) {
   if (!record) return empty;
   const list = Array.isArray(record.approvals) ? record.approvals : [];
   const pending = list.filter((a) => a && a.status === "pending");
-  // Sort oldest-first so the most-stuck approval is the most visible entry.
   pending.sort((a, b) => {
-    const at = Date.parse(a && (a.createdAt || a.updatedAt) || "") || 0;
-    const bt = Date.parse(b && (b.createdAt || b.updatedAt) || "") || 0;
+    const at = (Date.parse((a && (a.createdAt || a.updatedAt)) || "") || 0);
+    const bt = (Date.parse((b && (b.createdAt || b.updatedAt)) || "") || 0);
     return at - bt;
   });
   const projected = pending.slice(0, limit).map((a) => {
@@ -519,13 +518,20 @@ function projectApprovalsSlim(approvalsRecord, options) {
       ? Math.max(0, Math.round((now.getTime() - since) / 3_600_000))
       : null;
     const req = (a.classification && a.classification.request) || {};
+    const category = req.category || null;
+    // Public-dashboard allowlist for surfacing amount/asset. Only categories
+    // whose dollar value is project memory says is safe on GitHub-visitor
+    // surfaces appear with a number; anything else (e.g. future operator-
+    // revenue or treasury-spend approvals) shows category + issue link only.
+    const publicAmountCategories = new Set(["ai_food_refill"]);
+    const amountVisible = category && publicAmountCategories.has(category);
     return {
       id: a.id || null,
       issueNumber: typeof a.issueNumber === "number" ? a.issueNumber : null,
       issueUrl: a.issueUrl || null,
-      category: req.category || null,
-      amount: typeof req.amount === "number" ? req.amount : null,
-      asset: req.asset || null,
+      category,
+      amount: amountVisible && typeof req.amount === "number" ? req.amount : null,
+      asset: amountVisible ? (req.asset || null) : null,
       createdAt: a.createdAt || null,
       pendingSinceHours,
     };
