@@ -137,6 +137,19 @@ The signer address must match `ORBIT_AGENT_SIGNER` — that's the D-006 sanity c
 
 ---
 
+## 6a. (Optional) Add maintainers (turn on quorum)
+
+By default, only the configured owner can approve external spends. To make the repo survive losing any single account, add maintainers — every external spend then needs K-of-N approval (see `PLAN/SPECS/MULTI_MAINTAINER_QUORUM.md` for the math).
+
+```bash
+# Comma-separated GitHub usernames. Include yourself.
+gh variable set ORBIT_MAINTAINERS --body "alice,bob,carol"
+```
+
+Quorum activates automatically when this variable contains more than one name. With one name (or unset), the agent runs in solo-owner mode and falls back to the legacy single-approver path. The `governance.js` quorum code, the parser, and the rejection-veto logic are already shipped (`src/agent/governance.js:217-490`, `tests/governance-quorum.test.js`); this variable is the only wire.
+
+---
+
 ## 7. (Optional) Configure an AI provider
 
 Without AI, every cycle runs the deterministic fallback. To let the agent actually plan:
