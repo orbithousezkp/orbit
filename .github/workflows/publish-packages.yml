@@ -35,6 +35,15 @@ permissions:
 
 jobs:
   publish:
+    # Patch Set AI: workflow_dispatch must be owner-only. Without this,
+    # any contributor with write access could manually trigger a publish
+    # to npm with the repo's NPM_TOKEN. Tag pushes go to anyone who can
+    # push tags (still restricted to maintainers in practice), but
+    # workflow_dispatch is anyone-with-write — too loose for NPM_TOKEN
+    # exposure.
+    if: >-
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_dispatch' && github.actor == vars.ORBIT_OWNER_USERNAME)
     runs-on: ubuntu-latest
     timeout-minutes: 10
 

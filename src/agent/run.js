@@ -668,10 +668,24 @@ async function main() {
   // Re-read on-disk state in case actions.js wrote launchOnceFired during
   // the cycle (launch_native_token persists it via clanker.js).
   let onDiskState = stateBeforeCycle;
+  let onDiskParseFailed = false;
   try {
     onDiskState = JSON.parse(fs.readFileSync(path.resolve(config.repoRoot, "memory/state.json"), "utf-8"));
   } catch {
-    onDiskState = stateBeforeCycle;
+    // Patch Set AI: a torn/missing state.json HERE (after the cycle ran)
+    // cannot be silently recovered. The previous "fallback to
+    // stateBeforeCycle" path was a bypass — if persistLaunchOnceFired
+    // had already flipped the disk flag to true during this cycle and
+    // the file then tore, the stale snapshot (false) would compare
+    // against a fresh write (false) and the launch-once guard would
+    // pass — silently rolling back the launch flag on disk. Fail closed.
+    onDiskParseFailed = true;
+  }
+  if (onDiskParseFailed) {
+    const e = new Error("state-guard: refusing — memory/state.json is unreadable mid-cycle; not safe to overwrite without knowing prior disk state");
+    e.code = "STATE_TORN_REFUSE_WRITE";
+    try { require("./error-log").logError(config.repoRoot, { phase: "state-write", code: e.code, message: e.message }); } catch { /* ignore */ }
+    throw e;
   }
   if (onDiskState && onDiskState.launchOnceFired === true) {
     state.launchOnceFired = true;
