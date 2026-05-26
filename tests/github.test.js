@@ -2,7 +2,7 @@
 
 const assert = require("node:assert/strict");
 const test = require("node:test");
-const { GitHubClient } = require("../src/agent/github");
+const { GitHubClient, __test__ } = require("../src/agent/github");
 
 function response(body, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -161,6 +161,122 @@ test("search omits encoded relay result text", async () => {
     assert.equal(result.results.length, 1);
     assert.match(result.results[0].description, /OMITTED/);
     assert.doesNotMatch(result.results[0].description, /morse code/);
+  } finally {
+    global.fetch = originalFetch;
+  }
+});
+
+// === retry / backoff =========================================================
+
+test("isRetryableStatus retries 429 and 5xx, not other 4xx", () => {
+  const { isRetryableStatus } = __test__;
+  assert.equal(isRetryableStatus(429), true);
+  assert.equal(isRetryableStatus(500), true);
+  assert.equal(isRetryableStatus(503), true);
+  assert.equal(isRetryableStatus(504), true);
+  assert.equal(isRetryableStatus(401), false);
+  assert.equal(isRetryableStatus(404), false);
+  assert.equal(isRetryableStatus(422), false);
+  assert.equal(isRetryableStatus(200), false);
+});
+
+test("parseRetryAfter accepts numeric seconds and HTTP dates, returns null otherwise", () => {
+  const { parseRetryAfter } = __test__;
+  assert.equal(parseRetryAfter("3"), 3000);
+  assert.equal(parseRetryAfter("60"), 60000);
+  // Caps at 60s.
+  assert.equal(parseRetryAfter("99999"), 60000);
+  // HTTP date in the past clamps to 0, not negative.
+  assert.equal(parseRetryAfter("Wed, 21 Oct 2015 07:28:00 GMT"), 0);
+  // Garbage returns null (caller falls back to exponential backoff).
+  assert.equal(parseRetryAfter("not a number"), null);
+  assert.equal(parseRetryAfter(""), null);
+  assert.equal(parseRetryAfter(null), null);
+});
+
+test("computeBackoff yields a non-negative bounded delay", () => {
+  const { computeBackoff } = __test__;
+  for (let attempt = 0; attempt < 6; attempt++) {
+    const delay = computeBackoff(attempt, 100, 1000);
+    assert.ok(delay >= 0, `attempt ${attempt} produced negative delay ${delay}`);
+    assert.ok(delay <= 1000, `attempt ${attempt} exceeded cap: ${delay}`);
+  }
+});
+
+test("request retries a transient 503 then succeeds", async () => {
+  const originalFetch = global.fetch;
+  let calls = 0;
+  global.fetch = async () => {
+    calls++;
+    if (calls === 1) return response({ message: "service unavailable" }, 503);
+    return response([{ id: 1 }]);
+  };
+  try {
+    const result = await client().request("/repos/owner/orbit/issues", { maxRetries: 3 });
+    assert.equal(calls, 2);
+    assert.deepEqual(result, [{ id: 1 }]);
+  } finally {
+    global.fetch = originalFetch;
+  }
+});
+
+test("request does NOT retry a 404 (client error) and surfaces it fast", async () => {
+  const originalFetch = global.fetch;
+  let calls = 0;
+  global.fetch = async () => {
+    calls++;
+    return response({ message: "not found" }, 404);
+  };
+  try {
+    await assert.rejects(
+      () => client().request("/repos/owner/orbit/issues/99999", { maxRetries: 3 }),
+      /GitHub 404/
+    );
+    assert.equal(calls, 1, "404 must fail on the first attempt");
+  } finally {
+    global.fetch = originalFetch;
+  }
+});
+
+test("request honors Retry-After when the server provides one (429)", async () => {
+  // We don't test the actual wall-clock delay (slow + flaky); we test
+  // that the retry happens and that the retry path was taken.
+  const originalFetch = global.fetch;
+  let calls = 0;
+  global.fetch = async () => {
+    calls++;
+    if (calls === 1) {
+      // "1" second — within the 60s cap.
+      return new Response(JSON.stringify({ message: "rate limited" }), {
+        status: 429,
+        headers: { "content-type": "application/json", "retry-after": "0" }
+      });
+    }
+    return response([{ id: 7 }]);
+  };
+  try {
+    const result = await client().request("/repos/owner/orbit/issues", { maxRetries: 3 });
+    assert.equal(calls, 2);
+    assert.deepEqual(result, [{ id: 7 }]);
+  } finally {
+    global.fetch = originalFetch;
+  }
+});
+
+test("request gives up after maxRetries and surfaces the last error", async () => {
+  const originalFetch = global.fetch;
+  let calls = 0;
+  global.fetch = async () => {
+    calls++;
+    return response({ message: "still broken" }, 502);
+  };
+  try {
+    await assert.rejects(
+      () => client().request("/repos/owner/orbit/issues", { maxRetries: 2 }),
+      /GitHub 502/
+    );
+    // 1 initial + 2 retries = 3 attempts total.
+    assert.equal(calls, 3);
   } finally {
     global.fetch = originalFetch;
   }

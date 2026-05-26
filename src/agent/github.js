@@ -3,6 +3,42 @@
 const { omitUnsafeVisitorContent, scanTextRisk } = require("./scam");
 const { redactSecrets } = require("./safety");
 
+const DEFAULT_MAX_RETRIES = 3;
+const DEFAULT_BACKOFF_BASE_MS = 250;
+const DEFAULT_BACKOFF_MAX_MS = 8_000;
+const DEFAULT_RETRY_AFTER_CAP_MS = 60_000;
+const DEFAULT_REQUEST_TIMEOUT_MS = 30_000;
+
+function isRetryableStatus(status) {
+  // 429: rate limit. 502/503/504: transient upstream. 500 with empty body
+  // is sometimes transient too. Don't retry 4xx other than 429 — those
+  // won't change on retry.
+  return status === 429 || (status >= 500 && status <= 599);
+}
+
+function parseRetryAfter(header) {
+  if (!header) return null;
+  const raw = String(header).trim();
+  if (/^[0-9]+$/.test(raw)) {
+    return Math.min(Number(raw) * 1000, DEFAULT_RETRY_AFTER_CAP_MS);
+  }
+  const date = Date.parse(raw);
+  if (Number.isFinite(date)) {
+    return Math.min(Math.max(date - Date.now(), 0), DEFAULT_RETRY_AFTER_CAP_MS);
+  }
+  return null;
+}
+
+function computeBackoff(attempt, base = DEFAULT_BACKOFF_BASE_MS, cap = DEFAULT_BACKOFF_MAX_MS) {
+  // Exponential with full jitter: between 0 and (base * 2^attempt), capped.
+  const expo = Math.min(base * Math.pow(2, attempt), cap);
+  return Math.floor(Math.random() * expo);
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 function safePublicText(text, maxLength = 2000) {
   const redacted = redactSecrets(String(text || ""));
   return omitUnsafeVisitorContent(redacted, scanTextRisk(redacted)).slice(0, maxLength);
@@ -58,24 +94,65 @@ class GitHubClient {
     const callerHeaders = Object.fromEntries(
       Object.entries(options.headers || {}).filter(([key]) => key.toLowerCase() !== "authorization")
     );
-    const response = await fetch(`${this.baseUrl}${pathname}`, {
-      ...options,
-      headers: {
-        ...callerHeaders,
-        Accept: "application/vnd.github+json",
-        Authorization: `Bearer ${this.token}`,
-        "Content-Type": "application/json",
-        "X-GitHub-Api-Version": "2022-11-28"
+    const headers = {
+      ...callerHeaders,
+      Accept: "application/vnd.github+json",
+      Authorization: `Bearer ${this.token}`,
+      "Content-Type": "application/json",
+      "X-GitHub-Api-Version": "2022-11-28"
+    };
+
+    // Bounded retry with backoff. Retries 429 and 5xx; honors
+    // Retry-After when present. Network/abort errors are also retried
+    // because they're usually transient (DNS hiccup, runner network
+    // blip). Client errors (4xx other than 429) fail fast — they will
+    // not change on retry.
+    const maxRetries = options.maxRetries != null ? options.maxRetries : DEFAULT_MAX_RETRIES;
+    const timeoutMs = options.timeoutMs != null ? options.timeoutMs : DEFAULT_REQUEST_TIMEOUT_MS;
+    let attempt = 0;
+    let lastError = null;
+    while (attempt <= maxRetries) {
+      const aborter = new AbortController();
+      const timer = setTimeout(() => aborter.abort(), timeoutMs);
+      let response;
+      try {
+        response = await fetch(`${this.baseUrl}${pathname}`, {
+          ...options,
+          headers,
+          signal: aborter.signal
+        });
+      } catch (fetchError) {
+        clearTimeout(timer);
+        lastError = fetchError;
+        if (attempt >= maxRetries) {
+          throw new Error(`GitHub network error after ${attempt + 1} attempts: ${fetchError.message}`);
+        }
+        await sleep(computeBackoff(attempt));
+        attempt++;
+        continue;
       }
-    });
+      clearTimeout(timer);
 
-    if (!response.ok) {
-      const body = await response.text();
-      throw new Error(`GitHub ${response.status}: ${body.slice(0, 500)}`);
+      if (response.ok) {
+        if (response.status === 204) return null;
+        return response.json();
+      }
+
+      if (!isRetryableStatus(response.status) || attempt >= maxRetries) {
+        const body = await response.text();
+        throw new Error(`GitHub ${response.status}: ${body.slice(0, 500)}`);
+      }
+
+      const retryAfterMs = parseRetryAfter(response.headers.get("retry-after"));
+      const delay = retryAfterMs != null ? retryAfterMs : computeBackoff(attempt);
+      lastError = new Error(`GitHub ${response.status} (will retry)`);
+      // Drain the body so the socket can be reused.
+      try { await response.text(); } catch { /* ignore */ }
+      await sleep(delay);
+      attempt++;
     }
-
-    if (response.status === 204) return null;
-    return response.json();
+    // Should be unreachable — the loop above either returns or throws.
+    throw lastError || new Error("GitHub request exhausted retries with no error captured");
   }
 
   async listIssues({ state = "open", perPage = 20 } = {}) {
@@ -337,5 +414,11 @@ class GitHubClient {
 }
 
 module.exports = {
-  GitHubClient
+  GitHubClient,
+  // Exposed for targeted tests; not part of the supported API.
+  __test__: {
+    isRetryableStatus,
+    parseRetryAfter,
+    computeBackoff
+  }
 };
