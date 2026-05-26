@@ -476,10 +476,65 @@ test("runHorizonScan respects maxCandidatesPerScan", async () => {
   const classifier = async (item) => mockClassification({
     candidateSpecOutline: { title: item.title, purpose: "p", northStarConnection: "n", killCriteria: [] }
   });
-  const summary = await runHorizonScan(repoRoot, { fetcher, classifier });
+  const summary = await runHorizonScan(repoRoot, { fetcher, classifier }, {
+    state: { preLaunchVerified: true }
+  });
   assert.equal(summary.candidatesDrafted, 2);
   // And the registry now holds exactly 2.
   assert.equal(loadCandidates(repoRoot).candidates.length, 2);
+});
+
+// === D-018 pre-launch guard (HORIZON_SCANNER spec §6) ========================
+
+test("runHorizonScan guards against live mode when preLaunchVerified is missing", async () => {
+  const repoRoot = tempRepo();
+  saveSources(repoRoot, { schema: SOURCES_SCHEMA, sources: [mockSource()] });
+  writeFile(repoRoot, "memory/horizon-config.json", JSON.stringify({
+    schema: CONFIG_SCHEMA,
+    dryRun: false
+  }));
+  const fetcher = async () => [mockItem()];
+  const classifier = async () => mockClassification();
+  // No state passed -> loadState reads empty {} from the temp repo.
+  const summary = await runHorizonScan(repoRoot, { fetcher, classifier });
+  assert.equal(summary.guarded, true);
+  assert.match(summary.guard, /preLaunchVerified/);
+  assert.equal(summary.candidatesDrafted, 0);
+  // Fetcher must not have been invoked.
+  assert.equal(summary.fetchedItems, 0);
+});
+
+test("runHorizonScan guards against live mode when preLaunchVerified is explicitly false", async () => {
+  const repoRoot = tempRepo();
+  saveSources(repoRoot, { schema: SOURCES_SCHEMA, sources: [mockSource()] });
+  writeFile(repoRoot, "memory/horizon-config.json", JSON.stringify({
+    schema: CONFIG_SCHEMA,
+    dryRun: false
+  }));
+  const fetcher = async () => [mockItem()];
+  const classifier = async () => mockClassification();
+  const summary = await runHorizonScan(repoRoot, { fetcher, classifier }, {
+    state: { preLaunchVerified: false }
+  });
+  assert.equal(summary.guarded, true);
+  assert.equal(summary.candidatesDrafted, 0);
+});
+
+test("runHorizonScan permits dry-run pre-launch even when preLaunchVerified is false", async () => {
+  // Spec §6: dry-run mode is explicitly permitted pre-launch so developers
+  // (and CI) can exercise the loop. The guard should not fire.
+  const repoRoot = tempRepo();
+  saveSources(repoRoot, { schema: SOURCES_SCHEMA, sources: [mockSource()] });
+  // No config -> DEFAULT_CONFIG.dryRun === true.
+  const fetcher = async () => [mockItem()];
+  const classifier = async () => mockClassification();
+  const summary = await runHorizonScan(repoRoot, { fetcher, classifier }, {
+    state: { preLaunchVerified: false },
+    now: new Date("2026-05-26T00:00:00Z")
+  });
+  assert.notEqual(summary.guarded, true);
+  assert.equal(summary.dryRun, true);
+  assert.equal(summary.candidatesDrafted, 1);
 });
 
 test("runHorizonScan surfaces fetcher errors without aborting the scan", async () => {

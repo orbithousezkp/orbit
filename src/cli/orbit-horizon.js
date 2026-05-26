@@ -76,6 +76,11 @@ async function scan() {
   console.log("# orbit-horizon · scan (dry-run)");
   console.log("");
   const summary = await runHorizonScan(REPO_ROOT);
+  if (summary.guarded) {
+    console.log("GUARDED: " + summary.guard);
+    console.log("(dry-run mode is permitted pre-launch — see HORIZON_SCANNER.md §6)");
+    console.log("");
+  }
   console.log("dryRun:                  " + summary.dryRun);
   console.log("enabledSources:          " + summary.enabledSources);
   console.log("fetchedItems:            " + summary.fetchedItems);

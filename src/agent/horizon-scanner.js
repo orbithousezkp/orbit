@@ -20,6 +20,7 @@ const crypto = require("node:crypto");
 const SOURCES_PATH = "memory/horizon-sources.json";
 const CANDIDATES_PATH = "memory/horizon-candidates.json";
 const CONFIG_PATH = "memory/horizon-config.json";
+const STATE_PATH = "memory/state.json";
 const CANDIDATES_DIR = "PLAN/SPECS/CANDIDATES";
 const ARCHIVE_DIR = "PLAN/SPECS/ARCHIVE";
 const DRY_RUN_DIR = "runtime/horizon/dry";
@@ -116,6 +117,10 @@ function loadConfig(repoRoot) {
   // Merge with defaults so missing fields don't crash callers; defaults win
   // only when the file omits the field, never when it explicitly sets it.
   return { ...DEFAULT_CONFIG, ...(record || {}), schema: CONFIG_SCHEMA };
+}
+
+function loadState(repoRoot) {
+  return readJson(path.join(repoRoot, STATE_PATH), {});
 }
 
 // Validate a single source record. Returns null if invalid. Caller decides
@@ -390,6 +395,30 @@ async function runHorizonScan(repoRoot, deps = {}, options = {}) {
   const classifier = deps.classifier || defaultClassifier;
   const config = options.config || loadConfig(repoRoot);
   const now = options.now instanceof Date ? options.now : new Date();
+  const state = options.state || loadState(repoRoot);
+
+  // D-018 guard (per HORIZON_SCANNER spec §6): when not in dry-run mode,
+  // the scanner refuses to run unless state.preLaunchVerified === true.
+  // Dry-run remains permitted pre-launch so developers (and tests) can
+  // exercise the loop. Returning a structured "guarded" summary instead
+  // of throwing makes the caller's life easier and keeps the cycle
+  // resilient.
+  if (!config.dryRun && state.preLaunchVerified !== true) {
+    return {
+      dryRun: false,
+      guarded: true,
+      guard: "state.preLaunchVerified is not true (D-018 pre-launch gate)",
+      enabledSources: 0,
+      fetchedItems: 0,
+      classifiedItems: 0,
+      candidatesDrafted: 0,
+      candidatesSkippedDuplicate: 0,
+      classifierRejections: 0,
+      candidates: [],
+      lifecycle: null
+    };
+  }
+
   const sources = getEnabledSources(loadSources(repoRoot));
   const candidatesRecord = loadCandidates(repoRoot);
 
@@ -473,6 +502,7 @@ module.exports = {
   loadCandidates,
   saveCandidates,
   loadConfig,
+  loadState,
   // helpers
   validateSource,
   getEnabledSources,
