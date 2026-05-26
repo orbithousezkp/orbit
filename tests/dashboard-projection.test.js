@@ -254,6 +254,95 @@ test("projectForDashboard hides amount/asset for non-allowlisted approval catego
   assert.equal(leak.asset, null);
 });
 
+test("projectForDashboard exposes horizon slice with counts but never source URLs", () => {
+  // FOREVER_ROADMAP.md §2 rule 9: research access stays open, which means
+  // we deliberately do NOT publish what Orbit is reading. The horizon
+  // slice surfaces lifecycle counts so visitors can see the scanner is
+  // alive — never source URLs (would let observers game the inputs) and
+  // never raw fetched content.
+  const repoRoot = tempRepo();
+  writeJson(repoRoot, "memory/horizon-config.json", {
+    schema: "orbit-horizon-config/1",
+    dryRun: true,
+    scanCadenceHours: 24,
+  });
+  writeJson(repoRoot, "memory/horizon-sources.json", {
+    schema: "orbit-horizon-sources/1",
+    sources: [
+      { id: "eip-rss", type: "rss", url: "https://eips.ethereum.org/all.atom", classifyTo: ["identity"], enabled: false },
+      { id: "arxiv-cscr", type: "rss", url: "http://export.arxiv.org/rss/cs.CR", classifyTo: ["research"], enabled: true },
+    ],
+  });
+  writeJson(repoRoot, "memory/horizon-candidates.json", {
+    schema: "orbit-horizon-candidates/1",
+    candidates: [
+      {
+        id: "hc-001",
+        slug: "session-keys-erc7715",
+        sourceId: "eip-rss",
+        sourceContentHash: "0xabc",
+        primaryCurrent: "governance",
+        status: "pending",
+        filePath: "PLAN/SPECS/CANDIDATES/2026-05-26-session-keys-erc7715.md",
+        issueNumber: 124,
+        issueUrl: "https://github.com/owner/orbit/issues/124",
+        proposedAt: "2026-05-24T00:00:00.000Z",
+        ageOutAt: "2026-08-22T00:00:00.000Z",
+        lifecycleHistory: [],
+      },
+      {
+        id: "hc-002",
+        sourceContentHash: "0xdef",
+        status: "promoted",
+        proposedAt: "2026-04-01T00:00:00.000Z",
+        lifecycleHistory: [],
+      },
+      {
+        id: "hc-003",
+        sourceContentHash: "0xghi",
+        status: "archived",
+        proposedAt: "2026-03-01T00:00:00.000Z",
+        lifecycleHistory: [],
+      },
+    ],
+  });
+
+  const bundle = exportBundle(repoRoot, undefined, { receiptLimit: 10 });
+  const slim = projectForDashboard(bundle);
+
+  assert.equal(slim.horizon.schema, "orbit-horizon/1");
+  assert.equal(slim.horizon.dryRun, true);
+  assert.equal(slim.horizon.totalSources, 2);
+  assert.equal(slim.horizon.enabledSources, 1);
+  assert.equal(slim.horizon.pending, 1);
+  assert.equal(slim.horizon.promoted, 1);
+  assert.equal(slim.horizon.archived, 1);
+  assert.equal(slim.horizon.recent.length, 1);
+  assert.equal(slim.horizon.recent[0].slug, "session-keys-erc7715");
+  assert.equal(slim.horizon.recent[0].primaryCurrent, "governance");
+  assert.equal(slim.horizon.recent[0].issueNumber, 124);
+
+  // The slice never includes source URLs or raw content. Serialise the
+  // whole horizon slice to a string and grep — this catches any future
+  // addition that would leak the read list.
+  const serialised = JSON.stringify(slim.horizon);
+  assert.equal(serialised.includes("eips.ethereum.org"), false, "must not leak source URL");
+  assert.equal(serialised.includes("arxiv.org"), false, "must not leak source URL");
+  assert.equal(serialised.includes("sourceContentHash"), false, "must not leak content hash on visitor surface");
+});
+
+test("projectForDashboard horizon slice tolerates missing files", () => {
+  const repoRoot = tempRepo();
+  const bundle = exportBundle(repoRoot, undefined, { receiptLimit: 10 });
+  const slim = projectForDashboard(bundle);
+  assert.equal(slim.horizon.schema, "orbit-horizon/1");
+  assert.equal(slim.horizon.dryRun, true);
+  assert.equal(slim.horizon.enabledSources, 0);
+  assert.equal(slim.horizon.totalSources, 0);
+  assert.equal(slim.horizon.pending, 0);
+  assert.deepEqual(slim.horizon.recent, []);
+});
+
 function makeRefusalProof(overrides = {}) {
   return makeProof({
     cycle: overrides.cycle || 27,

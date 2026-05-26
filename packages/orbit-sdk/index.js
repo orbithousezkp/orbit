@@ -32,6 +32,9 @@ const FILES = {
   adopters:       'memory/adopters-registry.json',
   cycles:         'memory/cycles.jsonl',
   approvals:      'memory/approvals.json',
+  horizonSources:    'memory/horizon-sources.json',
+  horizonCandidates: 'memory/horizon-candidates.json',
+  horizonConfig:     'memory/horizon-config.json',
 };
 
 /**
@@ -347,9 +350,11 @@ const DASHBOARD_SCHEMA = "orbit-dashboard/1";
 const DEFAULT_REFUSAL_LIMIT = 20;
 const DEFAULT_MISSION_LIMIT = 20;
 const DEFAULT_APPROVAL_LIMIT = 20;
+const DEFAULT_HORIZON_RECENT_LIMIT = 5;
 const MISSION_SCHEMA = "orbit-missions/1";
 const APPROVALS_SCHEMA = "orbit-approvals/1";
 const ADOPTERS_SCHEMA = "orbit-adopters/1";
+const HORIZON_SCHEMA = "orbit-horizon/1";
 const PHASE_1_ADOPTER_TARGET = 5;
 const PHASE_5_ADOPTER_TARGET = 50;
 const REFUSAL_SUMMARY_MAX = 120;
@@ -544,6 +549,75 @@ function projectApprovalsSlim(approvalsRecord, options) {
   };
 }
 
+function projectHorizonSlim(horizonBundle, options) {
+  // The horizon slice shows that the scanner exists and where it is in its
+  // lifecycle — without leaking source URLs, fetched content, or any
+  // specific dollar figures. Per FOREVER_ROADMAP.md §2:
+  //   - rule 8: no money on visitor surfaces
+  //   - rule 9: research access open (so we deliberately do NOT publish
+  //     the source URL list, which would let observers infer what Orbit
+  //     is reading and game its inputs)
+  const opts = options || {};
+  const recentLimit = Number.isFinite(opts.horizonRecentLimit)
+    ? opts.horizonRecentLimit
+    : DEFAULT_HORIZON_RECENT_LIMIT;
+  const config = (horizonBundle && horizonBundle.config) || null;
+  const sourcesRecord = (horizonBundle && horizonBundle.sources) || null;
+  const candidatesRecord = (horizonBundle && horizonBundle.candidates) || null;
+
+  const empty = {
+    schema: HORIZON_SCHEMA,
+    dryRun: true,
+    enabledSources: 0,
+    totalSources: 0,
+    pending: 0,
+    promoted: 0,
+    archived: 0,
+    recent: [],
+  };
+  if (!config && !sourcesRecord && !candidatesRecord) return empty;
+
+  const sources = Array.isArray(sourcesRecord && sourcesRecord.sources)
+    ? sourcesRecord.sources
+    : [];
+  const enabledSources = sources.filter((s) => s && s.enabled).length;
+  const candidates = Array.isArray(candidatesRecord && candidatesRecord.candidates)
+    ? candidatesRecord.candidates
+    : [];
+  const pending = candidates.filter((c) => c && c.status === "pending");
+  const promoted = candidates.filter((c) => c && c.status === "promoted");
+  const archived = candidates.filter((c) => c && c.status === "archived");
+
+  // Oldest pending first — the most-stuck candidate is most visible.
+  pending.sort((a, b) => {
+    const at = Date.parse((a && a.proposedAt) || "") || 0;
+    const bt = Date.parse((b && b.proposedAt) || "") || 0;
+    return at - bt;
+  });
+
+  const recent = pending.slice(0, recentLimit).map((c) => ({
+    id: c.id || null,
+    slug: c.slug || null,
+    primaryCurrent: c.primaryCurrent || null,
+    proposedAt: c.proposedAt || null,
+    // Issue link is OK to surface (it's a github issue in the same repo);
+    // source URL is NOT (per rule 9 above).
+    issueNumber: typeof c.issueNumber === "number" ? c.issueNumber : null,
+    issueUrl: c.issueUrl || null,
+  }));
+
+  return {
+    schema: HORIZON_SCHEMA,
+    dryRun: config ? Boolean(config.dryRun) : true,
+    enabledSources,
+    totalSources: sources.length,
+    pending: pending.length,
+    promoted: promoted.length,
+    archived: archived.length,
+    recent,
+  };
+}
+
 function projectReceipt(r) {
   return {
     path: r.path || null,
@@ -616,6 +690,11 @@ function exportBundle(repoRoot, _unused, options) {
     missions: readJson(path.join(root, FILES.missions)),
     adopters: readJson(path.join(root, FILES.adopters)),
     approvals: readJson(path.join(root, FILES.approvals)),
+    horizon: {
+      config:     readJson(path.join(root, FILES.horizonConfig)),
+      sources:    readJson(path.join(root, FILES.horizonSources)),
+      candidates: readJson(path.join(root, FILES.horizonCandidates)),
+    },
   };
   if (includeMemory) {
     bundle.memory = {
@@ -725,6 +804,7 @@ function projectForDashboard(bundle, options) {
     missions: projectMissionsSlim(b.missions, opts),
     adopters: projectAdoptersSlim(b.adopters, opts),
     approvals: projectApprovalsSlim(b.approvals, opts),
+    horizon: projectHorizonSlim(b.horizon, opts),
   };
 
   slim.digest = digestForObject({
@@ -739,6 +819,7 @@ function projectForDashboard(bundle, options) {
     missionActive: slim.missions ? slim.missions.active : 0,
     adopterCount: slim.adopters ? slim.adopters.adopted : 0,
     approvalsPending: slim.approvals ? slim.approvals.pending : 0,
+    horizonPending: slim.horizon ? slim.horizon.pending : 0,
   });
 
   return slim;

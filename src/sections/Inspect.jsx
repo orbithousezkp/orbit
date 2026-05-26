@@ -34,6 +34,10 @@ export default function Inspect() {
   const approvalsPending = data?.approvals?.pending ?? null;
   const approvalsTotal = data?.approvals?.total ?? null;
   const approvalsList = Array.isArray(data?.approvals?.list) ? data.approvals.list : [];
+  const horizonDryRun = data?.horizon?.dryRun;
+  const horizonEnabledSources = data?.horizon?.enabledSources ?? null;
+  const horizonTotalSources = data?.horizon?.totalSources ?? null;
+  const horizonPending = data?.horizon?.pending ?? null;
 
   return (
     <section id="inspect" className="section section--inspect">
@@ -99,6 +103,22 @@ export default function Inspect() {
                 : approvalsTotal !== null
                   ? `${approvalsTotal} total · oldest-first below`
                   : 'oldest-first below'}
+          </div>
+        </div>
+
+        <div className="cell">
+          <div className="cell__label">horizon scanner</div>
+          <div className="cell__value">
+            {horizonEnabledSources === null
+              ? '—'
+              : `${horizonEnabledSources}${horizonTotalSources !== null ? `/${horizonTotalSources}` : ''}`}
+          </div>
+          <div className="cell__hint">
+            {horizonEnabledSources === null
+              ? 'projection rebuilds next cycle'
+              : horizonDryRun
+                ? `dry-run · ${horizonPending ?? 0} candidate${(horizonPending ?? 0) === 1 ? '' : 's'} pending`
+                : `live · ${horizonPending ?? 0} candidate${(horizonPending ?? 0) === 1 ? '' : 's'} pending`}
           </div>
         </div>
 
