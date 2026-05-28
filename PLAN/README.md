@@ -10,7 +10,7 @@ Compiled plan for shipping Orbit to launch on Clanker. Built using the ClaudeCod
 4. `PHASES.md` — phased ship plan (Day 1 → Year 1)
 5. `DAY_1.md` — concrete ship list for Day 1 and the first 7 days
 6. `ROADMAP.md` — unlimited-exploration backlog (everything Orbit could become)
-7. `DEPLOY_PLAN.md` — domain (orbit.horse), env vars, infra
+7. `DEPLOY_PLAN.md` — GitHub Pages dashboard, env vars, infra (custom domain deferred)
 8. `DECISIONS.md` — locked architectural and strategic decisions
 9. `RISKS.md` — known risks and mitigations
 

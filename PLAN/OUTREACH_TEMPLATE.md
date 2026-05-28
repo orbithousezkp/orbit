@@ -94,7 +94,7 @@ Rules:
 Rules:
 - Always end with a question that surfaces their pain point. Don't pitch first.
 - Have the scaffold command memorized: `npx create-orbit-house <name>`. Don't fumble.
-- If they care, hand them a sticker with `orbit.horse` and `github.com/orbithousezkp/orbit`. No business card.
+- If they care, hand them a sticker with the dashboard URL and `github.com/orbithousezkp/orbit`. No business card.
 
 ---
 

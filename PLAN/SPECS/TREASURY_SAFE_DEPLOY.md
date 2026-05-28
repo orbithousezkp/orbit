@@ -2,7 +2,7 @@
 
 Status: ready-to-execute (owner-driven, not automated)
 Refs: D-004 (Safe is 2-of-3 on Base), D-014 (no on-chain action without approval+receipt), D-017 (Treasury Safe + Operator only), D-018 gate item 7
-Cross-refs: `PLAN/DEPLOY_PLAN.md` (Wallet section + env var inventory + orbit.horse specifics), `PLAN/CLANKER_FEE_STRATEGY.md`, `.github/workflows/orbit-cycle.yml`
+Cross-refs: `PLAN/DEPLOY_PLAN.md` (Wallet section + env var inventory + Pages section), `PLAN/CLANKER_FEE_STRATEGY.md`, `PLAN/OWNER_PUNCH_LIST.md` §6, `.github/workflows/orbit-cycle.yml`
 
 > Orbit cannot deploy a Safe. The owner does it, by hand, once. This document is the script. Follow it top to bottom. Do not skip the verification checklist in section 5 — D-018 gate item 7 is not "Safe deployed", it is "Safe deployed AND funded AND recorded AND verified".
 

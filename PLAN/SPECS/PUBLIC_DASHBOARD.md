@@ -1,7 +1,9 @@
-# SPEC — Public Dashboard at orbit.horse (S-003)
+# SPEC — Public Dashboard on GitHub Pages (S-003)
 
 Status: shipped 2026-05-24 (engineering); pending GitHub Pages enablement on the repo
 Refs: D-007, D-006, BRAND.md, DEPLOY_PLAN.md, feedback memory `github-only`
+
+> **Note (2026-05-28):** The custom-domain `orbit.horse` originally planned for this spec was deferred (commit 84767747). The current target is the Pages default URL `https://orbithousezkp.github.io/orbit/`. The custom-domain sections below remain as the runbook for re-introducing a custom domain in a later phase — they are not Phase 1 work.
 
 ## 1. Hosting Choice — GitHub Pages (mandatory)
 

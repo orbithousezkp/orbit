@@ -187,7 +187,7 @@ Every check must be ✓. Specific verifications:
   # compare to: gh variable get ORBIT_AGENT_SIGNER
   ```
 - **AI provider live.** `gh secret list | grep -E 'ANTHROPIC|OPENAI'` shows at least one. `ORBIT_AI_PROVIDERS` variable lists which ones to use.
-- **GitHub Pages serving.** `curl -fsS https://orbit.horse/dashboard.json | jq '.cycle'` returns a recent cycle number. `curl -fsS https://orbit.horse/.well-known/orbit.json | jq '.token.launchStatus'` returns `"not_launched"` or `"planned"`.
+- **GitHub Pages serving.** `curl -fsS https://orbithousezkp.github.io/orbit/dashboard.json | jq '.cycle'` returns a recent cycle number. `curl -fsS https://orbithousezkp.github.io/orbit/.well-known/orbit.json | jq '.token.launchStatus'` returns `"not_launched"` or `"planned"`.
 - **Farcaster signer live.** `gh secret list | grep ORBIT_FARCASTER` shows the signer secrets; `gh variable get ORBIT_FARCASTER_DRY_RUN` returns `false`.
 - **Clean cycle stretch in progress.** `gh run list --workflow=orbit-cycle.yml --limit 30 --json conclusion | jq '[.[] | select(.conclusion=="success")] | length'` returns 24+.
 
@@ -340,13 +340,13 @@ git push origin main
 
 - **Dashboard reflects launch.**
   ```bash
-  curl -fsS https://orbit.horse/dashboard.json | jq '.walletPolicy.token'
+  curl -fsS https://orbithousezkp.github.io/orbit/dashboard.json | jq '.walletPolicy.token'
   ```
   Returns `{ "launchStatus": "launched", "address": "0x…", … }`. The wallet policy assembler at `src/agent/wallet.js:78` reads `token.launchStatus` directly.
 
 - **Well-known reflects launch.**
   ```bash
-  curl -fsS https://orbit.horse/.well-known/orbit.json | jq '.token'
+  curl -fsS https://orbithousezkp.github.io/orbit/.well-known/orbit.json | jq '.token'
   ```
   Returns `launchStatus: "launched"`. The publisher is `src/agent/well-known.js:81`.
 

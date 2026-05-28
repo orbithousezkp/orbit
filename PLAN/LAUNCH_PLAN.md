@@ -79,7 +79,7 @@ Surface area: whatever the private-repo run discovers. Patch in tight commits. D
 These cannot be done by code — they're owner actions with external accounts. Sequence:
 
 1. `gh secret set NPM_TOKEN` (automation token) → publish workflow can ship `@orbit-house/sdk` + `create-orbit-house`.
-2. Settings → Pages → Source: GitHub Actions → `orbit.horse` resolves.
+2. Settings → Pages → Source: GitHub Actions → `https://orbithousezkp.github.io/orbit/` resolves (custom domain deferred per commit 84767747).
 3. `gh variable set ORBIT_AGENT_SIGNER --body 0x...` (the EOA the agent uses to sign proofs).
 4. Neynar API key + signer UUID for Farcaster casting (`PLAN/SPECS/FARCASTER_CAST_PIPELINE.md §10`).
 5. `gh variable set ORBIT_AI_PROVIDERS` + `gh secret set ORBIT_AI_PROVIDER_KEYS`.

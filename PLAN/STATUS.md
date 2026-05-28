@@ -11,7 +11,7 @@
 | GITHUB | yes — private build repo (location managed by owner) |
 | BRANCH | main |
 | PUBLIC REPO | `/home/asuran/Downloads/orbit` (this repo) |
-| PUBLIC DOMAIN | orbit.horse |
+| PUBLIC DOMAIN | `https://orbithousezkp.github.io/orbit/` (Pages default; custom domain deferred) |
 
 ---
 
@@ -42,7 +42,7 @@ OPEN BLOCKERS     : Owner actions — enable GitHub Pages; set ORBIT_AGENT_SIGNE
 |----|------|------|--------|--------|
 | S-001 | S-PLAN | Plan compilation + Clanker fee research | DONE 2026-05-23 | PLAN/ directory: MASTER_PLAN, CLANKER_FEE_STRATEGY, DAY_1, PHASES, ROADMAP, BRAND, DEPLOY_PLAN, DECISIONS, RISKS, STATUS |
 | S-002 | S-BUILD | Wallet-signed cycle proofs (D-006) | DONE 2026-05-24 | EIP-712 signing on every cycle; `src/agent/proof-signing.js` + `proof-canonical.js`; `@orbit-house/verifier` package; signed proofs verifiable via verifier CLI |
-| S-003 | S-BUILD | Public dashboard for orbit.horse (D-007) | DONE 2026-05-24 | `projectForDashboard` SDK helper; cycle writes `public/dashboard.json` (≤60KB cap); React Dashboard renders all spec sections; bundle 66.5KB gz; GitHub Pages workflow `deploy-dashboard.yml` + `public/CNAME` shipped |
+| S-003 | S-BUILD | Public dashboard on GitHub Pages (D-007) | DONE 2026-05-24 | `projectForDashboard` SDK helper; cycle writes `public/dashboard.json` (≤60KB cap); React Dashboard renders all spec sections; bundle 66.5KB gz; GitHub Pages workflow `deploy-dashboard.yml` + `public/CNAME` shipped (custom-domain `orbit.horse` deferred 2026-05-28) |
 | S-004 | S-BUILD | Farcaster cast pipeline (D-008) | DONE 2026-05-24 | `src/agent/farcaster.js` (pickTemplate, renderCast, scanOutbound, publishCast, postCycleCast); `cast_to_farcaster` tool + handler; cycle posts at end of `main()` (dry-run default TRUE); workflow env in orbit-cycle.yml + orbit-event.yml |
 | S-005 | S-BUILD | Publish-ready @orbit-house/sdk + create-orbit-house (D-009) | DONE 2026-05-24 | `packages/orbit-sdk` publish-ready (8KB tarball, 14 exports, MIT LICENSE); `packages/create-orbit-house` full scaffolder (bin.js + 11 templates, atomic rollback, path-traversal guard) |
 | S-006 | S-BUILD | Closed-loop demo runbook + integration test | DONE 2026-05-24 | `PLAN/SPECS/CLOSED_LOOP_DEMO.md` + `tests/closed-loop-demo.test.js` covering refill-request → approval → record → next-call chain |
@@ -158,7 +158,7 @@ Do NOT propose token-launch work (S-011+) until owner closes those items.
 | D-004 | S-001 | Treasury custody is Safe multisig 2-of-3 on Base before token deploy |
 | D-005 | S-001 | Weekly $ORBIT buybacks funded from WETH balance, under approval gate |
 | D-006 | S-001 | Every cycle proof signed with agent wallet key before launch |
-| D-007 | S-001 | Public dashboard hosted at orbit.horse, separate from household-UI app |
+| D-007 | S-001 | Public dashboard hosted on GitHub Pages, separate from household-UI app (orbit.horse stub dropped 2026-05-28; default URL `orbithousezkp.github.io/orbit/`) |
 | D-008 | S-001 | Farcaster casting wired into cycle loop, not external automation |
 | D-009 | S-001 | SDK published as `@orbit-house/sdk` on npm |
 | D-010 | S-001 | Founder ↔ Orbit voice separation, two accounts |
@@ -196,7 +196,7 @@ Do NOT propose token-launch work (S-011+) until owner closes those items.
 
 | Session | Change | Section updated |
 |---------|--------|-----------------|
-| S-001 | Initial deploy plan created. Domain (orbit.horse), Safe treasury, Clanker fee config locked. All env vars inventoried. | All sections |
+| S-001 | Initial deploy plan created. Custom domain (orbit.horse), Safe treasury, Clanker fee config locked. All env vars inventoried. (orbit.horse later deferred 2026-05-28.) | All sections |
 
 ---
 

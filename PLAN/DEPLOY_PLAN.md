@@ -2,10 +2,18 @@
 
 > Living document. Updated every session that introduces a deploy-relevant change.
 
+> **Status note (2026-05-28):** The `orbit.horse` custom-domain plan referenced
+> throughout this document is **deferred**. Current Pages target is the
+> repo's default subdomain `https://orbithousezkp.github.io/orbit/`. The
+> `orbit.horse` content below is retained as future-option scaffolding —
+> ignore the DNS / CNAME / "Domain Configuration" sections until/unless a
+> custom domain is re-added. See commit 84767747 (drop orbit.horse stub)
+> + `PLAN/OWNER_PUNCH_LIST.md` §1 (live Pages setup).
+
 ## Architecture Overview
 
 ```
-[orbit.horse]                 — public dashboard (read-only)
+[orbithousezkp.github.io/orbit]   — public dashboard (read-only, default Pages URL)
        │
        └──> GitHub Pages — static site (built by .github/workflows/deploy-dashboard.yml)
                 │
@@ -43,16 +51,19 @@
 
 ## Domain Configuration
 
-| Domain | Use | Notes |
-|---|---|---|
-| `orbit.horse` | Public read-only dashboard | Already owned by user. Point DNS to GitHub Pages IPs (185.199.108–111.153). `public/CNAME` already declares the custom domain. |
-| `verify.orbit.horse` (optional) | Hosted receipt verifier UI | Phase 2 — let anyone paste a proof and verify |
-| `api.orbit.horse` (optional) | HTTP read API mirroring the SDK | Phase 4 — wait for federation demand |
+**Current target:** Pages default URL `https://orbithousezkp.github.io/orbit/`. No custom domain.
 
-DNS setup steps:
-1. At registrar: four `A` records on apex `orbit.horse` → `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`
-2. Repo → Settings → Pages → Source: **GitHub Actions**, custom domain `orbit.horse`, Enforce HTTPS once cert provisions
-3. Verify with `dig orbit.horse` and `curl -I https://orbit.horse`
+| Domain | Use | Status |
+|---|---|---|
+| `orbithousezkp.github.io/orbit/` | Public read-only dashboard (current default) | Awaits Pages enable — see `PLAN/OWNER_PUNCH_LIST.md` §1 |
+| ~~`orbit.horse`~~ | (deferred — owned but not wired) | Deferred per commit 84767747. The DNS setup steps below remain as a runbook for future re-enable, not as a Phase 1 task. |
+| `verify.<custom>` (optional) | Hosted receipt verifier UI | Phase 2+ — let anyone paste a proof and verify |
+| `api.<custom>` (optional) | HTTP read API mirroring the SDK | Phase 4 — wait for federation demand |
+
+DNS setup steps (only when custom domain is re-enabled — deferred):
+1. At registrar: four `A` records on apex `<your-domain>` → `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`
+2. Repo → Settings → Pages → Source: **GitHub Actions**, custom domain `<your-domain>`, Enforce HTTPS once cert provisions
+3. Verify with `dig <your-domain>` and `curl -I https://<your-domain>`
 
 ## Third-Party Accounts Needed
 
@@ -62,7 +73,7 @@ DNS setup steps:
 | npm `@orbit-house` scope | SDK publication | Create org, add publish token to GitHub secrets |
 | Neynar API account | Farcaster casting | Sign up, get API key + signer, add to repo secrets |
 | Farcaster account `@orbit` | Orbit's public voice | Create, link signer to Neynar |
-| GitHub Pages | Dashboard hosting | Repo Settings → Pages → Source: GitHub Actions; set custom domain `orbit.horse` |
+| GitHub Pages | Dashboard hosting | Repo Settings → Pages → Source: GitHub Actions. Default URL `https://orbithousezkp.github.io/orbit/`; custom domain deferred. |
 | Safe multisig | Treasury custody | Deploy on Base, add signers |
 | Clanker.world | Token launch | Connect deployer wallet at launch time |
 | Base RPC (Alchemy/QuickNode) | On-chain reads from cycle | API key in secrets |
@@ -105,7 +116,7 @@ DNS setup steps:
 | `ORBIT_AGENT_SIGNER` | Public address of the signing key — what verifiers expect |
 | `ORBIT_FARCASTER_NEYNAR_API_KEY` | Neynar API access |
 | `ORBIT_FARCASTER_SIGNER_UUID` | Neynar signer for the @orbit account |
-| `ORBIT_DASHBOARD_URL` | `https://orbit.horse` — for cast links |
+| `ORBIT_DASHBOARD_URL` | `https://orbithousezkp.github.io/orbit/` — for cast links (custom domain deferred) |
 | `ORBIT_VERIFIER_NPM_PACKAGE` | `@orbit-house/verifier` — for instructions in casts |
 
 (Per D-017: Buyback/Bounty/Lore wallets removed. All WETH flows to Treasury Safe; spending happens via approval-gated sub-budgets.)
@@ -154,7 +165,7 @@ DNS setup steps:
 - Treasury Safe deploy + signer add
 - Recipient wallet derivation
 - Farcaster account creation
-- DNS configuration for orbit.horse
+- DNS configuration (only if a custom domain is re-introduced; deferred)
 - npm org registration + publish
 - Token deploy via clanker.world
 - AI provider top-up (when approval issue fires)
@@ -193,12 +204,14 @@ Owner runs the script manually. Not auto-executed.
 
 **Hard rule:** No wallet address in source control. All addresses live in GitHub Secrets and are referenced by env var name only.
 
-## Domain — orbit.horse — Specifics
+## Domain — Custom domain (deferred)
 
-Already owned by user. Setup (GitHub Pages only — see `feedback_github_only` memory):
+> Current target is the Pages default URL `https://orbithousezkp.github.io/orbit/` — no DNS work required. The steps below are the runbook for re-introducing a custom domain (e.g. if `orbit.horse` is re-enabled later). Do not execute as part of S-GATE-1.
+
+Setup (GitHub Pages only — see `feedback_github_only` memory):
 
 1. Repo → Settings → Pages → Source: **GitHub Actions** (the `.github/workflows/deploy-dashboard.yml` workflow handles build + deploy)
-2. Repo → Settings → Pages → Custom domain: `orbit.horse` (the `public/CNAME` file already declares it)
+2. Repo → Settings → Pages → Custom domain: `<your-domain>` (add a `public/CNAME` file declaring it)
 3. At registrar, add four `A` records on apex pointing to GitHub Pages IPs:
    - `185.199.108.153`
    - `185.199.109.153`
@@ -206,7 +219,7 @@ Already owned by user. Setup (GitHub Pages only — see `feedback_github_only` m
    - `185.199.111.153`
 4. Optional: `CNAME` record on `www` → `<owner>.github.io.`
 5. Wait for HTTPS cert provisioning (usually <10 min), then tick "Enforce HTTPS"
-6. Verify `dig orbit.horse +short` returns the four IPs above and `curl -I https://orbit.horse` returns 200
+6. Verify `dig <your-domain> +short` returns the four IPs above and `curl -I https://<your-domain>` returns 200
 7. Every cycle commit will trigger a Pages redeploy via the workflow's `paths:` filter
 
 No third-party hosting. No deploy hook. No external CI.
@@ -215,5 +228,6 @@ No third-party hosting. No deploy hook. No external CI.
 
 | Date | Session | What changed |
 |---|---|---|
-| 2026-05-23 | S-001 | Initial deploy plan created. Domain (orbit.horse), Safe treasury, Clanker fee config locked. |
+| 2026-05-23 | S-001 | Initial deploy plan created. Custom domain (orbit.horse), Safe treasury, Clanker fee config locked. |
+| 2026-05-28 | S-OWNER-RUNBOOK | Dropped orbit.horse from active plan (commit 84767747). Default Pages URL `orbithousezkp.github.io/orbit/`. Custom-domain section reframed as a future runbook. Added `OWNER_PUNCH_LIST.md` cross-ref. |
 | 2026-05-24 | S-003 | Dashboard hosting locked to GitHub Pages per "github-only" constraint. Vercel references removed. `deploy-dashboard.yml` + `public/CNAME` shipped. |

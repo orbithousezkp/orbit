@@ -98,5 +98,5 @@ That's the deal. No newsletter, no auth flow, no opt-in.
 
 - 5-minute setup recipe: [`PLAN/ADOPTER_QUICKSTART.md`](./ADOPTER_QUICKSTART.md)
 - Architecture deep-dive: [`docs/quickstart.md`](../docs/quickstart.md)
-- Public dashboard reference: [`orbit.horse`](https://orbit.horse)
+- Public dashboard reference: `https://orbithousezkp.github.io/orbit/` (Pages default URL)
 - Verifier CLI: `npx @orbit-house/verifier --help`

@@ -19,7 +19,7 @@ Nine phases plus a horizon. Each phase is gated by concrete deliverables, not da
 **Success criteria for phase exit (S-GATE-1):**
 - 14 consecutive days of cycles with zero broken runs
 - Signed proofs working in every cycle
-- Public dashboard at orbit.horse stable
+- Public dashboard live on GitHub Pages
 - ≥1 daily Farcaster cast for 14 days
 - ≥1 second adopter repo running Orbit
 - Closed-loop demo run successfully once
@@ -34,7 +34,7 @@ Nine phases plus a horizon. Each phase is gated by concrete deliverables, not da
 | S-002 | S-BUILD | Wallet-signed cycle proofs | `src/agent/proofs.js` extension; every receipt signed |
 | S-003 | S-BUILD | Verifier CLI as separate package | `packages/orbit-verifier/` published |
 | S-004 | S-BUILD | Farcaster caster integration | `src/agent/farcaster.js` + tool entry |
-| S-005 | S-BUILD | Public dashboard at orbit.horse | `apps/dashboard/` deployed |
+| S-005 | S-BUILD | Public dashboard live on GitHub Pages | `apps/dashboard/` deployed |
 | S-006 | S-BUILD | Lore foundation + voice guide | `lore/` directory populated |
 | S-007 | S-BUILD | SDK npm publish + `create-orbit-house` scaffolder | Both packages live on npm |
 | S-008 | S-PLAN | Treasury Safe + recipient wallet setup | Addresses recorded in DEPLOY_PLAN.md |
@@ -348,7 +348,7 @@ What NEVER gets killed (at any phase):
 - Treasury Safe (no launch without multisig)
 - Closed-loop demo (the credibility moment)
 - 14-day stable cycles (no launch without proven reliability)
-- Dashboard at orbit.horse (public face)
+- Public dashboard on Pages (public face)
 - The 12 immutable principles in [FOREVER_ROADMAP.md §2](FOREVER_ROADMAP.md#2-immutable-principles-these-never-change)
 
 At Phase 6+ the kill-priority list is rewritten by the quorum of the day. Founder schedule pressure is, by then, no longer a concept.

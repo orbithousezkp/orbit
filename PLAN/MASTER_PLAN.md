@@ -70,7 +70,7 @@ Three things compounding, all must hit:
 In priority order, see `DAY_1.md` and `PHASES.md` for detail:
 
 1. **Wallet-signed cycle proofs** + verifier CLI
-2. **Public dashboard** at `orbit.horse` (cycle counter, latest receipt, treasury, last 10 actions)
+2. **Public dashboard** on GitHub Pages — `https://orbithousezkp.github.io/orbit/` (cycle counter, latest receipt, treasury, last 10 actions)
 3. **Farcaster casting** integration in cycle loop
 4. **Lore directory** + agent voice guide
 5. **`create-orbit-house` scaffolder** + SDK npm publish
@@ -153,7 +153,7 @@ We optimize for the $30M+ ceiling but plan budget around the $3M floor.
 3. **Cycle proofs must be signed before launch.** Without signatures, the receipt story is fragile.
 4. **Cycle cadence must be unbroken for 14 days before launch.** Visible reliability earns trust.
 5. **No on-chain action without approval issue + signed receipt.** No exceptions for "trial runs."
-6. **Domain orbit.horse hosts the public read-only artifact.** Never a wallet UI, never key material.
+6. **GitHub Pages hosts the public read-only artifact.** Never a wallet UI, never key material. (Custom-domain `orbit.horse` deferred — see commit 84767747.)
 
 ## Reading Map
 

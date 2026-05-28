@@ -211,5 +211,5 @@ Before pulling the trigger on the Clanker deploy:
 - [ ] Fee config (1%/1%, 95/5 split, both WETH) confirmed on a screenshot of clanker.world before clicking deploy
 - [ ] Cycle proof signing implemented and live (the launch receipt MUST be signed)
 - [ ] Farcaster cast queued for the deploy moment
-- [ ] Dashboard at orbit.horse showing pre-launch state
+- [ ] Public dashboard live on GitHub Pages showing pre-launch state
 - [ ] 14 consecutive days of stable cycles confirmed before launch day

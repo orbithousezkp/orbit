@@ -36,10 +36,10 @@ Everything below is implementable with what exists today. No new dependencies, n
 
 **Effort:** ~3 hours, owner sets up account
 
-### 4. Public Dashboard at orbit.horse
+### 4. Public Dashboard on GitHub Pages
 
 **What:**
-- New static site (Vite build of existing `src/App.jsx` with simplified read-only mode) at `orbit.horse`
+- New static site (Vite build of existing `src/App.jsx` with simplified read-only mode) at `https://orbithousezkp.github.io/orbit/` (Pages default; custom domain deferred)
 - Shows: cycle counter, latest receipt (signed), treasury Safe balance, last 10 actions, blocked-actions list
 - Deploys from public repo via GitHub Pages (`.github/workflows/deploy-dashboard.yml`)
 - Updates on every push (every cycle)
@@ -149,7 +149,7 @@ Specific runbook:
 | 1. Signed proofs | Implements code | Uses it (writes signed proofs every cycle) |
 | 2. Verifier CLI | Implements + publishes | — |
 | 3. Farcaster caster | Sets up account + secrets | Posts daily after wiring done |
-| 4. Dashboard | Deploys to orbit.horse | — |
+| 4. Dashboard | Deploys to GitHub Pages | — |
 | 5. Lore + voice | Drafts, with agent input | Drafts subsequent cycle notes |
 | 6. SDK + scaffolder | Publishes to npm | — |
 | 7. Treasury Safe | Deploys + funds | — |
@@ -165,7 +165,7 @@ End of Day 1, the repo state shows:
 
 - [ ] At least one signed cycle proof exists
 - [ ] Verifier CLI runs cleanly on that proof
-- [ ] Dashboard live at orbit.horse showing the cycle counter
+- [ ] Dashboard live on GitHub Pages showing the cycle counter
 - [ ] At least one Farcaster cast from Orbit's account
 - [ ] `lore/00-genesis.md` exists
 - [ ] `@orbit-house/sdk` is published to npm

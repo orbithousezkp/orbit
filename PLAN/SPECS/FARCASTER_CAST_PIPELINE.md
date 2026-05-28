@@ -12,7 +12,7 @@ Neynar wraps it: managed signer (UUID stays on our side, key custody is theirs),
 
 Per-protocol limits stay: short cast 0–320 bytes, LONG_CAST 321–1024 bytes, embeds capped at 2, each ≤256 bytes. We always emit short casts; fall back to LONG_CAST only if stats push routine over 320.
 
-Mini Apps (Frames v2) deferred to Phase 2 — requires hosted manifest at `/.well-known/farcaster.json` signed by Orbit's custody address. Plain URL embeds to orbit.horse for launch.
+Mini Apps (Frames v2) deferred to Phase 2 — requires hosted manifest at `/.well-known/farcaster.json` signed by Orbit's custody address. Plain URL embeds to the Pages dashboard URL (`https://orbithousezkp.github.io/orbit/` by default; custom domain optional + deferred) for launch.
 
 Sources: Neynar docs (`docs.neynar.com/reference/publish-cast`, `docs.neynar.com/reference/create-signer`), Farcaster protocol SPECIFICATION.md, Neynar pricing page.
 
@@ -48,7 +48,7 @@ Constants: `NEYNAR_CAST_URL = "https://api.neynar.com/v2/farcaster/cast"`. Heade
 | `refusal` | any step's risk.level ≥ high and refused | `refused: {oneLineSummary}\nwhy: {category}\nlogged: {receiptUrl}` |
 | `routine` (default) | none of above | `cycle #{n} · {triggerLabel}\n\n· {bullet1}\n· {bullet2}\n· {bullet3}\n\n${aiUsd} AI · {refusedCount} refused · {pendingCount} pending\n\nreceipt: {receiptUrl}` |
 
-`receiptUrl = ${config.publicBaseUrl || 'https://orbit.horse'}/receipts/${proof.cycle}`. When `publicBaseUrl` unset, embed #2 is the raw GitHub blob URL.
+`receiptUrl = ${config.publicBaseUrl || 'https://orbithousezkp.github.io/orbit/'}/receipts/${proof.cycle}`. When `publicBaseUrl` unset, embed #2 is the raw GitHub blob URL.
 
 Bullets are deterministic — tool name → phrase mapping (`comment_issue` → "replied to issue #N"; `append_memory` → "logged knowledge: {title}"; `propose_spend` → "proposed spend, gated"). Agent never writes bullet text directly.
 
@@ -97,7 +97,7 @@ Before `publishCast` opens a socket:
 3. `scanTextRisk(text)` from `scam.js` — block if `level === "critical"`.
 4. Byte-length check — `Buffer.byteLength(text) <= 320`. If over, truncate bullets, retry. If still over, allow LONG_CAST only with explicit `kind === "long-required"`.
 5. EVM address check — disallow `0x[a-fA-F0-9]{40}` unless it's `config.treasuryAddress` (which is redacted by sanitizePublicArtifact anyway).
-6. URL allowlist — only `orbit.horse`, `github.com`, `basescan.org`. Anything else dropped from `embeds`.
+6. URL allowlist — only the configured `ORBIT_PUBLIC_URL` host (default `orbithousezkp.github.io`), `github.com`, `basescan.org`. Anything else dropped from `embeds`.
 
 Any failure → `{ok:false, blocked:true, reason}` and reason written into `proof.cast`. Cycle continues.
 
@@ -146,11 +146,11 @@ CI sets `ORBIT_FARCASTER_DRY_RUN=true` and provides no real key. Tests hermetic.
 - [ ] Sign up on `dev.neynar.com`. Create an app. Capture API key (server-side) and Client ID (informational only).
 - [ ] Create an approved signer: SIWN flow or `POST /v2/farcaster/signer` + QR scan in Warpcast as Orbit. Confirm `status: "approved"`. Capture `signer_uuid`.
 - [ ] Add GitHub Actions secrets: `ORBIT_FARCASTER_NEYNAR_API_KEY`, `ORBIT_FARCASTER_SIGNER_UUID`.
-- [ ] Add GitHub Actions vars: `ORBIT_FARCASTER_DRY_RUN=false`, `ORBIT_PUBLIC_URL=https://orbit.horse` (after dashboard ships).
+- [ ] Add GitHub Actions vars: `ORBIT_FARCASTER_DRY_RUN=false`, `ORBIT_PUBLIC_URL=https://orbithousezkp.github.io/orbit/` (or your custom domain, if you reintroduce one — orbit.horse stub was dropped per commit 84767747).
 - [ ] Extend `.github/workflows/orbit-cycle.yml` env block with those three names.
 - [ ] Local `ORBIT_FARCASTER_DRY_RUN=true npm run cycle` and confirm cast text reads in Orbit's voice.
 - [ ] Flip `ORBIT_FARCASTER_DRY_RUN=false`. Let one scheduled cycle land. Verify on Warpcast + receipt link resolves.
-- [ ] Pin Orbit's Farcaster bio: `i live at github.com/{repo}. i wake every 30m. i sign everything. receipts at orbit.horse.`
+- [ ] Pin Orbit's Farcaster bio: `i live at github.com/{repo}. i wake every 30m. i sign everything. receipts at <PAGES_URL>.`
 
 ## Critical files
 

@@ -18,7 +18,7 @@
 |---|---|---|---|
 | 1 | 14 consecutive days of cycles with zero broken runs | NOT-MET (only Actions can produce) | [ ] |
 | 2 | Signed proofs working in every cycle | MET (engineering) | [ ] |
-| 3 | Public dashboard at orbit.horse stable | PARTIAL (workflow ready) | [ ] |
+| 3 | Public dashboard live on GitHub Pages | PARTIAL (workflow ready, awaits `PAGES_ENABLED=true` + Pages source set to Actions) | [ ] |
 | 4 | ≥1 daily Farcaster cast for 14 days | NOT-MET (signer not provisioned) | [ ] |
 | 5 | ≥1 second adopter repo running Orbit | NOT-MET (S-016 outreach) | [ ] |
 | 6 | Closed-loop demo run successfully once | NOT-MET (runbook ready) | [ ] |
@@ -42,15 +42,18 @@ S-GATE-1 must close BEFORE D-018 #4 (12-hour clean cycle stretch) can be marked.
 
 ## Owner Closing Checklist
 
+> **Use `PLAN/OWNER_PUNCH_LIST.md` for the executable, copy-pasteable version of this list with exact commands.**
+> The summary below is for cross-reference only.
+
 Each item links to its runbook. Owner ticks when done; date and proof URL.
 
-- [ ] **Enable GitHub Pages** — runbook: `PLAN/DEPLOY_PLAN.md` "orbit.horse specifics". Done: ____ Proof: ____
-- [ ] **Set `ORBIT_AGENT_SIGNER` repo variable** — runbook: `PLAN/DEPLOY_PLAN.md` env inventory. Done: ____ Proof: ____
-- [ ] **Provision Farcaster signer** — runbook: `PLAN/SPECS/FARCASTER_CAST_PIPELINE.md` §10. Done: ____ Proof: ____
-- [ ] **Deploy Treasury Safe on Base** — runbook: `PLAN/SPECS/TREASURY_SAFE_DEPLOY.md` (8 checks). Done: ____ Safe address: ____ Test tx: ____
-- [ ] **Publish SDK and scaffolder to npm** — `npm publish --access public` from each package dir. Done: ____ Versions: ____
-- [ ] **Configure AI provider** — set `ORBIT_AI_PROVIDERS` + `ORBIT_AI_PROVIDER_KEYS`. Done: ____
-- [ ] **Verify 12-hour clean cycle stretch** — observe Actions cron for 24 consecutive cycles. Record cycle range in `memory/state.json` (`firstCleanCycle`, `lastCleanCycle`) and flip `state.preLaunchVerified = true`. Done: ____ Range: ____ — ____
+- [ ] **Enable GitHub Pages** — runbook: `PLAN/OWNER_PUNCH_LIST.md` §1 + `PLAN/DEPLOY_PLAN.md`. Done: ____ Proof: ____
+- [ ] **Set `ORBIT_AGENT_SIGNER` repo variable** — runbook: `PLAN/OWNER_PUNCH_LIST.md` §2 + `packages/orbit-keygen/`. Done: ____ Proof: ____
+- [ ] **Provision Farcaster signer** — runbook: `PLAN/OWNER_PUNCH_LIST.md` §4 + `PLAN/SPECS/FARCASTER_CAST_PIPELINE.md` §10. Done: ____ Proof: ____
+- [ ] **Deploy Treasury Safe on Base** — runbook: `PLAN/OWNER_PUNCH_LIST.md` §6 + `PLAN/SPECS/TREASURY_SAFE_DEPLOY.md` (8 checks). Done: ____ Safe address: ____ Test tx: ____
+- [ ] **Publish SDK + scaffolder + proof-viewer to npm** — runbook: `PLAN/OWNER_PUNCH_LIST.md` §5. Done: ____ Versions: ____
+- [ ] **Configure AI provider** — runbook: `PLAN/OWNER_PUNCH_LIST.md` §3 + `PLAN/PRIVATE_DRYRUN.md`. Done: ____
+- [ ] **Verify 12-hour clean cycle stretch** — runbook: `PLAN/OWNER_PUNCH_LIST.md` §7. Observe Actions cron for 24 consecutive cycles. Record cycle range in `memory/state.json` (`firstCleanCycle`, `lastCleanCycle`) and flip `state.preLaunchVerified = true` with matching `preLaunchVerifiedHash` (T-2). Done: ____ Range: ____ — ____
 
 ## Escalation
 
