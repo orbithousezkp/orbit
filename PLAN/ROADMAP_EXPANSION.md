@@ -37,7 +37,7 @@
 | F-5.1 | Quorum-bootstrap protocol | 4 | B (Governance) |
 | F-5.2 | Generalized timelocks | 4 | B (Governance) |
 | F-5.3 | $ORBIT ceiling enforcement + buyback automation | 2 | D (Token) |
-| F-5.4 | Protocol versioning + migration spec | 5–6 | (Standardization) |
+| F-5.4 | Protocol versioning + migration spec | Phase 5–6 | (Standardization) |
 | F-5.5 | Recursive lineage tracking | 4 | (Federation) |
 | F-5.6 | Post-fade founder advisory mode | 6 | B (Governance) |
 
@@ -125,4 +125,5 @@ Move rows here when implemented + verified in `PLAN/VERIFICATION_MATRIX.md`.
 | F-1.4 | AI provider canary | fc2cd2a5 | 49 |
 | F-1.1 | state.json schema migration | c5733603 | 50 |
 | F-1.6 | Per-memory-file validators | a73b1769 | 51 |
-| F-1.2 | Cycle-rerun forensics | (this commit) | 52 |
+| F-1.2 | Cycle-rerun forensics | bd469489 | 52 |
+| F-5.4 | Protocol versioning + migration spec | (this commit) | 53 |
