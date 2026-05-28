@@ -35,7 +35,7 @@
 | F-4.5 | Scoped capability delegation | Phase 4 | B (Governance) |
 | F-4.6 | Spec conformance test suite | 5–6 | (Standardization) |
 | F-5.1 | Quorum-bootstrap protocol | 4 | B (Governance) |
-| F-5.2 | Generalized timelocks | 4 | B (Governance) |
+| F-5.2 | Generalized timelocks | Phase 4 | B (Governance) |
 | F-5.3 | $ORBIT ceiling enforcement + buyback automation | 2 | D (Token) |
 | F-5.4 | Protocol versioning + migration spec | Phase 5–6 | (Standardization) |
 | F-5.5 | Recursive lineage tracking | 4 | (Federation) |
@@ -130,4 +130,5 @@ Move rows here when implemented + verified in `PLAN/VERIFICATION_MATRIX.md`.
 | F-4.5 | Scoped capability delegation | 388495c9 | 54 |
 | F-2.5 | Per-tool budget envelope | 6e1b829d | 55 |
 | F-2.3 | Per-provider cost ceiling + auto-failover | 8c607e27 | 56 |
-| F-2.2 | Tiered spend levels | (this commit) | 57 |
+| F-2.2 | Tiered spend levels | fa4c77de | 57 |
+| F-5.2 | Generalized timelocks | (this commit) | 58 |

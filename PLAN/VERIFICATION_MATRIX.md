@@ -12,8 +12,8 @@ Spec: docs/superpowers/specs/2026-05-28-verification-and-roadmap-reorg-design.md
 
 ## Summary
 
-- Total features: 57
-- PASS: 49
+- Total features: 58
+- PASS: 50
 - FAIL: 0 (fixed inline this sprint: 0; filed as roadmap: 0)
 - PARTIAL-DEFERRED: 5 (assigned phases — see PLAN/ROADMAP.md)
 - OWNER-BLOCKED: 3 (owner punch list — see PLAN/SGATE_1.md)
@@ -86,3 +86,4 @@ Spec: docs/superpowers/specs/2026-05-28-verification-and-roadmap-reorg-design.md
 | 55 | Per-tool budget envelope (F-2.5) | ROADMAP_EXPANSION.md F-2.5 | src/agent/tool-budget.js DEFAULT_TOOL_BUDGET + initToolBudgetState + checkToolBudget + consumeToolBudget + remainingToolBudget + resetToolBudget + budgetSnapshot | unit | tests/tool-budget.test.js 18/18 | PASS |
 | 56 | Per-provider cost ceiling + failover (F-2.3) | ROADMAP_EXPANSION.md F-2.3 | src/agent/ai-cost-ceiling.js DEFAULT_PER_PROVIDER_CEILING_USD + initCostLedger + recordProviderCost + checkProviderCeiling + pickFailoverProvider + costSnapshot | unit | tests/ai-cost-ceiling.test.js 19/19 | PASS |
 | 57 | Tiered spend levels (F-2.2) | ROADMAP_EXPANSION.md F-2.2 | src/agent/spend-tiers.js DEFAULT_SPEND_TIERS + classifySpendTier + quorumThresholdForTier + tierSnapshot + describeSpendTier | unit | tests/spend-tiers.test.js 18/18 | PASS |
+| 58 | Generalized timelocks (F-5.2) | ROADMAP_EXPANSION.md F-5.2 | src/agent/timelock.js DEFAULT_TIMELOCK_DURATIONS_MS + proposeTimelock + evaluateTimelock + extendTimelock + rejectTimelock + describeTimelock | unit | tests/timelock.test.js 17/17 | PASS |
