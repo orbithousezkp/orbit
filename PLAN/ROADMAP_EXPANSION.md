@@ -10,7 +10,7 @@
 
 | F-ID | Feature | Existing Phase | Existing Domain |
 |---|---|---|---|
-| F-1.1 | state.json schema migration system | 1 | A (Trust) |
+| F-1.1 | state.json schema migration system | Phase 1 | A (Trust) |
 | F-1.2 | Cycle-rerun forensics | 1 | A (Trust) |
 | F-1.3 | Memory file integrity scanner | Phase 1 | A (Trust) |
 | F-1.4 | AI provider canary | Phase 1 | (operational) |
@@ -122,4 +122,5 @@ Move rows here when implemented + verified in `PLAN/VERIFICATION_MATRIX.md`.
 |---|---|---|---|
 | F-1.5 | Error-log compaction policy | fc5164df | 47 |
 | F-1.3 | Memory file integrity scanner | 3d37cc96 | 48 |
-| F-1.4 | AI provider canary | (this commit) | 49 |
+| F-1.4 | AI provider canary | fc2cd2a5 | 49 |
+| F-1.1 | state.json schema migration | (this commit) | 50 |
