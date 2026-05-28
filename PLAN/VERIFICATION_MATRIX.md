@@ -41,12 +41,12 @@ Spec: docs/superpowers/specs/2026-05-28-verification-and-roadmap-reorg-design.md
 | 18 | Founder-handoff Safe broadcast | S-035 / FOUNDER_HANDOFF | src/agent/handoff-executor.js:35 ADD_OWNER_WITH_THRESHOLD_SELECTOR, :63 build tx data, :88-96 manual broadcast checklist (no auto-broadcast) | static | helper produces tx data + checklist; on-chain broadcast is owner action | PARTIAL-DEFERRED |
 | 19 | SDK public (@orbit-house/sdk) | D-009 | packages/orbit-sdk/index.js:1017 module.exports (create, createOrbitClient, exportBundle, projectForDashboard, projectHandoffSlim, projectSpawnSlim, projectFamilySlim, projectErrorsSlim, FILES) | unit | tests/orbit-sdk*.test.js 25/25 | PASS |
 | 20 | Dashboard build (Pages) | D-007 | dist/dashboard.json (built), dist/index.html, dist/CNAME, .github/workflows/deploy-dashboard.yml | unit | tests/dashboard*.test.js + tests/build*.test.js 26/26 + dashboard.json present | PASS |
-| 21 | HORIZON_SCANNER dryrun mode | Q domain / HORIZON_SCANNER spec |  |  |  |  |
-| 22 | HORIZON_SCANNER classifier LLM | Q domain |  |  |  |  |
-| 23 | Proof-cast in-cycle (Farcaster) | D-008 |  |  |  |  |
-| 24 | Proof-viewer local CLI | Phase 1 / S-003 verifier |  |  |  |  |
-| 25 | Proof-viewer published to npm | Phase 1 / S-003 |  |  |  |  |
-| 26 | Merkle anchor (D-012, D-018 gated) | D-012 |  |  |  |  |
+| 21 | HORIZON_SCANNER dryrun mode | Q domain / HORIZON_SCANNER spec | src/agent/horizon-scanner.js:65 dryRun:true default, :289 dryRun filePath, :326-329 dryRun return, :347 summary; src/cli/orbit-horizon.js CLI; memory/horizon-config.json | unit | tests/horizon*.test.js 37/37 | PASS |
+| 22 | HORIZON_SCANNER classifier LLM | Q domain | src/agent/horizon-scanner.js:61 classifierModel:"haiku", :167-179 default classifier rejects everything (no live LLM call) | static | LLM-backed classifier not wired; default rejects all | PARTIAL-DEFERRED |
+| 23 | Proof-cast in-cycle (Farcaster) | D-008 | src/agent/farcaster.js:10 NEYNAR_CAST_URL, :27 pickTemplate, :60-122 renderers (routine/buyback/refusal/approval/milestone/mistake), :356 summarize, :468 publishCast, :561 cycle integration | unit | tests/farcaster*.test.js 18/18; signer not provisioned (S-GATE-1 punch-list) | OWNER-BLOCKED |
+| 24 | Proof-viewer local CLI | Phase 1 / S-003 verifier | packages/proof-viewer/cli.js (summary/show/recent/stats), packages/proof-viewer/index.js, packages/proof-viewer/viewer.js | probe | `node packages/proof-viewer/cli.js --help` prints usage | PASS |
+| 25 | Proof-viewer published to npm | Phase 1 / S-003 | packages/proof-viewer/package.json | static | `npm view @orbit-house/proof-viewer` returns 404; not published | PARTIAL-DEFERRED |
+| 26 | Merkle anchor (D-012, D-018 gated) | D-012 | src/agent/merkle-anchor.js:14 ledger path, :272 idempotency key, :284-294 enabled+gate+contract guards, :288 preLaunchVerified gate, :318 approval body, :374-386 dryRun default true | unit | tests/merkle*.test.js 16/16 | PASS |
 | 27 | T-2 gate-hash binding | STABILITY_SECURITY.md T-2 |  |  |  |  |
 | 28 | T-3 signed-commit CI check | STABILITY_SECURITY.md T-3 |  |  |  |  |
 | 29 | T-6 AI key rotation advisory | STABILITY_SECURITY.md T-6 |  |  |  |  |
