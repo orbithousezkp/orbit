@@ -291,6 +291,65 @@ function approvalIssueBody(approval) {
   return lines.join("\n");
 }
 
+// T-5 (STABILITY_SECURITY.md): public approval-issue bodies must not leak
+// the sensitive fields of a spend request (Amount; Recipient wallet address;
+// Purpose; URL on external_spend) when posted to a GitHub issue. Approver
+// looks up the full request in memory/approvals.json by ID.
+//
+// Class-label recipients (configured provider names like
+// "configured-ai-credit-provider") and configured purchase URLs for
+// non-external_spend categories stay visible — those are public click
+// targets the approver needs.
+//
+// Risk-flag CATEGORIES surface (they ARE the signal the approver needs);
+// flag MESSAGES stay private (may themselves contain incident detail).
+function approvalIssueBodyPublic(approval) {
+  const request = approval.classification.request;
+  const recipient = String(request.recipient || "");
+  const recipientLooksLikeAddress = /^0x[0-9a-fA-F]{40}$/.test(recipient);
+  const recipientLine = recipientLooksLikeAddress
+    ? "Recipient: `<redacted; see private state>`"
+    : `Recipient: \`${recipient || "none"}\``;
+
+  const isExternalSpend = request.category === "external_spend";
+  const purchaseUrl = typeof request.url === "string" ? request.url.trim() : "";
+
+  const lines = [
+    "Orbit is blocking an external or risky spend request until owner approval is public.",
+    "",
+    `Approval ID: \`${approval.id}\``,
+    `Category: \`${request.category}\``,
+    `Asset: \`${request.asset}\``,
+    "Amount: `<redacted; see private state>`",
+    recipientLine,
+    "Purpose: `<redacted; see private state>`"
+  ];
+  // For non-external_spend categories (e.g. ai_food_refill), the URL is a
+  // public click-target to the configured provider — keep it.
+  if (!isExternalSpend && purchaseUrl) {
+    lines.push(`Purchase URL: ${purchaseUrl}`);
+  }
+  lines.push(
+    "",
+    "Approver must inspect the full request locally in `memory/approvals.json`",
+    "(keyed by Approval ID) before commenting APPROVE or REJECT.",
+    "",
+    "Risk-flag categories:",
+    approval.classification.risk.flags.length
+      ? approval.classification.risk.flags.map((flag) => `- ${flag.category}`).join("\n")
+      : "- none",
+    "",
+    "To approve, the configured owner must add this exact standalone comment:",
+    "",
+    `\`APPROVE ORBIT-SPEND ${approval.id}\``,
+    "",
+    "To reject, the configured owner must add this exact standalone comment:",
+    "",
+    `\`REJECT ORBIT-SPEND ${approval.id}\``
+  );
+  return lines.join("\n");
+}
+
 async function requestOwnerApproval(config, github, rawRequest = {}) {
   const classification = classifySpend(config, rawRequest);
   if (!classification.requiresOwnerApproval) {
@@ -342,7 +401,7 @@ async function requestOwnerApproval(config, github, rawRequest = {}) {
   if (!approval.issueNumber && github) {
     const issue = await github.createIssue({
       title: `[orbit approval] external spend ${id}`,
-      body: approvalIssueBody(approval),
+      body: approvalIssueBodyPublic(approval),
       labels: [config.approvalIssueLabel, "orbit:external-spend"].filter(Boolean)
     });
     approval = upsertApproval(config.repoRoot, {
@@ -757,6 +816,8 @@ module.exports = {
   GOVERNANCE_PATH,
   PRE_LAUNCH_MAX_AGE_MS,
   actionTier,
+  approvalIssueBody,
+  approvalIssueBodyPublic,
   assertPreLaunchHashIntegrity,
   assertPreLaunchNotExpired,
   assertTreasuryFloor,

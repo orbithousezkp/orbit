@@ -13,9 +13,9 @@ Spec: docs/superpowers/specs/2026-05-28-verification-and-roadmap-reorg-design.md
 ## Summary
 
 - Total features: 46
-- PASS: 37
+- PASS: 38
 - FAIL: 0 (fixed inline this sprint: 0; filed as roadmap: 0)
-- PARTIAL-DEFERRED: 6 (assigned phases — see PLAN/ROADMAP.md)
+- PARTIAL-DEFERRED: 5 (assigned phases — see PLAN/ROADMAP.md)
 - OWNER-BLOCKED: 3 (owner punch list — see PLAN/SGATE_1.md)
 
 ## Method legend
@@ -33,7 +33,7 @@ Spec: docs/superpowers/specs/2026-05-28-verification-and-roadmap-reorg-design.md
 | 2 | Treasury 95/5 split (D-017) | DECISIONS.md D-017 | src/agent/config.js:290, src/agent/clanker.js:136-138 (rewardSplit), src/agent/treasury.js:53-54,335-336 | unit | tests/treasury-sweep.test.js 38/38 + tests/treasury.test.js | PASS |
 | 3 | Founder-handoff timelock | identity.md / S-035 / FOUNDER_HANDOFF | src/agent/handoff.js:33-34 (7d + 7d extension), :93 assertCanPropose, :313 timelockEndsAt | unit | tests/handoff.test.js + tests/handoff-executor.test.js 36/36 | PASS |
 | 4 | Quorum-CI parseQuorumComments | S-029/S-030 | src/agent/governance.js:415 actionTier, :428 parseQuorumComments, :494 evaluateQuorum | unit | tests/quorum*.test.js + tests/governance*.test.js 64/64 | PASS |
-| 5 | T-5 spend approval gates (id-only public, recipient private) | STABILITY_SECURITY.md T-5 | src/agent/governance.js:167-198 approvalIssueBody, :177 still emits Recipient publicly | static | recipient still in issue body line 177; T-5 fix not implemented | PARTIAL-DEFERRED |
+| 5 | T-5 spend approval gates (id-only public, recipient private) | STABILITY_SECURITY.md T-5 | src/agent/governance.js approvalIssueBodyPublic() redacts Amount + wallet-address Recipient + Purpose + (external_spend) URL; requestOwnerApproval posts the redacted variant | unit | tests/governance-t5-issue-redaction.test.js 8/8 | PASS |
 | 6 | Cycle retry-backoff | STABILITY_SECURITY.md / cycle reliability | src/agent/cycle-backoff.js:35 computeBackoffMs (2^n cap), :61 record, :75 clear | unit | tests/cycle-backoff*.test.js 14/14 | PASS |
 | 7 | Error-log persistent JSONL | observability | src/agent/error-log.js:31 MAX_LINES=5000, :32 TRIM_TO=4000, :41 redact, :73 rotateIfNeeded | unit | tests/error-log*.test.js 8/8 | PASS |
 | 8 | Atomic writes (safety.js) | safety / state-tamper defense | src/agent/safety.js:143 atomicWriteFile (writes tmp + fsync + rename), 24 callers under src/agent | unit | tests/safety*.test.js + 24 callsites use the helper | PASS |
