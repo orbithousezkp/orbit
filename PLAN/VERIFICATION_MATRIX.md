@@ -10,6 +10,14 @@ Spec: docs/superpowers/specs/2026-05-28-verification-and-roadmap-reorg-design.md
 - `PARTIAL-DEFERRED` — by-design incomplete; assigned to roadmap phase
 - `OWNER-BLOCKED` — code ready, awaits owner secret/wallet/action
 
+## Summary
+
+- Total features: 46
+- PASS: 33
+- FAIL: 0 (fixed inline this sprint: 0; filed as roadmap: 0)
+- PARTIAL-DEFERRED: 10 (assigned phases — see PLAN/ROADMAP.md)
+- OWNER-BLOCKED: 3 (owner punch list — see PLAN/SGATE_1.md)
+
 ## Method legend
 
 - `unit` — existing unit test in `tests/`
@@ -53,3 +61,17 @@ Spec: docs/superpowers/specs/2026-05-28-verification-and-roadmap-reorg-design.md
 | 30 | T-7 30-day expiry on preLaunchVerified | STABILITY_SECURITY.md T-7 | src/agent/governance.js — no preLaunchVerifiedAt/expiryDays/30-day references | static | T-7 not implemented | PARTIAL-DEFERRED |
 | 31 | deploy-dashboard Pages guard (PAGES_ENABLED) | recent fix Patch Set AK | .github/workflows/deploy-dashboard.yml:29-33,69 (workflow_dispatch only fires when vars.PAGES_ENABLED == 'true'), :78 actions/deploy-pages@v5 | static | guard explicit in workflow | PASS |
 | 32 | .env.example.tpl shipped (scaffolder) | recent fix Patch Set AK | packages/create-orbit-house/templates/.env.example.tpl (43 lines, all placeholder env vars listed) + .gitignore:5 `!.env.example.tpl` allowlist; packages/create-orbit-house/package.json `files: ["templates/"]` packages the file | static | file present on disk + allowlist in place + npm `files` includes templates/ | PASS |
+| 33 | Wallet-signed cycle proofs (D-006) | DECISIONS.md D-006 / ROADMAP.md A | src/agent/proof-signing.js:69 signProof, :88-90 isSigned guard; src/agent/proof-canonical.js:6 SIGNATURE_ENVELOPE_KEYS | unit | tests/proof-signing.test.js 14/14 | PASS |
+| 34 | Standalone verifier CLI (S-003) | PHASES.md S-003 / ROADMAP.md A | packages/orbit-verifier/cli.js, packages/orbit-verifier/canonical.js, packages/orbit-verifier/index.js | unit | tests/orbit-verifier.test.js 10/10 | PASS |
+| 35 | Adopter registry + handshake | ROADMAP.md K / adopter sovereignty | src/agent/adopters.js:38 buildEmptyRegistry, :58 parseHandshakeIssue, :74 validateHandshake, :104 rateLimit, :135 processHandshakes; memory/adopters-registry.json | unit | tests/adopter*.test.js 21/21 | PASS |
+| 36 | Scam scanner (issue-scam-scanner) | ROADMAP.md F | src/agent/scam.js:48 extractUrls, :60 scanUrl, :79 riskLevel, :87 scanTextRisk, :126 scanSpendIntent; packages/issue-scam-scanner/ | unit | tests/issue-scam-scanner.test.js 31/31 | PASS |
+| 37 | Autonomous spawn (D-AD) | Patch Set AD | src/agent/spawn.js, src/agent/spawn-executor.js, src/cli/orbit-spawn.js | unit | tests/spawn*.test.js 26/26 | PASS |
+| 38 | npm run health (preflight) | PHASES.md S-GATE-1 #1 / D-018 #1 | src/cli/health.js (required vs optional ledger files); src/cli/orbit-preflight.js; src/cli/orbit-healthcheck.js | unit | tests/health*.test.js 4/4 | PASS |
+| 39 | Well-known passport + .well-known/orbit.json | ROADMAP.md I / federation | src/agent/well-known.js | unit | tests/well-known*.test.js 8/8 | PASS |
+| 40 | Mission board | ROADMAP.md I / Phase 3 (S-MB) | src/agent/missions.js; memory/missions.json | unit | tests/missions*.test.js 16/16 | PASS |
+| 41 | Bus-factor (founder-fade metric) | identity.md / Phase 5 founder-fade | src/agent/bus-factor.js + src/agent/bus-factor-data.js | unit | tests/bus-factor*.test.js 34/34 | PASS |
+| 42 | Launch validator (pre-deploy gate) | CLANKER_FEE_STRATEGY.md / D-018 #8 | src/agent/launch-validator.js; src/cli/orbit-launch-validate.js | unit | tests/launch-validator*.test.js 34/34 | PASS |
+| 43 | Keygen package (signer key provisioning) | DEPLOY_PLAN.md / S-008 | packages/orbit-keygen/bin.js, packages/orbit-keygen/src/ | unit | tests/keygen.test.js 45/45 | PASS |
+| 44 | MCP server (SDK MCP bridge) | PHASES.md S-031/S-032 / Phase 4 | packages/orbit-mcp-server/bin.js, packages/orbit-mcp-server/src/ | unit | tests/mcp-server.test.js 17/17 | PASS |
+| 45 | Vanity Safe address tool | PLAN/SPECS/TREASURY_KEYS_BACKUP / D-019 | packages/orbit-vanity-safe/ | unit | tests/vanity-safe.test.js 34/34 | PASS |
+| 46 | Plugin loader (@orbit/tool-*) | ROADMAP.md J / Phase 3 | src/agent/plugin-loader.js; packages/orbit-tool-example/ | static | code in place; full plugin economy is Phase 3 | PARTIAL-DEFERRED |
