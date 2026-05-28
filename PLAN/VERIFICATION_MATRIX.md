@@ -47,9 +47,9 @@ Spec: docs/superpowers/specs/2026-05-28-verification-and-roadmap-reorg-design.md
 | 24 | Proof-viewer local CLI | Phase 1 / S-003 verifier | packages/proof-viewer/cli.js (summary/show/recent/stats), packages/proof-viewer/index.js, packages/proof-viewer/viewer.js | probe | `node packages/proof-viewer/cli.js --help` prints usage | PASS |
 | 25 | Proof-viewer published to npm | Phase 1 / S-003 | packages/proof-viewer/package.json | static | `npm view @orbit-house/proof-viewer` returns 404; not published | PARTIAL-DEFERRED |
 | 26 | Merkle anchor (D-012, D-018 gated) | D-012 | src/agent/merkle-anchor.js:14 ledger path, :272 idempotency key, :284-294 enabled+gate+contract guards, :288 preLaunchVerified gate, :318 approval body, :374-386 dryRun default true | unit | tests/merkle*.test.js 16/16 | PASS |
-| 27 | T-2 gate-hash binding | STABILITY_SECURITY.md T-2 |  |  |  |  |
-| 28 | T-3 signed-commit CI check | STABILITY_SECURITY.md T-3 |  |  |  |  |
-| 29 | T-6 AI key rotation advisory | STABILITY_SECURITY.md T-6 |  |  |  |  |
-| 30 | T-7 30-day expiry on preLaunchVerified | STABILITY_SECURITY.md T-7 |  |  |  |  |
-| 31 | deploy-dashboard Pages guard | recent fix Patch Set AK |  |  |  |  |
-| 32 | .env.example.tpl shipped (scaffolder) | recent fix Patch Set AK |  |  |  |  |
+| 27 | T-2 gate-hash binding | STABILITY_SECURITY.md T-2 | src/agent/governance.js — no gateHash/hashCriteria/D018_CRITERIA_HASH references | static | T-2 not yet implemented; sticky-flag exploit unfixed | PARTIAL-DEFERRED |
+| 28 | T-3 signed-commit CI check | STABILITY_SECURITY.md T-3 | .github/workflows/signed-commit-check.yml:8-9,77,124-128 (ADVISORY when ORBIT_SIGN_ENFORCE!=true); .github/CODEOWNERS | static | advisory mode shipped; ENFORCE requires owner-set ORBIT_SIGN_ENFORCE=true + GPG signer | OWNER-BLOCKED |
+| 29 | T-6 AI key rotation advisory | STABILITY_SECURITY.md T-6 | src/agent/inference.js, src/agent/run.js, memory/state.json — no aiKeyRotation references | static | T-6 not implemented | PARTIAL-DEFERRED |
+| 30 | T-7 30-day expiry on preLaunchVerified | STABILITY_SECURITY.md T-7 | src/agent/governance.js — no preLaunchVerifiedAt/expiryDays/30-day references | static | T-7 not implemented | PARTIAL-DEFERRED |
+| 31 | deploy-dashboard Pages guard (PAGES_ENABLED) | recent fix Patch Set AK | .github/workflows/deploy-dashboard.yml:29-33,69 (workflow_dispatch only fires when vars.PAGES_ENABLED == 'true'), :78 actions/deploy-pages@v5 | static | guard explicit in workflow | PASS |
+| 32 | .env.example.tpl shipped (scaffolder) | recent fix Patch Set AK | packages/create-orbit-house/templates/.env.example.tpl (43 lines, all placeholder env vars listed) + .gitignore:5 `!.env.example.tpl` allowlist; packages/create-orbit-house/package.json `files: ["templates/"]` packages the file | static | file present on disk + allowlist in place + npm `files` includes templates/ | PASS |
