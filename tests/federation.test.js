@@ -254,6 +254,25 @@ test("isFederationEnabled returns ok when env flag and state both green", () => 
   }
 });
 
+test("T-1: isFederationEnabled returns false when treasury balance is below floor", () => {
+  const prev = process.env.ORBIT_ENABLE_FEDERATION;
+  process.env.ORBIT_ENABLE_FEDERATION = "true";
+  try {
+    const r = isFederationEnabled({}, {
+      preLaunchVerified: true,
+      treasury: {
+        floorWei: "1000000000000000000",
+        balanceEstimateWei: "500000000000000000"
+      }
+    });
+    assert.equal(r.ok, false);
+    assert.match(r.reason, /treasury_floor/);
+  } finally {
+    if (prev === undefined) delete process.env.ORBIT_ENABLE_FEDERATION;
+    else process.env.ORBIT_ENABLE_FEDERATION = prev;
+  }
+});
+
 test("inbox ledger round-trips and dedupes by nonce", async () => {
   const root = tmpRepoRoot();
   try {

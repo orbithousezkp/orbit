@@ -349,6 +349,26 @@ test("proposeAnchor returns blocked when not enabled", async () => {
 
 // --- executeAnchor -------------------------------------------------------
 
+test("T-1: executeAnchor refuses when state-coherence check breaches treasury floor", async () => {
+  const repoRoot = tempRepo();
+  const config = baseConfig(repoRoot);
+  // Treasury state already below floor — coherence check (amount=0) must fail.
+  const breachedState = readyState({
+    treasury: {
+      floorWei: "1000000000000000000",      // 1 ETH floor
+      balanceEstimateWei: "500000000000000000" // est: 0.5 ETH — below floor before any spend
+    }
+  });
+  const result = await executeAnchor(config, {
+    state: breachedState,
+    github: fakeGithub()
+  }, { proposalIssueNumber: 999 });
+  assert.equal(result.ok, false);
+  assert.equal(result.blocked, true);
+  assert.equal(result.status, "blocked_treasury_floor");
+  assert.match(result.reason, /treasury_floor/);
+});
+
 test("executeAnchor in dry-run with full approval returns synthetic txHash and no network call", async () => {
   const repoRoot = tempRepo();
   const config = baseConfig(repoRoot);

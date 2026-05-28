@@ -530,6 +530,28 @@ async function executeAnchor(config, context, params = {}) {
     };
   }
 
+  // T-1: treasury-floor state-coherence guard. amountWei=0 checks current
+  // balance vs floor before the anchor tx draws gas. Belt-and-braces with D-018.
+  const { assertTreasuryFloor } = require("./governance");
+  const floorDecision = assertTreasuryFloor({
+    state,
+    config,
+    amountWei: "0",
+    actionType: "merkle_anchor",
+    actionLabel: "merkle anchor submission"
+  });
+  if (!floorDecision.ok) {
+    return {
+      ok: false,
+      blocked: true,
+      reason: floorDecision.reason,
+      detail: floorDecision.detail,
+      status: "blocked_treasury_floor",
+      treasuryFloor: floorDecision,
+      dryRun: Boolean(config.anchor && config.anchor.dryRun !== false)
+    };
+  }
+
   const anchor = config.anchor || {};
   const dryRun = anchor.dryRun !== false; // default true
 

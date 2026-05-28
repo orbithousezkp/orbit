@@ -387,6 +387,20 @@ function isFederationEnabled(config = {}, state = {}) {
   if (state.preLaunchVerified !== true) {
     return { ok: false, reason: "pre_launch_not_verified" };
   }
+  // T-1: treasury-floor state-coherence guard. amountWei=0 confirms current
+  // balance is not already below floor before federation runs (some message
+  // paths may eventually carry on-chain side effects).
+  const { assertTreasuryFloor } = require("./governance");
+  const floorDecision = assertTreasuryFloor({
+    state,
+    config,
+    amountWei: "0",
+    actionType: "federation",
+    actionLabel: "federation enable"
+  });
+  if (!floorDecision.ok) {
+    return { ok: false, reason: floorDecision.reason, detail: floorDecision.detail };
+  }
   return { ok: true };
 }
 

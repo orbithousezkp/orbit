@@ -13,9 +13,9 @@ Spec: docs/superpowers/specs/2026-05-28-verification-and-roadmap-reorg-design.md
 ## Summary
 
 - Total features: 46
-- PASS: 33
+- PASS: 34
 - FAIL: 0 (fixed inline this sprint: 0; filed as roadmap: 0)
-- PARTIAL-DEFERRED: 10 (assigned phases — see PLAN/ROADMAP.md)
+- PARTIAL-DEFERRED: 9 (assigned phases — see PLAN/ROADMAP.md)
 - OWNER-BLOCKED: 3 (owner punch list — see PLAN/SGATE_1.md)
 
 ## Method legend
@@ -38,7 +38,7 @@ Spec: docs/superpowers/specs/2026-05-28-verification-and-roadmap-reorg-design.md
 | 7 | Error-log persistent JSONL | observability | src/agent/error-log.js:31 MAX_LINES=5000, :32 TRIM_TO=4000, :41 redact, :73 rotateIfNeeded | unit | tests/error-log*.test.js 8/8 | PASS |
 | 8 | Atomic writes (safety.js) | safety / state-tamper defense | src/agent/safety.js:143 atomicWriteFile (writes tmp + fsync + rename), 24 callers under src/agent | unit | tests/safety*.test.js + 24 callsites use the helper | PASS |
 | 9 | Cron skip-guard | STABILITY_SECURITY.md §1 | src/agent/skip-guard.js:14 sign, :21 verify, :43 drawNextTarget (30-90min), :48 evaluateSkip; src/agent/run.js:361 calls evaluateSkip | unit | tests/skip-guard*.test.js 11/11 | PASS |
-| 10 | T-1 WETH floor | STABILITY_SECURITY.md T-1 | src/agent/governance.js:591 assertTreasuryFloor; callers: src/agent/clanker.js:376, src/agent/buyback.js:871 ONLY (not in merkle-anchor or federation) | unit | tests/treasury-floor*.test.js 12/12 PASS, but missing 2 of 4 spec'd callers | PARTIAL-DEFERRED |
+| 10 | T-1 WETH floor | STABILITY_SECURITY.md T-1 | src/agent/governance.js:591 assertTreasuryFloor; callers: clanker.js:376, buyback.js:871, merkle-anchor.js executeAnchor, federation.js isFederationEnabled | unit | tests/treasury-floor.test.js + merkle-anchor.test.js (T-1 row) + federation.test.js (T-1 row) | PASS |
 | 11 | T-8 performance-based AI routing | STABILITY_SECURITY.md §2 T-8 | src/agent/ai-routing.js:53 orderProviders, :74 recordSuccess, :101 recordFailure, :108-109 demote on 3 failures | unit | tests/ai-routing*.test.js 34/34 | PASS |
 | 12 | Provider-neutral inference | feedback_performance_based_ai_routing | src/agent/inference.js:209-217 providers list, :279 chatPath per-provider, :289 fetch chat completions; src/agent/config.js:122 ORBIT_AI_PROVIDERS parse | unit | tests/inference*.test.js + tests/ai-routing*.test.js | PASS |
 | 13 | MiMo / OpenGateway wiring (D-018 #3) | D-018 #3 | gh variable list: no ORBIT_AI_* set; gh secret list: no ORBIT_AI_* set | static | code path exists (provider-neutral) but owner has not provisioned secret | OWNER-BLOCKED |
