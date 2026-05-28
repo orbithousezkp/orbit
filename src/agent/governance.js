@@ -78,6 +78,58 @@ function stableFingerprint(value) {
   return crypto.createHash("sha256").update(normalized).digest("hex").slice(0, 16);
 }
 
+// T-2: canonical 8-item D-018 criteria. The hash of this list is bound to
+// state.preLaunchVerifiedHash. Any drift (criteria reorder, edit, add, remove)
+// changes the hash, which invalidates a previously-verified state. Prevents
+// the "sticky flag" exploit where preLaunchVerified stays true after the bar
+// for verification has moved.
+//
+// To add a criterion: append to the end (keeps existing hash stable longer)
+// and require owner to re-verify post-change.
+const D018_CRITERIA = Object.freeze([
+  { id: 1, label: "health 0 FAIL, 0 OPEN BLOCKERS" },
+  { id: 2, label: "tests 0 fail" },
+  { id: 3, label: "AI provider configured" },
+  { id: 4, label: "12-hour clean Actions stretch" },
+  { id: 5, label: "Signed proofs verifiable via npx @orbit-house/verifier" },
+  { id: 6, label: "Dashboard reachable" },
+  { id: 7, label: "Treasury Safe live" },
+  { id: 8, label: "Pre-deploy checklist complete" }
+]);
+
+function d018CriteriaHash() {
+  return stableFingerprint(D018_CRITERIA);
+}
+
+function assertPreLaunchHashIntegrity(state = {}) {
+  const expectedHash = d018CriteriaHash();
+  if (state.preLaunchVerified !== true) {
+    return { ok: true, reason: "pre_launch_not_verified", expectedHash, currentHash: null };
+  }
+  const currentHash = typeof state.preLaunchVerifiedHash === "string"
+    ? state.preLaunchVerifiedHash
+    : null;
+  if (currentHash === null) {
+    return {
+      ok: false,
+      reason: "pre_launch_hash_missing",
+      detail: "state.preLaunchVerified is true but state.preLaunchVerifiedHash is unset",
+      expectedHash,
+      currentHash: null
+    };
+  }
+  if (currentHash !== expectedHash) {
+    return {
+      ok: false,
+      reason: "pre_launch_hash_drift",
+      detail: `D-018 criteria changed since verification (was ${currentHash}, now ${expectedHash})`,
+      expectedHash,
+      currentHash
+    };
+  }
+  return { ok: true, reason: "verified", expectedHash, currentHash };
+}
+
 function stableValue(value) {
   if (Array.isArray(value)) return value.map(stableValue);
   if (value && typeof value === "object") {
@@ -660,11 +712,14 @@ function assertTreasuryFloor({ state, config, amountWei, actionType, actionLabel
 module.exports = {
   ACTION_TIER_MAP,
   APPROVALS_PATH,
+  D018_CRITERIA,
   GOVERNANCE_PATH,
   actionTier,
+  assertPreLaunchHashIntegrity,
   assertTreasuryFloor,
   checkOwnerApproval,
   classifySpend,
+  d018CriteriaHash,
   evaluateQuorum,
   governanceStatus,
   guardSpend,
