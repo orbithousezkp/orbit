@@ -15,7 +15,7 @@
 | F-1.3 | Memory file integrity scanner | Phase 1 | A (Trust) |
 | F-1.4 | AI provider canary | Phase 1 | (operational) |
 | F-1.5 | Error-log compaction policy | Phase 1 | (operational) |
-| F-1.6 | Per-memory-file validators | 1 | A (Trust) |
+| F-1.6 | Per-memory-file validators | Phase 1 | A (Trust) |
 | F-2.1 | Safe multi-sig wallet integration | 1–2 | C (Treasury) |
 | F-2.2 | Tiered spend levels | 2 | B (Governance) |
 | F-2.3 | Per-provider cost ceiling + auto-failover | 2 | (operational) |
@@ -123,4 +123,5 @@ Move rows here when implemented + verified in `PLAN/VERIFICATION_MATRIX.md`.
 | F-1.5 | Error-log compaction policy | fc5164df | 47 |
 | F-1.3 | Memory file integrity scanner | 3d37cc96 | 48 |
 | F-1.4 | AI provider canary | fc2cd2a5 | 49 |
-| F-1.1 | state.json schema migration | (this commit) | 50 |
+| F-1.1 | state.json schema migration | c5733603 | 50 |
+| F-1.6 | Per-memory-file validators | (this commit) | 51 |
