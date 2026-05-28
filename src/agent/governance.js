@@ -130,6 +130,47 @@ function assertPreLaunchHashIntegrity(state = {}) {
   return { ok: true, reason: "verified", expectedHash, currentHash };
 }
 
+// T-7: time-based expiry on state.preLaunchVerified. 30-day max age forces
+// owner re-verification even if D-018 criteria haven't drifted (T-2). Catches
+// stale verifications where the environment (deps, infra, market) moved but
+// the criteria definition did not.
+const PRE_LAUNCH_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
+
+function assertPreLaunchNotExpired(state = {}, now = new Date()) {
+  if (state.preLaunchVerified !== true) {
+    return { ok: true, reason: "pre_launch_not_verified" };
+  }
+  const verifiedAtRaw = state.preLaunchVerifiedAt;
+  if (!verifiedAtRaw || typeof verifiedAtRaw !== "string") {
+    return {
+      ok: false,
+      reason: "pre_launch_age_unknown",
+      detail: "state.preLaunchVerified is true but state.preLaunchVerifiedAt is unset"
+    };
+  }
+  const verifiedAtMs = Date.parse(verifiedAtRaw);
+  if (Number.isNaN(verifiedAtMs)) {
+    return {
+      ok: false,
+      reason: "pre_launch_age_unknown",
+      detail: `state.preLaunchVerifiedAt is not a valid ISO date: ${verifiedAtRaw}`
+    };
+  }
+  const nowMs = now instanceof Date ? now.getTime() : Number(now);
+  const ageMs = nowMs - verifiedAtMs;
+  if (ageMs > PRE_LAUNCH_MAX_AGE_MS) {
+    return {
+      ok: false,
+      reason: "pre_launch_expired",
+      detail: `verification is ${Math.round(ageMs / (24 * 60 * 60 * 1000))} days old (max 30)`,
+      ageMs,
+      maxAgeMs: PRE_LAUNCH_MAX_AGE_MS,
+      verifiedAt: verifiedAtRaw
+    };
+  }
+  return { ok: true, reason: "verified", ageMs, maxAgeMs: PRE_LAUNCH_MAX_AGE_MS };
+}
+
 function stableValue(value) {
   if (Array.isArray(value)) return value.map(stableValue);
   if (value && typeof value === "object") {
@@ -714,8 +755,10 @@ module.exports = {
   APPROVALS_PATH,
   D018_CRITERIA,
   GOVERNANCE_PATH,
+  PRE_LAUNCH_MAX_AGE_MS,
   actionTier,
   assertPreLaunchHashIntegrity,
+  assertPreLaunchNotExpired,
   assertTreasuryFloor,
   checkOwnerApproval,
   classifySpend,
