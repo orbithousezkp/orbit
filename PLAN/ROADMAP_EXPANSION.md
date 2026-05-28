@@ -17,7 +17,7 @@
 | F-1.5 | Error-log compaction policy | Phase 1 | (operational) |
 | F-1.6 | Per-memory-file validators | Phase 1 | A (Trust) |
 | F-2.1 | Safe multi-sig wallet integration | 1–2 | C (Treasury) |
-| F-2.2 | Tiered spend levels | 2 | B (Governance) |
+| F-2.2 | Tiered spend levels | Phase 2 | B (Governance) |
 | F-2.3 | Per-provider cost ceiling + auto-failover | Phase 2 | (operational) |
 | F-2.4 | Farcaster reply → governance ingestion | 2 | B (Governance) |
 | F-2.5 | Per-tool budget envelope | Phase 2 | B (Governance) |
@@ -129,4 +129,5 @@ Move rows here when implemented + verified in `PLAN/VERIFICATION_MATRIX.md`.
 | F-5.4 | Protocol versioning + migration spec | 2665d9d5 | 53 |
 | F-4.5 | Scoped capability delegation | 388495c9 | 54 |
 | F-2.5 | Per-tool budget envelope | 6e1b829d | 55 |
-| F-2.3 | Per-provider cost ceiling + auto-failover | (this commit) | 56 |
+| F-2.3 | Per-provider cost ceiling + auto-failover | 8c607e27 | 56 |
+| F-2.2 | Tiered spend levels | (this commit) | 57 |
