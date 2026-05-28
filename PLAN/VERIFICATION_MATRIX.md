@@ -36,11 +36,11 @@ Spec: docs/superpowers/specs/2026-05-28-verification-and-roadmap-reorg-design.md
 | 13 | MiMo / OpenGateway wiring (D-018 #3) | D-018 #3 | gh variable list: no ORBIT_AI_* set; gh secret list: no ORBIT_AI_* set | static | code path exists (provider-neutral) but owner has not provisioned secret | OWNER-BLOCKED |
 | 14 | Env budget reconcile | recent fix Patch Set (treasury) | src/agent/treasury.js:28-29 init from config, :107-110 reconcile on load, :269-273 remaining computation | unit | tests/treasury*.test.js + tests/ai-food*.test.js 104/104 | PASS |
 | 15 | T-4 fetchUrl/webSearch envelope | STABILITY_SECURITY.md T-4 | src/agent/web.js:182-184 UNTRUSTED tags, :190 wrap, :240 trustLevel, :250 provenance; provenance-tagged spend escalation NOT wired in governance.js | static | envelope + URL risk in place; spend escalation half missing | PARTIAL-DEFERRED |
-| 16 | Federation handshake | S-021/S-022 / federation.md |  |  |  |  |
-| 17 | Repo-spawning (create-orbit-house) | D-009 / S-007 / D-020 |  |  |  |  |
-| 18 | Founder-handoff Safe broadcast | S-035 / FOUNDER_HANDOFF |  |  |  |  |
-| 19 | SDK public (@orbit-house/sdk) | D-009 |  |  |  |  |
-| 20 | Dashboard build (Pages) | D-007 |  |  |  |  |
+| 16 | Federation handshake | S-021/S-022 / federation.md | src/agent/federation.js:29 MESSAGE_TYPES (HELLO,INTEL_SHARE,CAPABILITY_ADVERTISE), :387 preLaunchVerified gate, :399-400 required fields | unit | tests/federation*.test.js 31/31 | PASS |
+| 17 | Repo-spawning (create-orbit-house) | D-009 / S-007 / D-020 | packages/create-orbit-house/bin.js, packages/create-orbit-house/src/, packages/create-orbit-house/templates/ | unit | tests/create-orbit-house*.test.js + tests/spawn*.test.js 72/72 | PASS |
+| 18 | Founder-handoff Safe broadcast | S-035 / FOUNDER_HANDOFF | src/agent/handoff-executor.js:35 ADD_OWNER_WITH_THRESHOLD_SELECTOR, :63 build tx data, :88-96 manual broadcast checklist (no auto-broadcast) | static | helper produces tx data + checklist; on-chain broadcast is owner action | PARTIAL-DEFERRED |
+| 19 | SDK public (@orbit-house/sdk) | D-009 | packages/orbit-sdk/index.js:1017 module.exports (create, createOrbitClient, exportBundle, projectForDashboard, projectHandoffSlim, projectSpawnSlim, projectFamilySlim, projectErrorsSlim, FILES) | unit | tests/orbit-sdk*.test.js 25/25 | PASS |
+| 20 | Dashboard build (Pages) | D-007 | dist/dashboard.json (built), dist/index.html, dist/CNAME, .github/workflows/deploy-dashboard.yml | unit | tests/dashboard*.test.js + tests/build*.test.js 26/26 + dashboard.json present | PASS |
 | 21 | HORIZON_SCANNER dryrun mode | Q domain / HORIZON_SCANNER spec |  |  |  |  |
 | 22 | HORIZON_SCANNER classifier LLM | Q domain |  |  |  |  |
 | 23 | Proof-cast in-cycle (Farcaster) | D-008 |  |  |  |  |
