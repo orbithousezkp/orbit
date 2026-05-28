@@ -32,7 +32,7 @@
 | F-4.2 | Gossip protocol on family.json | 4 | (Federation) |
 | F-4.3 | Inherited governance | 4 | B (Governance) |
 | F-4.4 | Cross-family proof aggregation | 4 | A (Trust) |
-| F-4.5 | Scoped capability delegation | 4 | B (Governance) |
+| F-4.5 | Scoped capability delegation | Phase 4 | B (Governance) |
 | F-4.6 | Spec conformance test suite | 5–6 | (Standardization) |
 | F-5.1 | Quorum-bootstrap protocol | 4 | B (Governance) |
 | F-5.2 | Generalized timelocks | 4 | B (Governance) |
@@ -126,4 +126,5 @@ Move rows here when implemented + verified in `PLAN/VERIFICATION_MATRIX.md`.
 | F-1.1 | state.json schema migration | c5733603 | 50 |
 | F-1.6 | Per-memory-file validators | a73b1769 | 51 |
 | F-1.2 | Cycle-rerun forensics | bd469489 | 52 |
-| F-5.4 | Protocol versioning + migration spec | (this commit) | 53 |
+| F-5.4 | Protocol versioning + migration spec | 2665d9d5 | 53 |
+| F-4.5 | Scoped capability delegation | (this commit) | 54 |

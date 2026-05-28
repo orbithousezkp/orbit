@@ -12,8 +12,8 @@ Spec: docs/superpowers/specs/2026-05-28-verification-and-roadmap-reorg-design.md
 
 ## Summary
 
-- Total features: 53
-- PASS: 45
+- Total features: 54
+- PASS: 46
 - FAIL: 0 (fixed inline this sprint: 0; filed as roadmap: 0)
 - PARTIAL-DEFERRED: 5 (assigned phases — see PLAN/ROADMAP.md)
 - OWNER-BLOCKED: 3 (owner punch list — see PLAN/SGATE_1.md)
@@ -82,3 +82,4 @@ Spec: docs/superpowers/specs/2026-05-28-verification-and-roadmap-reorg-design.md
 | 51 | Per-memory-file schema validators (F-1.6) | ROADMAP_EXPANSION.md F-1.6 | src/agent/memory-schema.js CANONICAL_MEMORY_SCHEMAS + validateMemoryFile + validateMemoryShape + buildSchemaRegistry + registerSchema | unit | tests/memory-schema.test.js 14/14 | PASS |
 | 52 | Cycle-rerun forensics (F-1.2) | ROADMAP_EXPANSION.md F-1.2 | src/agent/cycle-replay.js replayCycleProof + crossCheckClaims + buildReplayReport | unit | tests/cycle-replay.test.js 16/16 | PASS |
 | 53 | Protocol versioning (F-5.4) | ROADMAP_EXPANSION.md F-5.4 | src/agent/protocol-version.js ORBIT_PROTOCOL_VERSION + parse/isCompatible/stamp/read/detectDrift | unit | tests/protocol-version.test.js 19/19 | PASS |
+| 54 | Scoped capability delegation (F-4.5) | ROADMAP_EXPANSION.md F-4.5 | src/agent/scoped-delegation.js KNOWN_CAPABILITIES + buildDelegationGrant + validateDelegationGrant + isCapabilityGranted + filterAllowedCapabilities + isGrantExpired | unit | tests/scoped-delegation.test.js 20/20 | PASS |
