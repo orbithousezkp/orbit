@@ -12,8 +12,8 @@ Spec: docs/superpowers/specs/2026-05-28-verification-and-roadmap-reorg-design.md
 
 ## Summary
 
-- Total features: 58
-- PASS: 50
+- Total features: 46
+- PASS: 38
 - FAIL: 0 (fixed inline this sprint: 0; filed as roadmap: 0)
 - PARTIAL-DEFERRED: 5 (assigned phases — see PLAN/ROADMAP.md)
 - OWNER-BLOCKED: 3 (owner punch list — see PLAN/SGATE_1.md)
@@ -75,15 +75,3 @@ Spec: docs/superpowers/specs/2026-05-28-verification-and-roadmap-reorg-design.md
 | 44 | MCP server (SDK MCP bridge) | PHASES.md S-031/S-032 / Phase 4 | packages/orbit-mcp-server/bin.js, packages/orbit-mcp-server/src/ | unit | tests/mcp-server.test.js 17/17 | PASS |
 | 45 | Vanity Safe address tool | PLAN/SPECS/TREASURY_KEYS_BACKUP / D-019 | packages/orbit-vanity-safe/ | unit | tests/vanity-safe.test.js 34/34 | PASS |
 | 46 | Plugin loader (@orbit/tool-*) | ROADMAP.md J / Phase 3 | src/agent/plugin-loader.js; packages/orbit-tool-example/ | static | code in place; full plugin economy is Phase 3 | PARTIAL-DEFERRED |
-| 47 | Error-log monthly compaction (F-1.5) | ROADMAP_EXPANSION.md F-1.5 | src/agent/error-log.js compactOldEntries() + COMPACTION_MAX_AGE_DAYS | unit | tests/error-log-compaction.test.js 9/9 | PASS |
-| 48 | Memory file integrity scanner (F-1.3) | ROADMAP_EXPANSION.md F-1.3 | src/agent/memory-scan.js scanMemoryIntegrity() | unit | tests/memory-scan.test.js 10/10 | PASS |
-| 49 | AI provider canary (F-1.4) | ROADMAP_EXPANSION.md F-1.4 | src/agent/ai-canary.js evaluateCanaryHealth() | unit | tests/ai-canary.test.js 12/12 | PASS |
-| 50 | state.json schema migration (F-1.1) | ROADMAP_EXPANSION.md F-1.1 | src/agent/state-migrate.js buildMigrationRegistry + migrateState + planMigration | unit | tests/state-migrate.test.js 15/15 | PASS |
-| 51 | Per-memory-file schema validators (F-1.6) | ROADMAP_EXPANSION.md F-1.6 | src/agent/memory-schema.js CANONICAL_MEMORY_SCHEMAS + validateMemoryFile + validateMemoryShape + buildSchemaRegistry + registerSchema | unit | tests/memory-schema.test.js 14/14 | PASS |
-| 52 | Cycle-rerun forensics (F-1.2) | ROADMAP_EXPANSION.md F-1.2 | src/agent/cycle-replay.js replayCycleProof + crossCheckClaims + buildReplayReport | unit | tests/cycle-replay.test.js 16/16 | PASS |
-| 53 | Protocol versioning (F-5.4) | ROADMAP_EXPANSION.md F-5.4 | src/agent/protocol-version.js ORBIT_PROTOCOL_VERSION + parse/isCompatible/stamp/read/detectDrift | unit | tests/protocol-version.test.js 19/19 | PASS |
-| 54 | Scoped capability delegation (F-4.5) | ROADMAP_EXPANSION.md F-4.5 | src/agent/scoped-delegation.js KNOWN_CAPABILITIES + buildDelegationGrant + validateDelegationGrant + isCapabilityGranted + filterAllowedCapabilities + isGrantExpired | unit | tests/scoped-delegation.test.js 20/20 | PASS |
-| 55 | Per-tool budget envelope (F-2.5) | ROADMAP_EXPANSION.md F-2.5 | src/agent/tool-budget.js DEFAULT_TOOL_BUDGET + initToolBudgetState + checkToolBudget + consumeToolBudget + remainingToolBudget + resetToolBudget + budgetSnapshot | unit | tests/tool-budget.test.js 18/18 | PASS |
-| 56 | Per-provider cost ceiling + failover (F-2.3) | ROADMAP_EXPANSION.md F-2.3 | src/agent/ai-cost-ceiling.js DEFAULT_PER_PROVIDER_CEILING_USD + initCostLedger + recordProviderCost + checkProviderCeiling + pickFailoverProvider + costSnapshot | unit | tests/ai-cost-ceiling.test.js 19/19 | PASS |
-| 57 | Tiered spend levels (F-2.2) | ROADMAP_EXPANSION.md F-2.2 | src/agent/spend-tiers.js DEFAULT_SPEND_TIERS + classifySpendTier + quorumThresholdForTier + tierSnapshot + describeSpendTier | unit | tests/spend-tiers.test.js 18/18 | PASS |
-| 58 | Generalized timelocks (F-5.2) | ROADMAP_EXPANSION.md F-5.2 | src/agent/timelock.js DEFAULT_TIMELOCK_DURATIONS_MS + proposeTimelock + evaluateTimelock + extendTimelock + rejectTimelock + describeTimelock | unit | tests/timelock.test.js 17/17 | PASS |

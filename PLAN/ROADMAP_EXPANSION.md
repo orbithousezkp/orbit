@@ -10,17 +10,17 @@
 
 | F-ID | Feature | Existing Phase | Existing Domain |
 |---|---|---|---|
-| F-1.1 | state.json schema migration system | Phase 1 | A (Trust) |
-| F-1.2 | Cycle-rerun forensics | Phase 1 | A (Trust) |
-| F-1.3 | Memory file integrity scanner | Phase 1 | A (Trust) |
-| F-1.4 | AI provider canary | Phase 1 | (operational) |
-| F-1.5 | Error-log compaction policy | Phase 1 | (operational) |
-| F-1.6 | Per-memory-file validators | Phase 1 | A (Trust) |
+| F-1.1 | state.json schema migration system | 1 | A (Trust) |
+| F-1.2 | Cycle-rerun forensics | 1 | A (Trust) |
+| F-1.3 | Memory file integrity scanner | 1 | A (Trust) |
+| F-1.4 | AI provider canary | 1 | (operational) |
+| F-1.5 | Error-log compaction policy | 1 | (operational) |
+| F-1.6 | Per-memory-file validators | 1 | A (Trust) |
 | F-2.1 | Safe multi-sig wallet integration | 1–2 | C (Treasury) |
-| F-2.2 | Tiered spend levels | Phase 2 | B (Governance) |
-| F-2.3 | Per-provider cost ceiling + auto-failover | Phase 2 | (operational) |
+| F-2.2 | Tiered spend levels | 2 | B (Governance) |
+| F-2.3 | Per-provider cost ceiling + auto-failover | 2 | (operational) |
 | F-2.4 | Farcaster reply → governance ingestion | 2 | B (Governance) |
-| F-2.5 | Per-tool budget envelope | Phase 2 | B (Governance) |
+| F-2.5 | Per-tool budget envelope | 2 | B (Governance) |
 | F-2.6 | Safe owner-rotation watchdog | 2 | C (Treasury) |
 | F-3.1 | Public verifier endpoint | 3 | A (Trust) |
 | F-3.2 | Merkle anchoring on-chain (extend) | 2–3 | A (Trust) |
@@ -32,12 +32,12 @@
 | F-4.2 | Gossip protocol on family.json | 4 | (Federation) |
 | F-4.3 | Inherited governance | 4 | B (Governance) |
 | F-4.4 | Cross-family proof aggregation | 4 | A (Trust) |
-| F-4.5 | Scoped capability delegation | Phase 4 | B (Governance) |
+| F-4.5 | Scoped capability delegation | 4 | B (Governance) |
 | F-4.6 | Spec conformance test suite | 5–6 | (Standardization) |
 | F-5.1 | Quorum-bootstrap protocol | 4 | B (Governance) |
-| F-5.2 | Generalized timelocks | Phase 4 | B (Governance) |
+| F-5.2 | Generalized timelocks | 4 | B (Governance) |
 | F-5.3 | $ORBIT ceiling enforcement + buyback automation | 2 | D (Token) |
-| F-5.4 | Protocol versioning + migration spec | Phase 5–6 | (Standardization) |
+| F-5.4 | Protocol versioning + migration spec | 5–6 | (Standardization) |
 | F-5.5 | Recursive lineage tracking | 4 | (Federation) |
 | F-5.6 | Post-fade founder advisory mode | 6 | B (Governance) |
 
@@ -114,21 +114,10 @@
 5. Commit with `docs(roadmap): add F-X.Y <feature>`.
 6. Do not build it. Wait for the phase to be active.
 
-## Shipped
+## Shipped (empty)
 
 Move rows here when implemented + verified in `PLAN/VERIFICATION_MATRIX.md`.
 
 | F-ID | Feature | Shipped in commit | Matrix row |
 |---|---|---|---|
-| F-1.5 | Error-log compaction policy | fc5164df | 47 |
-| F-1.3 | Memory file integrity scanner | 3d37cc96 | 48 |
-| F-1.4 | AI provider canary | fc2cd2a5 | 49 |
-| F-1.1 | state.json schema migration | c5733603 | 50 |
-| F-1.6 | Per-memory-file validators | a73b1769 | 51 |
-| F-1.2 | Cycle-rerun forensics | bd469489 | 52 |
-| F-5.4 | Protocol versioning + migration spec | 2665d9d5 | 53 |
-| F-4.5 | Scoped capability delegation | 388495c9 | 54 |
-| F-2.5 | Per-tool budget envelope | 6e1b829d | 55 |
-| F-2.3 | Per-provider cost ceiling + auto-failover | 8c607e27 | 56 |
-| F-2.2 | Tiered spend levels | fa4c77de | 57 |
-| F-5.2 | Generalized timelocks | (this commit) | 58 |
+| — | — | — | — |
