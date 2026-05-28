@@ -31,6 +31,13 @@ const DEFAULT_LOG_PATH = "memory/errors.jsonl";
 const DEFAULT_MAX_LINES = 5000;
 const DEFAULT_TRIM_TO = 4000;
 
+// F-1.5: monthly compaction. After 30 days, entries roll into
+// memory/errors-YYYY-MM.jsonl archives so the live log only carries recent
+// errors. Existing 5000-line soft-cap rotate-in-place is unchanged.
+const COMPACTION_MAX_AGE_DAYS = 30;
+const COMPACTION_MAX_AGE_MS = COMPACTION_MAX_AGE_DAYS * 24 * 60 * 60 * 1000;
+const COMPACTION_ARCHIVE_PREFIX = "errors-";
+
 function nowIso() {
   return new Date().toISOString();
 }
@@ -136,10 +143,97 @@ function readRecentErrors(repoRoot, options = {}) {
   }
 }
 
+// F-1.5: compactOldEntries — separate from the soft-cap rotation. Walks
+// memory/errors.jsonl, sorts entries by `ts` age, and moves anything older
+// than COMPACTION_MAX_AGE_DAYS into a monthly archive
+// (memory/errors-YYYY-MM.jsonl). Malformed lines and entries with
+// unparseable timestamps stay in the live log so compaction never silently
+// loses data. Caller (e.g. a weekly script or a cycle subsystem) decides
+// when to run it. Best-effort: never throws.
+function compactOldEntries(repoRoot, options = {}) {
+  if (!repoRoot) return { ok: false, reason: "no_repo_root" };
+  const logPath = options.logPath || DEFAULT_LOG_PATH;
+  const archivePrefix = options.archivePrefix || COMPACTION_ARCHIVE_PREFIX;
+  const maxAgeMs = options.maxAgeMs != null ? options.maxAgeMs : COMPACTION_MAX_AGE_MS;
+  const now = options.now instanceof Date ? options.now : new Date();
+  const cutoffMs = now.getTime() - maxAgeMs;
+
+  const absPath = path.resolve(repoRoot, logPath);
+  const memoryDir = path.dirname(absPath);
+
+  let contents;
+  try {
+    contents = fs.readFileSync(absPath, "utf-8");
+  } catch {
+    // File missing → nothing to compact.
+    return { ok: true, archived: 0, kept: 0, archives: {} };
+  }
+
+  const lines = contents.split("\n").filter((l) => l.length > 0);
+  const keep = [];
+  const buckets = new Map();
+
+  for (const line of lines) {
+    let entry;
+    try {
+      entry = JSON.parse(line);
+    } catch {
+      // Malformed: keep in live log so a maintainer can fix manually.
+      keep.push(line);
+      continue;
+    }
+    const ts = typeof entry.ts === "string" ? Date.parse(entry.ts) : NaN;
+    if (Number.isNaN(ts) || ts >= cutoffMs) {
+      // Unparseable timestamp or still fresh: keep live.
+      keep.push(line);
+      continue;
+    }
+    // Old: bucket by year-month.
+    const d = new Date(ts);
+    const yyyy = d.getUTCFullYear();
+    const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
+    const bucketKey = `${archivePrefix}${yyyy}-${mm}.jsonl`;
+    if (!buckets.has(bucketKey)) buckets.set(bucketKey, []);
+    buckets.get(bucketKey).push(line);
+  }
+
+  // Append to archives (don't overwrite existing archive content).
+  const archives = {};
+  for (const [filename, archivedLines] of buckets.entries()) {
+    const archivePath = path.join(memoryDir, filename);
+    try {
+      fs.appendFileSync(archivePath, archivedLines.join("\n") + "\n", "utf-8");
+      archives[filename] = archivedLines.length;
+    } catch (err) {
+      return { ok: false, reason: "archive_write_failed", error: err.message };
+    }
+  }
+
+  // Rewrite live log with only the kept lines.
+  try {
+    if (keep.length === 0) {
+      fs.writeFileSync(absPath, "", "utf-8");
+    } else {
+      fs.writeFileSync(absPath, keep.join("\n") + "\n", "utf-8");
+    }
+  } catch (err) {
+    return { ok: false, reason: "live_write_failed", error: err.message };
+  }
+
+  let archivedTotal = 0;
+  for (const v of buckets.values()) archivedTotal += v.length;
+
+  return { ok: true, archived: archivedTotal, kept: keep.length, archives };
+}
+
 module.exports = {
-  logError,
-  readRecentErrors,
+  COMPACTION_ARCHIVE_PREFIX,
+  COMPACTION_MAX_AGE_DAYS,
+  COMPACTION_MAX_AGE_MS,
   DEFAULT_LOG_PATH,
   DEFAULT_MAX_LINES,
-  DEFAULT_TRIM_TO
+  DEFAULT_TRIM_TO,
+  compactOldEntries,
+  logError,
+  readRecentErrors
 };

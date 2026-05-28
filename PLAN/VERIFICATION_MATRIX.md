@@ -12,8 +12,8 @@ Spec: docs/superpowers/specs/2026-05-28-verification-and-roadmap-reorg-design.md
 
 ## Summary
 
-- Total features: 46
-- PASS: 38
+- Total features: 47
+- PASS: 39
 - FAIL: 0 (fixed inline this sprint: 0; filed as roadmap: 0)
 - PARTIAL-DEFERRED: 5 (assigned phases — see PLAN/ROADMAP.md)
 - OWNER-BLOCKED: 3 (owner punch list — see PLAN/SGATE_1.md)
@@ -75,3 +75,4 @@ Spec: docs/superpowers/specs/2026-05-28-verification-and-roadmap-reorg-design.md
 | 44 | MCP server (SDK MCP bridge) | PHASES.md S-031/S-032 / Phase 4 | packages/orbit-mcp-server/bin.js, packages/orbit-mcp-server/src/ | unit | tests/mcp-server.test.js 17/17 | PASS |
 | 45 | Vanity Safe address tool | PLAN/SPECS/TREASURY_KEYS_BACKUP / D-019 | packages/orbit-vanity-safe/ | unit | tests/vanity-safe.test.js 34/34 | PASS |
 | 46 | Plugin loader (@orbit/tool-*) | ROADMAP.md J / Phase 3 | src/agent/plugin-loader.js; packages/orbit-tool-example/ | static | code in place; full plugin economy is Phase 3 | PARTIAL-DEFERRED |
+| 47 | Error-log monthly compaction (F-1.5) | ROADMAP_EXPANSION.md F-1.5 | src/agent/error-log.js compactOldEntries() + COMPACTION_MAX_AGE_DAYS | unit | tests/error-log-compaction.test.js 9/9 | PASS |

@@ -14,7 +14,7 @@
 | F-1.2 | Cycle-rerun forensics | 1 | A (Trust) |
 | F-1.3 | Memory file integrity scanner | 1 | A (Trust) |
 | F-1.4 | AI provider canary | 1 | (operational) |
-| F-1.5 | Error-log compaction policy | 1 | (operational) |
+| F-1.5 | Error-log compaction policy | Phase 1 | (operational) |
 | F-1.6 | Per-memory-file validators | 1 | A (Trust) |
 | F-2.1 | Safe multi-sig wallet integration | 1–2 | C (Treasury) |
 | F-2.2 | Tiered spend levels | 2 | B (Governance) |
@@ -114,10 +114,10 @@
 5. Commit with `docs(roadmap): add F-X.Y <feature>`.
 6. Do not build it. Wait for the phase to be active.
 
-## Shipped (empty)
+## Shipped
 
 Move rows here when implemented + verified in `PLAN/VERIFICATION_MATRIX.md`.
 
 | F-ID | Feature | Shipped in commit | Matrix row |
 |---|---|---|---|
-| — | — | — | — |
+| F-1.5 | Error-log compaction policy | (this commit) | new (added next pass) |
