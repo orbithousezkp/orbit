@@ -21,11 +21,11 @@ Spec: docs/superpowers/specs/2026-05-28-verification-and-roadmap-reorg-design.md
 
 | # | Feature | Source claim | Code (file:line) | Method | Evidence | Status |
 |---|---|---|---|---|---|---|
-| 1 | D-018 gate (preLaunchVerified) | DECISIONS.md D-018 |  |  |  |  |
-| 2 | Treasury 95/5 split (D-017) | DECISIONS.md D-017 |  |  |  |  |
-| 3 | Founder-handoff timelock | identity.md / S-035 / FOUNDER_HANDOFF |  |  |  |  |
-| 4 | Quorum-CI parseQuorumComments | S-029/S-030 |  |  |  |  |
-| 5 | T-5 spend approval gates | STABILITY_SECURITY.md T-5 |  |  |  |  |
+| 1 | D-018 gate (preLaunchVerified) | DECISIONS.md D-018 | src/agent/clanker.js:338-345, src/agent/buyback.js:203-205, src/agent/merkle-anchor.js:288-290, src/agent/federation.js:387, src/agent/treasury-sweep.js:107, src/agent/handoff.js:95-97, src/agent/horizon-scanner.js:406-411 | unit | tests/buyback.test.js:108 (refuses-when-not-verified), tests/clanker-gate.test.js:44-95 (10 cases) | PASS |
+| 2 | Treasury 95/5 split (D-017) | DECISIONS.md D-017 | src/agent/config.js:290, src/agent/clanker.js:136-138 (rewardSplit), src/agent/treasury.js:53-54,335-336 | unit | tests/treasury-sweep.test.js 38/38 + tests/treasury.test.js | PASS |
+| 3 | Founder-handoff timelock | identity.md / S-035 / FOUNDER_HANDOFF | src/agent/handoff.js:33-34 (7d + 7d extension), :93 assertCanPropose, :313 timelockEndsAt | unit | tests/handoff.test.js + tests/handoff-executor.test.js 36/36 | PASS |
+| 4 | Quorum-CI parseQuorumComments | S-029/S-030 | src/agent/governance.js:415 actionTier, :428 parseQuorumComments, :494 evaluateQuorum | unit | tests/quorum*.test.js + tests/governance*.test.js 64/64 | PASS |
+| 5 | T-5 spend approval gates (id-only public, recipient private) | STABILITY_SECURITY.md T-5 | src/agent/governance.js:167-198 approvalIssueBody, :177 still emits Recipient publicly | static | recipient still in issue body line 177; T-5 fix not implemented | PARTIAL-DEFERRED |
 | 6 | Cycle retry-backoff | STABILITY_SECURITY.md / cycle reliability |  |  |  |  |
 | 7 | Error-log persistent JSONL | observability |  |  |  |  |
 | 8 | Atomic writes (safety.js) | safety / state-tamper defense |  |  |  |  |
