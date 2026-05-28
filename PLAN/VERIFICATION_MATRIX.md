@@ -26,11 +26,11 @@ Spec: docs/superpowers/specs/2026-05-28-verification-and-roadmap-reorg-design.md
 | 3 | Founder-handoff timelock | identity.md / S-035 / FOUNDER_HANDOFF | src/agent/handoff.js:33-34 (7d + 7d extension), :93 assertCanPropose, :313 timelockEndsAt | unit | tests/handoff.test.js + tests/handoff-executor.test.js 36/36 | PASS |
 | 4 | Quorum-CI parseQuorumComments | S-029/S-030 | src/agent/governance.js:415 actionTier, :428 parseQuorumComments, :494 evaluateQuorum | unit | tests/quorum*.test.js + tests/governance*.test.js 64/64 | PASS |
 | 5 | T-5 spend approval gates (id-only public, recipient private) | STABILITY_SECURITY.md T-5 | src/agent/governance.js:167-198 approvalIssueBody, :177 still emits Recipient publicly | static | recipient still in issue body line 177; T-5 fix not implemented | PARTIAL-DEFERRED |
-| 6 | Cycle retry-backoff | STABILITY_SECURITY.md / cycle reliability |  |  |  |  |
-| 7 | Error-log persistent JSONL | observability |  |  |  |  |
-| 8 | Atomic writes (safety.js) | safety / state-tamper defense |  |  |  |  |
-| 9 | Cron skip-guard | STABILITY_SECURITY.md §1 |  |  |  |  |
-| 10 | T-1 WETH floor | STABILITY_SECURITY.md T-1 |  |  |  |  |
+| 6 | Cycle retry-backoff | STABILITY_SECURITY.md / cycle reliability | src/agent/cycle-backoff.js:35 computeBackoffMs (2^n cap), :61 record, :75 clear | unit | tests/cycle-backoff*.test.js 14/14 | PASS |
+| 7 | Error-log persistent JSONL | observability | src/agent/error-log.js:31 MAX_LINES=5000, :32 TRIM_TO=4000, :41 redact, :73 rotateIfNeeded | unit | tests/error-log*.test.js 8/8 | PASS |
+| 8 | Atomic writes (safety.js) | safety / state-tamper defense | src/agent/safety.js:143 atomicWriteFile (writes tmp + fsync + rename), 24 callers under src/agent | unit | tests/safety*.test.js + 24 callsites use the helper | PASS |
+| 9 | Cron skip-guard | STABILITY_SECURITY.md §1 | src/agent/skip-guard.js:14 sign, :21 verify, :43 drawNextTarget (30-90min), :48 evaluateSkip; src/agent/run.js:361 calls evaluateSkip | unit | tests/skip-guard*.test.js 11/11 | PASS |
+| 10 | T-1 WETH floor | STABILITY_SECURITY.md T-1 | src/agent/governance.js:591 assertTreasuryFloor; callers: src/agent/clanker.js:376, src/agent/buyback.js:871 ONLY (not in merkle-anchor or federation) | unit | tests/treasury-floor*.test.js 12/12 PASS, but missing 2 of 4 spec'd callers | PARTIAL-DEFERRED |
 | 11 | T-8 performance-based AI routing | STABILITY_SECURITY.md §2 T-8 |  |  |  |  |
 | 12 | Provider-neutral inference | feedback_performance_based_ai_routing |  |  |  |  |
 | 13 | MiMo / OpenGateway wiring | D-018 #3 |  |  |  |  |
