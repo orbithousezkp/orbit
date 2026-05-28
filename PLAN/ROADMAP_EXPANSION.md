@@ -12,7 +12,7 @@
 |---|---|---|---|
 | F-1.1 | state.json schema migration system | 1 | A (Trust) |
 | F-1.2 | Cycle-rerun forensics | 1 | A (Trust) |
-| F-1.3 | Memory file integrity scanner | 1 | A (Trust) |
+| F-1.3 | Memory file integrity scanner | Phase 1 | A (Trust) |
 | F-1.4 | AI provider canary | 1 | (operational) |
 | F-1.5 | Error-log compaction policy | Phase 1 | (operational) |
 | F-1.6 | Per-memory-file validators | 1 | A (Trust) |
@@ -120,4 +120,5 @@ Move rows here when implemented + verified in `PLAN/VERIFICATION_MATRIX.md`.
 
 | F-ID | Feature | Shipped in commit | Matrix row |
 |---|---|---|---|
-| F-1.5 | Error-log compaction policy | (this commit) | new (added next pass) |
+| F-1.5 | Error-log compaction policy | fc5164df | 47 |
+| F-1.3 | Memory file integrity scanner | (this commit) | 48 |
