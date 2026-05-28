@@ -31,11 +31,11 @@ Spec: docs/superpowers/specs/2026-05-28-verification-and-roadmap-reorg-design.md
 | 8 | Atomic writes (safety.js) | safety / state-tamper defense | src/agent/safety.js:143 atomicWriteFile (writes tmp + fsync + rename), 24 callers under src/agent | unit | tests/safety*.test.js + 24 callsites use the helper | PASS |
 | 9 | Cron skip-guard | STABILITY_SECURITY.md §1 | src/agent/skip-guard.js:14 sign, :21 verify, :43 drawNextTarget (30-90min), :48 evaluateSkip; src/agent/run.js:361 calls evaluateSkip | unit | tests/skip-guard*.test.js 11/11 | PASS |
 | 10 | T-1 WETH floor | STABILITY_SECURITY.md T-1 | src/agent/governance.js:591 assertTreasuryFloor; callers: src/agent/clanker.js:376, src/agent/buyback.js:871 ONLY (not in merkle-anchor or federation) | unit | tests/treasury-floor*.test.js 12/12 PASS, but missing 2 of 4 spec'd callers | PARTIAL-DEFERRED |
-| 11 | T-8 performance-based AI routing | STABILITY_SECURITY.md §2 T-8 |  |  |  |  |
-| 12 | Provider-neutral inference | feedback_performance_based_ai_routing |  |  |  |  |
-| 13 | MiMo / OpenGateway wiring | D-018 #3 |  |  |  |  |
-| 14 | Env budget reconcile | recent fix (treasury) |  |  |  |  |
-| 15 | T-4 fetchUrl/webSearch envelope | STABILITY_SECURITY.md T-4 |  |  |  |  |
+| 11 | T-8 performance-based AI routing | STABILITY_SECURITY.md §2 T-8 | src/agent/ai-routing.js:53 orderProviders, :74 recordSuccess, :101 recordFailure, :108-109 demote on 3 failures | unit | tests/ai-routing*.test.js 34/34 | PASS |
+| 12 | Provider-neutral inference | feedback_performance_based_ai_routing | src/agent/inference.js:209-217 providers list, :279 chatPath per-provider, :289 fetch chat completions; src/agent/config.js:122 ORBIT_AI_PROVIDERS parse | unit | tests/inference*.test.js + tests/ai-routing*.test.js | PASS |
+| 13 | MiMo / OpenGateway wiring (D-018 #3) | D-018 #3 | gh variable list: no ORBIT_AI_* set; gh secret list: no ORBIT_AI_* set | static | code path exists (provider-neutral) but owner has not provisioned secret | OWNER-BLOCKED |
+| 14 | Env budget reconcile | recent fix Patch Set (treasury) | src/agent/treasury.js:28-29 init from config, :107-110 reconcile on load, :269-273 remaining computation | unit | tests/treasury*.test.js + tests/ai-food*.test.js 104/104 | PASS |
+| 15 | T-4 fetchUrl/webSearch envelope | STABILITY_SECURITY.md T-4 | src/agent/web.js:182-184 UNTRUSTED tags, :190 wrap, :240 trustLevel, :250 provenance; provenance-tagged spend escalation NOT wired in governance.js | static | envelope + URL risk in place; spend escalation half missing | PARTIAL-DEFERRED |
 | 16 | Federation handshake | S-021/S-022 / federation.md |  |  |  |  |
 | 17 | Repo-spawning (create-orbit-house) | D-009 / S-007 / D-020 |  |  |  |  |
 | 18 | Founder-handoff Safe broadcast | S-035 / FOUNDER_HANDOFF |  |  |  |  |
