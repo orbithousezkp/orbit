@@ -25,7 +25,12 @@ concurrency:
 
 jobs:
   build:
-    if: ${{ !github.event.repository.private }}
+    # Pages on private repos needs Pro/Team/Enterprise — gate auto-push to public-only.
+    # workflow_dispatch bypasses, but ONLY if owner has explicitly set vars.PAGES_ENABLED=true
+    # (otherwise the deploy step would hard-fail and burn Actions minutes).
+    if: >-
+      (github.event_name == 'push' && !github.event.repository.private) ||
+      (github.event_name == 'workflow_dispatch' && vars.PAGES_ENABLED == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -59,7 +64,9 @@ jobs:
 
   deploy:
     needs: build
-    if: ${{ !github.event.repository.private }}
+    if: >-
+      (github.event_name == 'push' && !github.event.repository.private) ||
+      (github.event_name == 'workflow_dispatch' && vars.PAGES_ENABLED == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 5
     environment:

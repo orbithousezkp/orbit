@@ -1,0 +1,14 @@
+# CODEOWNERS — required reviewers for PRs into main.
+# Pairs with T-3 (signed-commit-check.yml) + branch protection.
+# Update the @orbithousezkp handle to the actual maintainer GitHub username/team.
+
+* @orbithousezkp
+
+# Governance, treasury, and security surfaces require owner review even if
+# other maintainers are added later (D-017 / D-018 / S-GATE-1 load-bearing).
+/src/agent/governance.js   @orbithousezkp
+/src/agent/treasury*.js    @orbithousezkp
+/src/agent/handoff*.js     @orbithousezkp
+/src/agent/clanker.js      @orbithousezkp
+/PLAN/                     @orbithousezkp
+/.github/                  @orbithousezkp

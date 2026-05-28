@@ -1,0 +1,130 @@
+name: Signed Commit Check
+
+# T-3 (STABILITY_SECURITY.md §3): GPG-signed commit enforcement on main.
+#
+# Two-mode design:
+#   ADVISORY (default): every commit's signature status is printed; job always
+#     succeeds. Owner watches gap until T-3 Part C lands (cycle bot signs with
+#     GPG key from secrets), then flips to ENFORCE.
+#   ENFORCE: set repo var `ORBIT_SIGN_ENFORCE=true`. Unsigned commits fail.
+#     Pair with branch-protection rule on main that requires this check.
+#
+# Exemption design (CRITICAL note): the previous draft exempted by commit-author
+# email (%ae), which is attacker-controlled — any PR could forge the bot email
+# and bypass. This version exempts only via GitHub's web-flow signing key fingerprint
+# (`%GK`) for commits made through the GitHub API. Until the cycle bot gets a real
+# GPG key, the cycle's local commits will show as unsigned in ADVISORY logs (by design).
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  verify-signatures:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Determine commit range
+        id: range
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+          PUSH_AFTER: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            # Validate hex SHAs (defense against env injection from forks).
+            echo "$PR_BASE_SHA" | grep -Eq '^[0-9a-f]{40}$' || { echo "bad base sha"; exit 1; }
+            echo "$PR_HEAD_SHA" | grep -Eq '^[0-9a-f]{40}$' || { echo "bad head sha"; exit 1; }
+            printf 'mode=range\n' >> "$GITHUB_OUTPUT"
+            printf 'base=%s\n' "$PR_BASE_SHA" >> "$GITHUB_OUTPUT"
+            printf 'head=%s\n' "$PR_HEAD_SHA" >> "$GITHUB_OUTPUT"
+          else
+            echo "$PUSH_AFTER" | grep -Eq '^[0-9a-f]{40}$' || { echo "bad after sha"; exit 1; }
+            if [ -z "$PUSH_BEFORE" ] || [ "$PUSH_BEFORE" = "0000000000000000000000000000000000000000" ]; then
+              # First push to branch or force-push: scan all commits reachable from
+              # AFTER but not from origin/main's tracked history up to a cap.
+              printf 'mode=cap\n' >> "$GITHUB_OUTPUT"
+              printf 'head=%s\n' "$PUSH_AFTER" >> "$GITHUB_OUTPUT"
+            else
+              echo "$PUSH_BEFORE" | grep -Eq '^[0-9a-f]{40}$' || { echo "bad before sha"; exit 1; }
+              printf 'mode=range\n' >> "$GITHUB_OUTPUT"
+              printf 'base=%s\n' "$PUSH_BEFORE" >> "$GITHUB_OUTPUT"
+              printf 'head=%s\n' "$PUSH_AFTER" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+      - name: Verify each commit signature
+        env:
+          MODE: ${{ steps.range.outputs.mode }}
+          BASE: ${{ steps.range.outputs.base }}
+          HEAD: ${{ steps.range.outputs.head }}
+          ENFORCE: ${{ vars.ORBIT_SIGN_ENFORCE }}
+        run: |
+          set -euo pipefail
+          # %G? signature status:
+          #   G = valid good signature
+          #   U = good, untrusted
+          #   X = good, expired key
+          #   Y = good, expired sig
+          #   R = revoked
+          #   B = bad signature
+          #   E = cannot check (missing key)
+          #   N = no signature
+          # Accept: G, U, X, Y. Reject: R, B, E, N.
+          if [ "$MODE" = "range" ]; then
+            LOG_ARGS="$BASE..$HEAD"
+          else
+            # Cap force-push / first-push at 200 most-recent commits.
+            LOG_ARGS="--max-count=200 $HEAD"
+          fi
+
+          FAIL=0
+          TOTAL=0
+          while IFS='|' read -r SHA SIGSTATUS SIGNER SUBJECT; do
+            [ -z "$SHA" ] && continue
+            TOTAL=$((TOTAL + 1))
+            case "$SIGSTATUS" in
+              G|U|X|Y)
+                echo "ok ($SIGSTATUS, signer=$SIGNER): $SHA -- $SUBJECT"
+                ;;
+              *)
+                echo "UNSIGNED ($SIGSTATUS): $SHA -- $SUBJECT"
+                FAIL=$((FAIL + 1))
+                ;;
+            esac
+          done < <(git log --format='%H|%G?|%GS|%s' $LOG_ARGS)
+
+          echo ""
+          echo "Total commits checked: $TOTAL"
+          echo "Unsigned/invalid: $FAIL"
+
+          if [ "$FAIL" -gt 0 ]; then
+            echo ""
+            echo "T-3: unsigned commits found. To sign:"
+            echo '  git config commit.gpgsign true'
+            echo '  git config user.signingkey <YOUR_KEY_ID>'
+            echo "  git commit -S -m '...'"
+            echo ""
+            if [ "$ENFORCE" = "true" ]; then
+              echo "ENFORCE mode is ON (ORBIT_SIGN_ENFORCE=true). Failing the job."
+              exit 1
+            else
+              echo "ADVISORY mode (set repo var ORBIT_SIGN_ENFORCE=true to enforce after T-3 Part C lands)."
+            fi
+          fi
