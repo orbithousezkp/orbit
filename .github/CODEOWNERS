@@ -12,3 +12,15 @@
 /src/agent/clanker.js      @orbithousezkp
 /PLAN/                     @orbithousezkp
 /.github/                  @orbithousezkp
+
+# Added 2026-05-29 per security audit finding #14:
+# launch-validator gates D-018 pre-deploy; buyback + fee-floor are
+# D-017 treasury floor / operator-revenue load-bearing; state.json
+# holds preLaunchVerified flag — anyone with write could flip it via
+# PR without owner review (T-2's hash check is the only other defense);
+# scripts/ are cycle entry points.
+/src/agent/launch-validator.js  @orbithousezkp
+/src/agent/buyback*.js          @orbithousezkp
+/src/agent/fee-floor.js         @orbithousezkp
+/memory/state.json              @orbithousezkp
+/scripts/                       @orbithousezkp
