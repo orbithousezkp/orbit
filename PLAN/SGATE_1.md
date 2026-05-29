@@ -8,7 +8,7 @@
 |---|---|
 | Gate ID | S-GATE-1 |
 | Opened | 2026-05-24 |
-| Current status | OPEN — pending owner closure of 7 punch-list items |
+| Current status | OPEN — 3 of 7 owner punch-list items still pending (Farcaster, Safe, T-3 enforce). 24-cycle stretch in progress (10/24 as of 2026-05-29). |
 | Closes | when all criteria below mark ✅ |
 | Decision references | D-006, D-007, D-008, D-009, D-014, D-018 |
 
@@ -18,7 +18,7 @@
 |---|---|---|---|
 | 1 | 14 consecutive days of cycles with zero broken runs | NOT-MET (only Actions can produce) | [ ] |
 | 2 | Signed proofs working in every cycle | MET (engineering) | [ ] |
-| 3 | Public dashboard live on GitHub Pages | PARTIAL (workflow ready, awaits `PAGES_ENABLED=true` + Pages source set to Actions) | [ ] |
+| 3 | Public dashboard live on GitHub Pages | MET — live at https://orbit.horse (custom domain, HTTPS enforced, 2026-05-29) | [x] |
 | 4 | ≥1 daily Farcaster cast for 14 days | NOT-MET (signer not provisioned) | [ ] |
 | 5 | ≥1 second adopter repo running Orbit | NOT-MET (S-016 outreach) | [ ] |
 | 6 | Closed-loop demo run successfully once | NOT-MET (runbook ready) | [ ] |
@@ -32,11 +32,11 @@ S-GATE-1 must close BEFORE D-018 #4 (12-hour clean cycle stretch) can be marked.
 | D-018 # | Item | State |
 |---|---|---|
 | 1 | health 0 FAIL, 0 OPEN BLOCKERS | PARTIAL |
-| 2 | tests 0 fail | MET — 365/0 |
-| 3 | AI provider configured | NOT-MET |
-| 4 | 12-hour clean Actions stretch | NOT-MET |
+| 2 | tests 0 fail | MET — 1571/0 (2026-05-29) |
+| 3 | AI provider configured | MET — freemodel vip-sg gpt-5.5, 8/8 success on cycle #64 |
+| 4 | 12-hour clean Actions stretch | IN-PROGRESS — 10 consecutive clean cycles (#55-#64) as of 2026-05-29 |
 | 5 | Signed proofs verifiable via `npx @orbithouse/verifier` | MET (code) |
-| 6 | Dashboard reachable | PARTIAL |
+| 6 | Dashboard reachable | MET — https://orbit.horse (2026-05-29) |
 | 7 | Treasury Safe live | NOT-MET |
 | 8 | Pre-deploy checklist complete | PARTIAL |
 
@@ -47,13 +47,13 @@ S-GATE-1 must close BEFORE D-018 #4 (12-hour clean cycle stretch) can be marked.
 
 Each item links to its runbook. Owner ticks when done; date and proof URL.
 
-- [ ] **Enable GitHub Pages** — runbook: `PLAN/OWNER_PUNCH_LIST.md` §1 + `PLAN/DEPLOY_PLAN.md`. Done: ____ Proof: ____
-- [ ] **Set `ORBIT_AGENT_SIGNER` repo variable** — runbook: `PLAN/OWNER_PUNCH_LIST.md` §2 + `packages/orbit-keygen/`. Done: ____ Proof: ____
-- [ ] **Provision Farcaster signer** — runbook: `PLAN/OWNER_PUNCH_LIST.md` §4 + `PLAN/SPECS/FARCASTER_CAST_PIPELINE.md` §10. Done: ____ Proof: ____
+- [x] **Enable GitHub Pages** — Done: 2026-05-29 Proof: https://orbit.horse (custom domain, HTTPS enforced)
+- [x] **Set `ORBIT_AGENT_SIGNER` repo variable** — Done: 2026-05-29 Proof: `0x58211f54ee90fb403dec9cd57e8407f9963adaed`
+- [ ] **Provision Farcaster signer** — runbook: `~/Downloads/orbitbackup/gh-secrets-helper.html` + `PLAN/SPECS/FARCASTER_CAST_PIPELINE.md` §10. Done: ____ Proof: ____
 - [ ] **Deploy Treasury Safe on Base** — runbook: `PLAN/OWNER_PUNCH_LIST.md` §6 + `PLAN/SPECS/TREASURY_SAFE_DEPLOY.md` (8 checks). Done: ____ Safe address: ____ Test tx: ____
-- [ ] **Publish SDK + scaffolder + proof-viewer to npm** — runbook: `PLAN/OWNER_PUNCH_LIST.md` §5. Done: ____ Versions: ____
-- [ ] **Configure AI provider** — runbook: `PLAN/OWNER_PUNCH_LIST.md` §3 + `PLAN/PRIVATE_DRYRUN.md`. Done: ____
-- [ ] **Verify 12-hour clean cycle stretch** — runbook: `PLAN/OWNER_PUNCH_LIST.md` §7. Observe Actions cron for 24 consecutive cycles. Record cycle range in `memory/state.json` (`firstCleanCycle`, `lastCleanCycle`) and flip `state.preLaunchVerified = true` with matching `preLaunchVerifiedHash` (T-2). Done: ____ Range: ____ — ____
+- [x] **Publish SDK + scaffolder + proof-viewer to npm** — Done: 2026-05-29 Versions: `@orbithouse/sdk@0.1.0`, `create-orbit-house@0.1.0`, `@orbithouse/proof-viewer@0.1.0`, `@orbithouse/keygen@0.1.0`, `@orbithouse/mcp-server@0.1.0`
+- [x] **Configure AI provider** — Done: 2026-05-29 Provider: freemodel vip-sg gpt-5.5 (OpenAI shape, 8/8 success on cycle #64)
+- [ ] **Verify 12-hour clean cycle stretch** — IN-PROGRESS — 10 consecutive clean cycles (#55-#64) as of 2026-05-29. Hourly cron at `7 * * * *`, ~14 more needed.
 
 ## Escalation
 

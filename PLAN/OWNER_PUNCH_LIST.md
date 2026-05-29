@@ -6,16 +6,16 @@
 
 | Status | Item | Time | Deep runbook |
 |---|---|---|---|
-| ☐ | 1. Enable GitHub Pages | 10 min | `PLAN/DEPLOY_PLAN.md` |
-| ☐ | 2. Set `ORBIT_AGENT_SIGNER` repo variable | 5 min | `packages/orbit-keygen/` + `PLAN/DEPLOY_PLAN.md` |
-| ☐ | 3. Configure AI provider (MiMo / OpenGateway) | 10 min | `PLAN/PRIVATE_DRYRUN.md` |
-| ☐ | 4. Provision Farcaster signer | 30 min | `PLAN/SPECS/FARCASTER_CAST_PIPELINE.md` §10 |
-| ☐ | 5. Publish SDK + scaffolder + proof-viewer to npm | 20 min | this file §5 |
+| ✅ | 1. Enable GitHub Pages | done 2026-05-29 | live at https://orbit.horse |
+| ✅ | 2. Set `ORBIT_AGENT_SIGNER` repo variable | done 2026-05-29 | `0x58211f54...3adaed` |
+| ✅ | 3. Configure AI provider | done 2026-05-29 | freemodel vip-sg gpt-5.5 (OpenAI shape) |
+| ☐ | 4. Provision Farcaster signer | 30 min | `~/Downloads/orbitbackup/gh-secrets-helper.html` |
+| ✅ | 5. Publish SDK + scaffolder + proof-viewer to npm | done 2026-05-29 | 5 packages live (`@orbithouse/*` + `create-orbit-house`) |
 | ☐ | 6. Deploy Treasury Safe on Base | 60–90 min | `PLAN/SPECS/TREASURY_SAFE_DEPLOY.md` |
-| ☐ | 7. Verify 12-hour clean cycle stretch | 12+ hours wallclock, ~10 min owner | `PLAN/PRIVATE_DRYRUN.md` |
-| ☐ | 8. Enable T-3 signed-commit enforcement | 15 min | this file §8 |
+| ⏳ | 7. Verify 12-hour clean cycle stretch | in progress (10/24) | hourly cron `7 * * * *`, ~14h remaining |
+| ☐ | 8. Enable T-3 signed-commit enforcement | 15 min | this file §8 (blocked on T-3 Part C bot-signing) |
 
-Total active owner time: ~3 hours plus a 12-hour observation window.
+Remaining owner time: ~2 hours plus the in-progress 14-hour observation window.
 
 ---
 
