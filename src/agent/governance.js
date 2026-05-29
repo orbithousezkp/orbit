@@ -278,6 +278,17 @@ function normalizeSpendRequest(request = {}) {
     recipient: request.recipient || "",
     url: request.url || "",
     notes: request.notes || "",
+    // T-4 (security audit 2026-05-29): track the trust level of the
+    // content that produced this spend request. Values:
+    //   - "trusted" (default) — request originated from repo state, owner
+    //     issue, or signed proof.
+    //   - "external_untrusted" — request contains content sourced from
+    //     fetchUrl / webSearch / any path that ran external content
+    //     through the LLM. classifySpend escalates these regardless of
+    //     allowedWithoutApproval — a prompt-injected page that tells the
+    //     agent "send 0.5 ETH to 0xBAD" must NOT use the fast path even
+    //     if the recipient happens to be a self-address.
+    provenance: request.provenance === "external_untrusted" ? "external_untrusted" : "trusted",
     requestedAt: request.requestedAt || new Date().toISOString()
   };
 }
@@ -315,18 +326,33 @@ function classifySpend(config, rawRequest = {}) {
   const allowedLaunch = request.category === "token_launch" && ["treasury", "operator_revenue", "none", "non_address_or_protocol"].includes(recipientKind);
 
   const allowedWithoutApproval = allowedOperatorRevenue || allowedTreasuryInternal || allowedGas || allowedClaim || allowedLaunch;
-  const requiresOwnerApproval = !allowedWithoutApproval || risk.score >= 70;
+  // T-4 (security audit 2026-05-29): provenance escalation. If the spend
+  // request derives from external_untrusted content (a fetchUrl or
+  // webSearch response), refuse the fast path. The LLM may have been
+  // prompt-injected; an attacker-controlled page can claim "spend to a
+  // self-address" to slip past the allowedWithoutApproval branch. Force
+  // public owner approval regardless of category.
+  const provenanceEscalation = request.provenance === "external_untrusted";
+  const requiresOwnerApproval = !allowedWithoutApproval || risk.score >= 70 || provenanceEscalation;
+
+  let reason;
+  if (provenanceEscalation && allowedWithoutApproval) {
+    reason = "Spend request derived from external_untrusted content (T-4); requiring public owner approval despite self-address category.";
+  } else if (requiresOwnerApproval) {
+    reason = "External or high-risk spend requires public owner approval.";
+  } else {
+    reason = "Spend is inside Orbit's allowed self/revenue policy.";
+  }
 
   return {
     request,
     recipientKind,
     risk,
     allowedWithoutApproval,
+    provenanceEscalation,
     requiresOwnerApproval,
     decision: requiresOwnerApproval ? "owner_approval_required" : "allowed",
-    reason: requiresOwnerApproval
-      ? "External or high-risk spend requires public owner approval."
-      : "Spend is inside Orbit's allowed self/revenue policy."
+    reason
   };
 }
 
@@ -982,6 +1008,7 @@ module.exports = {
   loadApprovals,
   loadGovernance,
   normalizeActionToken,
+  normalizeSpendRequest,
   parseQuorumComments,
   requestOwnerApproval,
   requiresQuorum,
