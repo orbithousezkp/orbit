@@ -620,3 +620,222 @@ test("hung AI provider aborts at the configured timeout and falls through", asyn
     global.fetch = originalFetch;
   }
 });
+
+// Anthropic-shape adapter (security audit follow-up, 2026-05-29):
+// providers with `shape: "anthropic"` send Anthropic-native body to
+// /v1/messages and parse `content[0].text` instead of `choices[0].message.content`.
+// Pairs with freemodel-cc / Anthropic direct providers.
+
+test("anthropic-shape provider: body has system extracted + tools transformed", async () => {
+  const originalFetch = global.fetch;
+  let capturedBody = null;
+  let capturedHeaders = null;
+  global.fetch = async (_url, options) => {
+    capturedBody = JSON.parse(options.body);
+    capturedHeaders = options.headers;
+    return {
+      ok: true,
+      status: 200,
+      async json() {
+        return {
+          id: "msg_1",
+          content: [{ type: "text", text: "ok hello" }],
+          stop_reason: "end_turn",
+          usage: { input_tokens: 10, output_tokens: 5 }
+        };
+      }
+    };
+  };
+  try {
+    const result = await infer(config({
+      aiProviders: [
+        {
+          name: "freemodel",
+          shape: "anthropic",
+          apiBase: "https://api-cc.freemodel.dev",
+          chatPath: "/v1/messages",
+          model: "claude-haiku-4-5-20251001",
+          authHeader: "x-api-key",
+          authScheme: "raw",
+          apiKey: "test-key",
+          extraHeaders: { "anthropic-version": "2023-06-01" },
+          priority: 1
+        }
+      ]
+    }), [
+      { role: "system", content: "you are orbit" },
+      { role: "user", content: "say ok" }
+    ], [
+      { name: "echo", description: "Echo back", inputSchema: { type: "object", properties: { text: { type: "string" } } } }
+    ]);
+    assert.equal(result.fallback, false);
+    assert.match(result.content, /ok hello/);
+    // Body shape checks
+    assert.equal(capturedBody.system, "you are orbit", "system extracted to top-level");
+    assert.equal(capturedBody.messages.length, 1, "system removed from messages array");
+    assert.equal(capturedBody.messages[0].role, "user");
+    assert.ok(typeof capturedBody.max_tokens === "number");
+    assert.ok(Array.isArray(capturedBody.tools));
+    assert.equal(capturedBody.tools[0].name, "echo");
+    assert.ok(capturedBody.tools[0].input_schema, "tools use input_schema not parameters");
+    assert.equal(capturedBody.tools[0].input_schema.type, "object");
+    // Header check — x-api-key, no Bearer
+    assert.equal(capturedHeaders["x-api-key"], "test-key");
+    assert.equal(capturedHeaders["anthropic-version"], "2023-06-01");
+  } finally {
+    global.fetch = originalFetch;
+  }
+});
+
+test("anthropic-shape provider: response with content[].text becomes choice.message.content", async () => {
+  const originalFetch = global.fetch;
+  global.fetch = async () => ({
+    ok: true,
+    status: 200,
+    async json() {
+      return {
+        content: [
+          { type: "text", text: "first part" },
+          { type: "text", text: "second part" }
+        ],
+        stop_reason: "end_turn"
+      };
+    }
+  });
+  try {
+    const result = await infer(config({
+      aiProviders: [
+        {
+          name: "anth",
+          shape: "anthropic",
+          apiBase: "https://x",
+          chatPath: "/v1/messages",
+          model: "claude-haiku-4-5-20251001",
+          authHeader: "x-api-key",
+          authScheme: "raw",
+          apiKey: "k",
+          priority: 1
+        }
+      ]
+    }), [{ role: "user", content: "x" }], []);
+    assert.equal(result.fallback, false);
+    assert.equal(result.content, "first part\nsecond part");
+    assert.equal(result.finishReason, "end_turn");
+  } finally {
+    global.fetch = originalFetch;
+  }
+});
+
+test("anthropic-shape provider: tool_use blocks become tool_calls (OpenAI shape)", async () => {
+  const originalFetch = global.fetch;
+  global.fetch = async () => ({
+    ok: true,
+    status: 200,
+    async json() {
+      return {
+        content: [
+          { type: "text", text: "calling tool" },
+          { type: "tool_use", id: "toolu_1", name: "echo", input: { text: "hi" } }
+        ],
+        stop_reason: "tool_use"
+      };
+    }
+  });
+  try {
+    const result = await infer(config({
+      aiProviders: [
+        {
+          name: "anth",
+          shape: "anthropic",
+          apiBase: "https://x",
+          chatPath: "/v1/messages",
+          model: "claude-haiku-4-5-20251001",
+          authHeader: "x-api-key",
+          authScheme: "raw",
+          apiKey: "k",
+          priority: 1
+        }
+      ]
+    }), [{ role: "user", content: "x" }], []);
+    assert.equal(result.fallback, false);
+    assert.match(result.content, /calling tool/);
+    assert.ok(Array.isArray(result.toolCalls));
+    assert.equal(result.toolCalls.length, 1);
+    assert.equal(result.toolCalls[0].id, "toolu_1");
+    assert.equal(result.toolCalls[0].function.name, "echo");
+    const args = JSON.parse(result.toolCalls[0].function.arguments);
+    assert.equal(args.text, "hi");
+  } finally {
+    global.fetch = originalFetch;
+  }
+});
+
+test("anthropic-shape provider: empty content array → 'AI API returned no message'", async () => {
+  const originalFetch = global.fetch;
+  global.fetch = async () => ({
+    ok: true,
+    status: 200,
+    async json() {
+      return { content: [], stop_reason: "end_turn" };
+    }
+  });
+  try {
+    const result = await infer(config({
+      aiProviders: [
+        {
+          name: "anth",
+          shape: "anthropic",
+          apiBase: "https://x",
+          chatPath: "/v1/messages",
+          model: "claude-haiku-4-5-20251001",
+          authHeader: "x-api-key",
+          authScheme: "raw",
+          apiKey: "k",
+          priority: 1
+        }
+      ]
+    }), [{ role: "user", content: "x" }], []);
+    // Falls back to deterministic when the only configured provider fails.
+    assert.equal(result.fallback, true);
+  } finally {
+    global.fetch = originalFetch;
+  }
+});
+
+test("openai-shape default still works (regression check)", async () => {
+  const originalFetch = global.fetch;
+  let capturedBody = null;
+  global.fetch = async (_url, options) => {
+    capturedBody = JSON.parse(options.body);
+    return {
+      ok: true,
+      status: 200,
+      async json() {
+        return {
+          choices: [{ message: { role: "assistant", content: "openai still works" }, finish_reason: "stop" }]
+        };
+      }
+    };
+  };
+  try {
+    const result = await infer(config({
+      aiProviders: [
+        {
+          name: "openai",
+          apiBase: "https://api.openai.com/v1",
+          chatPath: "/chat/completions",
+          model: "gpt-4o-mini",
+          apiKey: "k",
+          priority: 1
+        }
+      ]
+    }), [{ role: "user", content: "x" }], []);
+    assert.equal(result.fallback, false);
+    assert.equal(result.content, "openai still works");
+    // Verify default OpenAI body shape preserved
+    assert.equal(capturedBody.messages[0].role, "user");
+    assert.equal(capturedBody.system, undefined, "no separate system field on OpenAI shape");
+  } finally {
+    global.fetch = originalFetch;
+  }
+});

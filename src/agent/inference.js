@@ -256,16 +256,54 @@ async function infer(config, messages, tools, routing) {
     const originalIndex = providers.indexOf(provider);
     const index = originalIndex >= 0 ? originalIndex : iterIndex;
     const providerName = provider.name || `route_${index}`;
-    const body = {
-      model: provider.model,
-      messages: apiMessages,
-      temperature: 0.2,
-      // Bound the response so reasoning models (e.g. mimo-v2.5-pro)
-      // don't run away with the upstream connection. Provider can
-      // override via provider.maxTokens.
-      max_tokens: Number(provider.maxTokens || 4096),
-      tools: toolsSchema
-    };
+
+    // Body shape: OpenAI-compatible (default) or Anthropic-native.
+    // Anthropic-shape providers (Claude direct, freemodel-cc, any
+    // /v1/messages endpoint) declare `shape: "anthropic"` in
+    // ORBIT_AI_PROVIDERS config. They use:
+    //   - separate `system` field (extracted from system messages)
+    //   - mandatory `max_tokens`
+    //   - tools shaped { name, description, input_schema } (no
+    //     "type":"function" wrapper)
+    //   - response: { content: [{type:"text", text:"..."}], stop_reason }
+    // OpenAI-shape (default) keeps the existing body/parse path.
+    const isAnthropicShape = provider.shape === "anthropic";
+
+    let body;
+    if (isAnthropicShape) {
+      const systemMessages = apiMessages.filter((m) => m.role === "system");
+      const conversationMessages = apiMessages
+        .filter((m) => m.role !== "system")
+        .map((m) => ({ role: m.role, content: m.content || "" }));
+      body = {
+        model: provider.model,
+        messages: conversationMessages,
+        max_tokens: Number(provider.maxTokens || 4096),
+        temperature: 0.2
+      };
+      if (systemMessages.length > 0) {
+        body.system = systemMessages.map((m) => m.content || "").join("\n\n");
+      }
+      if (toolsSchema.length > 0) {
+        // Anthropic tools shape: { name, description, input_schema }
+        body.tools = toolsSchema.map((t) => ({
+          name: t.function.name,
+          description: t.function.description,
+          input_schema: t.function.parameters
+        }));
+      }
+    } else {
+      body = {
+        model: provider.model,
+        messages: apiMessages,
+        temperature: 0.2,
+        // Bound the response so reasoning models (e.g. mimo-v2.5-pro)
+        // don't run away with the upstream connection. Provider can
+        // override via provider.maxTokens.
+        max_tokens: Number(provider.maxTokens || 4096),
+        tools: toolsSchema
+      };
+    }
 
     const startedAt = Date.now();
     try {
@@ -307,9 +345,50 @@ async function infer(config, messages, tools, routing) {
       }
 
       const parsed = await response.json();
-      const choice = parsed.choices && parsed.choices[0];
-      if (!choice || !choice.message) {
-        throw new Error("AI API returned no message");
+
+      // Anthropic-shape response parsing. Native Anthropic returns:
+      //   { content: [{type:"text", text:"..."}, {type:"tool_use", ...}],
+      //     stop_reason: "end_turn"|"tool_use"|... }
+      // We translate this back into the OpenAI-shape `choice` the rest of
+      // run.js consumes, so callers stay shape-agnostic.
+      let choice;
+      if (isAnthropicShape) {
+        const blocks = Array.isArray(parsed.content) ? parsed.content : [];
+        const textParts = blocks.filter((b) => b && b.type === "text").map((b) => b.text || "");
+        const toolUseBlocks = blocks.filter((b) => b && b.type === "tool_use");
+        const toolCalls = toolUseBlocks.map((b, i) => ({
+          id: b.id || `call_${i}`,
+          type: "function",
+          function: {
+            name: b.name,
+            arguments: typeof b.input === "string" ? b.input : JSON.stringify(b.input || {})
+          }
+        }));
+        if (textParts.length === 0 && toolCalls.length === 0) {
+          throw new Error("AI API returned no message");
+        }
+        choice = {
+          message: {
+            role: "assistant",
+            content: textParts.join("\n"),
+            tool_calls: toolCalls.length > 0 ? toolCalls : undefined
+          },
+          finish_reason: parsed.stop_reason || "stop"
+        };
+        if (parsed.usage) {
+          // Anthropic uses input_tokens / output_tokens; usage helper
+          // already handles both shapes.
+          parsed.usage = {
+            prompt_tokens: parsed.usage.input_tokens,
+            completion_tokens: parsed.usage.output_tokens,
+            ...parsed.usage
+          };
+        }
+      } else {
+        choice = parsed.choices && parsed.choices[0];
+        if (!choice || !choice.message) {
+          throw new Error("AI API returned no message");
+        }
       }
 
       const latencyMs = Date.now() - startedAt;
