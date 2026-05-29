@@ -89,3 +89,24 @@ test("assertPreLaunchNotExpired: uses Date.now() when no now passed", () => {
   });
   assert.equal(result.ok, true);
 });
+
+// T-7b (security audit 2026-05-29): future-dated preLaunchVerifiedAt is rejected.
+
+test("T-7b: future-dated preLaunchVerifiedAt fails (would silently extend validity)", () => {
+  const future = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(); // 1d in future
+  const result = assertPreLaunchNotExpired({
+    preLaunchVerified: true,
+    preLaunchVerifiedAt: future
+  });
+  assert.equal(result.ok, false);
+  assert.equal(result.reason, "pre_launch_age_unknown");
+});
+
+test("T-7b: tiny clock-skew (≤5 min) is tolerated", () => {
+  const slightFuture = new Date(Date.now() + 60 * 1000).toISOString(); // 1 min ahead
+  const result = assertPreLaunchNotExpired({
+    preLaunchVerified: true,
+    preLaunchVerifiedAt: slightFuture
+  });
+  assert.equal(result.ok, true);
+});

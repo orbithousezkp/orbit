@@ -93,6 +93,20 @@ function stableFingerprint(value) {
 // hash" question.
 //
 // To add/edit a criterion: bump D018_CRITERIA_VERSION + edit list. Re-verify.
+//
+// Threat-model note (#4 in 2026-05-29 security audit): T-2's hash check
+// gates ON state.preLaunchVerifiedHash matching d018CriteriaHash(), but
+// the hash field itself is plain JSON in memory/state.json. A hostile
+// maintainer (or a compromised LLM with commit perms) who could land a
+// commit on `main` could set BOTH preLaunchVerified=true AND
+// preLaunchVerifiedHash=<currentHash> in the same commit, bypassing T-2
+// entirely. The defenses are layered OUTSIDE this module:
+//   - .github/CODEOWNERS pins /memory/state.json to owner (added 2026-05-29)
+//   - .github/workflows/signed-commit-check.yml refuses unsigned commits
+//     when ORBIT_SIGN_ENFORCE=true (T-3; owner enable via PUNCH_LIST §8)
+//   - Branch protection requires the verify-signatures check + signed
+//     commits to merge (owner enable via PUNCH_LIST §8)
+// Without all three, T-2 is paper-only. The runbook is OWNER_PUNCH_LIST.md §8.
 const D018_CRITERIA_VERSION = 1;
 const D018_CRITERIA = Object.freeze([
   { id: 1, label: "health 0 FAIL, 0 OPEN BLOCKERS" },
@@ -166,6 +180,19 @@ function assertPreLaunchNotExpired(state = {}, now = new Date()) {
   }
   const nowMs = now instanceof Date ? now.getTime() : Number(now);
   const ageMs = nowMs - verifiedAtMs;
+  // T-7b (security audit 2026-05-29): future-dated preLaunchVerifiedAt
+  // would yield negative age and silently extend validity. Reject any
+  // timestamp ahead of `now` (with a small clock-skew tolerance).
+  const CLOCK_SKEW_TOLERANCE_MS = 5 * 60 * 1000; // 5 min
+  if (ageMs < -CLOCK_SKEW_TOLERANCE_MS) {
+    return {
+      ok: false,
+      reason: "pre_launch_age_unknown",
+      detail: `state.preLaunchVerifiedAt is in the future (${verifiedAtRaw}); refusing to extend validity`,
+      verifiedAt: verifiedAtRaw,
+      ageMs
+    };
+  }
   if (ageMs > PRE_LAUNCH_MAX_AGE_MS) {
     return {
       ok: false,

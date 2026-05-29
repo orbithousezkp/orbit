@@ -122,6 +122,16 @@ gh run watch
 
 **Record:** Done date ____ Provider ____ Daily budget $____
 
+**T-6 rotation stamp:** After completing this step (or any later key rotation), stamp `state.aiKeyRotation.lastRotatedAt` so the cycle's 90-day advisory predicate (`evaluateAiKeyRotation` in `src/agent/ai-key-rotation.js`) opens an `orbit:rotation-due` issue when due. Commands:
+
+```bash
+# After rotating the actual provider key + updating ORBIT_AI_PROVIDER_KEYS secret:
+npm run rotate:ai-key            # writes memory/state.json with lastRotatedAt = now
+git add memory/state.json
+git commit -m "ops(t-6): record AI-key rotation"
+git push origin main
+```
+
 ---
 
 ## 4. Provision Farcaster signer
