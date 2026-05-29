@@ -10,3 +10,10 @@ coverage/
 launch-ready/
 .gh-config/
 .envrc
+
+# T-5: approvals.json holds sensitive spend payloads (Amount, Recipient,
+# Purpose) that approvalIssueBodyPublic redacts from the public GitHub
+# issue. The file itself must stay local-only so the redaction is not
+# undone by `git add`. Code (governance.js:loadApprovals) treats a
+# missing file as { approvals: [] } so a fresh checkout works.
+memory/approvals.json
