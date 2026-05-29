@@ -335,12 +335,25 @@ async function makeClanker(config) {
 
 async function launchNativeToken(config, cycle = 0, state = {}, env) {
   const resolvedEnv = env || process.env;
-  if (state.preLaunchVerified !== true) {
+  // T-2/T-7d (security audit 2026-05-29): combined gate — flag true AND
+  // criteria-hash matches current D018_CRITERIA AND verification ≤30 days old.
+  // Backward-compat: legacy refusal reason preserved when only the flag is
+  // unset; T-2/T-7 add the hash + age branches.
+  const { assertPreLaunchGate } = require("./governance");
+  const preLaunchGate = assertPreLaunchGate(state);
+  if (!preLaunchGate.ok) {
     return {
       status: "blocked",
       ok: false,
       blocked: true,
-      reason: "state.preLaunchVerified is not true (D-018 pre-launch gate)"
+      reason: preLaunchGate.reason === "pre_launch_not_verified"
+        ? "state.preLaunchVerified is not true (D-018 pre-launch gate)"
+        : preLaunchGate.reason,
+      detail: preLaunchGate.detail || null,
+      expectedHash: preLaunchGate.expectedHash || null,
+      currentHash: preLaunchGate.currentHash || null,
+      ageMs: preLaunchGate.ageMs || null,
+      maxAgeMs: preLaunchGate.maxAgeMs || null
     };
   }
 
@@ -485,12 +498,18 @@ async function launchNativeToken(config, cycle = 0, state = {}, env) {
 }
 
 async function runRevenueCycle(config, state = {}) {
-  if (state.preLaunchVerified !== true) {
+  // T-2/T-7d: combined gate (see launchNativeToken for full notes).
+  const { assertPreLaunchGate } = require("./governance");
+  const preLaunchGate = assertPreLaunchGate(state);
+  if (!preLaunchGate.ok) {
     return {
       status: "blocked",
       ok: false,
       blocked: true,
-      reason: "state.preLaunchVerified is not true (D-018 pre-launch gate)"
+      reason: preLaunchGate.reason === "pre_launch_not_verified"
+        ? "state.preLaunchVerified is not true (D-018 pre-launch gate)"
+        : preLaunchGate.reason,
+      detail: preLaunchGate.detail || null
     };
   }
 

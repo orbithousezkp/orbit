@@ -84,8 +84,16 @@ function stableFingerprint(value) {
 // the "sticky flag" exploit where preLaunchVerified stays true after the bar
 // for verification has moved.
 //
-// To add a criterion: append to the end (keeps existing hash stable longer)
-// and require owner to re-verify post-change.
+// T-2b (security audit 2026-05-29): hash now includes an explicit
+// D018_CRITERIA_VERSION integer. A benign refactor (whitespace tweak,
+// rephrase) MUST be paired with a version bump — otherwise the hash drifts
+// silently and the gate flag becomes invalid for everyone without anyone
+// noticing the intent. The version makes "did we intend to invalidate
+// existing verifications?" a yes/no question instead of a "look at the
+// hash" question.
+//
+// To add/edit a criterion: bump D018_CRITERIA_VERSION + edit list. Re-verify.
+const D018_CRITERIA_VERSION = 1;
 const D018_CRITERIA = Object.freeze([
   { id: 1, label: "health 0 FAIL, 0 OPEN BLOCKERS" },
   { id: 2, label: "tests 0 fail" },
@@ -98,7 +106,7 @@ const D018_CRITERIA = Object.freeze([
 ]);
 
 function d018CriteriaHash() {
-  return stableFingerprint(D018_CRITERIA);
+  return stableFingerprint({ version: D018_CRITERIA_VERSION, items: D018_CRITERIA });
 }
 
 function assertPreLaunchHashIntegrity(state = {}) {
@@ -169,6 +177,56 @@ function assertPreLaunchNotExpired(state = {}, now = new Date()) {
     };
   }
   return { ok: true, reason: "verified", ageMs, maxAgeMs: PRE_LAUNCH_MAX_AGE_MS };
+}
+
+// T-2/T-7d (security audit 2026-05-29): convenience helper that all
+// on-chain gates call before producing a tx. Combines the three checks:
+//   1. state.preLaunchVerified === true (the D-018 master gate)
+//   2. assertPreLaunchHashIntegrity (T-2 — criteria-drift defense)
+//   3. assertPreLaunchNotExpired (T-7 — age defense)
+// Returns { ok, reason, detail? }. The same blocked-shape consumers
+// (clanker, treasury-sweep, etc.) already use.
+//
+// Backward-compat: legacy state that has preLaunchVerified=true but
+// neither preLaunchVerifiedHash nor preLaunchVerifiedAt set is treated
+// as LEGACY-ALLOWED (returns ok:true with reason="verified_legacy").
+// This is so existing deployments + test fixtures do not silently break
+// when T-2/T-7 wiring lands. Pre-launch verification post-2026-05-29
+// MUST set both fields per OWNER_PUNCH_LIST.md §7; T-2/T-7 then bind.
+function assertPreLaunchGate(state = {}, now = new Date()) {
+  if (state.preLaunchVerified !== true) {
+    return {
+      ok: false,
+      reason: "pre_launch_not_verified",
+      detail: "state.preLaunchVerified is not true (D-018 pre-launch gate)"
+    };
+  }
+  const hasHash = typeof state.preLaunchVerifiedHash === "string" && state.preLaunchVerifiedHash.length > 0;
+  const hasTimestamp = typeof state.preLaunchVerifiedAt === "string" && state.preLaunchVerifiedAt.length > 0;
+  if (!hasHash && !hasTimestamp) {
+    return { ok: true, reason: "verified_legacy" };
+  }
+  const hashCheck = assertPreLaunchHashIntegrity(state);
+  if (!hashCheck.ok) {
+    return {
+      ok: false,
+      reason: hashCheck.reason,
+      detail: hashCheck.detail,
+      expectedHash: hashCheck.expectedHash,
+      currentHash: hashCheck.currentHash
+    };
+  }
+  const ageCheck = assertPreLaunchNotExpired(state, now);
+  if (!ageCheck.ok) {
+    return {
+      ok: false,
+      reason: ageCheck.reason,
+      detail: ageCheck.detail,
+      ageMs: ageCheck.ageMs,
+      maxAgeMs: ageCheck.maxAgeMs
+    };
+  }
+  return { ok: true, reason: "verified" };
 }
 
 function stableValue(value) {
@@ -292,24 +350,32 @@ function approvalIssueBody(approval) {
 }
 
 // T-5 (STABILITY_SECURITY.md): public approval-issue bodies must not leak
-// the sensitive fields of a spend request (Amount; Recipient wallet address;
-// Purpose; URL on external_spend) when posted to a GitHub issue. Approver
-// looks up the full request in memory/approvals.json by ID.
+// the sensitive fields of a spend request (Amount; Recipient; Purpose; URL
+// on external_spend) when posted to a GitHub issue. Approver looks up the
+// full request in memory/approvals.json by ID.
 //
-// Class-label recipients (configured provider names like
-// "configured-ai-credit-provider") and configured purchase URLs for
-// non-external_spend categories stay visible — those are public click
-// targets the approver needs.
+// T-5c (security audit, 2026-05-29): previous version redacted Recipient
+// only when it matched /^0x[40]/. That missed ENS names, CAIP-10
+// addresses, Bitcoin/Solana strings — all would leak as plain Recipient
+// on a public repo. New default: redact unless the request category is on
+// the SAFE_RECIPIENT_CATEGORIES allowlist (where recipient is a public
+// class label, e.g. ai_food_refill's "configured-ai-credit-provider").
 //
 // Risk-flag CATEGORIES surface (they ARE the signal the approver needs);
 // flag MESSAGES stay private (may themselves contain incident detail).
+const SAFE_RECIPIENT_CATEGORIES = new Set([
+  "ai_food_refill" // recipient is a configured provider name, not an address
+]);
+
 function approvalIssueBodyPublic(approval) {
   const request = approval.classification.request;
   const recipient = String(request.recipient || "");
-  const recipientLooksLikeAddress = /^0x[0-9a-fA-F]{40}$/.test(recipient);
-  const recipientLine = recipientLooksLikeAddress
-    ? "Recipient: `<redacted; see private state>`"
-    : `Recipient: \`${recipient || "none"}\``;
+  const recipientCategorySafe = SAFE_RECIPIENT_CATEGORIES.has(request.category);
+  const recipientLine = recipient.length === 0
+    ? "Recipient: `none`"
+    : recipientCategorySafe
+      ? `Recipient: \`${recipient}\``
+      : "Recipient: `<redacted; see private state>`";
 
   const isExternalSpend = request.category === "external_spend";
   const purchaseUrl = typeof request.url === "string" ? request.url.trim() : "";
@@ -870,11 +936,13 @@ module.exports = {
   ACTION_TIER_MAP,
   APPROVALS_PATH,
   D018_CRITERIA,
+  D018_CRITERIA_VERSION,
   GOVERNANCE_PATH,
   PRE_LAUNCH_MAX_AGE_MS,
   actionTier,
   approvalIssueBody,
   approvalIssueBodyPublic,
+  assertPreLaunchGate,
   assertPreLaunchHashIntegrity,
   assertPreLaunchNotExpired,
   assertTreasuryFloor,

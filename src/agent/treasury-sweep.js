@@ -104,7 +104,15 @@ function computeSweepIdem({ cycle, sweepWeek, balanceWei }) {
 function isSweepEnabled(config, state, env) {
   const reasons = [];
   if (env && env.ORBIT_ENABLE_TREASURY_SWEEP !== "true") reasons.push("ORBIT_ENABLE_TREASURY_SWEEP is not true");
-  if (!state || state.preLaunchVerified !== true) reasons.push("state.preLaunchVerified is not true (D-018)");
+  // T-2/T-7d (security audit 2026-05-29): combined gate replaces bare
+  // boolean check. Hash + age now also gate the sweep.
+  const { assertPreLaunchGate } = require("./governance");
+  const preLaunchGate = assertPreLaunchGate(state || {});
+  if (!preLaunchGate.ok) {
+    reasons.push(preLaunchGate.reason === "pre_launch_not_verified"
+      ? "state.preLaunchVerified is not true (D-018)"
+      : `D-018 gate: ${preLaunchGate.reason}`);
+  }
   if (!state || typeof state.tokenAddress !== "string" || state.tokenAddress.length < 10) {
     reasons.push("state.tokenAddress is not set");
   }

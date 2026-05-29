@@ -96,3 +96,67 @@ test("approvalIssueBodyPublic refers reader to private state for details", () =>
   const body = approvalIssueBodyPublic(sampleApproval());
   assert.match(body, /memory\/approvals\.json/);
 });
+
+// T-5c (security audit 2026-05-29): broaden redaction. Previously only
+// /^0x[40]/ addresses were redacted, leaving ENS / CAIP / non-EVM strings
+// exposed. Now default-deny: redact unless category is on the safe-class
+// allowlist.
+
+test("T-5c: ENS-name recipient is redacted (was leaked pre-fix)", () => {
+  const approval = {
+    id: "ensleak123",
+    classification: {
+      request: {
+        category: "external_spend",
+        asset: "ETH",
+        amount: "0.5",
+        recipient: "vitalik.eth",
+        purpose: "x",
+        url: ""
+      },
+      risk: { flags: [] }
+    }
+  };
+  const body = approvalIssueBodyPublic(approval);
+  assert.doesNotMatch(body, /vitalik\.eth/);
+  assert.match(body, /Recipient: `<redacted/);
+});
+
+test("T-5c: CAIP-10 chain-prefixed recipient is redacted", () => {
+  const approval = {
+    id: "caip123",
+    classification: {
+      request: {
+        category: "external_spend",
+        asset: "USDC",
+        amount: "100",
+        recipient: "eip155:1:0xdeadbeef00000000000000000000000000000001",
+        purpose: "x",
+        url: ""
+      },
+      risk: { flags: [] }
+    }
+  };
+  const body = approvalIssueBodyPublic(approval);
+  assert.doesNotMatch(body, /eip155:1:/);
+  assert.doesNotMatch(body, /deadbeef/);
+});
+
+test("T-5c: ai_food_refill category preserves provider name (allowlisted)", () => {
+  const approval = {
+    id: "aifood123",
+    classification: {
+      request: {
+        category: "ai_food_refill",
+        asset: "USD credits",
+        amount: 20,
+        recipient: "configured-ai-credit-provider",
+        purpose: "x",
+        url: "https://provider.example/buy"
+      },
+      risk: { flags: [] }
+    }
+  };
+  const body = approvalIssueBodyPublic(approval);
+  assert.match(body, /configured-ai-credit-provider/);
+});
