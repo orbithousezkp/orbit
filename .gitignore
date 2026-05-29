@@ -17,3 +17,9 @@ launch-ready/
 # undone by `git add`. Code (governance.js:loadApprovals) treats a
 # missing file as { approvals: [] } so a fresh checkout works.
 memory/approvals.json
+
+# orbit-keygen output. Web3 Keystore v3 (encrypted, but the encryption is
+# only as strong as the passphrase, and the file shape itself proves a key
+# pair exists). Never commit. orbit-keygen claims it auto-adds this to
+# .gitignore — adding here as belt + braces.
+keys/
