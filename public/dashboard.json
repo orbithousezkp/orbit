@@ -1,7 +1,7 @@
 {
   "schema": "orbit-dashboard/1",
-  "generatedAt": "2026-05-29T01:35:01.121Z",
-  "gitCommit": "e9061ef",
+  "generatedAt": "2026-05-29T02:14:49.564Z",
+  "gitCommit": "3166801",
   "product": {
     "name": "Orbit",
     "category": "GitHub-native agent infrastructure"
@@ -11,14 +11,14 @@
     "name": "Foundation Control Plane",
     "status": "active"
   },
-  "signer": null,
+  "signer": "0x58211F54eE90FB403dEC9cd57E8407F9963ADaed",
   "lifecycle": {
-    "cycle": 60,
+    "cycle": 61,
     "born": "2026-05-22T01:46:39.981Z",
-    "lastActive": "2026-05-29T01:35:00.205Z",
+    "lastActive": "2026-05-29T02:14:48.861Z",
     "lastStatus": "completed",
     "firstWakeIntroComplete": true,
-    "recordedCycles": 60
+    "recordedCycles": 61
   },
   "walletPolicy": {
     "approvalMode": "owner_approval_required",
@@ -45,12 +45,12 @@
     ]
   },
   "receipts": {
-    "count": 46,
+    "count": 47,
     "latest": {
-      "path": "runtime/proofs/2026-05-29/2026-05-29T01-35-00-738Z.json",
-      "cycle": 60,
-      "startedAt": "2026-05-29T01:35:00.205Z",
-      "finishedAt": "2026-05-29T01:35:00.738Z",
+      "path": "runtime/proofs/2026-05-29/2026-05-29T02-14-49-211Z.json",
+      "cycle": 61,
+      "startedAt": "2026-05-29T02:14:48.861Z",
+      "finishedAt": "2026-05-29T02:14:49.211Z",
       "trigger": {
         "type": "event",
         "id": "owner_manual_wake",
@@ -63,13 +63,56 @@
       "totalSteps": 3,
       "filesChangedCount": 4,
       "result": "No AI provider is configured. Local deterministic planner selected: Build from open-source idea: Issue Scam Scanner GitHub Action: Problem: Repos need a reusable agent control plane instead of scattered scripts. Project idea: A GitHub Actio",
-      "signed": false,
-      "signer": null,
-      "signatureScheme": null,
-      "payloadHash": null
+      "signed": true,
+      "signer": "0x58211F54eE90FB403dEC9cd57E8407F9963ADaed",
+      "signatureScheme": "eip712:orbit-cycle-proof/1",
+      "payloadHash": "0x199fc5f7bfb241e8b45a483818856b19f5505dc86f5d77e42b13e1776c2e7a5a"
     },
-    "latestSigned": null,
+    "latestSigned": {
+      "path": "runtime/proofs/2026-05-29/2026-05-29T02-14-49-211Z.json",
+      "cycle": 61,
+      "startedAt": "2026-05-29T02:14:48.861Z",
+      "finishedAt": "2026-05-29T02:14:49.211Z",
+      "trigger": {
+        "type": "event",
+        "id": "owner_manual_wake",
+        "label": "owner manual wake",
+        "source": "workflow_dispatch",
+        "action": "",
+        "reason": "Wake because the owner asked for a cycle now."
+      },
+      "dryRun": false,
+      "totalSteps": 3,
+      "filesChangedCount": 4,
+      "result": "No AI provider is configured. Local deterministic planner selected: Build from open-source idea: Issue Scam Scanner GitHub Action: Problem: Repos need a reusable agent control plane instead of scattered scripts. Project idea: A GitHub Actio",
+      "signed": true,
+      "signer": "0x58211F54eE90FB403dEC9cd57E8407F9963ADaed",
+      "signatureScheme": "eip712:orbit-cycle-proof/1",
+      "payloadHash": "0x199fc5f7bfb241e8b45a483818856b19f5505dc86f5d77e42b13e1776c2e7a5a"
+    },
     "list": [
+      {
+        "path": "runtime/proofs/2026-05-29/2026-05-29T02-14-49-211Z.json",
+        "cycle": 61,
+        "startedAt": "2026-05-29T02:14:48.861Z",
+        "finishedAt": "2026-05-29T02:14:49.211Z",
+        "trigger": {
+          "type": "event",
+          "id": "owner_manual_wake",
+          "label": "owner manual wake",
+          "source": "workflow_dispatch",
+          "action": "",
+          "reason": "Wake because the owner asked for a cycle now."
+        },
+        "dryRun": false,
+        "totalSteps": 3,
+        "filesChangedCount": 4,
+        "result": "No AI provider is configured. Local deterministic planner selected: Build from open-source idea: Issue Scam Scanner GitHub Action: Problem: Repos need a reusable agent control plane instead of scattered scripts. Project idea: A GitHub Actio",
+        "signed": true,
+        "signer": "0x58211F54eE90FB403dEC9cd57E8407F9963ADaed",
+        "signatureScheme": "eip712:orbit-cycle-proof/1",
+        "payloadHash": "0x199fc5f7bfb241e8b45a483818856b19f5505dc86f5d77e42b13e1776c2e7a5a"
+      },
       {
         "path": "runtime/proofs/2026-05-29/2026-05-29T01-35-00-738Z.json",
         "cycle": 60,
@@ -273,29 +316,6 @@
         "signer": null,
         "signatureScheme": null,
         "payloadHash": null
-      },
-      {
-        "path": "runtime/proofs/2026-05-24/2026-05-24T22-44-32-651Z.json",
-        "cycle": 51,
-        "startedAt": "2026-05-24T22:41:30.076Z",
-        "finishedAt": "2026-05-24T22:44:32.651Z",
-        "trigger": {
-          "type": "mandatory",
-          "id": "regular_heartbeat",
-          "label": "30-minute heartbeat",
-          "intervalMinutes": 30,
-          "source": "schedule",
-          "action": "",
-          "reason": "Wake on the fixed repository control-plane rhythm even when no event fires."
-        },
-        "dryRun": false,
-        "totalSteps": 29,
-        "filesChangedCount": 6,
-        "result": null,
-        "signed": false,
-        "signer": null,
-        "signatureScheme": null,
-        "payloadHash": null
       }
     ]
   },
@@ -357,9 +377,9 @@
     "byPhase": {},
     "recent": []
   },
-  "digest": "0x23d57cfc",
+  "digest": "0x55f51bb5",
   "revenue": {
-    "generatedAt": "2026-05-29T01:35:01.123Z",
+    "generatedAt": "2026-05-29T02:14:49.565Z",
     "streamCount": {
       "active": 0,
       "deprecated": 0
