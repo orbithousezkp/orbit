@@ -21,7 +21,7 @@
 **Why Orbit drives it.** gitty's build pipeline is multi-phase (rootfs → kernel → chroot wrapper → security layer → dev layer → AI layer → image → installer → docs) and benefits from the same approval-gated, signed-cycle, public-cast pattern Orbit gives every adopter. Each build phase becomes one or more cycles, each release artifact is named in a signed proof, and Farcaster casts make progress public.
 
 **Architecture.**
-- gitty lives in its own public GitHub repo, scaffolded via `npx @orbit-house/create-orbit-house`
+- gitty lives in its own public GitHub repo, scaffolded via `npx @orbithouse/create-orbit-house`
 - Standard Orbit workflows (`orbit-cycle.yml`, `orbit-event.yml`) plus two custom workflows: `gitty-build.yml` (debootstrap on push to `build/*` branches) and `gitty-release.yml` (D-014 approval-gated tag → signed Release)
 - Separate signer key, separate Farcaster FID, no treasury required for v0.1
 - Orbit drives the build by reading `memory/roadmap.json`, performing branch pushes + issue comments via existing tools, then reading build status comments on the next cycle
@@ -30,7 +30,7 @@
 
 **Sequencing.**
 - **Blocks first** on the private-repo rehearsal of the public-ready Orbit completing (see `docs/REHEARSAL_RUNBOOK.md`). Gitty does not start until the rehearsal closes.
-- Then blocks on S-GATE-1 punch list item #5 (npm publish of `@orbit-house/create-orbit-house`, `@orbit-house/sdk`, `@orbit-house/verifier`).
+- Then blocks on S-GATE-1 punch list item #5 (npm publish of `@orbithouse/create-orbit-house`, `@orbithouse/sdk`, `@orbithouse/verifier`).
 - Does **not** depend on the rehearsal token outcome itself, the Treasury Safe, or D-018 work beyond what the rehearsal already validates.
 - Federation handshake (gitty → mothership `INTEL_SHARE`) waits on federation phase-3 outbound wiring.
 

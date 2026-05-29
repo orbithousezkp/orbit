@@ -1,13 +1,13 @@
 "use strict";
 
-// Thin adapter around @orbit-house/sdk so the MCP tool layer doesn't reach
+// Thin adapter around @orbithouse/sdk so the MCP tool layer doesn't reach
 // into SDK internals. Each function returns a plain object (or array) suitable
 // for serialising to MCP `content[].text`.
 
 let sdkModule;
 try {
   // Published package (production / npm-installed consumer).
-  sdkModule = require("@orbit-house/sdk");
+  sdkModule = require("@orbithouse/sdk");
 } catch {
   // Workspace fallback (this monorepo).
   sdkModule = require("../../orbit-sdk");

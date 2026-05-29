@@ -1,4 +1,4 @@
-# @orbit-house/mcp-server
+# @orbithouse/mcp-server
 
 _Part of [Orbit](https://github.com/orbithousezkp/orbit) — the control plane for agent memory and infrastructure inside any GitHub repo._
 
@@ -11,16 +11,16 @@ Read-only by design. The MCP surface does not expose a write path — every on-c
 ## Install
 
 ```bash
-npm install -g @orbit-house/mcp-server
+npm install -g @orbithouse/mcp-server
 ```
 
 Or use `npx` per invocation:
 
 ```bash
-npx -y @orbit-house/mcp-server
+npx -y @orbithouse/mcp-server
 ```
 
-The package depends on `@orbit-house/sdk` and ships zero other dependencies.
+The package depends on `@orbithouse/sdk` and ships zero other dependencies.
 
 ---
 
@@ -43,7 +43,7 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) o
   "mcpServers": {
     "orbit": {
       "command": "npx",
-      "args": ["-y", "@orbit-house/mcp-server"],
+      "args": ["-y", "@orbithouse/mcp-server"],
       "env": {
         "ORBIT_REPO_ROOT": "/absolute/path/to/your/orbit-repo"
       }
@@ -105,10 +105,10 @@ If the MCP spec evolves significantly, swap the implementation; the SDK adapter 
 
 ```bash
 # In an Orbit repo:
-echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}' | npx @orbit-house/mcp-server
+echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}' | npx @orbithouse/mcp-server
 # Should print a JSON-RPC response with serverInfo and protocolVersion.
 
-echo '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' | npx @orbit-house/mcp-server
+echo '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' | npx @orbithouse/mcp-server
 # Should list the 6 tools.
 ```
 
@@ -118,7 +118,7 @@ echo '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' | npx @orbit-house/mcp-ser
 
 - Spec: [`PLAN/SPECS/MCP_BRIDGE.md`](../../PLAN/SPECS/MCP_BRIDGE.md) (S-031)
 - Session: S-032 build
-- SDK: [`@orbit-house/sdk`](../orbit-sdk/) — the read primitive this wraps
-- Verifier: [`@orbit-house/verifier`](../orbit-verifier/) — verify the signed proofs this server surfaces
+- SDK: [`@orbithouse/sdk`](../orbit-sdk/) — the read primitive this wraps
+- Verifier: [`@orbithouse/verifier`](../orbit-verifier/) — verify the signed proofs this server surfaces
 
 MIT.

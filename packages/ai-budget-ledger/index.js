@@ -6,7 +6,7 @@
  * Re-exports the full library API from ledger.js and persist.js
  * so consumers can do:
  *
- *   const ledger = require("@orbit-house/ai-budget-ledger");
+ *   const ledger = require("@orbithouse/ai-budget-ledger");
  *
  * Zero external dependencies.
  */

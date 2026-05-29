@@ -21,7 +21,7 @@ Everything below is implementable with what exists today. No new dependencies, n
 
 **What:**
 - New file `packages/orbit-verifier/index.js` and `cli.js`
-- `npx @orbit-house/verifier <proof.json>` reads proof, recovers signer, checks against expected signer address
+- `npx @orbithouse/verifier <proof.json>` reads proof, recovers signer, checks against expected signer address
 - Returns OK / FAIL with cycle ID + signer
 
 **Effort:** ~2 hours
@@ -60,7 +60,7 @@ Everything below is implementable with what exists today. No new dependencies, n
 
 **What:**
 - Remove `"private": true` from `packages/orbit-sdk/package.json`
-- Add LICENSE, README, publish to npm as `@orbit-house/sdk`
+- Add LICENSE, README, publish to npm as `@orbithouse/sdk`
 - New `packages/create-orbit-house/` — small bin that scaffolds `.github/workflows/`, `memory/`, `governance.json`, `treasury.json` defaults
 - Publish as `create-orbit-house` so `npx create-orbit-house` works
 
@@ -168,7 +168,7 @@ End of Day 1, the repo state shows:
 - [ ] Dashboard live on GitHub Pages showing the cycle counter
 - [ ] At least one Farcaster cast from Orbit's account
 - [ ] `lore/00-genesis.md` exists
-- [ ] `@orbit-house/sdk` is published to npm
+- [ ] `@orbithouse/sdk` is published to npm
 - [ ] `create-orbit-house` is published to npm
 - [ ] Treasury Safe deployed on Base with all signers
 - [ ] One closed-loop demo run end-to-end with public receipt

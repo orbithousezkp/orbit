@@ -5,7 +5,7 @@
  * follows the Orbit data contract (see docs/data-contract.md).
  *
  * Usage:
- *   const orbit = require('@orbit-house/sdk');
+ *   const orbit = require('@orbithouse/sdk');
  *   const sdk = orbit.create('/path/to/orbit-repo');
  *   const status = sdk.quickStatus();
  *   const passport = sdk.getPassport();

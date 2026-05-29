@@ -88,7 +88,7 @@ test("projectForDashboard returns slim shape with schema and digest", () => {
   assert.equal(slim.walletPolicy.publicViewOnly, true);
   // D-020: token state is not in the SDK projection. Adopters
   // don't ship a token-launch surface and the parent's token
-  // status is not surfaced through @orbit-house/sdk.
+  // status is not surfaced through @orbithouse/sdk.
   assert.equal(slim.walletPolicy.token, undefined);
   assert.deepEqual(slim.permissions.allowedWithoutApproval, ["gas", "ai_call"]);
   assert.deepEqual(slim.permissions.blockedUntilApproved, ["Live wallet signing"]);

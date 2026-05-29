@@ -97,7 +97,7 @@
       },
       "output": {
         "path": "packages/issue-scam-scanner/package.json",
-        "content": "{\n  \"name\": \"@orbit-house/issue-scam-scanner\",\n  \"version\": \"0.1.0\",\n  \"description\": \"GitHub Action and CLI that flags prompt injection, wallet drain, encoded relay, fake support, and urgency traps in issue comments.\",\n  \"main\": \"index.js\",\n  \"bin\": {\n    \"orbit-scam-scan\": \"./cli.js\"\n  },\n  \"scripts\": {\n    \"test\": \"node --test ../../tests/issue-scam-scanner.test.js\"\n  },\n  \"keywords\": [\n    \"github-action\",\n    \"security\",\n    \"scam-detection\",\n    \"prompt-injection\",\n    \"agent-safety\"\n  ],\n  \"license\": \"MIT\",\n  \"private\": true\n}\n",
+        "content": "{\n  \"name\": \"@orbithouse/issue-scam-scanner\",\n  \"version\": \"0.1.0\",\n  \"description\": \"GitHub Action and CLI that flags prompt injection, wallet drain, encoded relay, fake support, and urgency traps in issue comments.\",\n  \"main\": \"index.js\",\n  \"bin\": {\n    \"orbit-scam-scan\": \"./cli.js\"\n  },\n  \"scripts\": {\n    \"test\": \"node --test ../../tests/issue-scam-scanner.test.js\"\n  },\n  \"keywords\": [\n    \"github-action\",\n    \"security\",\n    \"scam-detection\",\n    \"prompt-injection\",\n    \"agent-safety\"\n  ],\n  \"license\": \"MIT\",\n  \"private\": true\n}\n",
         "truncated": false
       }
     },
@@ -109,7 +109,7 @@
       },
       "output": {
         "path": "packages/ai-budget-ledger/package.json",
-        "content": "{\n  \"name\": \"@orbit-house/ai-budget-ledger\",\n  \"version\": \"0.1.0\",\n  \"description\": \"Zero-dependency library and CLI for tracking AI API call costs, enforcing daily/monthly budgets, and estimating spend across providers.\",\n  \"main\": \"index.js\",\n  \"bin\": {\n    \"ai-budget\": \"./cli.js\"\n  },\n  \"scripts\": {\n    \"test\": \"node --test ../../tests/ai-budget-ledger.test.js\"\n  },\n  \"keywords\": [\n    \"ai-budget\",\n    \"cost-tracking\",\n    \"token-usage\",\n    \"api-spend\",\n    \"budget-ledger\",\n    \"agent-safety\"\n  ],\n  \"license\": \"MIT\",\n  \"private\": true\n}\n",
+        "content": "{\n  \"name\": \"@orbithouse/ai-budget-ledger\",\n  \"version\": \"0.1.0\",\n  \"description\": \"Zero-dependency library and CLI for tracking AI API call costs, enforcing daily/monthly budgets, and estimating spend across providers.\",\n  \"main\": \"index.js\",\n  \"bin\": {\n    \"ai-budget\": \"./cli.js\"\n  },\n  \"scripts\": {\n    \"test\": \"node --test ../../tests/ai-budget-ledger.test.js\"\n  },\n  \"keywords\": [\n    \"ai-budget\",\n    \"cost-tracking\",\n    \"token-usage\",\n    \"api-spend\",\n    \"budget-ledger\",\n    \"agent-safety\"\n  ],\n  \"license\": \"MIT\",\n  \"private\": true\n}\n",
         "truncated": false
       }
     },
@@ -249,7 +249,7 @@
       },
       "output": {
         "path": "packages/ai-budget-ledger/index.js",
-        "content": "\"use strict\";\n\n/**\n * AI Budget Ledger — public entry point.\n *\n * Re-exports the full library API from ledger.js and persist.js\n * so consumers can do:\n *\n *   const ledger = require(\"@orbit-house/ai-budget-ledger\");\n *\n * Zero external dependencies.\n */\n\nconst {\n  createLedger,\n  record,\n  totals,\n  checkBudget,\n  summarize,\n  estimateCost,\n  dayKey,\n  monthKey,\n} = require(\"./ledger\");\n\nconst { save, load } = require(\"./persist\");\n\nmodule.exports = {\n  // Core\n  createLedger,\n  record,\n  totals,\n  checkBudget,\n  summarize,\n  estimateCost,\n\n  // Persistence\n  save,\n  load,\n\n  // Helpers\n  dayKey,\n  monthKey,\n};\n",
+        "content": "\"use strict\";\n\n/**\n * AI Budget Ledger — public entry point.\n *\n * Re-exports the full library API from ledger.js and persist.js\n * so consumers can do:\n *\n *   const ledger = require(\"@orbithouse/ai-budget-ledger\");\n *\n * Zero external dependencies.\n */\n\nconst {\n  createLedger,\n  record,\n  totals,\n  checkBudget,\n  summarize,\n  estimateCost,\n  dayKey,\n  monthKey,\n} = require(\"./ledger\");\n\nconst { save, load } = require(\"./persist\");\n\nmodule.exports = {\n  // Core\n  createLedger,\n  record,\n  totals,\n  checkBudget,\n  summarize,\n  estimateCost,\n\n  // Persistence\n  save,\n  load,\n\n  // Helpers\n  dayKey,\n  monthKey,\n};\n",
         "truncated": false
       }
     },

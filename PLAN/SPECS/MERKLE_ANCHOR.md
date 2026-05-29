@@ -260,7 +260,7 @@ See `tests/merkle-anchor.test.js` (>=12 tests, `node --test`):
 - **Wallet wiring.** `wallet.sendAnchorTransaction(contract, windowEnd, root, leafCount)`
   is the missing piece for live execution. It belongs in the wallet helper
   that already gates buyback live execution (S-014).
-- **Verifier extension.** The off-chain verifier (`@orbit-house/verifier`)
+- **Verifier extension.** The off-chain verifier (`@orbithouse/verifier`)
   should grow a mode that pulls all proofs for a given window, recomputes
   the root locally, and compares against `rootForWindow(windowEnd)` on Base.
 - **Dashboard tile.** `orbit.horse` should surface the most recent anchored

@@ -26,7 +26,7 @@ export const phases = [
       'capability registry: declared, discoverable, machine-readable',
       'permission boundaries with owner approval gates',
       'prompt-injection guard, scam defence, deterministic fallback planner',
-      '@orbit-house/sdk · create-orbit-house · verifier cli all published',
+      '@orbithouse/sdk · create-orbit-house · verifier cli all published',
     ],
   },
   {
@@ -57,7 +57,7 @@ export const phases = [
     pitch:
       'orbits advertise what they can do. plugins, subscriptions, and the mission board give $ORBIT something to do besides speculation. discovery starts becoming commerce. the developer toolchain plugs in.',
     bullets: [
-      'plugin loader live · third-party @orbit-house/tool-* packages',
+      'plugin loader live · third-party @orbithouse/tool-* packages',
       'capability advertising queryable across the network',
       'signed plugin manifests verified before load',
       'per-repo subscription tier — token-gated SDK access',

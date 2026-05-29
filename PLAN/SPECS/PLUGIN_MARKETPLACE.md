@@ -2,7 +2,7 @@
 
 ## 1. Goal
 
-A registry of published `@orbit-house/tool-*` plugins with aggregate usage stats and a simple reputation score. The registry is a static JSON published to `orbit.horse/registry.json`, refreshed weekly by the host Orbit. Adopter repos opt in to having their plugin usage counted.
+A registry of published `@orbithouse/tool-*` plugins with aggregate usage stats and a simple reputation score. The registry is a static JSON published to `orbit.horse/registry.json`, refreshed weekly by the host Orbit. Adopter repos opt in to having their plugin usage counted.
 
 ## 2. Constraints
 
@@ -15,7 +15,7 @@ A registry of published `@orbit-house/tool-*` plugins with aggregate usage stats
 ## 3. Scope
 
 In:
-- Discovery: weekly npm crawl for `@orbit-house/tool-*` packages with `package.json` marker `"orbit": { "plugin": true }`
+- Discovery: weekly npm crawl for `@orbithouse/tool-*` packages with `package.json` marker `"orbit": { "plugin": true }`
 - Aggregation: count of installs (derived from cycle proofs across adopter repos that opt-in)
 - Reputation score: simple formula based on install count, refusal rate, last-published-at
 - Registry JSON published to `orbit.horse/registry.json`
@@ -38,7 +38,7 @@ Out:
   "signature": "0x...",
   "plugins": [
     {
-      "name": "@orbit-house/tool-example",
+      "name": "@orbithouse/tool-example",
       "version": "0.3.1",
       "description": "...",
       "capabilities": ["read-memory"],

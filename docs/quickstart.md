@@ -21,7 +21,7 @@ git clone https://github.com/orbithousezkp/orbit.git
 cd orbit
 ```
 
-Once `@orbit-house/sdk` and `create-orbit-house` are on npm, you can also scaffold a fresh Orbit-enabled repo with:
+Once `@orbithouse/sdk` and `create-orbit-house` are on npm, you can also scaffold a fresh Orbit-enabled repo with:
 
 ```bash
 npx create-orbit-house my-repo

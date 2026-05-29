@@ -43,8 +43,8 @@ test("e2e: scaffold into empty temp dir via main()", async () => {
     const governance = JSON.parse(fs.readFileSync(path.join(dir, "memory", "governance.json"), "utf8"));
     assert.equal(governance.ownerUsername, "e2e-user");
     const pkg = JSON.parse(fs.readFileSync(path.join(dir, "package.json"), "utf8"));
-    assert.equal(pkg.scripts.cycle, "node node_modules/@orbit-house/sdk/cli.js cycle");
-    assert.equal(pkg.dependencies["@orbit-house/sdk"], "^0.1.0");
+    assert.equal(pkg.scripts.cycle, "node node_modules/@orbithouse/sdk/cli.js cycle");
+    assert.equal(pkg.dependencies["@orbithouse/sdk"], "^0.1.0");
     const readme = fs.readFileSync(path.join(dir, "README.md"), "utf8");
     assert.ok(readme.includes("<!-- orbit:start -->"));
     assert.ok(readme.includes("<!-- orbit:end -->"));
@@ -94,7 +94,7 @@ test("e2e: merging into a target that already has a package.json keeps its scrip
     assert.equal(pkg.scripts.build, "vite build");
     assert.equal(pkg.scripts.cycle, "node mine.js", "existing cycle script must NOT be clobbered");
     assert.equal(pkg.dependencies.react, "^18");
-    assert.equal(pkg.dependencies["@orbit-house/sdk"], "^0.1.0");
+    assert.equal(pkg.dependencies["@orbithouse/sdk"], "^0.1.0");
     const readme = fs.readFileSync(path.join(dir, "README.md"), "utf8");
     assert.ok(readme.includes("# Existing repo"));
     assert.ok(readme.includes("<!-- orbit:start -->"));

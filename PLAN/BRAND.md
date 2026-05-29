@@ -218,7 +218,7 @@ Finished:   2026-XX-XXT00:00:14Z
 Steps:      6
 AI usage:   13,400 tokens · within envelope
 Signed by:  0xABC...
-Verify:     npx @orbit-house/verifier <path>
+Verify:     npx @orbithouse/verifier <path>
 ```
 
 Receipt format is part of the brand. Never decorate it. Never make it pretty. Plain text is the aesthetic.

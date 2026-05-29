@@ -52,7 +52,7 @@ export const currents = [
     n: '06',
     name: 'adoption',
     star: 'orbit-shaped infrastructure runs in more repos every quarter, by more independent operators.',
-    inflight: 'adopter handshake (S-ADP-1) · adopter registry · plugin loader for @orbit-house/tool-* packages.',
+    inflight: 'adopter handshake (S-ADP-1) · adopter registry · plugin loader for @orbithouse/tool-* packages.',
   },
   {
     n: '07',

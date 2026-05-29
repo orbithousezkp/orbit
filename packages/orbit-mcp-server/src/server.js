@@ -15,7 +15,7 @@ const { listResources, readResource } = require("./resources");
 
 const PROTOCOL_VERSION = "2024-11-05";
 const SERVER_INFO = {
-  name: "@orbit-house/mcp-server",
+  name: "@orbithouse/mcp-server",
   version: "0.1.0"
 };
 

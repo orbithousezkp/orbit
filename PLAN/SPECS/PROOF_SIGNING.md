@@ -202,7 +202,7 @@ packages/orbit-verifier/
 
 ```json
 {
-  "name": "@orbit-house/verifier",
+  "name": "@orbithouse/verifier",
   "version": "0.1.0",
   "description": "Verify Orbit cycle proof signatures. Pure Node + viem.",
   "main": "index.js",
@@ -290,7 +290,7 @@ Verifier CLI tests: exit codes 0/1/2/3/4 via `execFileSync` in `tests/orbit-veri
 - Existing unsigned proofs stay readable. SDK returns them with `{ signed: false, verified: false }`. No history rewriting.
 - First signed cycle = first cycle with both env vars set. Record `firstSignedCycle: <N>` in `memory/state.json`.
 - CLI `orbit-sdk receipts` (existing) gains `[signed]`/`[unsigned]`/`[invalid]` tag in non-JSON mode.
-- Publish `signer` address in `memory/identity.md` so external verifiers can `npx @orbit-house/verifier --signer 0x… proof.json`.
+- Publish `signer` address in `memory/identity.md` so external verifiers can `npx @orbithouse/verifier --signer 0x… proof.json`.
 - If key rotates, owner updates `ORBIT_AGENT_SIGNER` repo var in same commit as secret. Cycle-start check catches typos.
 
 ## Critical files to touch

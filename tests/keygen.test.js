@@ -1,5 +1,5 @@
 /**
- * Tests for @orbit-house/keygen
+ * Tests for @orbithouse/keygen
  *
  * Uses Node's built-in test runner (node:test).
  *

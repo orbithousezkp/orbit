@@ -17,10 +17,10 @@ function runPack() {
   return Array.isArray(parsed) ? parsed[0] : parsed;
 }
 
-test("npm pack --dry-run produces a publish-ready @orbit-house/sdk tarball", () => {
+test("npm pack --dry-run produces a publish-ready @orbithouse/sdk tarball", () => {
   const info = runPack();
 
-  assert.equal(info.name, "@orbit-house/sdk", "package name");
+  assert.equal(info.name, "@orbithouse/sdk", "package name");
   assert.match(info.version, /^\d+\.\d+\.\d+(?:[-+].+)?$/, "valid semver");
 
   const files = (info.files || []).map((f) => f.path);

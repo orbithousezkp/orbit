@@ -36,7 +36,7 @@ The workflow `.github/workflows/deploy-dashboard.yml` is already wired. `public/
    - Secrets: `ORBIT_WALLET_PRIVATE_KEY = 0x...` (the matching key)
 3. Recommended (per `PLAN/DEPLOY_PLAN.md`): hold the key in a workflow-scoped secret store; do not paste into local `.env`.
 
-**Acceptance.** Next cycle's commit body includes `signer: 0x...` and `proof.signature` is non-null. `npx @orbit-house/verifier <receipt.json>` returns OK.
+**Acceptance.** Next cycle's commit body includes `signer: 0x...` and `proof.signature` is non-null. `npx @orbithouse/verifier <receipt.json>` returns OK.
 
 ---
 
@@ -88,7 +88,7 @@ ORBIT_OPS_RUNWAY_SAFE           = 0x...  ( 500 bps; gas + RPC + infra)
 
 ## 5. Publish SDK and scaffolder to npm
 
-**Why.** `@orbit-house/sdk` and `create-orbit-house` are publish-ready (8KB and 11-template tarballs respectively). Until they're on npm, adopters can only consume Orbit by cloning the repo — the S-016 onboarding push is impossible.
+**Why.** `@orbithouse/sdk` and `create-orbit-house` are publish-ready (8KB and 11-template tarballs respectively). Until they're on npm, adopters can only consume Orbit by cloning the repo — the S-016 onboarding push is impossible.
 
 **Do.**
 ```
@@ -109,7 +109,7 @@ cd ../orbit-anchor && npm publish --access public
 cd ../orbit-tool-example && npm publish --access public
 ```
 
-**Acceptance.** Each package resolves at `https://www.npmjs.com/package/@orbit-house/<name>`. `npx create-orbit-house demo-orbit` succeeds in a clean directory.
+**Acceptance.** Each package resolves at `https://www.npmjs.com/package/@orbithouse/<name>`. `npx create-orbit-house demo-orbit` succeeds in a clean directory.
 
 ---
 

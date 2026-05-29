@@ -4,7 +4,7 @@ Two npm packages live in this repo:
 
 | Package | Path | Purpose |
 | --- | --- | --- |
-| `@orbit-house/sdk` | `packages/orbit-sdk/` | Read-only SDK for any consumer of an Orbit repo (CLIs, dashboards, federation peers). |
+| `@orbithouse/sdk` | `packages/orbit-sdk/` | Read-only SDK for any consumer of an Orbit repo (CLIs, dashboards, federation peers). |
 | `create-orbit-house` | `packages/create-orbit-house/` | `npm init orbit-house <name>` scaffolder for new adopters. |
 
 Both are public on npm with provenance, published by `.github/workflows/publish-packages.yml` on tag push.
@@ -49,7 +49,7 @@ If you need to publish without a tag (e.g. emergency dot release), use the **wor
 
 Only the files listed in each package's `files` array end up in the tarball:
 
-- `@orbit-house/sdk`: `index.js`, `cli.js`, `README.md`, `LICENSE` (≈12KB).
+- `@orbithouse/sdk`: `index.js`, `cli.js`, `README.md`, `LICENSE` (≈12KB).
 - `create-orbit-house`: `bin.js`, `src/`, `templates/`, `README.md`, `LICENSE` (≈12KB).
 
 To verify before publishing:

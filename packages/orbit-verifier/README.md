@@ -1,4 +1,4 @@
-# @orbit-house/verifier
+# @orbithouse/verifier
 
 _Part of [Orbit](https://github.com/orbithousezkp/orbit) â€” the control plane for agent memory and infrastructure inside any GitHub repo._
 
@@ -7,9 +7,9 @@ Verify Orbit cycle proof signatures from outside the repo. No Orbit dependency â
 ## Install
 
 ```sh
-npm install -g @orbit-house/verifier
+npm install -g @orbithouse/verifier
 # or one-shot
-npx @orbit-house/verifier proof.json
+npx @orbithouse/verifier proof.json
 ```
 
 ## CLI
@@ -36,7 +36,7 @@ orbit-verify [--signer 0xAbc...] [--json] <proof.json> [proof.json ...]
 ## Programmatic
 
 ```js
-const { verifyProofFile } = require("@orbit-house/verifier");
+const { verifyProofFile } = require("@orbithouse/verifier");
 
 const proof = require("./runtime/proofs/2026-05-23/2026-05-23T16-42-46-385Z.json");
 const result = await verifyProofFile(proof, { expectedSigner: "0xAbc..." });

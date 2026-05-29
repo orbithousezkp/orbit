@@ -61,7 +61,7 @@ function render(result, opts) {
   lines.push("       ORBIT_DRY_RUN              true   (flip to false when ready)");
   lines.push("  5. Push to GitHub. The schedule runs every 30 min.");
   lines.push("  6. Watch your first cycle: gh run watch");
-  lines.push("  7. Verify with: npx @orbit-house/sdk status");
+  lines.push("  7. Verify with: npx @orbithouse/sdk status");
   lines.push("");
   lines.push("docs: https://github.com/orbithousezkp/orbit");
   lines.push("");

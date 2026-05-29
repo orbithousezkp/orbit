@@ -1,5 +1,5 @@
 /**
- * Tests for @orbit-house/vanity-safe
+ * Tests for @orbithouse/vanity-safe
  *
  * Uses Node's built-in test runner. Reference vectors are computed via viem
  * (already a top-level dependency of this repo) using the same Safe v1.4.1

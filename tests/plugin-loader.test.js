@@ -34,7 +34,7 @@ const {
 
 function makePlugin(overrides = {}) {
   return {
-    name: "@orbit-house/tool-example",
+    name: "@orbithouse/tool-example",
     version: "0.1.0",
     capabilities: ["read-memory"],
     tools: [
@@ -142,7 +142,7 @@ test("validatePlugin rejects a tool with non-function handler", () => {
 
 test("validatePlugin accepts a well-formed plugin", () => {
   const result = validatePlugin(makePlugin());
-  assert.equal(result.name, "@orbit-house/tool-example");
+  assert.equal(result.name, "@orbithouse/tool-example");
   assert.deepEqual(result.capabilities, ["read-memory"]);
 });
 
@@ -305,8 +305,8 @@ test("loadPlugins returns empty list when no plugins are enabled", () => {
   const repoRoot = tmpRepoRoot();
   writeManifest(repoRoot, {
     plugins: [
-      { name: "@orbit-house/tool-a", source: "@orbit-house/tool-a", enabled: false, capabilities: ["read-memory"] },
-      { name: "@orbit-house/tool-b", source: "@orbit-house/tool-b", enabled: false, capabilities: ["read-memory"] }
+      { name: "@orbithouse/tool-a", source: "@orbithouse/tool-a", enabled: false, capabilities: ["read-memory"] },
+      { name: "@orbithouse/tool-b", source: "@orbithouse/tool-b", enabled: false, capabilities: ["read-memory"] }
     ]
   });
   const result = loadPlugins(repoRoot, { env: { ORBIT_ENABLE_PLUGINS: "true" } });
@@ -319,8 +319,8 @@ test("loadPlugins refuses duplicate plugin names in the manifest", () => {
   const repoRoot = tmpRepoRoot();
   writeManifest(repoRoot, {
     plugins: [
-      { name: "@orbit-house/tool-x", source: "@orbit-house/tool-x", enabled: true, capabilities: ["read-memory"] },
-      { name: "@orbit-house/tool-x", source: "@orbit-house/tool-x", enabled: true, capabilities: ["read-memory"] }
+      { name: "@orbithouse/tool-x", source: "@orbithouse/tool-x", enabled: true, capabilities: ["read-memory"] },
+      { name: "@orbithouse/tool-x", source: "@orbithouse/tool-x", enabled: true, capabilities: ["read-memory"] }
     ]
   });
   const result = loadPlugins(repoRoot, { env: { ORBIT_ENABLE_PLUGINS: "true" } });

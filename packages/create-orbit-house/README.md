@@ -2,7 +2,7 @@
 
 _Part of [Orbit](https://github.com/orbithousezkp/orbit) — the control plane for agent memory and infrastructure inside any GitHub repo._
 
-Scaffolder for new Orbit repos. Adds GitHub Actions workflows, memory files, governance, treasury policy, and the `@orbit-house/sdk` dependency to a target repository.
+Scaffolder for new Orbit repos. Adds GitHub Actions workflows, memory files, governance, treasury policy, and the `@orbithouse/sdk` dependency to a target repository.
 
 ## Install
 
@@ -44,7 +44,7 @@ target              Directory path. Default: current dir if --here else prompt
 - `runtime/proofs/.gitkeep` — proof receipt directory
 - `.env.example` — required env var names (no secrets)
 - `README.md` — Orbit section between `<!-- orbit:start -->` markers
-- `package.json` — merged `scripts.cycle` and `@orbit-house/sdk` dependency
+- `package.json` — merged `scripts.cycle` and `@orbithouse/sdk` dependency
 
 No secrets are written. All sensitive values are referenced by env-var name only.
 

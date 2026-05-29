@@ -44,26 +44,26 @@ If anything red: stop, fix, re-run. Do not advance to §2 with any red line.
 
 **Goal:** Produce four encrypted keystore files (signer-a, signer-b, signer-c, operator, deployer) that never leave the local filesystem. Imported into MetaMask/Frame for tx signing.
 
-The `@orbit-house/keygen` CLI ships in parallel this session. It writes Web3 Secret Storage v3 keystores (the format MetaMask/Frame import natively).
+The `@orbithouse/keygen` CLI ships in parallel this session. It writes Web3 Secret Storage v3 keystores (the format MetaMask/Frame import natively).
 
 ```bash
-npx @orbit-house/keygen new signer-a
+npx @orbithouse/keygen new signer-a
 # prompt: passphrase (entered twice, never echoed)
 # prompt: passphrase confirmation
 # stdout: 0xAaaa…  (public address only — secret material never touches stdout)
 # writes:  ./keys/signer-a.json  (encrypted with scrypt, the same KDF MetaMask uses)
 
-npx @orbit-house/keygen new signer-b
-npx @orbit-house/keygen new signer-c
-npx @orbit-house/keygen new operator
-npx @orbit-house/keygen new deployer
+npx @orbithouse/keygen new signer-b
+npx @orbithouse/keygen new signer-c
+npx @orbithouse/keygen new operator
+npx @orbithouse/keygen new deployer
 ```
 
 For each generated key:
 
 1. **Record the public address** in a local notes file (`OWNER_ACTIONS_PRIVATE.md` if you keep one out-of-repo). The address is public; the keystore + passphrase are not.
 2. **Import the `./keys/<slot>.json` into MetaMask or Frame.** In MetaMask: Account menu → Import account → JSON File → select keystore → enter passphrase. In Frame: Add account → JSON Keystore → same flow.
-3. **Test the import.** Switch to Base mainnet, view the imported account, confirm the displayed address matches the one `@orbit-house/keygen` printed.
+3. **Test the import.** Switch to Base mainnet, view the imported account, confirm the displayed address matches the one `@orbithouse/keygen` printed.
 
 **Backup, two locations, asymmetric storage:**
 
@@ -78,10 +78,10 @@ Encrypted at rest does not mean safe in transit. Do not paste a keystore into a 
 
 **Goal:** For each of the 7 Safes, find a Safe Proxy Factory salt that produces a deployed Safe address ending in `7777777`. Pure address vanity — no key risk; the grinder only manipulates the public salt parameter passed to `createProxyWithNonce`.
 
-The `@orbit-house/vanity-safe` CLI ships in parallel this session.
+The `@orbithouse/vanity-safe` CLI ships in parallel this session.
 
 ```bash
-npx @orbit-house/vanity-safe grind \
+npx @orbithouse/vanity-safe grind \
   --owners <signer-a-address>,<signer-b-address>,<signer-c-address> \
   --threshold 2 \
   --suffix 7777777 \
@@ -334,7 +334,7 @@ git push origin main
 
 - **Receipt verifies.** The launch wrote a signed proof under `runtime/proofs/<date>/<step>.json`. Run:
   ```bash
-  npx @orbit-house/verifier runtime/proofs/2026-05-25/<step>.json
+  npx @orbithouse/verifier runtime/proofs/2026-05-25/<step>.json
   ```
   Must return `verified: true`. Signer must match `ORBIT_AGENT_SIGNER`.
 
@@ -386,7 +386,7 @@ cast call <WETH-address> "balanceOf(address)(uint256)" <operator-address> --rpc-
 cast call <WETH-address> "balanceOf(address)(uint256)" <fee-receive-safe> --rpc-url https://mainnet.base.org
 
 # Receipt verifies
-npx @orbit-house/verifier runtime/proofs/<date>/<step>.json
+npx @orbithouse/verifier runtime/proofs/<date>/<step>.json
 ```
 
 ---
@@ -444,7 +444,7 @@ The failure modes, in chronological order from most to least recoverable:
 
 - **D-002 violation discovered post-launch (recipients accruing in `Clanker` not `Paired`).** Stop revenue cycles immediately (`gh variable set ORBIT_ENABLE_REVENUE_CYCLE --body "false"` or equivalent). Open an incident issue. tokenAdmin (Fee Receive Safe) can update recipient config on-chain via 2/3 multisig — propose the corrected config there. Do not claim any fees until corrected.
 
-- **Operator wallet compromised post-launch.** Open governance issue. tokenAdmin (Fee Receive Safe) updates the operator recipient on-chain to a new operator wallet (also generated via `@orbit-house/keygen`). Old wallet retains any fees already accrued — accept the loss; the going-forward stream is what matters.
+- **Operator wallet compromised post-launch.** Open governance issue. tokenAdmin (Fee Receive Safe) updates the operator recipient on-chain to a new operator wallet (also generated via `@orbithouse/keygen`). Old wallet retains any fees already accrued — accept the loss; the going-forward stream is what matters.
 
 - **A signer Safe key compromised.** Other 2 of 3 signers propose owner rotation on every Safe (`swapOwner`). Until rotated, the compromised key alone cannot move funds (2/3 threshold). Move fast but not panicked.
 

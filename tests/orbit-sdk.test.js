@@ -1,5 +1,5 @@
 /**
- * Tests for @orbit-house/sdk
+ * Tests for @orbithouse/sdk
  *
  * Uses Node's built-in test runner (node:test).
  * Tests run against the actual Orbit repo state.

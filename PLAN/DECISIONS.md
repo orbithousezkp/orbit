@@ -84,13 +84,13 @@
 
 ---
 
-## D-009 — SDK published as `@orbit-house/sdk` on npm
+## D-009 — SDK published as `@orbithouse/sdk` on npm
 
 **When:** 2026-05-23
 **Session:** S-001
-**Decision:** `packages/orbit-sdk` is published to npm under the scope `@orbit-house`. Currently `"private": true` — that flag is removed and the package is published before Phase 1 closes.
-**Why:** No external adoption possible without a published package. `@orbit-house` matches the household metaphor and is presumably available (verify before publish).
-**Implication:** Owner must register `@orbit-house` org on npm. `create-orbit-house` is also published under same scope or as a standalone unscoped package.
+**Decision:** `packages/orbit-sdk` is published to npm under the scope `@orbithouse`. Currently `"private": true` — that flag is removed and the package is published before Phase 1 closes.
+**Why:** No external adoption possible without a published package. `@orbithouse` matches the household metaphor and is presumably available (verify before publish).
+**Implication:** Owner must register `@orbithouse` org on npm. `create-orbit-house` is also published under same scope or as a standalone unscoped package.
 
 ---
 
@@ -197,7 +197,7 @@ Both recipients have `admin = Treasury Safe`. Buyback, bounty payouts, and lore 
 2. `npm test` passes with 0 failures, 0 skipped tests added in this session
 3. AI provider (MiMo Pro 2.5 via OpenGateway) is configured and verified — at least one cycle calls AI successfully and writes a non-fallback proof
 4. Cycles fire cleanly via GitHub Actions schedule for 12 unbroken hours (24 cycles × 30 min), every cycle producing a signed proof, with zero crashes and zero deterministic-fallback events
-5. Signed cycle proofs (D-006) are live and verifiable via `npx @orbit-house/verifier`
+5. Signed cycle proofs (D-006) are live and verifiable via `npx @orbithouse/verifier`
 6. Public dashboard at orbit.horse is reachable and shows current cycle data
 7. Treasury Safe is deployed and funded on Base
 8. Pre-deploy checklist in `CLANKER_FEE_STRATEGY.md` is fully checked
@@ -254,13 +254,13 @@ Weekly sweep mechanic: every 7 days the Fee Receive Safe (where Clanker pays out
 
 **When:** 2026-05-26
 **Session:** S-SCAFFOLD-AE (Patch Set AE)
-**Decision:** **The `create-orbit-house` scaffolder and `@orbit-house/sdk` ship NOTHING related to token launch. Adopters who choose to launch a token from their own Orbit do so independently. The parent project provides no help, support, or token-launch tracking for adopters.**
+**Decision:** **The `create-orbit-house` scaffolder and `@orbithouse/sdk` ship NOTHING related to token launch. Adopters who choose to launch a token from their own Orbit do so independently. The parent project provides no help, support, or token-launch tracking for adopters.**
 
 Specifically:
 
 - The scaffolder's `.env.example.tpl` no longer lists `ORBIT_TOKEN_ADMIN_ADDRESS`, `ORBIT_TREASURY_ADDRESS`, `ORBIT_OPERATOR_REVENUE_ADDRESS`, `ORBIT_OPERATOR_REVENUE_BPS`, `ORBIT_BASE_RPC_URL`, `ORBIT_ENABLE_TOKEN_LAUNCH`, or `ORBIT_ENABLE_REVENUE_CLAIMS`. `ORBIT_WALLET_PRIVATE_KEY` stays — it's used for D-006 cycle-proof signing, which adopters DO need.
 - The scaffolder's `orbit-cycle.yml.tpl` and `orbit-event.yml.tpl` no longer inject any token / treasury / operator / launch env vars into the agent.
-- `@orbit-house/sdk`'s `quickStatus()` no longer returns `tokenSymbol` or `tokenLaunchStatus`. `projectForDashboard()` no longer emits a `walletPolicy.token` block.
+- `@orbithouse/sdk`'s `quickStatus()` no longer returns `tokenSymbol` or `tokenLaunchStatus`. `projectForDashboard()` no longer emits a `walletPolicy.token` block.
 - `src/agent/clanker.js` and the `launch_native_token` / `prepare_token_launch` / `run_revenue_cycle` tools remain in the **parent** repo (Orbit's own Phase 2 path) but are not copied into any scaffolded child.
 
 **Why:** Two reasons.

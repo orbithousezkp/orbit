@@ -107,7 +107,7 @@ async function execute(plan, opts) {
   if (opts.dryRun) {
     for (const it of plan.items) {
       if (it.kind === "package") {
-        result.merged.push({ path: it.dest, addedKeys: ["scripts.cycle", "dependencies.@orbit-house/sdk"] });
+        result.merged.push({ path: it.dest, addedKeys: ["scripts.cycle", "dependencies.@orbithouse/sdk"] });
         continue;
       }
       if (it.kind === "readme") {

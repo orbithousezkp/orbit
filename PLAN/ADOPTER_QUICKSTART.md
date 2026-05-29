@@ -2,7 +2,7 @@
 
 > Get a new GitHub repo running its first Orbit cycle in under five minutes. No wallet, no token, no on-chain action required.
 
-> **Sovereignty note (D-020).** Your Orbit is yours. The scaffold ships nothing related to token launches and `@orbit-house/sdk` exports nothing token-related. If you decide to launch a token from your Orbit later, you do so independently — the upstream project provides no code, no help, no support, and does not track your token activity. Your wallet, your risk, your call.
+> **Sovereignty note (D-020).** Your Orbit is yours. The scaffold ships nothing related to token launches and `@orbithouse/sdk` exports nothing token-related. If you decide to launch a token from your Orbit later, you do so independently — the upstream project provides no code, no help, no support, and does not track your token activity. Your wallet, your risk, your call.
 
 This recipe assumes:
 - You have `npx`, `git`, and `gh` (GitHub CLI) installed
@@ -119,7 +119,7 @@ npm run sdk -- treasury         # token, fees, distribution policy
 Or via the SDK in code:
 
 ```js
-const orbit = require('@orbit-house/sdk');
+const orbit = require('@orbithouse/sdk');
 const sdk = orbit.create(process.cwd());
 console.log(sdk.quickStatus());
 console.log(sdk.projectForDashboard());
@@ -141,7 +141,7 @@ gh variable set ORBIT_AGENT_SIGNER --body "0x..."       # the ADDR above
 Next cycle, the proof in `runtime/proofs/<date>/<step>.json` will include a `signature` field. Verify with:
 
 ```bash
-npx @orbit-house/verifier runtime/proofs/<date>/<step>.json
+npx @orbithouse/verifier runtime/proofs/<date>/<step>.json
 ```
 
 The signer address must match `ORBIT_AGENT_SIGNER` — that's the D-006 sanity check.

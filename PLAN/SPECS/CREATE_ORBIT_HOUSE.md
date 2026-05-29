@@ -47,7 +47,7 @@ Zero runtime deps. Node ≥18 (uses native fs/promises, readline/promises).
 | `runtime/proofs/.gitkeep` | (verbatim) | none |
 | `.env.example` | .env.example.tpl | (placeholder values only) |
 | `README.md` (append) | README.orbit-section.md.tpl | `{{AGENT_NAME}}` |
-| `package.json` (merge) | package.json.partial.json | adds `scripts.cycle`, `dependencies.@orbit-house/sdk` |
+| `package.json` (merge) | package.json.partial.json | adds `scripts.cycle`, `dependencies.@orbithouse/sdk` |
 
 Hard rule: NO secrets, NO addresses, NO private keys in any template. All references are env-var names. Values like `ORBIT_TREASURY_ADDRESS` appear only as identifiers in `.env.example`.
 
@@ -118,7 +118,7 @@ added:
   .env.example
 
 merged:
-  package.json  (added: scripts.cycle, dependency @orbit-house/sdk)
+  package.json  (added: scripts.cycle, dependency @orbithouse/sdk)
 
 skipped (already present):
   README.md  (no marker found; add <!-- orbit:start --> to enable merge)
@@ -138,7 +138,7 @@ next steps:
        ORBIT_DRY_RUN              true   (flip to false when ready)
   5. Push to GitHub. The schedule runs every 30 min.
   6. Watch your first cycle: gh run watch
-  7. Verify with: npx @orbit-house/sdk status
+  7. Verify with: npx @orbithouse/sdk status
 
 docs: https://orbit.horse  ·  https://github.com/orbithousezkp/orbit
 ```
@@ -175,7 +175,7 @@ CI matrix: Node 18, 20, 22 on ubuntu-latest and macos-latest.
 
 ## 8. npm Publish Steps
 
-Run after D-009 prerequisites (npm `@orbit-house` org registered):
+Run after D-009 prerequisites (npm `@orbithouse` org registered):
 
 1. Bump version in `packages/create-orbit-house/package.json` to `0.1.0`
 2. Verify `name` is `create-orbit-house` (UNSCOPED — so `npx create-orbit-house` works directly without org prefix)

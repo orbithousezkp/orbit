@@ -70,7 +70,7 @@ export const capabilities = [
     name: 'sdk + scaffolder',
     path: 'packages/orbit-sdk',
     status: 'live',
-    desc: '@orbit-house/sdk · create-orbit-house · verifier cli — adopt the layer from a single command.',
+    desc: '@orbithouse/sdk · create-orbit-house · verifier cli — adopt the layer from a single command.',
   },
   {
     n: '11',

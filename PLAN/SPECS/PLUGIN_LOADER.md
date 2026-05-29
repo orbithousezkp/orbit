@@ -85,7 +85,7 @@ for the bounty market accepting plugin work
 
 ```js
 module.exports = {
-  name:    "@orbit-house/tool-example",        // npm-style name
+  name:    "@orbithouse/tool-example",        // npm-style name
   version: "0.1.0",                            // semver
   capabilities: ["read-memory"],               // subset of allowlist
   tools: [
@@ -110,8 +110,8 @@ with a stable, machine-readable message — surfaceable as a refusal log.
 {
   "plugins": [
     {
-      "name": "@orbit-house/tool-example",
-      "source": "@orbit-house/tool-example",
+      "name": "@orbithouse/tool-example",
+      "source": "@orbithouse/tool-example",
       "version": "0.1.0",
       "capabilities": ["read-memory"],
       "enabled": true,
@@ -125,7 +125,7 @@ with a stable, machine-readable message — surfaceable as a refusal log.
 - `name` MUST equal the plugin module's `name`. A mismatch is a load-time
   refusal.
 - `source` is either a `require()`-resolvable specifier
-  (`@orbit-house/tool-example`) or a repo-relative path
+  (`@orbithouse/tool-example`) or a repo-relative path
   (`./packages/orbit-tool-example`). Both resolve from the adopter
   `repoRoot`.
 - `capabilities` is the owner-authorized set. A plugin update that quietly
@@ -221,7 +221,7 @@ plugin never crashes the run.
 9. **Two plugins claim the same tool name.** Resolved at the cycle-loop
    layer, not here. The loader returns each plugin namespaced by
    `plugin.name`; the registration step prefixes the tool with the plugin
-   name (`@orbit-house/tool-example:echo`) so collisions are impossible by
+   name (`@orbithouse/tool-example:echo`) so collisions are impossible by
    construction.
 10. **Duplicate manifest entry for the same plugin name.** Second entry
     refused with `duplicate_in_manifest`.

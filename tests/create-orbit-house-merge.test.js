@@ -11,18 +11,18 @@ test("mergePackageJson preserves existing scripts and deps", () => {
     dependencies: { react: "^18.0.0" }
   });
   const additions = {
-    scripts: { cycle: "node node_modules/@orbit-house/sdk/cli.js cycle" },
-    dependencies: { "@orbit-house/sdk": "^0.1.0" }
+    scripts: { cycle: "node node_modules/@orbithouse/sdk/cli.js cycle" },
+    dependencies: { "@orbithouse/sdk": "^0.1.0" }
   };
   const r = merge.mergePackageJson(existing, additions);
   assert.equal(r.malformed, false);
   assert.equal(r.merged.scripts.build, "vite build");
   assert.equal(r.merged.scripts.test, "node --test");
-  assert.equal(r.merged.scripts.cycle, "node node_modules/@orbit-house/sdk/cli.js cycle");
+  assert.equal(r.merged.scripts.cycle, "node node_modules/@orbithouse/sdk/cli.js cycle");
   assert.equal(r.merged.dependencies.react, "^18.0.0");
-  assert.equal(r.merged.dependencies["@orbit-house/sdk"], "^0.1.0");
+  assert.equal(r.merged.dependencies["@orbithouse/sdk"], "^0.1.0");
   assert.ok(r.addedKeys.includes("scripts.cycle"));
-  assert.ok(r.addedKeys.includes("dependencies.@orbit-house/sdk"));
+  assert.ok(r.addedKeys.includes("dependencies.@orbithouse/sdk"));
 });
 
 test("mergePackageJson does NOT clobber existing cycle script", () => {
@@ -30,7 +30,7 @@ test("mergePackageJson does NOT clobber existing cycle script", () => {
     scripts: { cycle: "node my/own.js" }
   });
   const additions = {
-    scripts: { cycle: "node node_modules/@orbit-house/sdk/cli.js cycle" }
+    scripts: { cycle: "node node_modules/@orbithouse/sdk/cli.js cycle" }
   };
   const r = merge.mergePackageJson(existing, additions);
   assert.equal(r.merged.scripts.cycle, "node my/own.js");
@@ -40,7 +40,7 @@ test("mergePackageJson does NOT clobber existing cycle script", () => {
 test("mergePackageJson handles missing package.json", () => {
   const r = merge.mergePackageJson("", {
     scripts: { cycle: "node x.js" },
-    dependencies: { "@orbit-house/sdk": "^0.1.0" }
+    dependencies: { "@orbithouse/sdk": "^0.1.0" }
   });
   assert.equal(r.malformed, false);
   assert.equal(r.merged.scripts.cycle, "node x.js");

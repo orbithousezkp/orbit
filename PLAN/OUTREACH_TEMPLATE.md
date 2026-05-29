@@ -31,7 +31,7 @@ i'm reaching out because {{repo}} is doing {{specific thing}} and that's the kin
 orbit is a github-native control plane for agents running inside a repo:
 - memory that survives across runs
 - public approval gates (no agent action without a paper trail)
-- eip-712 signed proofs of every cycle (verifiable with npx @orbit-house/verifier)
+- eip-712 signed proofs of every cycle (verifiable with npx @orbithouse/verifier)
 - ai-budget caps, refusal logging, intake risk scanning
 - $0 hosting — github actions + pages
 

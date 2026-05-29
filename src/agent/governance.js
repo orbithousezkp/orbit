@@ -113,7 +113,7 @@ const D018_CRITERIA = Object.freeze([
   { id: 2, label: "tests 0 fail" },
   { id: 3, label: "AI provider configured" },
   { id: 4, label: "12-hour clean Actions stretch" },
-  { id: 5, label: "Signed proofs verifiable via npx @orbit-house/verifier" },
+  { id: 5, label: "Signed proofs verifiable via npx @orbithouse/verifier" },
   { id: 6, label: "Dashboard reachable" },
   { id: 7, label: "Treasury Safe live" },
   { id: 8, label: "Pre-deploy checklist complete" }

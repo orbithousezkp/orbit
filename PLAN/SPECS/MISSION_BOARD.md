@@ -161,7 +161,7 @@ Input: `{ missionId, shippingClaimUrl }` plus a read-only handle to the GitHub A
 
 Algorithm is identical to the bounty verifier with these differences:
 
-- A mission's `shippingClaimUrl` may be a PR URL **or** an Orbit signed-receipt URL. A signed-receipt claim is valid only if (a) the receipt is verifiable via `@orbit-house/verifier`, (b) the receipt references the mission issue by canonical URL, and (c) the cycle in which the receipt was signed completed without a `REFUSAL` outcome on the referenced action.
+- A mission's `shippingClaimUrl` may be a PR URL **or** an Orbit signed-receipt URL. A signed-receipt claim is valid only if (a) the receipt is verifiable via `@orbithouse/verifier`, (b) the receipt references the mission issue by canonical URL, and (c) the cycle in which the receipt was signed completed without a `REFUSAL` outcome on the referenced action.
 - A new checker name `receipt-references-mission` is added to the registry: passes if the signed receipt's `actions[]` array contains an entry whose `summary` or `idem` references the mission's idempotency key.
 
 All other checkers (`pr-merged`, `linked-issue-closed`, `ci-green`, `file-exists`, `tests-pass`) work as in the bounty spec.

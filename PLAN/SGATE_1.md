@@ -35,7 +35,7 @@ S-GATE-1 must close BEFORE D-018 #4 (12-hour clean cycle stretch) can be marked.
 | 2 | tests 0 fail | MET — 365/0 |
 | 3 | AI provider configured | NOT-MET |
 | 4 | 12-hour clean Actions stretch | NOT-MET |
-| 5 | Signed proofs verifiable via `npx @orbit-house/verifier` | MET (code) |
+| 5 | Signed proofs verifiable via `npx @orbithouse/verifier` | MET (code) |
 | 6 | Dashboard reachable | PARTIAL |
 | 7 | Treasury Safe live | NOT-MET |
 | 8 | Pre-deploy checklist complete | PARTIAL |

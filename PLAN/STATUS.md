@@ -41,10 +41,10 @@ OPEN BLOCKERS     : Owner actions — enable GitHub Pages; set ORBIT_AGENT_SIGNE
 | ID | Type | Name | Status | Output |
 |----|------|------|--------|--------|
 | S-001 | S-PLAN | Plan compilation + Clanker fee research | DONE 2026-05-23 | PLAN/ directory: MASTER_PLAN, CLANKER_FEE_STRATEGY, DAY_1, PHASES, ROADMAP, BRAND, DEPLOY_PLAN, DECISIONS, RISKS, STATUS |
-| S-002 | S-BUILD | Wallet-signed cycle proofs (D-006) | DONE 2026-05-24 | EIP-712 signing on every cycle; `src/agent/proof-signing.js` + `proof-canonical.js`; `@orbit-house/verifier` package; signed proofs verifiable via verifier CLI |
+| S-002 | S-BUILD | Wallet-signed cycle proofs (D-006) | DONE 2026-05-24 | EIP-712 signing on every cycle; `src/agent/proof-signing.js` + `proof-canonical.js`; `@orbithouse/verifier` package; signed proofs verifiable via verifier CLI |
 | S-003 | S-BUILD | Public dashboard on GitHub Pages (D-007) | DONE 2026-05-24 | `projectForDashboard` SDK helper; cycle writes `public/dashboard.json` (≤60KB cap); React Dashboard renders all spec sections; bundle 66.5KB gz; GitHub Pages workflow `deploy-dashboard.yml` + `public/CNAME` shipped (custom-domain `orbit.horse` deferred 2026-05-28) |
 | S-004 | S-BUILD | Farcaster cast pipeline (D-008) | DONE 2026-05-24 | `src/agent/farcaster.js` (pickTemplate, renderCast, scanOutbound, publishCast, postCycleCast); `cast_to_farcaster` tool + handler; cycle posts at end of `main()` (dry-run default TRUE); workflow env in orbit-cycle.yml + orbit-event.yml |
-| S-005 | S-BUILD | Publish-ready @orbit-house/sdk + create-orbit-house (D-009) | DONE 2026-05-24 | `packages/orbit-sdk` publish-ready (8KB tarball, 14 exports, MIT LICENSE); `packages/create-orbit-house` full scaffolder (bin.js + 11 templates, atomic rollback, path-traversal guard) |
+| S-005 | S-BUILD | Publish-ready @orbithouse/sdk + create-orbit-house (D-009) | DONE 2026-05-24 | `packages/orbit-sdk` publish-ready (8KB tarball, 14 exports, MIT LICENSE); `packages/create-orbit-house` full scaffolder (bin.js + 11 templates, atomic rollback, path-traversal guard) |
 | S-006 | S-BUILD | Closed-loop demo runbook + integration test | DONE 2026-05-24 | `PLAN/SPECS/CLOSED_LOOP_DEMO.md` + `tests/closed-loop-demo.test.js` covering refill-request → approval → record → next-call chain |
 | S-007 | S-BUILD | Lore foundation (00-genesis, voice, cycles-of-note) | DONE 2026-05-24 | `lore/00-genesis.md`, `lore/voice.md`, `lore/cycles-of-note/`, `lore/README.md` |
 | S-008 | S-PLAN | Treasury Safe deploy runbook | DONE 2026-05-24 | `PLAN/SPECS/TREASURY_SAFE_DEPLOY.md` (8-item checklist) — owner runs deploy |
@@ -64,13 +64,13 @@ OPEN BLOCKERS     : Owner actions — enable GitHub Pages; set ORBIT_AGENT_SIGNE
 | S-Phase4-5 | S-PLAN | Phase 4-5 outlook | DONE 2026-05-24 | `PLAN/SPECS/PHASE_4_5_OUTLOOK.md` |
 | S-MB-1 | S-PLAN | Public Mission Board protocol spec | DONE 2026-05-25 | `PLAN/SPECS/MISSION_BOARD.md` — 14-section spec; lifecycle (10 states), stake contract interface, verifier reuse from BOUNTY_MARKET §5 plus 3 new refusal codes, D-014 approval gate, D-018 + S-GATE-3 hard-block, federation hooks deferred to S-MB-3 |
 | S-MB-W | S-BUILD | Mission Board widget (Phase 1/2) | DONE 2026-05-25 | `src/agent/missions.js` (parser + scanner + projection); `tests/missions.test.js` (17 cases); `.github/ISSUE_TEMPLATE/mission.yml`; SDK `projectForDashboard` exposes `missions: { active, total, list }` slice; cycle writes `memory/missions.json` each run. No staking, no on-chain action — the proposer-stake market lives in S-MB-2 behind S-GATE-3. |
-| S-032 | S-BUILD | MCP server (`@orbit-house/mcp-server`) | DONE 2026-05-25 | `packages/orbit-mcp-server/` — zero-dep stdio MCP server wrapping `@orbit-house/sdk`. 6 tools (`getCycles`/`getReceipt`/`getRefusals`/`getTreasury`/`getDashboardProjection`/`getFederationPeers`) + 3 resources (`cycle://N`, `receipt://N`, `dashboard://current`); `tests/mcp-server.test.js` (17 cases incl. end-to-end JSON-RPC). |
+| S-032 | S-BUILD | MCP server (`@orbithouse/mcp-server`) | DONE 2026-05-25 | `packages/orbit-mcp-server/` — zero-dep stdio MCP server wrapping `@orbithouse/sdk`. 6 tools (`getCycles`/`getReceipt`/`getRefusals`/`getTreasury`/`getDashboardProjection`/`getFederationPeers`) + 3 resources (`cycle://N`, `receipt://N`, `dashboard://current`); `tests/mcp-server.test.js` (17 cases incl. end-to-end JSON-RPC). |
 | S-016-A | S-BUILD | Adopter onboarding artifacts | DONE 2026-05-25 | `PLAN/ADOPTER_PITCH.md` (1-page pitch), `PLAN/ADOPTER_QUICKSTART.md` (9-step recipe), `PLAN/OUTREACH_TEMPLATE.md` (5 templates + tracking schema). Outreach itself is human work. |
 | S-OWN-1 | S-PLAN | Owner-actions surfacing | DONE 2026-05-25 | `OWNER_ACTIONS.md` (top-level) — 7-item S-GATE-1 punch list with copy-paste commands and acceptance checks per item. |
 | S-ADP-1 | S-PLAN/S-BUILD | Adopter handshake + auto-tracking | DONE 2026-05-25 | `PLAN/SPECS/ADOPTER_HANDSHAKE.md`; `src/agent/adopters.js` (handshake intake + 3-criteria re-verification scanner; 22 cases in `tests/adopters.test.js`); `memory/adopters-registry.json` seeded with gitty; `src/cli/orbit-adopter.js` (add/list/verify/remove); SDK `projectForDashboard` exposes `adopters: { adopted, total, phase1Target, phase5Target, list }`; SPA cell shows X/5 toward Phase 1; lineage field added to `well-known.js`; scaffolder templates `memory/orbit-lineage.json.tpl` + `.github/workflows/orbit-onboard.yml.tpl` with `--handshake` flag (default opt-in=N). |
 | S-TREAS-1 | S-PLAN/S-BUILD | D-019 Treasury split into 6 bucket Safes + weekly sweep | DONE 2026-05-25 | `PLAN/DECISIONS.md` D-019 (supersedes D-017's single-Safe stance); `PLAN/SPECS/TREASURY_ALLOCATION.md` (full bucket spec); `PLAN/SPECS/TREASURY_KEYS_BACKUP.md` (multi-sig setup + recovery procedure); `src/agent/treasury-sweep.js` + `tests/treasury-sweep.test.js` (27 cases); `memory/treasury.json` extended with buckets block; OWNER_ACTIONS item 4 expanded to 7-Safe deploy; CLANKER_FEE_STRATEGY.md two-step model. Allocation (% of 95% inflow): Floor 4500 / Productive 2000 / Buyback 500 / Growth 1500 / AI Costs 1000 / Ops Runway 500. DRY_RUN-locked behind state.preLaunchVerified per D-018. |
 | S-HORIZON-1 | S-PLAN/S-BUILD | Horizon scanner — self-extending roadmap engine | SKELETON DONE 2026-05-26 | `PLAN/SPECS/HORIZON_SCANNER.md` (11-section spec); `PLAN/FOREVER_ROADMAP.md` (meta-roadmap with 10 currents); `src/agent/horizon-scanner.js` (5 components: source registry, fetcher hook, classifier hook, drafter, promoter/archiver); `tests/horizon-scanner.test.js` (34 cases incl. dry-run/real-run drafter + lifecycle ticker + end-to-end runHorizonScan with injected mocks + duplicate detection + maxCandidatesPerScan); `src/cli/orbit-horizon.js` (status / scan / list-candidates); `memory/horizon-{sources,candidates,config}.json` seeded with conservative defaults (4 sources, all `enabled: false`; `dryRun: true`). Skeleton ships inert — default fetcher returns 0 items, default classifier rejects all. Live mode requires an owner-wired LLM-backed classifier AND `state.preLaunchVerified === true` (D-018). |
-| S-024 | S-BUILD | Plugin/tool loader for `@orbit-house/tool-*` | DONE 2026-05-24 | `src/agent/plugin-loader.js` + `tests/plugin-loader.test.js` (31 tests); `PLAN/SPECS/PLUGIN_LOADER.md`; `packages/orbit-tool-example/` reference scaffold; capability allowlist + sanitizeToolResponse + ORBIT_ENABLE_PLUGINS gate |
+| S-024 | S-BUILD | Plugin/tool loader for `@orbithouse/tool-*` | DONE 2026-05-24 | `src/agent/plugin-loader.js` + `tests/plugin-loader.test.js` (31 tests); `PLAN/SPECS/PLUGIN_LOADER.md`; `packages/orbit-tool-example/` reference scaffold; capability allowlist + sanitizeToolResponse + ORBIT_ENABLE_PLUGINS gate |
 | S-029/S-030 | S-PLAN/S-BUILD | Multi-maintainer quorum | DONE 2026-05-24 | additive edits to `src/agent/governance.js` + `src/agent/config.js` (`computeThresholds`, `parseQuorumComments`, `evaluateQuorum`, `requiresQuorum`); `tests/governance-quorum.test.js` (26 tests); `PLAN/SPECS/MULTI_MAINTAINER_QUORUM.md`; existing `tests/governance.test.js` unchanged |
 | S-009 | S-BUILD | Closed-loop demo EXECUTION | OWNER-PENDING | needs live Actions cycle (runbook + test ready) |
 | S-011 | S-PLAN | Clanker v4 deploy dry run | PENDING — owner action | needs `ORBIT_AGENT_SIGNER` set + S-GATE-1 closed |
@@ -92,7 +92,7 @@ OPEN BLOCKERS     : Owner actions — enable GitHub Pages; set ORBIT_AGENT_SIGNE
 | `ORBIT_AGENT_SIGNER` repo variable unset | Signed-proof verification chain | 2026-05-24 | — |
 | Farcaster signer (Neynar API key + signer UUID) not provisioned | S-GATE-1 #4 | 2026-05-24 | — |
 | Treasury Safe not deployed on Base | S-GATE-1 #7, D-018 #7 | 2026-05-24 | — |
-| `@orbit-house` npm org not registered + packages unpublished | SDK distribution | 2026-05-24 | — |
+| `@orbithouse` npm org not registered + packages unpublished | SDK distribution | 2026-05-24 | — |
 | `ORBIT_AI_PROVIDERS` / `ORBIT_AI_PROVIDER_KEYS` not configured | D-018 #3 | 2026-05-24 | — |
 | 12-hour clean Actions stretch not yet observed | D-018 #4, S-GATE-1 #1 | 2026-05-24 | — |
 
@@ -118,7 +118,7 @@ OPEN BLOCKERS     : Owner actions — enable GitHub Pages; set ORBIT_AGENT_SIGNE
 2. Set `ORBIT_AGENT_SIGNER` repo variable
 3. Provision Farcaster signer (Neynar)
 4. Deploy Treasury Safe on Base
-5. `npm publish --access public` for `@orbit-house/sdk` and `create-orbit-house`
+5. `npm publish --access public` for `@orbithouse/sdk` and `create-orbit-house`
 6. Configure AI provider keys
 7. Verify 12-hour clean Actions cron stretch
 
@@ -160,7 +160,7 @@ Do NOT propose token-launch work (S-011+) until owner closes those items.
 | D-006 | S-001 | Every cycle proof signed with agent wallet key before launch |
 | D-007 | S-001 | Public dashboard hosted on GitHub Pages, separate from household-UI app (orbit.horse stub dropped 2026-05-28; default URL `orbithousezkp.github.io/orbit/`) |
 | D-008 | S-001 | Farcaster casting wired into cycle loop, not external automation |
-| D-009 | S-001 | SDK published as `@orbit-house/sdk` on npm |
+| D-009 | S-001 | SDK published as `@orbithouse/sdk` on npm |
 | D-010 | S-001 | Founder ↔ Orbit voice separation, two accounts |
 | D-011 | S-001 | ZK trust layer deferred to year 2+; signed-proofs-only at launch |
 | D-012 | S-001 | Daily Merkle root anchored on Base in Phase 2 |

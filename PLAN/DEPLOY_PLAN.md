@@ -70,7 +70,7 @@ DNS setup steps (only when custom domain is re-enabled — deferred):
 | Service | Purpose | Owner action |
 |---|---|---|
 | GitHub Org `orbit-house` (or equivalent) | Repo, packages, marketplace | Verify ownership |
-| npm `@orbit-house` scope | SDK publication | Create org, add publish token to GitHub secrets |
+| npm `@orbithouse` scope | SDK publication | Create org, add publish token to GitHub secrets |
 | Neynar API account | Farcaster casting | Sign up, get API key + signer, add to repo secrets |
 | Farcaster account `@orbit` | Orbit's public voice | Create, link signer to Neynar |
 | GitHub Pages | Dashboard hosting | Repo Settings → Pages → Source: GitHub Actions. Default URL `https://orbithousezkp.github.io/orbit/`; custom domain deferred. |
@@ -117,7 +117,7 @@ DNS setup steps (only when custom domain is re-enabled — deferred):
 | `ORBIT_FARCASTER_NEYNAR_API_KEY` | Neynar API access |
 | `ORBIT_FARCASTER_SIGNER_UUID` | Neynar signer for the @orbit account |
 | `ORBIT_DASHBOARD_URL` | `https://orbithousezkp.github.io/orbit/` — for cast links (custom domain deferred) |
-| `ORBIT_VERIFIER_NPM_PACKAGE` | `@orbit-house/verifier` — for instructions in casts |
+| `ORBIT_VERIFIER_NPM_PACKAGE` | `@orbithouse/verifier` — for instructions in casts |
 
 (Per D-017: Buyback/Bounty/Lore wallets removed. All WETH flows to Treasury Safe; spending happens via approval-gated sub-budgets.)
 
@@ -145,7 +145,7 @@ DNS setup steps (only when custom domain is re-enabled — deferred):
 | Lore pool wallet | Not yet | Phase 1 — derive (small balance is fine) |
 | Farcaster signer (Neynar) | Not yet | Phase 1 — sign up + onboard |
 | Dashboard hosting | Shipped — GitHub Pages workflow + CNAME | Phase 1 — owner enables Pages in repo Settings |
-| npm `@orbit-house` org | Not yet | Phase 1 — register, get publish token |
+| npm `@orbithouse` org | Not yet | Phase 1 — register, get publish token |
 | Merkle anchor contract | Not yet | Phase 2 — write simple contract or use existing pattern |
 
 ## Automated vs Manual Steps

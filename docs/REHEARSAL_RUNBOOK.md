@@ -15,7 +15,7 @@ Tick each before starting:
 - [ ] A throwaway Farcaster signer + FID via Neynar (or skip casting by leaving `ORBIT_FARCASTER_DRY_RUN=true`).
 - [ ] A throwaway Base RPC URL (Alchemy/QuickNode free tier is fine).
 - [ ] An AI provider key for `ORBIT_AI_PROVIDERS` + `ORBIT_AI_PROVIDER_KEYS` (the same Anthropic key as production is fine — small workload).
-- [ ] The npm packages `@orbit-house/sdk` + `@orbit-house/create-orbit-house` + `@orbit-house/verifier` published (S-GATE-1 #5). Without this, you cannot scaffold an external adopter — but for the rehearsal we **clone this repo verbatim** instead of scaffolding, so this prerequisite is **optional** for the rehearsal itself.
+- [ ] The npm packages `@orbithouse/sdk` + `@orbithouse/create-orbit-house` + `@orbithouse/verifier` published (S-GATE-1 #5). Without this, you cannot scaffold an external adopter — but for the rehearsal we **clone this repo verbatim** instead of scaffolding, so this prerequisite is **optional** for the rehearsal itself.
 
 ---
 
@@ -208,11 +208,11 @@ Pick one proof from §6 (launch) and one from §7 (buyback). For each:
 gh api repos/<owner>/orbit-rehearsal/contents/runtime/proofs/<date>/<file>.json \
   --jq '.content' | base64 -d > proof.json
 
-npx @orbit-house/verifier proof.json --signer <ORBIT_AGENT_SIGNER_ADDRESS>
+npx @orbithouse/verifier proof.json --signer <ORBIT_AGENT_SIGNER_ADDRESS>
 # Exit 0 = signature verified against the agent signer.
 ```
 
-If npm publication of `@orbit-house/verifier` isn't done yet, run it locally instead:
+If npm publication of `@orbithouse/verifier` isn't done yet, run it locally instead:
 
 ```bash
 node /home/asuran/Downloads/orbit/packages/orbit-verifier/cli.js proof.json --signer <ORBIT_AGENT_SIGNER_ADDRESS>

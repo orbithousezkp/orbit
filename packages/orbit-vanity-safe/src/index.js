@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @orbit-house/vanity-safe — main exports
+ * @orbithouse/vanity-safe — main exports
  *
  * Public API:
  *   predictSafeAddress({ owners, threshold, saltNonce, ... }) -> "0x..."

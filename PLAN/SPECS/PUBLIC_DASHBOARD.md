@@ -51,7 +51,7 @@ Single homepage, anchor-linked sections. No client-side router. Sections in DOM 
 |   Two columns: allowed-without-approval / blocked         |
 +----------------------------------------------------------+
 | VERIFY YOUR OWN COPY                                     |
-|   $ npm i -g @orbit-house/verifier                       |
+|   $ npm i -g @orbithouse/verifier                       |
 |   $ orbit-verify <receipt-url>                            |
 +----------------------------------------------------------+
 | FOOTER: github, npm, farcaster, lore, built timestamp     |

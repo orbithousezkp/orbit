@@ -1,4 +1,4 @@
-# @orbit-house/keygen — Local Ethereum keystore generator
+# @orbithouse/keygen — Local Ethereum keystore generator
 
 Generate Ethereum keypairs on your own machine, encrypt them with a
 passphrase, and write them as Web3 Keystore v3 files. The same format
@@ -73,7 +73,7 @@ hold raw key material.
 ## Install
 
 ```
-npm install --save-dev @orbit-house/keygen
+npm install --save-dev @orbithouse/keygen
 # or, inside the orbit monorepo:
 npm install
 ```
@@ -144,7 +144,7 @@ geth account import ./keys/<slot>.json
 ### Programmatic use
 
 ```js
-const keygen = require('@orbit-house/keygen');
+const keygen = require('@orbithouse/keygen');
 
 const { privateKey, address } = keygen.generateKeypair();
 // privateKey is a 32-byte Buffer. address is "0x..." (40 hex chars, lowercase).

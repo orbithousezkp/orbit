@@ -23,7 +23,7 @@
 **Created `packages/ai-budget-ledger/index.js`** — the missing library entry point.
 
 The `package.json` declared `"main": "index.js"` but the file did not exist. This meant:
-- `require("@orbit-house/ai-budget-ledger")` would throw a MODULE_NOT_FOUND error
+- `require("@orbithouse/ai-budget-ledger")` would throw a MODULE_NOT_FOUND error
 - Only the CLI (`cli.js`) worked; the library import path was broken
 - The packages/README.md documented library usage that couldn't actually work
 

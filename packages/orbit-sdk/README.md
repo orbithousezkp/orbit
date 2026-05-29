@@ -14,7 +14,7 @@ Read-only JavaScript library and CLI for querying Orbit's machine-readable repos
 ## Library Usage
 
 ```js
-const orbit = require('@orbit-house/sdk');
+const orbit = require('@orbithouse/sdk');
 
 // Quick status — cycle, budget, tasks, level, staleness
 const status = orbit.quickStatus('/path/to/orbit/repo');

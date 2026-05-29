@@ -10,7 +10,7 @@ A **GitHub-native control plane** for AI agents that act inside your repo. It gi
 
 - **Memory** that survives across runs — agents remember decisions and previous cycles.
 - **Permissions** with public approval gates — no agent action without a paper trail.
-- **Signed proofs** of every cycle — EIP-712 receipts you can verify with `npx @orbit-house/verifier`.
+- **Signed proofs** of every cycle — EIP-712 receipts you can verify with `npx @orbithouse/verifier`.
 - **AI-budget controls** — daily and monthly caps, fallback routing, refusal logging.
 - **Risk scanning** on every issue, comment, and fetched URL — injection defense, wallet-drain detection, encoded-instruction relay catch.
 
@@ -99,4 +99,4 @@ That's the deal. No newsletter, no auth flow, no opt-in.
 - 5-minute setup recipe: [`PLAN/ADOPTER_QUICKSTART.md`](./ADOPTER_QUICKSTART.md)
 - Architecture deep-dive: [`docs/quickstart.md`](../docs/quickstart.md)
 - Public dashboard reference: `https://orbithousezkp.github.io/orbit/` (Pages default URL)
-- Verifier CLI: `npx @orbit-house/verifier --help`
+- Verifier CLI: `npx @orbithouse/verifier --help`

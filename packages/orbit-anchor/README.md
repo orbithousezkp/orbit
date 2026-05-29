@@ -1,4 +1,4 @@
-# @orbit-house/anchor — MerkleAnchor.sol
+# @orbithouse/anchor — MerkleAnchor.sol
 
 _Part of [Orbit](https://github.com/orbithousezkp/orbit) — the control plane for agent memory and infrastructure inside any GitHub repo._
 
@@ -21,7 +21,7 @@ specced in [`PLAN/SPECS/MERKLE_ANCHOR.md`](../../PLAN/SPECS/MERKLE_ANCHOR.md).
 - No token logic, no fees, no payments.
 - No upgradeability, no proxy, no admin escape hatches.
 - No re-anchoring or override of a previously written window (intentional; any historical override would defeat the tamper-evident guarantee).
-- No verification of the Merkle root — the chain only stores the value the owner submits. Verification is the off-chain verifier's job (`@orbit-house/verifier`).
+- No verification of the Merkle root — the chain only stores the value the owner submits. Verification is the off-chain verifier's job (`@orbithouse/verifier`).
 
 ## Constructor
 

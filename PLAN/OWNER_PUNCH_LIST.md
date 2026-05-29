@@ -170,7 +170,7 @@ gh run watch
 
 **Why:** S-GATE-1 #5 (second adopter) + S-007 (npm publish for adopter onboarding).
 
-**Prereqs:** npm account, scoped org `@orbit-house` created and verified.
+**Prereqs:** npm account, scoped org `@orbithouse` created and verified.
 
 **Commands:**
 
@@ -195,16 +195,16 @@ cd ../orbit-mcp-server
 npm publish --access public
 
 # 3) Verify each one is live
-npm view @orbit-house/sdk version
-npm view @orbit-house/create-orbit-house version
-npm view @orbit-house/proof-viewer version
-npm view @orbit-house/orbit-keygen version
-npm view @orbit-house/orbit-mcp-server version
+npm view @orbithouse/sdk version
+npm view @orbithouse/create-orbit-house version
+npm view @orbithouse/proof-viewer version
+npm view @orbithouse/orbit-keygen version
+npm view @orbithouse/orbit-mcp-server version
 ```
 
 **Verification:** Each `npm view` returns a version number (not 404).
 
-**Smoke test:** `npx @orbit-house/create-orbit-house --help` works from a clean directory.
+**Smoke test:** `npx @orbithouse/create-orbit-house --help` works from a clean directory.
 
 **Record:** Done date ____ Versions published ____
 

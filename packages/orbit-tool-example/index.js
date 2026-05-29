@@ -1,7 +1,7 @@
 "use strict";
 
 /**
- * @orbit-house/tool-example — reference plugin scaffold for the Orbit
+ * @orbithouse/tool-example — reference plugin scaffold for the Orbit
  * plugin/tool loader (S-024).
  *
  * Exposes a single read-only `echo` tool used as the smoke test for
@@ -13,7 +13,7 @@
  *   { name, version, capabilities, tools: [{ name, description, inputSchema, handler }] }
  */
 
-const NAME = "@orbit-house/tool-example";
+const NAME = "@orbithouse/tool-example";
 const VERSION = "0.1.0";
 
 const tools = [

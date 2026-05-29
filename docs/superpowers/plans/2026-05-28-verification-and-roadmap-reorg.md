@@ -404,7 +404,7 @@ node --test tests/sdk*.test.js 2>&1 | tail -5
 
 Fill row:
 ```markdown
-| 19 | SDK public (@orbit-house/sdk) | DECISIONS.md, recent commits | packages/orbit-sdk/index.js | unit | tests/sdk.test.js | PASS |
+| 19 | SDK public (@orbithouse/sdk) | DECISIONS.md, recent commits | packages/orbit-sdk/index.js | unit | tests/sdk.test.js | PASS |
 ```
 
 - [ ] **Step 5.5: Verify dashboard build (dist/dashboard.json)**
@@ -486,7 +486,7 @@ Fill row:
 
 Run:
 ```bash
-npm view @orbit-house/proof-viewer version 2>&1 | head -3
+npm view @orbithouse/proof-viewer version 2>&1 | head -3
 ```
 
 Expected: package not published; status PARTIAL-DEFERRED → Phase 3.
@@ -787,7 +787,7 @@ Replace contents of `PLAN/PHASES.md` with:
 **Exit criteria:**
 - Repo public OR canonical orbithousezkp/orbit created
 - GitHub Pages dashboard live, dashboard.json updated each cycle
-- SDK published to npm (@orbit-house/sdk)
+- SDK published to npm (@orbithouse/sdk)
 - create-orbit-house published to npm
 - proof-viewer published to npm
 - Public spec page rendered from PLAN/

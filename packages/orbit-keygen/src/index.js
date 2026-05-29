@@ -1,5 +1,5 @@
 /**
- * @orbit-house/keygen — programmatic API
+ * @orbithouse/keygen — programmatic API
  *
  * Top-level entrypoint exporting keystore encrypt/decrypt, address
  * derivation, hidden passphrase prompts, and CLI helpers. Designed so other

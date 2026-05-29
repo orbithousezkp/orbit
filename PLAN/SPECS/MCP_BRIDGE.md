@@ -6,7 +6,7 @@ Expose the Orbit SDK as MCP (Model Context Protocol) tools so any MCP-capable as
 
 ## 2. Constraints
 
-- github-only distribution — package published as `@orbit-house/mcp-server` on npm; no hosted server obligation
+- github-only distribution — package published as `@orbithouse/mcp-server` on npm; no hosted server obligation
 - No on-chain action via MCP — read-only only per **D-014**
 - Token-launch hard-block per **D-018** — read-only MCP can ship pre-launch, but token-utility surfaces wait for S-GATE-2
 - Public data is unauthenticated (matches the existing dashboard); write/admin requires token gating
@@ -28,12 +28,12 @@ Out:
 
 ### Package layout (`packages/orbit-mcp-server/`)
 ```
-package.json         (name: @orbit-house/mcp-server, bin: orbit-mcp)
+package.json         (name: @orbithouse/mcp-server, bin: orbit-mcp)
 bin.js               (#!/usr/bin/env node)
 src/index.js         (MCP server bootstrap)
 src/tools.js         (tool definitions)
 src/resources.js     (resource definitions)
-src/sdk-adapter.js   (thin wrapper around @orbit-house/sdk)
+src/sdk-adapter.js   (thin wrapper around @orbithouse/sdk)
 README.md
 LICENSE
 ```

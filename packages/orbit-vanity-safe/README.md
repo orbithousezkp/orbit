@@ -1,4 +1,4 @@
-# @orbit-house/vanity-safe
+# @orbithouse/vanity-safe
 
 Local CLI that grinds Safe Proxy Factory salts until the predicted Safe
 contract address ends in a target hex suffix.
@@ -156,7 +156,7 @@ const {
   predictSafeAddress,
   grindSync,
   grindParallel,
-} = require('@orbit-house/vanity-safe');
+} = require('@orbithouse/vanity-safe');
 
 const addr = predictSafeAddress({
   owners: ['0xA...', '0xB...', '0xC...'],

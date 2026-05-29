@@ -57,7 +57,7 @@ Per the founder's plan: before public launch, run Orbit live in a **private test
 What we verify:
 
 1. The scheduled cycle fires every 15 min without skipping.
-2. Signed proofs land under `runtime/proofs/<date>/` and verify via `npx @orbit-house/verifier`.
+2. Signed proofs land under `runtime/proofs/<date>/` and verify via `npx @orbithouse/verifier`.
 3. The dashboard rebuilds with real data after each cycle.
 4. The error log stays empty during clean operation; populates correctly when we inject a fault.
 5. The nightly healthcheck workflow runs at 04:17 UTC and opens an alert issue when we deliberately stale the state.
@@ -78,7 +78,7 @@ Surface area: whatever the private-repo run discovers. Patch in tight commits. D
 
 These cannot be done by code — they're owner actions with external accounts. Sequence:
 
-1. `gh secret set NPM_TOKEN` (automation token) → publish workflow can ship `@orbit-house/sdk` + `create-orbit-house`.
+1. `gh secret set NPM_TOKEN` (automation token) → publish workflow can ship `@orbithouse/sdk` + `create-orbit-house`.
 2. Settings → Pages → Source: GitHub Actions → `https://orbithousezkp.github.io/orbit/` resolves (custom domain deferred per commit 84767747).
 3. `gh variable set ORBIT_AGENT_SIGNER --body 0x...` (the EOA the agent uses to sign proofs).
 4. Neynar API key + signer UUID for Farcaster casting (`PLAN/SPECS/FARCASTER_CAST_PIPELINE.md §10`).

@@ -14,7 +14,7 @@ Phase 1 ships the full pre-launch product surface: signed cycle proofs, standalo
 | S-002 | Wallet-signed cycle proofs (D-006) | SHIPPED | PLAN/SPECS/PROOF_SIGNING.md |
 | S-003 | Public dashboard at orbit.horse (D-007) | SHIPPED | PLAN/SPECS/PUBLIC_DASHBOARD.md |
 | S-004 | Farcaster cast pipeline (D-008) | SHIPPED | PLAN/SPECS/FARCASTER_CAST_PIPELINE.md |
-| S-005 | Publish-ready @orbit-house/sdk + create-orbit-house (D-009) | SHIPPED | PLAN/SPECS/CREATE_ORBIT_HOUSE.md |
+| S-005 | Publish-ready @orbithouse/sdk + create-orbit-house (D-009) | SHIPPED | PLAN/SPECS/CREATE_ORBIT_HOUSE.md |
 | S-006 | Closed-loop demo runbook + integration test | SHIPPED | PLAN/SPECS/CLOSED_LOOP_DEMO.md |
 | S-007 | Lore foundation (00-genesis, voice, cycles-of-note) | SHIPPED | lore/README.md |
 | S-008 | Treasury Safe deploy runbook | SHIPPED — owner runs deploy | PLAN/SPECS/TREASURY_SAFE_DEPLOY.md |
@@ -34,7 +34,7 @@ Phase 1 ships the full pre-launch product surface: signed cycle proofs, standalo
 | 2 | `npm test` 0 failures | MET — 365 pass / 0 fail | full suite run 2026-05-24 |
 | 3 | AI provider configured + non-fallback proof | NOT-MET — owner sets ORBIT_AI_PROVIDERS / ORBIT_AI_PROVIDER_KEYS | health output: "ORBIT_AI_PROVIDERS not configured" |
 | 4 | 12-hour clean cycle stretch via GitHub Actions | NOT-MET — requires live Actions cron runs; cannot self-verify | only owner can confirm via Actions log |
-| 5 | Signed cycle proofs live + verifiable via `npx @orbit-house/verifier` | MET (code) — owner publishes verifier package to npm to activate `npx` flow | packages/orbit-verifier/ + S-002 |
+| 5 | Signed cycle proofs live + verifiable via `npx @orbithouse/verifier` | MET (code) — owner publishes verifier package to npm to activate `npx` flow | packages/orbit-verifier/ + S-002 |
 | 6 | Public dashboard at orbit.horse reachable | PARTIAL — workflow shipped (deploy-dashboard.yml), CNAME present; owner enables Pages | dist/dashboard.json built; Pages not yet activated |
 | 7 | Treasury Safe deployed and funded on Base | NOT-MET — owner action | runbook at PLAN/SPECS/TREASURY_SAFE_DEPLOY.md |
 | 8 | Pre-deploy checklist fully checked | PARTIAL — CLANKER_FEE_STRATEGY.md exists; some items owner-side | PLAN/CLANKER_FEE_STRATEGY.md |
@@ -47,7 +47,7 @@ Phase 1 ships the full pre-launch product surface: signed cycle proofs, standalo
 2. **Set `ORBIT_AGENT_SIGNER` repo variable** — derive from `ORBIT_WALLET_PRIVATE_KEY`. Unblocks signed-proof verification chain.
 3. **Create Orbit Farcaster account + Neynar signer** — set `ORBIT_FARCASTER_NEYNAR_API_KEY` + `ORBIT_FARCASTER_SIGNER_UUID` secrets; flip `ORBIT_FARCASTER_DRY_RUN=false`. Unblocks daily-cast cadence.
 4. **Deploy Treasury Safe on Base** — follow PLAN/SPECS/TREASURY_SAFE_DEPLOY.md (8-item checklist). Unblocks D-018 #7 + Clanker fee config.
-5. **`npm publish --access public`** from `packages/orbit-sdk/` and `packages/create-orbit-house/` — register `@orbit-house` npm org first.
+5. **`npm publish --access public`** from `packages/orbit-sdk/` and `packages/create-orbit-house/` — register `@orbithouse` npm org first.
 6. **Set AI provider keys** — `ORBIT_AI_PROVIDERS` + `ORBIT_AI_PROVIDER_KEYS` secrets. Unblocks D-018 #3.
 7. **Let cycles run 12+ hours via Actions** — observe ≥24 consecutive clean cycles, record `firstCleanCycle` / `lastCleanCycle` in `memory/state.json`, flip `state.preLaunchVerified = true`. Unblocks D-018 #4.
 

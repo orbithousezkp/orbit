@@ -1,9 +1,9 @@
-# @orbit-house/tool-example
+# @orbithouse/tool-example
 
 _Part of [Orbit](https://github.com/orbithousezkp/orbit) — the control plane for agent memory and infrastructure inside any GitHub repo._
 
 Reference plugin scaffold for the Orbit plugin/tool loader (S-024). Use this
-as the starting point for your own `@orbit-house/tool-*` plugin.
+as the starting point for your own `@orbithouse/tool-*` plugin.
 
 ## What it does
 
@@ -18,7 +18,7 @@ adopter repo.
 In an adopter Orbit repo:
 
 ```bash
-npm install @orbit-house/tool-example
+npm install @orbithouse/tool-example
 ```
 
 Then opt the plugin in by editing `memory/plugins.json`:
@@ -27,8 +27,8 @@ Then opt the plugin in by editing `memory/plugins.json`:
 {
   "plugins": [
     {
-      "name": "@orbit-house/tool-example",
-      "source": "@orbit-house/tool-example",
+      "name": "@orbithouse/tool-example",
+      "source": "@orbithouse/tool-example",
       "version": "0.1.0",
       "capabilities": ["read-memory"],
       "enabled": true,
@@ -59,7 +59,7 @@ A plugin module must export:
 
 ```js
 module.exports = {
-  name:    "@orbit-house/tool-yours",
+  name:    "@orbithouse/tool-yours",
   version: "0.1.0",
   capabilities: ["read-memory" /* | "read-issues" | "comment-issues"
                               | "write-memory" | "wallet" | "network" */],

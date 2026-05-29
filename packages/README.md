@@ -46,7 +46,7 @@ const caps = sdk.getCapabilities();
 **Model Context Protocol server** wrapping the SDK. Lets Claude Desktop, IDE extensions, and other MCP clients query an Orbit repo via 6 read-only tools (`getCycles`, `getReceipt`, `getRefusals`, `getTreasury`, `getDashboardProjection`, `getFederationPeers`) plus 3 resource schemes (`cycle://N`, `receipt://N`, `dashboard://current`). Zero external deps; vendored MCP protocol implementation keeps the audit surface tight.
 
 ```bash
-ORBIT_REPO_ROOT=/path/to/orbit npx -y @orbit-house/mcp-server
+ORBIT_REPO_ROOT=/path/to/orbit npx -y @orbithouse/mcp-server
 ```
 
 ### [Issue Scam Scanner](issue-scam-scanner/)

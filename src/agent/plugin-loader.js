@@ -74,7 +74,7 @@ const FORBIDDEN_RESPONSE_FIELDS = Object.freeze([
 
 const HTML_TAG_PATTERN = /<\s*\/?\s*[a-zA-Z][^>]*>/g;
 // Accept either bare identifiers (`tool-loadtest`) or npm-scoped names
-// (`@orbit-house/tool-example`). No spaces, no path traversal, capped at 96.
+// (`@orbithouse/tool-example`). No spaces, no path traversal, capped at 96.
 const NAME_PATTERN = /^(?:@[a-z0-9][a-z0-9._-]{0,40}\/)?[a-zA-Z][a-zA-Z0-9_.:-]{0,80}$/;
 const VERSION_PATTERN = /^\d+\.\d+\.\d+(?:[-+][A-Za-z0-9._-]+)?$/;
 const TOOL_NAME_PATTERN = /^[a-z][a-z0-9_]{0,63}$/;
@@ -301,7 +301,7 @@ function readManifest(repoRoot) {
  * Resolve a plugin module from a manifest entry. The `source` is interpreted
  * as either:
  *   - an absolute path under the repo, or
- *   - a require()-resolvable specifier (e.g. `@orbit-house/tool-example`)
+ *   - a require()-resolvable specifier (e.g. `@orbithouse/tool-example`)
  *     resolved from `repoRoot/node_modules`.
  *
  * Errors during resolution surface as `{ ok: false, reason }` rather than
