@@ -5,6 +5,9 @@
 #
 # The scanner detects: prompt injection, wallet drain language, encoded relay,
 # fake support, urgency traps, credential phishing, and other risky patterns.
+#
+# Start in label/comment-only mode. Do not auto-close, decode hidden payloads,
+# or route flagged content to agents until a maintainer has reviewed it.
 
 name: Issue Scam Scan
 
@@ -14,7 +17,11 @@ on:
   issue_comment:
     types: [created, edited]
 
+# Least-privilege permissions for this example:
+# - contents: read lets actions/checkout read the repo-local scanner package.
+# - issues: write lets the workflow add review labels and post the warning comment.
 permissions:
+  contents: read
   issues: write
 
 jobs:
