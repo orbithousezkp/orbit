@@ -702,6 +702,15 @@ function requiresQuorum(actionType, quorum) {
 // the guard so existing deployments are unaffected; opt in by populating
 // state.treasury (or config.treasury) with `floorWei`, `balanceEstimateWei`,
 // `maxSpendPerCycleWei`, and/or `hardCapPerCycleWei`.
+//
+// T-1b (security audit, 2026-05-28): when floorWei IS set, the check is
+// fail-CLOSED on missing/stale balance evidence. Spec is "every on-chain
+// action calls this before producing a tx" — an attacker who blanks
+// state.treasury.balanceEstimateWei must not silently re-enable spending.
+// Freshness window: 1 hour by default. Override via state.treasury.balanceEstimateFreshnessMs
+// or config.treasury.balanceEstimateFreshnessMs.
+
+const TREASURY_BALANCE_FRESHNESS_MS_DEFAULT = 60 * 60 * 1000;
 
 function toBigInt(value) {
   if (value === null || value === undefined || value === "") return null;
@@ -719,6 +728,12 @@ function toBigInt(value) {
 function treasuryPolicy(state, config) {
   const fromState = (state && state.treasury) || {};
   const fromConfig = (config && config.treasury) || {};
+  const freshnessRaw = fromState.balanceEstimateFreshnessMs != null
+    ? fromState.balanceEstimateFreshnessMs
+    : fromConfig.balanceEstimateFreshnessMs;
+  const freshnessMs = Number.isFinite(Number(freshnessRaw)) && Number(freshnessRaw) > 0
+    ? Number(freshnessRaw)
+    : TREASURY_BALANCE_FRESHNESS_MS_DEFAULT;
   return {
     floorWei: toBigInt(fromState.floorWei != null ? fromState.floorWei : fromConfig.floorWei),
     balanceEstimateWei: toBigInt(
@@ -727,6 +742,7 @@ function treasuryPolicy(state, config) {
         : fromConfig.balanceEstimateWei
     ),
     balanceEstimateAt: fromState.balanceEstimateAt || fromConfig.balanceEstimateAt || null,
+    balanceEstimateFreshnessMs: freshnessMs,
     maxSpendPerCycleWei: toBigInt(
       fromState.maxSpendPerCycleWei != null
         ? fromState.maxSpendPerCycleWei
@@ -740,7 +756,7 @@ function treasuryPolicy(state, config) {
   };
 }
 
-function assertTreasuryFloor({ state, config, amountWei, actionType, actionLabel } = {}) {
+function assertTreasuryFloor({ state, config, amountWei, actionType, actionLabel, now } = {}) {
   const planned = toBigInt(amountWei);
   if (planned === null) {
     return {
@@ -759,6 +775,47 @@ function assertTreasuryFloor({ state, config, amountWei, actionType, actionLabel
     };
   }
   const policy = treasuryPolicy(state, config);
+
+  // T-1b: hostile / corrupted state defense. A negative floor would let
+  // any spend pass the "after >= floor" check, so reject the policy itself.
+  if (policy.floorWei !== null && policy.floorWei < 0n) {
+    return {
+      ok: false,
+      reason: "treasury_floor_invalid_policy",
+      detail: "treasury.floorWei cannot be negative",
+      actionType: actionType || null,
+      floorWei: policy.floorWei.toString()
+    };
+  }
+
+  // T-1b: when the operator has opted into the floor (floorWei present),
+  // the balance evidence becomes load-bearing. Missing balance or stale
+  // balance must fail-closed — never skip the check.
+  if (policy.floorWei !== null) {
+    if (policy.balanceEstimateWei === null) {
+      return {
+        ok: false,
+        reason: "treasury_floor_balance_missing",
+        detail: "treasury.floorWei is set but balanceEstimateWei is missing; refusing fail-open",
+        actionType: actionType || null,
+        floorWei: policy.floorWei.toString()
+      };
+    }
+    const nowMs = now instanceof Date ? now.getTime()
+      : Number.isFinite(Number(now)) ? Number(now)
+      : Date.now();
+    const stampMs = policy.balanceEstimateAt ? Date.parse(policy.balanceEstimateAt) : NaN;
+    if (Number.isNaN(stampMs) || (nowMs - stampMs) > policy.balanceEstimateFreshnessMs) {
+      return {
+        ok: false,
+        reason: "treasury_floor_balance_stale",
+        detail: `balanceEstimateAt (${policy.balanceEstimateAt || "missing"}) is older than ${policy.balanceEstimateFreshnessMs}ms or unparseable`,
+        actionType: actionType || null,
+        balanceEstimateAt: policy.balanceEstimateAt,
+        balanceEstimateFreshnessMs: policy.balanceEstimateFreshnessMs
+      };
+    }
+  }
 
   if (policy.hardCapPerCycleWei !== null && planned > policy.hardCapPerCycleWei) {
     return {
