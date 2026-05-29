@@ -1,7 +1,7 @@
 {
   "ai": {
-    "dailyBudgetUsd": 5,
-    "monthlyBudgetUsd": 100,
+    "dailyBudgetUsd": 1,
+    "monthlyBudgetUsd": 20,
     "inputUsdPerMillion": 0.15,
     "outputUsdPerMillion": 0.6,
     "reserveUsd": 0,
@@ -2911,6 +2911,78 @@
         "completionTokens": 429,
         "totalTokens": 98895,
         "estimatedUsd": 0.0150273
+      },
+      {
+        "timestamp": "2026-05-29T04:41:06.462Z",
+        "aiRoute": "private-ai-route-1",
+        "note": "cycle 64 step 1",
+        "promptTokens": 64890,
+        "completionTokens": 127,
+        "totalTokens": 65017,
+        "estimatedUsd": 0.0098097
+      },
+      {
+        "timestamp": "2026-05-29T04:41:16.617Z",
+        "aiRoute": "private-ai-route-1",
+        "note": "cycle 64 step 2",
+        "promptTokens": 69052,
+        "completionTokens": 218,
+        "totalTokens": 69270,
+        "estimatedUsd": 0.0104886
+      },
+      {
+        "timestamp": "2026-05-29T04:41:22.348Z",
+        "aiRoute": "private-ai-route-1",
+        "note": "cycle 64 step 3",
+        "promptTokens": 72727,
+        "completionTokens": 65,
+        "totalTokens": 72792,
+        "estimatedUsd": 0.01094805
+      },
+      {
+        "timestamp": "2026-05-29T04:41:28.161Z",
+        "aiRoute": "private-ai-route-1",
+        "note": "cycle 64 step 4",
+        "promptTokens": 73680,
+        "completionTokens": 57,
+        "totalTokens": 73737,
+        "estimatedUsd": 0.0110862
+      },
+      {
+        "timestamp": "2026-05-29T04:41:49.342Z",
+        "aiRoute": "private-ai-route-1",
+        "note": "cycle 64 step 5",
+        "promptTokens": 73925,
+        "completionTokens": 911,
+        "totalTokens": 74836,
+        "estimatedUsd": 0.01163535
+      },
+      {
+        "timestamp": "2026-05-29T04:41:59.585Z",
+        "aiRoute": "private-ai-route-1",
+        "note": "cycle 64 step 6",
+        "promptTokens": 74653,
+        "completionTokens": 151,
+        "totalTokens": 74804,
+        "estimatedUsd": 0.01128855
+      },
+      {
+        "timestamp": "2026-05-29T04:42:12.503Z",
+        "aiRoute": "private-ai-route-1",
+        "note": "cycle 64 step 7",
+        "promptTokens": 74991,
+        "completionTokens": 446,
+        "totalTokens": 75437,
+        "estimatedUsd": 0.01151625
+      },
+      {
+        "timestamp": "2026-05-29T04:42:20.739Z",
+        "aiRoute": "private-ai-route-1",
+        "note": "cycle 64 step 8",
+        "promptTokens": 75477,
+        "completionTokens": 183,
+        "totalTokens": 75660,
+        "estimatedUsd": 0.01143135
       }
     ]
   },
@@ -2928,7 +3000,149 @@
     "treasuryRecipientEnv": "ORBIT_TREASURY_ADDRESS",
     "lastClaimAttemptAt": null,
     "lastClaimSentAt": null,
-    "lastClaimResult": null
+    "lastClaimResult": null,
+    "streams": [
+      {
+        "id": "clanker-trading-fees",
+        "type": "trading_fees",
+        "status": "active",
+        "lifetimeRevenueWei": "0",
+        "lastClaim": null,
+        "unitEconomics": {
+          "operatorShareBps": 500,
+          "treasuryShareBps": 9500,
+          "payoutAsset": "configured-paired-token",
+          "cadence": "weekly_performance",
+          "claimIntervalDays": 7
+        },
+        "createdAt": "2026-05-29T04:41:06.456Z",
+        "sunsetCriteria": null
+      },
+      {
+        "id": "ai-routing-margin",
+        "type": "ai_routing_margin",
+        "status": "experimental",
+        "lifetimeRevenueWei": "4410200000000000",
+        "lastClaim": {
+          "ts": "2026-05-29T04:42:20.737Z",
+          "amountWei": "571550000000000",
+          "source": "ai_call",
+          "txHash": null
+        },
+        "unitEconomics": {
+          "marginBps": 500,
+          "perCallSamples": [
+            {
+              "ts": "2026-05-29T04:41:06.456Z",
+              "provider": "vip-sg",
+              "model": "gpt-5.5",
+              "promptTokens": 64890,
+              "completionTokens": 127,
+              "wholesaleCostWei": "9810000000000000",
+              "marginWei": "490500000000000",
+              "billedWei": "10300500000000000",
+              "marginBps": 500,
+              "cycle": 0,
+              "adopterId": null
+            },
+            {
+              "ts": "2026-05-29T04:41:16.610Z",
+              "provider": "vip-sg",
+              "model": "gpt-5.5",
+              "promptTokens": 69052,
+              "completionTokens": 218,
+              "wholesaleCostWei": "10489000000000000",
+              "marginWei": "524450000000000",
+              "billedWei": "11013450000000000",
+              "marginBps": 500,
+              "cycle": 0,
+              "adopterId": null
+            },
+            {
+              "ts": "2026-05-29T04:41:22.346Z",
+              "provider": "vip-sg",
+              "model": "gpt-5.5",
+              "promptTokens": 72727,
+              "completionTokens": 65,
+              "wholesaleCostWei": "10948000000000000",
+              "marginWei": "547400000000000",
+              "billedWei": "11495400000000000",
+              "marginBps": 500,
+              "cycle": 0,
+              "adopterId": null
+            },
+            {
+              "ts": "2026-05-29T04:41:28.158Z",
+              "provider": "vip-sg",
+              "model": "gpt-5.5",
+              "promptTokens": 73680,
+              "completionTokens": 57,
+              "wholesaleCostWei": "11086000000000000",
+              "marginWei": "554300000000000",
+              "billedWei": "11640300000000000",
+              "marginBps": 500,
+              "cycle": 0,
+              "adopterId": null
+            },
+            {
+              "ts": "2026-05-29T04:41:49.340Z",
+              "provider": "vip-sg",
+              "model": "gpt-5.5",
+              "promptTokens": 73925,
+              "completionTokens": 911,
+              "wholesaleCostWei": "11635000000000000",
+              "marginWei": "581750000000000",
+              "billedWei": "12216750000000000",
+              "marginBps": 500,
+              "cycle": 0,
+              "adopterId": null
+            },
+            {
+              "ts": "2026-05-29T04:41:59.583Z",
+              "provider": "vip-sg",
+              "model": "gpt-5.5",
+              "promptTokens": 74653,
+              "completionTokens": 151,
+              "wholesaleCostWei": "11289000000000000",
+              "marginWei": "564450000000000",
+              "billedWei": "11853450000000000",
+              "marginBps": 500,
+              "cycle": 0,
+              "adopterId": null
+            },
+            {
+              "ts": "2026-05-29T04:42:12.501Z",
+              "provider": "vip-sg",
+              "model": "gpt-5.5",
+              "promptTokens": 74991,
+              "completionTokens": 446,
+              "wholesaleCostWei": "11516000000000000",
+              "marginWei": "575800000000000",
+              "billedWei": "12091800000000000",
+              "marginBps": 500,
+              "cycle": 0,
+              "adopterId": null
+            },
+            {
+              "ts": "2026-05-29T04:42:20.737Z",
+              "provider": "vip-sg",
+              "model": "gpt-5.5",
+              "promptTokens": 75477,
+              "completionTokens": 183,
+              "wholesaleCostWei": "11431000000000000",
+              "marginWei": "571550000000000",
+              "billedWei": "12002550000000000",
+              "marginBps": 500,
+              "cycle": 0,
+              "adopterId": null
+            }
+          ],
+          "totalCallsBilled": 8
+        },
+        "createdAt": "2026-05-29T04:41:06.456Z",
+        "sunsetCriteria": null
+      }
+    ]
   },
   "token": {
     "name": "Orbit",
