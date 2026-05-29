@@ -1,7 +1,7 @@
 {
   "schema": "orbit-dashboard/1",
-  "generatedAt": "2026-05-29T04:42:21.207Z",
-  "gitCommit": "5127d9c",
+  "generatedAt": "2026-05-29T17:55:24.296Z",
+  "gitCommit": "0c3502b",
   "product": {
     "name": "Orbit",
     "category": "GitHub-native agent infrastructure"
@@ -13,12 +13,12 @@
   },
   "signer": "0x58211F54eE90FB403dEC9cd57E8407F9963ADaed",
   "lifecycle": {
-    "cycle": 64,
+    "cycle": 65,
     "born": "2026-05-22T01:46:39.981Z",
-    "lastActive": "2026-05-29T04:40:56.385Z",
+    "lastActive": "2026-05-29T17:53:48.232Z",
     "lastStatus": "completed",
     "firstWakeIntroComplete": true,
-    "recordedCycles": 64
+    "recordedCycles": 65
   },
   "walletPolicy": {
     "approvalMode": "owner_approval_required",
@@ -45,52 +45,77 @@
     ]
   },
   "receipts": {
-    "count": 50,
+    "count": 51,
     "latest": {
-      "path": "runtime/proofs/2026-05-29/2026-05-29T04-42-20-741Z.json",
-      "cycle": 64,
-      "startedAt": "2026-05-29T04:40:56.385Z",
-      "finishedAt": "2026-05-29T04:42:20.741Z",
+      "path": "runtime/proofs/2026-05-29/2026-05-29T17-55-24-007Z.json",
+      "cycle": 65,
+      "startedAt": "2026-05-29T17:53:48.232Z",
+      "finishedAt": "2026-05-29T17:55:24.007Z",
       "trigger": {
-        "type": "event",
-        "id": "owner_manual_wake",
-        "label": "owner manual wake",
-        "source": "workflow_dispatch",
+        "type": "mandatory",
+        "id": "regular_heartbeat",
+        "label": "30-minute heartbeat",
+        "intervalMinutes": 30,
+        "source": "schedule",
         "action": "",
-        "reason": "Wake because the owner asked for a cycle now."
+        "reason": "Wake on the fixed repository control-plane rhythm even when no event fires."
       },
       "dryRun": false,
-      "totalSteps": 27,
+      "totalSteps": 19,
       "filesChangedCount": 7,
-      "result": "Cycle 64 completed one safe infrastructure/project-builder improvement.\n\nSelected direction: **build**  \nReason: after comparing **build**, **infrastructure**, and **earn**, the highest-value small action was to make the existing Issue Scam",
+      "result": "Cycle 65 safe infrastructure action completed.\n\nSelected direction: **build**  \nCompared: build, infrastructure, earn.  \nReason: cycle 64 created the Intake Guardrail adoption checklist, but the package README didn’t yet link to that safety",
       "signed": true,
       "signer": "0x58211F54eE90FB403dEC9cd57E8407F9963ADaed",
       "signatureScheme": "eip712:orbit-cycle-proof/1",
-      "payloadHash": "0x7953b1cc2309c26e31219a57b670b506f57babb286af3ee25318d3182e8419c7"
+      "payloadHash": "0xe3cb89861185baaec568dbec66715c1433aec7484dfad33d633cfe34401bb2ef"
     },
     "latestSigned": {
-      "path": "runtime/proofs/2026-05-29/2026-05-29T04-42-20-741Z.json",
-      "cycle": 64,
-      "startedAt": "2026-05-29T04:40:56.385Z",
-      "finishedAt": "2026-05-29T04:42:20.741Z",
+      "path": "runtime/proofs/2026-05-29/2026-05-29T17-55-24-007Z.json",
+      "cycle": 65,
+      "startedAt": "2026-05-29T17:53:48.232Z",
+      "finishedAt": "2026-05-29T17:55:24.007Z",
       "trigger": {
-        "type": "event",
-        "id": "owner_manual_wake",
-        "label": "owner manual wake",
-        "source": "workflow_dispatch",
+        "type": "mandatory",
+        "id": "regular_heartbeat",
+        "label": "30-minute heartbeat",
+        "intervalMinutes": 30,
+        "source": "schedule",
         "action": "",
-        "reason": "Wake because the owner asked for a cycle now."
+        "reason": "Wake on the fixed repository control-plane rhythm even when no event fires."
       },
       "dryRun": false,
-      "totalSteps": 27,
+      "totalSteps": 19,
       "filesChangedCount": 7,
-      "result": "Cycle 64 completed one safe infrastructure/project-builder improvement.\n\nSelected direction: **build**  \nReason: after comparing **build**, **infrastructure**, and **earn**, the highest-value small action was to make the existing Issue Scam",
+      "result": "Cycle 65 safe infrastructure action completed.\n\nSelected direction: **build**  \nCompared: build, infrastructure, earn.  \nReason: cycle 64 created the Intake Guardrail adoption checklist, but the package README didn’t yet link to that safety",
       "signed": true,
       "signer": "0x58211F54eE90FB403dEC9cd57E8407F9963ADaed",
       "signatureScheme": "eip712:orbit-cycle-proof/1",
-      "payloadHash": "0x7953b1cc2309c26e31219a57b670b506f57babb286af3ee25318d3182e8419c7"
+      "payloadHash": "0xe3cb89861185baaec568dbec66715c1433aec7484dfad33d633cfe34401bb2ef"
     },
     "list": [
+      {
+        "path": "runtime/proofs/2026-05-29/2026-05-29T17-55-24-007Z.json",
+        "cycle": 65,
+        "startedAt": "2026-05-29T17:53:48.232Z",
+        "finishedAt": "2026-05-29T17:55:24.007Z",
+        "trigger": {
+          "type": "mandatory",
+          "id": "regular_heartbeat",
+          "label": "30-minute heartbeat",
+          "intervalMinutes": 30,
+          "source": "schedule",
+          "action": "",
+          "reason": "Wake on the fixed repository control-plane rhythm even when no event fires."
+        },
+        "dryRun": false,
+        "totalSteps": 19,
+        "filesChangedCount": 7,
+        "result": "Cycle 65 safe infrastructure action completed.\n\nSelected direction: **build**  \nCompared: build, infrastructure, earn.  \nReason: cycle 64 created the Intake Guardrail adoption checklist, but the package README didn’t yet link to that safety",
+        "signed": true,
+        "signer": "0x58211F54eE90FB403dEC9cd57E8407F9963ADaed",
+        "signatureScheme": "eip712:orbit-cycle-proof/1",
+        "payloadHash": "0xe3cb89861185baaec568dbec66715c1433aec7484dfad33d633cfe34401bb2ef"
+      },
       {
         "path": "runtime/proofs/2026-05-29/2026-05-29T04-42-20-741Z.json",
         "cycle": 64,
@@ -292,28 +317,6 @@
         "signer": null,
         "signatureScheme": null,
         "payloadHash": null
-      },
-      {
-        "path": "runtime/proofs/2026-05-25/2026-05-25T05-23-43-770Z.json",
-        "cycle": 55,
-        "startedAt": "2026-05-25T05:20:19.188Z",
-        "finishedAt": "2026-05-25T05:23:43.770Z",
-        "trigger": {
-          "type": "event",
-          "id": "owner_manual_wake",
-          "label": "owner manual wake",
-          "source": "workflow_dispatch",
-          "action": "",
-          "reason": "Wake because the owner asked for a cycle now."
-        },
-        "dryRun": false,
-        "totalSteps": 29,
-        "filesChangedCount": 4,
-        "result": null,
-        "signed": false,
-        "signer": null,
-        "signatureScheme": null,
-        "payloadHash": null
       }
     ]
   },
@@ -371,23 +374,13 @@
   },
   "errors": {
     "schema": "orbit-errors/1",
-    "total": 1,
-    "byPhase": {
-      "tool": 1
-    },
-    "recent": [
-      {
-        "ts": "2026-05-29T04:41:06.466Z",
-        "phase": "tool",
-        "tool": "run_command",
-        "code": null,
-        "message": "command is not allowlisted: git diff --stat"
-      }
-    ]
+    "total": 0,
+    "byPhase": {},
+    "recent": []
   },
-  "digest": "0x6bb760a1",
+  "digest": "0x1ff2bd0e",
   "revenue": {
-    "generatedAt": "2026-05-29T04:42:21.209Z",
+    "generatedAt": "2026-05-29T17:55:24.299Z",
     "streamCount": {
       "active": 2,
       "deprecated": 0

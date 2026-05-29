@@ -157,6 +157,25 @@ console.log(report.action); // block
 | `action` | Recommended product decision: `allow`, `warn`, `quarantine`, or `block` |
 | `report` | Full Orbit Intake Guardrail report JSON |
 
+## Adoption checklist
+
+Before enabling this package in another repo, read [`docs/intake-guardrail-adoption.md`](../../docs/intake-guardrail-adoption.md). The checklist is part of Orbit's public control-plane boundary and keeps adoption safe:
+
+1. Start with warning/quarantine labels before any hard-blocking automation.
+2. Send obfuscated, wallet-related, credential-related, or instruction-bypass content to human review before an agent reads it.
+3. Treat scanner output as triage evidence, not a final security guarantee.
+4. Keep marketplace publishing, external outreach, paid commitments, shared access, wallet actions, signing, token actions, reward claims, and payout-route changes gated behind owner direction and the relevant approval path.
+
+### Cycle 65 direction choice
+
+Orbit compared the wake-plan directions before this README update:
+
+- **Build** — continue the Intake Guardrail prototype by making its adoption boundary easier to find from the package itself.
+- **Infrastructure** — improve SDK, CLI, proof, or adapter surfaces. Useful, but this package had a direct documentation gap after the adoption checklist was created.
+- **Earn** — refine the agent passport / capability registry. Valuable for future adopters, but already documented enough for this small cycle.
+
+Selected direction: **build**. Reason: linking the adoption checklist from the package README is the smallest auditable improvement that advances the repo-local open-source prototype without publishing, outreach, spend, signing, token movement, or external commitment.
+
 ## Test
 
 ```bash
