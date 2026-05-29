@@ -57,10 +57,35 @@ jobs:
           else
             echo "$PUSH_AFTER" | grep -Eq '^[0-9a-f]{40}$' || { echo "bad after sha"; exit 1; }
             if [ -z "$PUSH_BEFORE" ] || [ "$PUSH_BEFORE" = "0000000000000000000000000000000000000000" ]; then
-              # First push to branch or force-push: scan all commits reachable from
-              # AFTER but not from origin/main's tracked history up to a cap.
-              printf 'mode=cap\n' >> "$GITHUB_OUTPUT"
-              printf 'head=%s\n' "$PUSH_AFTER" >> "$GITHUB_OUTPUT"
+              # First push to branch OR force-push.
+              # T-3c (audit finding #6): previous version capped scan at 200
+              # commits, which let a force-push of 201+ unsigned commits hide
+              # the deeper ones forever. New behavior: compare AFTER against
+              # origin/main's tip (the previous canonical state). If origin/main
+              # is not yet fetched (very rare on `actions/checkout@v6`
+              # fetch-depth:0), fall back to scanning all commits reachable
+              # from AFTER — slower but correct.
+              if git rev-parse --verify origin/main >/dev/null 2>&1; then
+                ORIGIN_MAIN=$(git rev-parse origin/main)
+                if [ "$ORIGIN_MAIN" = "$PUSH_AFTER" ]; then
+                  # Push that doesn't actually move main (no-op or re-sync).
+                  printf 'mode=range\n' >> "$GITHUB_OUTPUT"
+                  printf 'base=%s\n' "$PUSH_AFTER" >> "$GITHUB_OUTPUT"
+                  printf 'head=%s\n' "$PUSH_AFTER" >> "$GITHUB_OUTPUT"
+                else
+                  # AFTER..origin/main pickup may be reverse; we want commits in
+                  # AFTER but NOT in origin/main (i.e., what this push adds).
+                  printf 'mode=force\n' >> "$GITHUB_OUTPUT"
+                  printf 'base=%s\n' "$ORIGIN_MAIN" >> "$GITHUB_OUTPUT"
+                  printf 'head=%s\n' "$PUSH_AFTER" >> "$GITHUB_OUTPUT"
+                fi
+              else
+                # Shallow / first-ever push: no canonical baseline. Scan
+                # everything reachable from HEAD. No cap (audit finding #6 —
+                # capping is the bypass).
+                printf 'mode=full\n' >> "$GITHUB_OUTPUT"
+                printf 'head=%s\n' "$PUSH_AFTER" >> "$GITHUB_OUTPUT"
+              fi
             else
               echo "$PUSH_BEFORE" | grep -Eq '^[0-9a-f]{40}$' || { echo "bad before sha"; exit 1; }
               printf 'mode=range\n' >> "$GITHUB_OUTPUT"
@@ -89,9 +114,17 @@ jobs:
           # Accept: G, U, X, Y. Reject: R, B, E, N.
           if [ "$MODE" = "range" ]; then
             LOG_ARGS="$BASE..$HEAD"
+          elif [ "$MODE" = "force" ]; then
+            # T-3c: force-push or first-push with origin/main present. Scan
+            # commits in HEAD not in BASE (origin/main). No --max-count cap —
+            # the cap was the bypass (audit finding #6). git rev-list will
+            # bound naturally by branch divergence.
+            LOG_ARGS="$BASE..$HEAD"
           else
-            # Cap force-push / first-push at 200 most-recent commits.
-            LOG_ARGS="--max-count=200 $HEAD"
+            # mode=full: shallow clone or first-ever push, no canonical
+            # baseline. Scan everything reachable from HEAD. Bounded by
+            # repo history, not an arbitrary cap.
+            LOG_ARGS="$HEAD"
           fi
 
           FAIL=0

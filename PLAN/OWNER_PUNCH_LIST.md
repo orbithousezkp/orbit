@@ -13,8 +13,9 @@
 | ☐ | 5. Publish SDK + scaffolder + proof-viewer to npm | 20 min | this file §5 |
 | ☐ | 6. Deploy Treasury Safe on Base | 60–90 min | `PLAN/SPECS/TREASURY_SAFE_DEPLOY.md` |
 | ☐ | 7. Verify 12-hour clean cycle stretch | 12+ hours wallclock, ~10 min owner | `PLAN/PRIVATE_DRYRUN.md` |
+| ☐ | 8. Enable T-3 signed-commit enforcement | 15 min | this file §8 |
 
-Total active owner time: ~2.5 hours plus a 12-hour observation window.
+Total active owner time: ~3 hours plus a 12-hour observation window.
 
 ---
 
@@ -284,6 +285,63 @@ npm run orbit:preflight --strict
 ```
 
 **Record:** Done date ____ Cycle range ____ — ____ Verified hash ____
+
+---
+
+## 8. Enable T-3 signed-commit enforcement
+
+**Why:** Without this, any maintainer (or compromised LLM with commit perms)
+can push unsigned commits to `main`. The signed-commit-check workflow runs
+ADVISORY by default — it logs but does not fail. ENFORCE mode requires
+THREE settings to actually gate merges:
+
+  (a) `ORBIT_SIGN_ENFORCE=true` repo variable — makes the workflow exit 1 on unsigned
+  (b) Branch protection rule with the workflow as a *required* status check
+  (c) Disallow force-pushes to `main` (the workflow's force-push path is hardened in T-3c but disallowing it entirely is the surer fix)
+
+All three are owner-only. Without all three, T-3 is a paper lock.
+
+**Prereqs:**
+- All maintainers have a GPG key on their GitHub identity (`https://github.com/settings/keys`).
+- At least one passing run of `signed-commit-check.yml` exists on `main` (otherwise the "required check" dropdown won't list it).
+
+**Commands:**
+
+```bash
+# (a) Flip the enforce var
+gh variable set ORBIT_SIGN_ENFORCE --body "true"
+
+# (b) Add the workflow as a required status check on main.
+#     This requires admin-level access to the repo via gh CLI:
+gh api -X PUT \
+  /repos/orbithousezkp/orbit/branches/main/protection \
+  -f required_status_checks[strict]=true \
+  -f required_status_checks[contexts][]="verify-signatures" \
+  -f enforce_admins=false \
+  -f required_pull_request_reviews[required_approving_review_count]=1 \
+  -f required_pull_request_reviews[require_code_owner_reviews]=true \
+  -f restrictions=null \
+  -f allow_force_pushes=false \
+  -f allow_deletions=false \
+  -f required_signatures=true
+
+# Verify
+gh api /repos/orbithousezkp/orbit/branches/main/protection --jq '.required_status_checks.contexts'
+# Expected: ["verify-signatures"]
+
+gh api /repos/orbithousezkp/orbit/branches/main/protection --jq '.required_signatures.enabled'
+# Expected: true
+```
+
+**Verification:** Open a test PR with an unsigned commit. The merge button stays disabled with "Required status check verify-signatures has not passed". Close the test PR without merging.
+
+**Record:** Done date ____ Branch protection enabled by ____
+
+**Note on bot commits:** Until T-3 Part C lands (cycle bot signs its commits with a GPG key from secrets), the `[orbit] cycle #N` commits from the workflow will land as unsigned and fail the check. Until then:
+- Keep `ORBIT_SIGN_ENFORCE=true` only for human-author commits (the workflow runs on `pull_request` so direct bot-push to `main` skips it), OR
+- Flip `ORBIT_SIGN_ENFORCE=false` temporarily during the 12-hour clean stretch (item 7) and re-enable after.
+
+T-3 Part C is tracked separately in `PLAN/STABILITY_SECURITY.md` and the matching `PLAN/ROADMAP_EXPANSION.md` entry — it requires a runbook for provisioning a GPG key inside GitHub Actions secrets without leaking it. Not part of S-GATE-1.
 
 ---
 
