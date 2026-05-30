@@ -116,7 +116,7 @@ function scanFile(absPath) {
 function main() {
   const files = walk(REPO_ROOT, []);
   if (files.length === 0) {
-    console.log("# env:check · no .env files found");
+    console.log("# env:check · no .env files found · clean");
     return 0;
   }
   let total = 0;

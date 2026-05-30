@@ -374,7 +374,7 @@ test("executeBuyback in dry-run with full approval simulates a swap and writes l
   // future so every scheduled time is due. Per-cycle invariant: AT MOST
   // ONE sub-buy fires per call, so this loop simulates N cycles.
   try {
-    const far = new Date("2026-06-01T00:00:00Z");
+    const far = new Date(Date.now() + 100 * 3600 * 1000);
     let last;
     for (let i = 0; i < 20; i += 1) {
       // eslint-disable-next-line no-await-in-loop
@@ -573,7 +573,7 @@ test("execute_buyback handler returns only safe summary fields and no router cal
   // S-BUY-1: a buyback is a campaign of N randomized sub-buys; the handler
   // fires AT MOST ONE per call. Loop with `now` 100h in the future so every
   // scheduled time is due, then check the final result.
-  const far = new Date("2026-06-01T00:00:00Z").toISOString();
+  const far = new Date(Date.now() + 100 * 3600 * 1000).toISOString();
   let result;
   for (let i = 0; i < 20; i += 1) {
     // eslint-disable-next-line no-await-in-loop
@@ -746,7 +746,7 @@ test("S-BUY-1: executeBuyback fires AT MOST ONE sub-buy per call (even when many
 
   // Drive `now` far past the window so EVERY scheduled time is due, then
   // verify ONLY ONE sub-buy flips to "completed" per call.
-  const far = new Date("2026-06-01T00:00:00Z");
+  const far = new Date(Date.now() + 100 * 3600 * 1000);
 
   // First call: create schedule + fire ONE sub-buy.
   await executeBuyback(config, {
@@ -797,7 +797,7 @@ test("S-BUY-1: executeBuyback archives the campaign when complete", async () => 
   });
 
   // Drain the campaign by calling exec in a loop with `now` far in the future.
-  const far = new Date("2026-06-01T00:00:00Z");
+  const far = new Date(Date.now() + 100 * 3600 * 1000);
   let result;
   for (let i = 0; i < 20; i += 1) {
     // eslint-disable-next-line no-await-in-loop
