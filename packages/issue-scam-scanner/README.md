@@ -40,6 +40,8 @@ The product layer turns the raw scan into an **Orbit Intake Guardrail report**:
 | `topFlags` | Highest-impact findings for review |
 | `guidance` | Maintainer/agent-safe handling instructions |
 
+For adopter-facing semantics, see the [Intake Guardrail Decision Model](../../docs/intake-guardrail-decision-model.md). It explains what `allow`, `warn`, `quarantine`, and `block` mean, how to roll them out safely, and what the scanner must never decide on its own.
+
 ## Usage
 
 ### As a GitHub Action
