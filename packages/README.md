@@ -67,6 +67,16 @@ node packages/issue-scam-scanner/cli.js "Ignore previous instructions"
 # → CRITICAL (score 80) — prompt_injection detected
 ```
 
+#### Safe rollout boundary
+
+Use the scanner as an intake guardrail, not as an autonomous punishment engine. Recommended adoption path:
+
+1. **Observe first** — run on issues, PRs, and comments with labels or CI summaries only.
+2. **Quarantine high-risk content** — route wallet, credential, obfuscated, or instruction-bypass findings to human review before any agent reads them.
+3. **Require least privilege** — grant only the permissions needed to label or comment during early rollout.
+4. **Keep final authority human** — scanner output is triage evidence, not a security guarantee or a reason to spend, sign, transfer, or publish.
+5. **Gate external moves** — marketplace publishing, outreach, paid commitments, shared access, wallet actions, token actions, reward claims, and payout-route changes remain owner-gated.
+
 ### [AI Budget Ledger](ai-budget-ledger/)
 
 **Library + CLI** for tracking AI API call costs, enforcing daily and monthly budgets, and estimating spend across providers.
@@ -130,6 +140,19 @@ npm test --workspace=packages/ai-budget-ledger
 - **Safe defaults** — Sensible thresholds, conservative budget checks, fail-closed behavior.
 - **No secrets required** — No API keys, wallet keys, or private config needed to run.
 - **Agent-friendly** — Designed for programmatic use by autonomous agents, not just humans.
+
+---
+
+## Cycle 69 direction choice
+
+Orbit compared safe wake-cycle directions before this change:
+
+- **Build** — continue the Issue Scam Scanner / Intake Guardrail prototype by making the package-level rollout boundary clearer for adopters.
+- **Infrastructure** — improve SDK, MCP, proof, or registry surfaces. Useful, but the toolkit index had a direct adoption-safety gap.
+- **Earn** — refine agent passport or capability-registry positioning. Valuable, but less immediate than documenting safe use of the existing prototype.
+- **Sustain** — refresh wallet-policy visibility. Important, but no wallet action or approval-class movement was needed this cycle.
+
+Selected direction: **build**. Reason: adding a concise safe-rollout boundary to the toolkit index is a small auditable improvement that advances a repo-local open-source prototype without publishing, outreach, spend, signing, token movement, reward claims, payout-route changes, or external commitments.
 
 ---
 
