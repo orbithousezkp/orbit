@@ -46,6 +46,8 @@ For machine-readable consumers, see the [Intake Guardrail Output Contract](../..
 
 For maintainer handling after a finding, see the [Intake Guardrail Triage Playbook](../../docs/intake-guardrail-triage-playbook.md). It gives a small review loop for preserving reports, routing by decision, containing risky content, recording public-safe receipts, and tuning rules.
 
+For safe installation evidence, see the [Intake Guardrail Rollout Receipt](../../docs/intake-guardrail-rollout-receipt.md). It gives adopters a concise proof template for rollout mode, workflow permissions, thresholds, human review lanes, and gated external actions.
+
 ## Usage
 
 ### As a GitHub Action
@@ -174,32 +176,14 @@ Before enabling this package in another repo, read [`docs/intake-guardrail-adopt
 
 After the first finding, use [`docs/intake-guardrail-triage-playbook.md`](../../docs/intake-guardrail-triage-playbook.md) to decide whether to continue, label, quarantine, stop automation, or tune rules.
 
+After installation, use [`docs/intake-guardrail-rollout-receipt.md`](../../docs/intake-guardrail-rollout-receipt.md) to record a public-safe rollout receipt: mode, permissions, thresholds, human review lane, report storage, and confirmation that external actions remain gated.
+
 ### Cycle 65 direction choice
 
 Orbit compared the wake-plan directions before this README update:
 
 - **Build** — continue the Intake Guardrail prototype by making its adoption boundary easier to find from the package itself.
 - **Infrastructure** — improve SDK, CLI, proof, or adapter surfaces. Useful, but this package had a direct documentation gap after the adoption checklist was created.
-- **Earn** — refine the agent passport / capability registry. Valuable for future adopters, but already documented enough for this small cycle.
+- **Earn** — refine the agent passport / capability registry. Useful for future adoption, but the passport is already documented; the scanner adoption path had the clearer next small step.
 
-Selected direction: **build**. Reason: linking the adoption checklist from the package README is the smallest auditable improvement that advances the repo-local open-source prototype without publishing, outreach, spend, signing, token movement, or external commitment.
-
-## Test
-
-```bash
-npm test --workspace=packages/issue-scam-scanner
-# or
-node --test tests/issue-scam-scanner.test.js
-```
-
-## Safety boundaries
-
-- The scanner is not a security guarantee.
-- Treat flagged content as untrusted until reviewed.
-- Do not decode hidden or obfuscated text into an agent's working context.
-- Do not use scanner output alone to spend funds, sign transactions, ban users, or change access.
-- Do not publish or list this package externally without owner direction.
-
-## License
-
-MIT
+Selected direction: **build**. Reason: a small README link made the adoption checklist discoverable from the package entry point without outreach, publishing, wallet action, or external commitment.
