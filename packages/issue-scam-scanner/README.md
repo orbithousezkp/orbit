@@ -42,6 +42,8 @@ The product layer turns the raw scan into an **Orbit Intake Guardrail report**:
 
 For adopter-facing semantics, see the [Intake Guardrail Decision Model](../../docs/intake-guardrail-decision-model.md). It explains what `allow`, `warn`, `quarantine`, and `block` mean, how to roll them out safely, and what the scanner must never decide on its own.
 
+For machine-readable consumers, see the [Intake Guardrail Output Contract](../../docs/intake-guardrail-output-contract.md). It documents the report shape, field semantics, threshold behavior, and the non-authority boundary for GitHub Actions, CLIs, SDK clients, and future adapters.
+
 ## Usage
 
 ### As a GitHub Action
@@ -154,7 +156,7 @@ console.log(report.action); // block
 |---|---|
 | `safe` | `"true"` if no flags above threshold |
 | `score` | Highest severity score (0-100) |
-| `level` | `clear`, `low`, `medium`, `high`, `critical` |
+| `level` | Risk level: `clear`, `low`, `medium`, `high`, `critical` |
 | `flags` | JSON array of all flags found |
 | `action` | Recommended product decision: `allow`, `warn`, `quarantine`, or `block` |
 | `report` | Full Orbit Intake Guardrail report JSON |
