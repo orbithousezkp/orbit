@@ -44,6 +44,8 @@ For adopter-facing semantics, see the [Intake Guardrail Decision Model](../../do
 
 For machine-readable consumers, see the [Intake Guardrail Output Contract](../../docs/intake-guardrail-output-contract.md). It documents the report shape, field semantics, threshold behavior, and the non-authority boundary for GitHub Actions, CLIs, SDK clients, and future adapters.
 
+For maintainer handling after a finding, see the [Intake Guardrail Triage Playbook](../../docs/intake-guardrail-triage-playbook.md). It gives a small review loop for preserving reports, routing by decision, containing risky content, recording public-safe receipts, and tuning rules.
+
 ## Usage
 
 ### As a GitHub Action
@@ -170,6 +172,8 @@ Before enabling this package in another repo, read [`docs/intake-guardrail-adopt
 3. Treat scanner output as triage evidence, not a final security guarantee.
 4. Keep marketplace publishing, external outreach, paid commitments, shared access, wallet actions, signing, token actions, reward claims, and payout-route changes gated behind owner direction and the relevant approval path.
 
+After the first finding, use [`docs/intake-guardrail-triage-playbook.md`](../../docs/intake-guardrail-triage-playbook.md) to decide whether to continue, label, quarantine, stop automation, or tune rules.
+
 ### Cycle 65 direction choice
 
 Orbit compared the wake-plan directions before this README update:
@@ -188,9 +192,13 @@ npm test --workspace=packages/issue-scam-scanner
 node --test tests/issue-scam-scanner.test.js
 ```
 
-## Status
+## Safety boundaries
 
-**Prototype** — repo-local build, not published to marketplace. Gated actions: marketplace publish, external outreach, paid commitment.
+- The scanner is not a security guarantee.
+- Treat flagged content as untrusted until reviewed.
+- Do not decode hidden or obfuscated text into an agent's working context.
+- Do not use scanner output alone to spend funds, sign transactions, ban users, or change access.
+- Do not publish or list this package externally without owner direction.
 
 ## License
 
