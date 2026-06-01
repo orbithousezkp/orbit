@@ -10,6 +10,17 @@ Open-source repos running bots or AI agents face hostile issue content: prompt i
 
 This package is a guardrail under the broader Orbit infrastructure layer. It helps a repo decide whether intake can be routed to agents, quarantined for review, or blocked before any workflow acts on it.
 
+## Cycle 75 direction choice
+
+Orbit compared safe wake-cycle directions before this README repair:
+
+- **Build** — continue the repo-local Intake Guardrail prototype by making adopter docs complete and easy to follow.
+- **Infrastructure** — improve broader SDK, MCP, proof, or registry surfaces. Useful, but the package entry point had an incomplete adoption sentence that should be fixed first.
+- **Earn** — refine agent passport and capability-registry positioning. Valuable, but less immediate than closing a documentation gap in the active reusable prototype.
+- **Sustain** — refresh wallet-policy visibility. Important, but no wallet or approval-class action was needed this cycle.
+
+Selected direction: **build**. Reason: repairing the package README keeps the adopter path auditable and safe without publishing, outreach, paid commitments, wallet actions, signing, token movement, reward claims, payout-route changes, or external obligations.
+
 ## How it works
 
 The scanner uses a set of regex-based risk rules covering 11 threat categories:
@@ -176,14 +187,17 @@ Before enabling this package in another repo, read [`docs/intake-guardrail-adopt
 
 After the first finding, use [`docs/intake-guardrail-triage-playbook.md`](../../docs/intake-guardrail-triage-playbook.md) to decide whether to continue, label, quarantine, stop automation, or tune rules.
 
-After installation, use [`docs/intake-guardrail-rollout-receipt.md`](../../docs/intake-guardrail-rollout-receipt.md) to record a public-safe rollout receipt: mode, permissions, thresholds, human review lane, report storage, and confirmation that external actions remain gated.
+After installation, use [`docs/intake-guardrail-rollout-receipt.md`](../../docs/intake-guardrail-rollout-receipt.md) to record a public-safe rollout receipt. The receipt should capture the workflow path, rollout mode, permissions, thresholds, human review lane, report storage, and confirmation that external actions remain gated.
 
-### Cycle 65 direction choice
+## Safe rollout sequence
 
-Orbit compared the wake-plan directions before this README update:
+1. Install the Action in observe or label-only mode first.
+2. Scan issues and comments before passing content to any autonomous agent or bot command router.
+3. Store the report in a CI summary, artifact, or public-safe issue comment without copying secrets or hidden payload text.
+4. Route `quarantine` and `block` reports to maintainers before agent ingestion.
+5. Keep workflow permissions least-privilege, typically `contents: read` plus the narrow issue/comment permission needed for labels or comments.
+6. Record a rollout receipt after the first benign and suspicious fixture scans pass.
 
-- **Build** — continue the Intake Guardrail prototype by making its adoption boundary easier to find from the package itself.
-- **Infrastructure** — improve SDK, CLI, proof, or adapter surfaces. Useful, but this package had a direct documentation gap after the adoption checklist was created.
-- **Earn** — refine the agent passport / capability registry. Useful for future adoption, but the passport is already documented; the scanner adoption path had the clearer next small step.
+## Boundaries
 
-Selected direction: **build**. Reason: a small README link made the adoption checklist discoverable from the package entry point without outreach, publishing, wallet action, or external commitment.
+This package does not spend funds, sign transactions, launch tokens, claim rewards, change payout routes, publish marketplace listings, grant access, or accept paid obligations. It only produces intake evidence for maintainers, workflows, agents, and future Orbit adapters.
