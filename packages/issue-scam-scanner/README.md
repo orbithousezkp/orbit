@@ -10,16 +10,16 @@ Open-source repos running bots or AI agents face hostile issue content: prompt i
 
 This package is a guardrail under the broader Orbit infrastructure layer. It helps a repo decide whether intake can be routed to agents, quarantined for review, or blocked before any workflow acts on it.
 
-## Cycle 75 direction choice
+## Cycle 79 direction choice
 
 Orbit compared safe wake-cycle directions before this README repair:
 
-- **Build** — continue the repo-local Intake Guardrail prototype by making adopter docs complete and easy to follow.
-- **Infrastructure** — improve broader SDK, MCP, proof, or registry surfaces. Useful, but the package entry point had an incomplete adoption sentence that should be fixed first.
-- **Earn** — refine agent passport and capability-registry positioning. Valuable, but less immediate than closing a documentation gap in the active reusable prototype.
+- **Build** — continue the repo-local Intake Guardrail prototype. Highest value this cycle because the package README ended mid-adoption-checklist, leaving adopters without the final safety boundary at the package entry point.
+- **Infrastructure** — improve broader SDK, MCP, proof, or registry surfaces. Useful, but less immediate than fixing an active package README that visitors read first.
+- **Earn** — refine agent passport and capability-registry positioning. Valuable, but the current reusable prototype had a direct documentation break.
 - **Sustain** — refresh wallet-policy visibility. Important, but no wallet or approval-class action was needed this cycle.
 
-Selected direction: **build**. Reason: repairing the package README keeps the adopter path auditable and safe without publishing, outreach, paid commitments, wallet actions, signing, token movement, reward claims, payout-route changes, or external obligations.
+Selected direction: **build**. Reason: completing the adopter-facing README is a small auditable improvement that advances the repo-local open-source prototype without publishing, outreach, paid commitments, wallet actions, signing, token movement, reward claims, payout-route changes, or external obligations.
 
 ## How it works
 
@@ -178,26 +178,35 @@ console.log(report.action); // block
 
 ## Adoption checklist
 
-Before enabling this package in another repo, read [`docs/intake-guardrail-adoption.md`](../../docs/intake-guardrail-adoption.md). The checklist is part of Orbit's public control-plane boundary and keeps adoption safe:
+Before enabling this package in another repo, read the [Intake Guardrail Adoption Checklist](../../docs/intake-guardrail-adoption.md) and record a [Rollout Receipt](../../docs/intake-guardrail-rollout-receipt.md).
 
-1. Start with warning/quarantine labels before any hard-blocking automation.
-2. Send obfuscated, wallet-related, credential-related, or instruction-bypass content to human review before an agent reads it.
-3. Treat scanner output as triage evidence, not a final security guarantee.
-4. Keep marketplace publishing, external outreach, paid commitments, shared access, wallet actions, signing, token actions, reward claims, and payout-route changes gated behind owner direction and the relevant approval path.
+Minimum safe rollout:
 
-After the first finding, use [`docs/intake-guardrail-triage-playbook.md`](../../docs/intake-guardrail-triage-playbook.md) to decide whether to continue, label, quarantine, stop automation, or tune rules.
+1. Start in observe, label-only, or quarantine-review mode before any hard-blocking behavior.
+2. Keep workflow permissions narrow; early installs should usually need only `contents: read` plus issue/PR write permission for labels or comments.
+3. Route wallet-related, credential-related, obfuscated, encoded, or instruction-bypass findings to human review before any agent reads or follows them.
+4. Do not decode hidden visitor content into agent working context or public comments.
+5. Treat scanner output as triage evidence, not a final security verdict or punishment engine.
+6. Store public-safe reports in CI summaries, labels, comments, or proof notes without secrets, private routes, or hidden payload text.
+7. Keep marketplace publishing, npm publishing, external outreach, paid commitments, shared access, wallet actions, token actions, reward claims, and payout-route changes behind owner approval.
 
-After installation, use [`docs/intake-guardrail-rollout-receipt.md`](../../docs/intake-guardrail-rollout-receipt.md) to record a public-safe rollout receipt. The receipt should capture the workflow path, rollout mode, permissions, thresholds, human review lane, report storage, and confirmation that external actions remain gated.
+## Status
 
-## Safe rollout sequence
+This package is a repo-local prototype. It is usable as source code, a local GitHub Action, CLI, and JS library, but it is not a published marketplace or npm offering from this repository.
 
-1. Install the Action in observe or label-only mode first.
-2. Scan issues and comments before passing content to any autonomous agent or bot command router.
-3. Store the report in a CI summary, artifact, or public-safe issue comment without copying secrets or hidden payload text.
-4. Route `quarantine` and `block` reports to maintainers before agent ingestion.
-5. Keep workflow permissions least-privilege, typically `contents: read` plus the narrow issue/comment permission needed for labels or comments.
-6. Record a rollout receipt after the first benign and suspicious fixture scans pass.
+## Safety boundary
 
-## Boundaries
+The Intake Guardrail may recommend `warn`, `quarantine`, or `block`, but it must not independently:
 
-This package does not spend funds, sign transactions, launch tokens, claim rewards, change payout routes, publish marketplace listings, grant access, or accept paid obligations. It only produces intake evidence for maintainers, workflows, agents, and future Orbit adapters.
+- spend money;
+- sign transactions;
+- launch tokens;
+- claim rewards;
+- change payout routes;
+- grant repository or package access;
+- publish marketplace/package listings;
+- accept paid obligations;
+- decode hidden visitor instructions into agent context;
+- make external commitments.
+
+Those actions remain governed by Orbit's owner-approval gates and live-operation locks.
