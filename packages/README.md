@@ -143,11 +143,11 @@ npm test --workspace=packages/ai-budget-ledger
 
 ---
 
-## Cycle 81 direction choice
+## Cycle 82 direction choice
 
 Orbit compared safe wake-cycle directions before this repair:
 
-- **Build** — continue the repo-local Intake Guardrail/toolkit prototype. Highest value this cycle because the toolkit index still ended mid-line in the future-package list, which weakens adopter clarity at the package entry point.
+- **Build** — continue the repo-local Intake Guardrail/toolkit prototype. Highest value this cycle because the toolkit index still ended mid-word in the future-package list, which weakens adopter clarity at the package entry point.
 - **Infrastructure** — improve SDK, MCP, proof, or registry surfaces. Useful, but the current reusable package index had a direct documentation integrity gap.
 - **Earn** — refine agent passport or capability-registry positioning. Valuable, but less immediate than fixing a broken public-facing artifact.
 - **Sustain** — refresh wallet-policy visibility. Important, but no wallet action or approval-class movement was needed this cycle.
@@ -165,6 +165,7 @@ All packages are **prototypes** — repo-local builds, not published to npm or G
 - npm or marketplace publishing with obligations
 - External outreach or promotion
 - Paid commitments or service agreements
+- Shared access, wallet actions, signing, token actions, reward claims, or payout-route changes
 
 ---
 
@@ -172,10 +173,9 @@ All packages are **prototypes** — repo-local builds, not published to npm or G
 
 Potential future packages (research stage):
 
-- **Proof Viewer** — Search and summarize cycle proofs, changed files, decisions, and refusal receipts without exposing private routes or hidden execution details.
-- **Memory Conflict Detector** — Flag stale or contradictory durable knowledge entries before they influence future cycles.
-- **Receipt Digest CLI** — Build compact public summaries from cycle notes, proof records, changed files, and refusal logs.
-- **Agent Passport Validator** — Check that a repo's passport, capability registry, and blocked-action list are present and consistent.
-- **Guarded Issue Router** — Combine intake scanning, duplicate detection, safe command parsing, and human-review routing for repos that run agents.
+- **Proof Receipt Viewer** — summarize cycle notes and runtime proofs into a portable audit trail for maintainers and dashboards.
+- **Agent Memory Inspector** — detect stale or contradictory repo memory before an agent acts on it.
+- **Approval Gate Templates** — reusable issue templates, labels, and workflow snippets for spend, signing, token, and external-commitment review.
+- **Lifecycle Health Check** — verify scheduled wake cycles, event intake, proof receipts, and no-op suppression in any GitHub-native agent repo.
 
-Safe next step: keep improving local docs, examples, tests, and package boundaries. Do not publish, promote, sell, spend, sign, launch tokens, claim rewards, change payout routes, or make external commitments without the owner-approved gate.
+Future packages stay repo-local until owner direction approves any external publishing or obligation-bearing launch.
