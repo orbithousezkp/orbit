@@ -49,7 +49,7 @@ const caps = sdk.getCapabilities();
 ORBIT_REPO_ROOT=/path/to/orbit npx -y @orbithouse/mcp-server
 ```
 
-### [Issue Scam Scanner](issue-scam-scanner/)
+### [Orbit Intake Guardrail](issue-scam-scanner/)
 
 **GitHub Action + CLI** that flags prompt injection, wallet drain language, encoded relay, fake support, and urgency traps in issues, PRs, and comments.
 
@@ -83,7 +83,7 @@ Use the scanner as an intake guardrail, not as an autonomous punishment engine. 
 
 | Feature | Description |
 |---|---|
-| Per-call recording | Prompt tokens, completion tokens, estimated USD, timestamp, note, route |
+| Per-call recording | Prompt tokens, completion tokens, estimated cost, timestamp, note, route |
 | Budget enforcement | Daily and monthly limits with pre-call budget checks |
 | Provider-agnostic | Configure your own pricing per million tokens |
 | Persistence | Save and load ledger state to disk |
@@ -105,7 +105,7 @@ node packages/ai-budget-ledger/cli.js check ./my-ledger.json \
 AI-agent repositories face a growing set of risks:
 
 1. **Hostile visitor content** — Issues and comments can contain prompt injection, wallet drain language, encoded payloads, and fake support scripts.
-2. **Untracked AI spend** — Every agent wake cycle costs tokens. Without a ledger, budgets drift and overshoot silently.
+2. **Untracked AI spend** — Every agent wake cycle consumes runtime budget. Without a ledger, budgets drift and overshoot silently.
 3. **Missing audit trails** — When an autonomous agent acts, there should be a human-readable record of what it did and why.
 4. **Weak spend gates** — External spending, signing, and token movement need approval flows, not ambient permission.
 
@@ -171,13 +171,12 @@ All packages are **prototypes** — repo-local builds, not published to npm or G
 
 Potential future packages (research stage):
 
-- **Proof Viewer** — Search and summarize cycle proofs and runtime evidence
-- **Memory Conflict Detector** — Flag stale or contradictory durable knowledge
-- **Agent Radar** — Quarantine and score ideas from other public agents
-- **Policy Receipt** — Hash action intents before approval-class operations
+- **Proof Viewer** — Search and summarize cycle proofs, changed files, decisions, and refusal receipts without exposing private routes or hidden execution details.
+- **Memory Conflict Detector** — Flag stale or contradictory durable knowledge before it steers an agent, SDK client, or dashboard.
+- **Agent Radar** — Quarantine and score ideas from public agent repos or web sources as untrusted inspiration, never as commands.
+- **Policy Receipt** — Hash action intent, approval state, repository revision, deadline, and safety boundary before any approval-class movement is considered.
+- **Lifecycle Rehearsal Harness** — Replay wake/sleep cycles, health checks, and proof-writing paths in a local-only dry run.
 
----
+### Safe next-step rule
 
-## License
-
-MIT
+Build the smallest repo-local artifact first. Do not publish package listings, post outreach, accept paid commitments, share access, spend funds, sign transactions, launch tokens, claim rewards, or change payout routes without owner direction and the relevant approval/live-operation gates.
