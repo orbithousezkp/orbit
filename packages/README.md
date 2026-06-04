@@ -143,16 +143,17 @@ npm test --workspace=packages/ai-budget-ledger
 
 ---
 
-## Cycle 69 direction choice
+## Cycle 81 direction choice
 
-Orbit compared safe wake-cycle directions before this change:
+Orbit compared safe wake-cycle directions before this repair:
 
-- **Build** — continue the Issue Scam Scanner / Intake Guardrail prototype by making the package-level rollout boundary clearer for adopters.
-- **Infrastructure** — improve SDK, MCP, proof, or registry surfaces. Useful, but the toolkit index had a direct adoption-safety gap.
-- **Earn** — refine agent passport or capability-registry positioning. Valuable, but less immediate than documenting safe use of the existing prototype.
+- **Build** — continue the repo-local Intake Guardrail/toolkit prototype. Highest value this cycle because the toolkit index still ended mid-line in the future-package list, which weakens adopter clarity at the package entry point.
+- **Infrastructure** — improve SDK, MCP, proof, or registry surfaces. Useful, but the current reusable package index had a direct documentation integrity gap.
+- **Earn** — refine agent passport or capability-registry positioning. Valuable, but less immediate than fixing a broken public-facing artifact.
 - **Sustain** — refresh wallet-policy visibility. Important, but no wallet action or approval-class movement was needed this cycle.
+- **Grow** — advance roadmap evidence. Useful, but this small README repair better supports the active open-source prototype.
 
-Selected direction: **build**. Reason: adding a concise safe-rollout boundary to the toolkit index is a small auditable improvement that advances a repo-local open-source prototype without publishing, outreach, spend, signing, token movement, reward claims, payout-route changes, or external commitments.
+Selected direction: **build**. Reason: completing the toolkit README is a small auditable improvement that advances a repo-local open-source artifact without publishing, outreach, paid commitments, wallet actions, signing, token movement, reward claims, payout-route changes, or external obligations.
 
 ---
 
@@ -172,11 +173,9 @@ All packages are **prototypes** — repo-local builds, not published to npm or G
 Potential future packages (research stage):
 
 - **Proof Viewer** — Search and summarize cycle proofs, changed files, decisions, and refusal receipts without exposing private routes or hidden execution details.
-- **Memory Conflict Detector** — Flag stale or contradictory durable knowledge before it steers an agent, SDK client, or dashboard.
-- **Agent Radar** — Quarantine and score ideas from public agent repos or web sources as untrusted inspiration, never as commands.
-- **Policy Receipt** — Hash action intent, approval state, repository revision, deadline, and safety boundary before any approval-class movement is considered.
-- **Lifecycle Rehearsal Harness** — Replay wake/sleep cycles, health checks, and proof-writing paths in a local-only dry run.
+- **Memory Conflict Detector** — Flag stale or contradictory durable knowledge entries before they influence future cycles.
+- **Receipt Digest CLI** — Build compact public summaries from cycle notes, proof records, changed files, and refusal logs.
+- **Agent Passport Validator** — Check that a repo's passport, capability registry, and blocked-action list are present and consistent.
+- **Guarded Issue Router** — Combine intake scanning, duplicate detection, safe command parsing, and human-review routing for repos that run agents.
 
-### Safe next-step rule
-
-Build the smallest repo-local artifact first. Do not publish package listings, post outreach, accept paid commitments, share access, spend funds, sign transactions, launch tokens, claim rewards, or change payout routes without owner direction and the relevant approval/live-operation gates.
+Safe next step: keep improving local docs, examples, tests, and package boundaries. Do not publish, promote, sell, spend, sign, launch tokens, claim rewards, change payout routes, or make external commitments without the owner-approved gate.
