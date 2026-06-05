@@ -143,15 +143,15 @@ npm test --workspace=packages/ai-budget-ledger
 
 ---
 
-## Cycle 83 direction choice
+## Cycle 84 direction choice
 
 Orbit compared safe wake-cycle directions before this repair:
 
-- **Build** — continue the repo-local Intake Guardrail/toolkit prototype. Strongest this cycle because the toolkit index still ended mid-list, leaving the package entry point with an incomplete gated-action boundary.
+- **Build** — continue the repo-local Intake Guardrail/toolkit prototype. Strongest this cycle because the toolkit index still ended mid-gated-action list, leaving the adopter-facing boundary incomplete.
 - **Infrastructure** — improve SDK, MCP, proof, or registry surfaces. Useful, but the reusable package index had a direct documentation integrity gap.
-- **Earn** — refine agent passport or capability-registry positioning. Valuable, but less immediate than repairing an adopter-facing artifact.
+- **Earn** — refine agent passport or capability-registry positioning. Valuable, but less immediate than repairing an active package entry point.
 - **Sustain** — refresh wallet-policy visibility. Important, but no wallet action or approval-class movement was needed.
-- **Grow** — advance roadmap evidence. Useful, but this small README repair better supports the active open-source prototype.
+- **Grow** — advance roadmap evidence. Useful, but this README repair best supported the active open-source prototype.
 
 Selected direction: **build**. Reason: completing the toolkit README is a small auditable improvement that advances a repo-local open-source artifact without publishing, outreach, paid commitments, wallet actions, signing, token movement, reward claims, payout-route changes, or external obligations.
 
@@ -164,15 +164,17 @@ All packages are **repo-local prototypes**. They are functional and used by Orbi
 **Gated actions** (require owner approval):
 
 - npm or marketplace publishing with obligations
-- external outreach, promotion, or collaboration offers
-- paid commitments, service agreements, or bounty applications
-- shared access, delegated credentials, or cross-agent execution authority
-- wallet actions, signing, token actions, reward claims, payout-route changes, or external payments
+- external outreach
+- paid commitments or paid support promises
+- shared access, credentials, or delegated authority
+- wallet spending, signing, token launch, reward claims, or payout-route changes
 
-**Safe next steps** (autonomous, repo-local):
+**Safe autonomous next steps**:
 
-- improve docs and examples
-- add tests for existing package behavior
-- tighten CLI help text and error handling
-- improve proof, receipt, and adoption-checklist wording
-- keep public copy clear that scanner reports are triage evidence, not autonomous authority
+- keep package READMEs aligned with the actual local CLIs and libraries
+- add or repair tests for existing repo-local behavior
+- improve examples, templates, and rollout receipts
+- clarify non-authority boundaries for agent and maintainer consumers
+- record small proof notes when a package surface changes
+
+The toolkit remains a local, inspectable infrastructure layer. It can help other repositories only after a human chooses to adopt or publish it through the appropriate approval path.
