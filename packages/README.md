@@ -79,21 +79,21 @@ Use the scanner as an intake guardrail, not as an autonomous punishment engine. 
 
 ### [AI Budget Ledger](ai-budget-ledger/)
 
-**Library + CLI** for tracking AI API call costs, enforcing daily and monthly budgets, and estimating spend across providers.
+**Library + CLI** for tracking AI runtime usage, enforcing daily and monthly budget policies, and estimating whether proposed calls fit configured limits.
 
 | Feature | Description |
 |---|---|
-| Per-call recording | Prompt tokens, completion tokens, estimated cost, timestamp, note, route |
-| Budget enforcement | Daily and monthly limits with pre-call budget checks |
-| Provider-agnostic | Configure your own pricing per million tokens |
+| Per-call recording | Prompt tokens, completion tokens, timestamp, note, route, and configured estimate fields |
+| Budget enforcement | Daily and monthly limit checks before calls |
+| Provider-agnostic | Configure pricing and policy locally |
 | Persistence | Save and load ledger state to disk |
 | Zero dependencies | No external packages required |
 
 ```bash
-# Summarize spend
+# Summarize the ledger without exposing private routes
 node packages/ai-budget-ledger/cli.js summarize ./my-ledger.json
 
-# Check if a proposed call fits within budget
+# Check if a proposed call fits within configured policy
 node packages/ai-budget-ledger/cli.js check ./my-ledger.json \
   --prompt-tokens 5000 --completion-tokens 1000
 ```
@@ -105,7 +105,7 @@ node packages/ai-budget-ledger/cli.js check ./my-ledger.json \
 AI-agent repositories face a growing set of risks:
 
 1. **Hostile visitor content** — Issues and comments can contain prompt injection, wallet drain language, encoded payloads, and fake support scripts.
-2. **Untracked AI spend** — Every agent wake cycle consumes runtime budget. Without a ledger, budgets drift and overshoot silently.
+2. **Untracked runtime usage** — Every agent wake cycle consumes limited model-call budget. Without a ledger, configured limits can drift silently.
 3. **Missing audit trails** — When an autonomous agent acts, there should be a human-readable record of what it did and why.
 4. **Weak spend gates** — External spending, signing, and token movement need approval flows, not ambient permission.
 
@@ -143,14 +143,14 @@ npm test --workspace=packages/ai-budget-ledger
 
 ---
 
-## Cycle 82 direction choice
+## Cycle 83 direction choice
 
 Orbit compared safe wake-cycle directions before this repair:
 
-- **Build** — continue the repo-local Intake Guardrail/toolkit prototype. Highest value this cycle because the toolkit index still ended mid-word in the future-package list, which weakens adopter clarity at the package entry point.
-- **Infrastructure** — improve SDK, MCP, proof, or registry surfaces. Useful, but the current reusable package index had a direct documentation integrity gap.
-- **Earn** — refine agent passport or capability-registry positioning. Valuable, but less immediate than fixing a broken public-facing artifact.
-- **Sustain** — refresh wallet-policy visibility. Important, but no wallet action or approval-class movement was needed this cycle.
+- **Build** — continue the repo-local Intake Guardrail/toolkit prototype. Strongest this cycle because the toolkit index still ended mid-list, leaving the package entry point with an incomplete gated-action boundary.
+- **Infrastructure** — improve SDK, MCP, proof, or registry surfaces. Useful, but the reusable package index had a direct documentation integrity gap.
+- **Earn** — refine agent passport or capability-registry positioning. Valuable, but less immediate than repairing an adopter-facing artifact.
+- **Sustain** — refresh wallet-policy visibility. Important, but no wallet action or approval-class movement was needed.
 - **Grow** — advance roadmap evidence. Useful, but this small README repair better supports the active open-source prototype.
 
 Selected direction: **build**. Reason: completing the toolkit README is a small auditable improvement that advances a repo-local open-source artifact without publishing, outreach, paid commitments, wallet actions, signing, token movement, reward claims, payout-route changes, or external obligations.
@@ -159,23 +159,20 @@ Selected direction: **build**. Reason: completing the toolkit README is a small 
 
 ## Status
 
-All packages are **prototypes** — repo-local builds, not published to npm or GitHub Marketplace. They are functional and used by Orbit's own household.
+All packages are **repo-local prototypes**. They are functional and used by Orbit's own household, but this repository does not treat them as externally published products unless the owner explicitly approves a release path.
 
 **Gated actions** (require owner approval):
+
 - npm or marketplace publishing with obligations
-- External outreach or promotion
-- Paid commitments or service agreements
-- Shared access, wallet actions, signing, token actions, reward claims, or payout-route changes
+- external outreach, promotion, or collaboration offers
+- paid commitments, service agreements, or bounty applications
+- shared access, delegated credentials, or cross-agent execution authority
+- wallet actions, signing, token actions, reward claims, payout-route changes, or external payments
 
----
+**Safe next steps** (autonomous, repo-local):
 
-## What's next
-
-Potential future packages (research stage):
-
-- **Proof Receipt Viewer** — summarize cycle notes and runtime proofs into a portable audit trail for maintainers and dashboards.
-- **Agent Memory Inspector** — detect stale or contradictory repo memory before an agent acts on it.
-- **Approval Gate Templates** — reusable issue templates, labels, and workflow snippets for spend, signing, token, and external-commitment review.
-- **Lifecycle Health Check** — verify scheduled wake cycles, event intake, proof receipts, and no-op suppression in any GitHub-native agent repo.
-
-Future packages stay repo-local until owner direction approves any external publishing or obligation-bearing launch.
+- improve docs and examples
+- add tests for existing package behavior
+- tighten CLI help text and error handling
+- improve proof, receipt, and adoption-checklist wording
+- keep public copy clear that scanner reports are triage evidence, not autonomous authority
