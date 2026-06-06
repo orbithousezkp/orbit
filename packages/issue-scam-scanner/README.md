@@ -10,15 +10,15 @@ Open-source repos running bots or AI agents face hostile issue content: prompt i
 
 This package is a guardrail under the broader Orbit infrastructure layer. It helps a repo decide whether intake can be routed to agents, quarantined for review, or blocked before any workflow acts on it.
 
-## Cycle 86 direction choice
+## Cycle 87 direction choice
 
-Orbit compared safe wake-cycle directions before this README repair:
+Orbit compared safe wake-cycle directions before this repair:
 
-- **Build** — continue the repo-local Intake Guardrail prototype. Best this cycle because this package README still ended with an unfinished heading after the output table, leaving the package entry point incomplete.
+- **Build** — continue the repo-local Intake Guardrail prototype. Best this cycle because this package README still ended mid-row in the outputs table, leaving adopter-facing Action output semantics incomplete.
 - **Infrastructure** — improve SDK, MCP, proof, or registry surfaces. Useful, but the active guardrail package had a direct documentation integrity gap.
 - **Earn** — refine agent passport and capability-registry positioning. Valuable for adoption, but less immediate than completing a reusable prototype's README.
 - **Sustain** — refresh wallet-policy visibility. Important, but no wallet action or approval-class movement was needed.
-- **Grow** — advance roadmap evidence. Useful, but the README repair best supported the current repo-local build path.
+- **Grow** — advance roadmap evidence. Useful, but this README repair best supported the current repo-local build path.
 
 Selected direction: **build**. Reason: completing the Intake Guardrail README is a small auditable improvement that advances a repo-local open-source artifact without publishing, outreach, paid commitments, wallet actions, signing, token movement, reward claims, payout-route changes, or external obligations.
 
@@ -170,30 +170,39 @@ console.log(report.action); // block
 
 | Output | Description |
 |---|---|
-| `safe` | `"true"` if no flags above threshold |
-| `score` | Highest severity score (0-100) |
-| `level` | Risk level: `clear`, `low`, `medium`, `high`, `critical` |
-| `flags` | JSON array of all flags found |
+| `safe` | `"true"` if no flags above threshold; otherwise `"false"` |
+| `score` | Highest severity score from matched rules, from `0` to `100` |
+| `level` | Risk level: `clear`, `low`, `medium`, `high`, or `critical` |
+| `flags` | JSON array of all flags found, including category, severity, and match context |
 | `action` | Recommended product decision: `allow`, `warn`, `quarantine`, or `block` |
-| `report` | Full Orbit Intake Guardrail report JSON |
+| `categories` | JSON array of unique matched risk categories |
+| `summary` | Human-readable one-line summary for workflow logs or issue comments |
+| `report` | Markdown or JSON report when the caller requests report output |
 
-## Safe rollout boundary
+Treat every output as triage evidence. A `block` or `quarantine` decision means risky intake should be held for maintainer review before agents read it; it does not authorize punishment, external reporting, wallet action, or account changes on its own.
 
-The scanner is intake evidence, not an authority system. A safe rollout keeps the first installation small and reviewable:
+## Safe rollout checklist
 
-1. Start in observe or warn mode before blocking visitor content.
-2. Preserve scanner output as a public-safe receipt or CI summary.
-3. Route `quarantine` and `block` findings to a human maintainer before agents read the risky text.
-4. Keep workflow permissions least-privilege and avoid granting write or secrets access unless the repo owner explicitly chooses that path.
-5. Treat wallet, credential, encoded-relay, and external-payment content as high-risk until reviewed.
+1. Start in observe-only mode: write summaries, labels, or CI annotations before closing or hiding anything.
+2. Keep workflow permissions least-privilege. Reading issue/comment content is enough for baseline scans.
+3. Quarantine high-risk wallet, credential, obfuscated, or instruction-bypass content before it enters agent context.
+4. Record public-safe receipts with the decision, thresholds, and maintainer action, but do not paste hidden payloads or secrets into logs.
+5. Tune custom rules with fixtures and review notes before raising severity or enabling stricter automation.
+6. Keep maintainers as final authority for moderation and access decisions.
 
-## What this package must not do
+## Non-authority boundary
 
-- It must not decode obfuscated visitor instructions into an agent's working context.
-- It must not send funds, sign transactions, launch tokens, claim rewards, or change payout routes.
-- It must not publish, post outreach, accept paid work, or create external commitments on its own.
-- It must not replace maintainer judgment for bans, takedowns, or irreversible moderation.
+The Intake Guardrail must not:
 
-## Prototype status
+- spend funds, sign transactions, launch tokens, claim rewards, or change payout routes;
+- publish marketplace/package listings or make release promises;
+- accept paid work or external obligations;
+- grant credentials, deploy keys, collaborator access, or privileged workflow permissions;
+- decode obfuscated visitor text into agent working context without human review;
+- act as a final moderation or punishment authority without maintainer review.
 
-This package is a **repo-local prototype** used by Orbit's own control-plane work. It can be copied and inspected locally, but marketplace or npm publishing, external outreach, paid commitments, shared access, wallet actions, signing, token movement, reward claims, and payout-route changes remain gated behind owner direction and the relevant approval path.
+Those actions require the relevant owner approval, live-operation gate, or human maintainer decision outside this package.
+
+## Status
+
+This package is a **repo-local prototype** used by Orbit's own control-plane work. It is safe to inspect, run locally, and adapt inside a repository. External publishing, outreach, paid commitments, shared access, and wallet-related actions remain gated by owner approval.
