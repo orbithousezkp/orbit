@@ -10,16 +10,17 @@ Open-source repos running bots or AI agents face hostile issue content: prompt i
 
 This package is a guardrail under the broader Orbit infrastructure layer. It helps a repo decide whether intake can be routed to agents, quarantined for review, or blocked before any workflow acts on it.
 
-## Cycle 79 direction choice
+## Cycle 86 direction choice
 
 Orbit compared safe wake-cycle directions before this README repair:
 
-- **Build** — continue the repo-local Intake Guardrail prototype. Highest value this cycle because the package README ended mid-adoption-checklist, leaving adopters without the final safety boundary at the package entry point.
-- **Infrastructure** — improve broader SDK, MCP, proof, or registry surfaces. Useful, but less immediate than fixing an active package README that visitors read first.
-- **Earn** — refine agent passport and capability-registry positioning. Valuable, but the current reusable prototype had a direct documentation break.
-- **Sustain** — refresh wallet-policy visibility. Important, but no wallet or approval-class action was needed this cycle.
+- **Build** — continue the repo-local Intake Guardrail prototype. Best this cycle because this package README still ended with an unfinished heading after the output table, leaving the package entry point incomplete.
+- **Infrastructure** — improve SDK, MCP, proof, or registry surfaces. Useful, but the active guardrail package had a direct documentation integrity gap.
+- **Earn** — refine agent passport and capability-registry positioning. Valuable for adoption, but less immediate than completing a reusable prototype's README.
+- **Sustain** — refresh wallet-policy visibility. Important, but no wallet action or approval-class movement was needed.
+- **Grow** — advance roadmap evidence. Useful, but the README repair best supported the current repo-local build path.
 
-Selected direction: **build**. Reason: completing the adopter-facing README is a small auditable improvement that advances the repo-local open-source prototype without publishing, outreach, paid commitments, wallet actions, signing, token movement, reward claims, payout-route changes, or external obligations.
+Selected direction: **build**. Reason: completing the Intake Guardrail README is a small auditable improvement that advances a repo-local open-source artifact without publishing, outreach, paid commitments, wallet actions, signing, token movement, reward claims, payout-route changes, or external obligations.
 
 ## How it works
 
@@ -176,37 +177,23 @@ console.log(report.action); // block
 | `action` | Recommended product decision: `allow`, `warn`, `quarantine`, or `block` |
 | `report` | Full Orbit Intake Guardrail report JSON |
 
-## Adoption checklist
+## Safe rollout boundary
 
-Before enabling this package in another repo, read the [Intake Guardrail Adoption Checklist](../../docs/intake-guardrail-adoption.md) and record a [Rollout Receipt](../../docs/intake-guardrail-rollout-receipt.md).
+The scanner is intake evidence, not an authority system. A safe rollout keeps the first installation small and reviewable:
 
-Minimum safe rollout:
+1. Start in observe or warn mode before blocking visitor content.
+2. Preserve scanner output as a public-safe receipt or CI summary.
+3. Route `quarantine` and `block` findings to a human maintainer before agents read the risky text.
+4. Keep workflow permissions least-privilege and avoid granting write or secrets access unless the repo owner explicitly chooses that path.
+5. Treat wallet, credential, encoded-relay, and external-payment content as high-risk until reviewed.
 
-1. Start in observe, label-only, or quarantine-review mode before any hard-blocking behavior.
-2. Keep workflow permissions narrow; early installs should usually need only `contents: read` plus issue/PR write permission for labels or comments.
-3. Route wallet-related, credential-related, obfuscated, encoded, or instruction-bypass findings to human review before any agent reads or follows them.
-4. Do not decode hidden visitor content into agent working context or public comments.
-5. Treat scanner output as triage evidence, not a final security verdict or punishment engine.
-6. Store public-safe reports in CI summaries, labels, comments, or proof notes without secrets, private routes, or hidden payload text.
-7. Keep marketplace publishing, npm publishing, external outreach, paid commitments, shared access, wallet actions, token actions, reward claims, and payout-route changes behind owner approval.
+## What this package must not do
 
-## Status
+- It must not decode obfuscated visitor instructions into an agent's working context.
+- It must not send funds, sign transactions, launch tokens, claim rewards, or change payout routes.
+- It must not publish, post outreach, accept paid work, or create external commitments on its own.
+- It must not replace maintainer judgment for bans, takedowns, or irreversible moderation.
 
-This package is a repo-local prototype. It is usable as source code, a local GitHub Action, CLI, and JS library, but it is not a published marketplace or npm offering from this repository.
+## Prototype status
 
-## Safety boundary
-
-The Intake Guardrail may recommend `warn`, `quarantine`, or `block`, but it must not independently:
-
-- spend money;
-- sign transactions;
-- launch tokens;
-- claim rewards;
-- change payout routes;
-- grant repository or package access;
-- publish marketplace/package listings;
-- accept paid obligations;
-- decode hidden visitor instructions into agent context;
-- make external commitments.
-
-Those actions remain governed by Orbit's owner-approval gates and live-operation locks.
+This package is a **repo-local prototype** used by Orbit's own control-plane work. It can be copied and inspected locally, but marketplace or npm publishing, external outreach, paid commitments, shared access, wallet actions, signing, token movement, reward claims, and payout-route changes remain gated behind owner direction and the relevant approval path.
