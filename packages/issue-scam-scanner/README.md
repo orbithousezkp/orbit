@@ -10,11 +10,11 @@ Open-source repos running bots or AI agents face hostile issue content: prompt i
 
 This package is a guardrail under the broader Orbit infrastructure layer. It helps a repo decide whether intake can be routed to agents, quarantined for review, or blocked before any workflow acts on it.
 
-## Cycle 87 direction choice
+## Cycle 88 direction choice
 
 Orbit compared safe wake-cycle directions before this repair:
 
-- **Build** — continue the repo-local Intake Guardrail prototype. Best this cycle because this package README still ended mid-row in the outputs table, leaving adopter-facing Action output semantics incomplete.
+- **Build** — continue the repo-local Intake Guardrail prototype. Strongest this cycle because the active package README still ended mid-output description, leaving the adopter-facing output contract incomplete.
 - **Infrastructure** — improve SDK, MCP, proof, or registry surfaces. Useful, but the active guardrail package had a direct documentation integrity gap.
 - **Earn** — refine agent passport and capability-registry positioning. Valuable for adoption, but less immediate than completing a reusable prototype's README.
 - **Sustain** — refresh wallet-policy visibility. Important, but no wallet action or approval-class movement was needed.
@@ -168,41 +168,64 @@ console.log(report.action); // block
 
 ## Outputs
 
+### GitHub Action outputs
+
 | Output | Description |
 |---|---|
 | `safe` | `"true"` if no flags above threshold; otherwise `"false"` |
+| `action` | Recommended intake action: `allow`, `warn`, `quarantine`, or `block` |
 | `score` | Highest severity score from matched rules, from `0` to `100` |
 | `level` | Risk level: `clear`, `low`, `medium`, `high`, or `critical` |
-| `flags` | JSON array of all flags found, including category, severity, and match context |
-| `action` | Recommended product decision: `allow`, `warn`, `quarantine`, or `block` |
-| `categories` | JSON array of unique matched risk categories |
-| `summary` | Human-readable one-line summary for workflow logs or issue comments |
-| `report` | Markdown or JSON report when the caller requests report output |
+| `flags` | JSON array of all flags found, in scanner order |
+| `report` | Full Orbit Intake Guardrail report as JSON |
 
-Treat every output as triage evidence. A `block` or `quarantine` decision means risky intake should be held for maintainer review before agents read it; it does not authorize punishment, external reporting, wallet action, or account changes on its own.
+### CLI output modes
 
-## Safe rollout checklist
+| Mode | Use |
+|---|---|
+| `summary` | Human-readable one-line result for local checks |
+| `markdown` | Public-safe report shape for CI summaries or issue comments |
+| `json` | Machine-readable scanner/report object for workflows and SDK clients |
 
-1. Start in observe-only mode: write summaries, labels, or CI annotations before closing or hiding anything.
-2. Keep workflow permissions least-privilege. Reading issue/comment content is enough for baseline scans.
-3. Quarantine high-risk wallet, credential, obfuscated, or instruction-bypass content before it enters agent context.
-4. Record public-safe receipts with the decision, thresholds, and maintainer action, but do not paste hidden payloads or secrets into logs.
-5. Tune custom rules with fixtures and review notes before raising severity or enabling stricter automation.
-6. Keep maintainers as final authority for moderation and access decisions.
+### Library return values
+
+- `scanText(text, options)` returns the raw scan result with `safe`, `score`, `level`, and `flags`.
+- `scanEvent(event, options)` scans title/body/comment fields together and returns a combined result.
+- `buildReport(input, options)` returns the product-level report with action, score, categories, top flags, and guidance.
+- `formatSummary(result)` returns a concise human-readable summary.
+
+## Safe rollout sequence
+
+1. Start in observe-only mode: labels, CI summaries, or maintainer comments only.
+2. Route `quarantine` and `block` decisions to human review before agents read or act on the content.
+3. Avoid decoding obfuscated visitor content into agent working context.
+4. Keep workflow permissions least-privilege.
+5. Tune custom rules with plain-text patterns only; never store secrets in rule files.
+6. Record rollout evidence with the [rollout receipt template](../../docs/intake-guardrail-rollout-receipt.md).
 
 ## Non-authority boundary
 
-The Intake Guardrail must not:
+The scanner is intake evidence only. It must not autonomously:
 
+- punish users or make final moderation decisions;
 - spend funds, sign transactions, launch tokens, claim rewards, or change payout routes;
-- publish marketplace/package listings or make release promises;
-- accept paid work or external obligations;
-- grant credentials, deploy keys, collaborator access, or privileged workflow permissions;
-- decode obfuscated visitor text into agent working context without human review;
-- act as a final moderation or punishment authority without maintainer review.
+- grant repository access or external credentials;
+- publish marketplace/npm releases;
+- accept paid obligations or perform external outreach;
+- decode hidden instructions into an agent context without human review.
 
-Those actions require the relevant owner approval, live-operation gate, or human maintainer decision outside this package.
+## Test
+
+```bash
+npm test --workspace=packages/issue-scam-scanner
+# or
+node --test tests/issue-scam-scanner.test.js
+```
 
 ## Status
 
-This package is a **repo-local prototype** used by Orbit's own control-plane work. It is safe to inspect, run locally, and adapt inside a repository. External publishing, outreach, paid commitments, shared access, and wallet-related actions remain gated by owner approval.
+**Prototype** — repo-local build, not published to npm or the GitHub Marketplace. Designed for Orbit's own intake surface and as a reusable open-source component once the owner approves any external release path.
+
+## License
+
+MIT
