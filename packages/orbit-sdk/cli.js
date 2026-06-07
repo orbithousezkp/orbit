@@ -12,6 +12,12 @@
  *   orbit latest-cycle [--repo /path/to/repo]
  *   orbit health [--repo /path/to/repo]
  *   orbit files [--repo /path/to/repo]
+ *
+ * Cycle 92 direction choice:
+ * - Compared build, infrastructure, earn, sustain, and grow.
+ * - Selected infrastructure/build because the SDK CLI is an adoption surface and
+ *   its public budget command needed to enforce the shared toolkit safety
+ *   contract without changing wallet, token, publishing, or external behavior.
  */
 
 const path = require('path');
@@ -40,13 +46,42 @@ function printJson(obj) {
   console.log(JSON.stringify(obj, null, 2));
 }
 
+function budgetLevel(summary) {
+  if (!summary || summary.canUseAi === false) return 'exhausted';
+
+  const dailyLimit = Number(summary.dailyBudgetUsd || 0);
+  const monthlyLimit = Number(summary.monthlyBudgetUsd || 0);
+  const dailyRemaining = Number(summary.dailyRemainingUsd || 0);
+  const monthlyRemaining = Number(summary.monthlyRemainingUsd || 0);
+
+  const ratios = [];
+  if (dailyLimit > 0) ratios.push(dailyRemaining / dailyLimit);
+  if (monthlyLimit > 0) ratios.push(monthlyRemaining / monthlyLimit);
+  const lowestRatio = ratios.length ? Math.min(...ratios) : 1;
+
+  if (lowestRatio <= 0) return 'exhausted';
+  if (lowestRatio <= 0.1) return 'critical';
+  if (lowestRatio <= 0.25) return 'low';
+  return 'ok';
+}
+
+function publicBudgetSummary(sdk) {
+  const summary = sdk.budgetSummary();
+  return {
+    status: budgetLevel(summary),
+    canUseAi: Boolean(summary.canUseAi),
+    policy: 'public_safe_status_only',
+    note: 'Detailed inference spend and remaining budget amounts are intentionally omitted from CLI output.',
+  };
+}
+
 function help() {
   console.log(`
 Orbit CLI — Query Orbit's machine-readable state.
 
 Commands:
-  status          Quick status summary (cycle, level, tasks, budget)
-  budget          AI-call budget summary (daily, monthly, lifetime spend)
+  status          Quick status summary (cycle, level, tasks, budget status)
+  budget          Public-safe AI-call budget status only
   capabilities    Active and planned capabilities
   tasks           Open and blocked tasks
   blocked         Wallet and external action restrictions
@@ -59,6 +94,11 @@ Options:
   --repo, -r      Path to Orbit repo (default: current directory)
   --limit, -l     Number of items to show (default: 5)
   --help, -h      Show this help message
+
+Safety:
+  Budget output is intentionally limited to ok/low/critical/exhausted style
+  status. Do not publish detailed inference-spend figures, remaining budget
+  amounts, provider routes, billing routes, or private operational details.
 `.trim());
 }
 
@@ -78,7 +118,7 @@ function main() {
       break;
 
     case 'budget':
-      printJson(sdk.budgetSummary());
+      printJson(publicBudgetSummary(sdk));
       break;
 
     case 'capabilities': {
