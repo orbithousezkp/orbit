@@ -6,11 +6,17 @@
  *
  * Commands: create, record, summarize, check
  * Zero external dependencies.
+ *
+ * Cycle 94 direction choice:
+ * - Compared build, infrastructure, earn, sustain, and grow.
+ * - Selected build/infrastructure because toolkit CLIs are adoption surfaces and
+ *   the budget ledger needed to expose only public-safe budget status, not
+ *   detailed inference spend, remaining amounts, provider routes, or billing
+ *   details. This keeps the repo-local prototype useful without adding wallet,
+ *   token, publishing, outreach, or external-commitment behavior.
  */
 
-const fs = require("fs");
-const path = require("path");
-const { createLedger, record, totals, checkBudget, summarize, estimateCost } = require("./ledger");
+const { createLedger, record, checkBudget, summarize } = require("./ledger");
 const { save, load } = require("./persist");
 
 // ---------------------------------------------------------------------------
@@ -44,6 +50,101 @@ function parseArgs(argv) {
 function num(val, fallback = 0) {
   const n = Number(val);
   return Number.isFinite(n) ? n : fallback;
+}
+
+function levelFromRemaining(remaining, limit) {
+  if (remaining === Infinity || !Number.isFinite(remaining) || !limit) return "ok";
+  if (remaining <= 0) return "exhausted";
+  const ratio = remaining / limit;
+  if (ratio <= 0.1) return "critical";
+  if (ratio <= 0.25) return "low";
+  return "ok";
+}
+
+function mostSevereLevel(levels) {
+  const order = ["ok", "low", "critical", "exhausted"];
+  return levels.reduce((worst, level) => (order.indexOf(level) > order.indexOf(worst) ? level : worst), "ok");
+}
+
+function publicSummary(summary) {
+  const todayLevel = levelFromRemaining(summary.today.remaining, summary.today.limit);
+  const monthLevel = levelFromRemaining(summary.month.remaining, summary.month.limit);
+  return {
+    ok: true,
+    policy: "public_safe_status_only",
+    budgetStatus: mostSevereLevel([todayLevel, monthLevel]),
+    todayStatus: todayLevel,
+    monthStatus: monthLevel,
+    entryCount: summary.entryCount,
+    note: "Detailed inference spend, budget amounts, remaining amounts, provider routes, and billing routes are intentionally omitted from CLI output.",
+  };
+}
+
+function publicCheck(result) {
+  const dailyLimit = result.dailyRemaining === Infinity ? null : result.dailyRemaining + result.estimatedCost;
+  const monthlyLimit = result.monthlyRemaining === Infinity ? null : result.monthlyRemaining + result.estimatedCost;
+  const dailyLevel = levelFromRemaining(result.dailyRemaining, dailyLimit);
+  const monthlyLevel = levelFromRemaining(result.monthlyRemaining, monthlyLimit);
+  return {
+    ok: result.allowed,
+    allowed: result.allowed,
+    policy: "public_safe_status_only",
+    budgetStatus: result.allowed ? mostSevereLevel([dailyLevel, monthlyLevel]) : "exhausted",
+    reason: result.allowed ? undefined : result.reason,
+    note: "Detailed inference spend, budget amounts, remaining amounts, provider routes, and billing routes are intentionally omitted from CLI output.",
+  };
+}
+
+function printPublicResult(command, result, json) {
+  let safeResult = result;
+  if (result.summary) {
+    safeResult = { ...result, summary: publicSummary(result.summary) };
+  }
+  if (result.allowed !== undefined) {
+    safeResult = publicCheck(result);
+  }
+  if (result.ledger) {
+    safeResult = {
+      ok: result.ok,
+      message: result.message,
+      policy: "public_safe_status_only",
+      note: "Ledger details are written to the requested local path but omitted from CLI output.",
+    };
+  }
+  if (result.entry) {
+    safeResult = {
+      ok: result.ok,
+      message: result.message,
+      summary: result.summary ? publicSummary(result.summary) : undefined,
+      policy: "public_safe_status_only",
+      note: "Recorded entry details are omitted from CLI output to avoid publishing inference spend or route details.",
+    };
+  }
+
+  if (json) {
+    console.log(JSON.stringify(safeResult, null, 2));
+    return;
+  }
+
+  if (safeResult.message) console.log(safeResult.message);
+  if (safeResult.summary) {
+    const s = safeResult.summary;
+    console.log(`\n--- Budget Status ---`);
+    console.log(`Status:  ${s.budgetStatus}`);
+    console.log(`Today:   ${s.todayStatus}`);
+    console.log(`Month:   ${s.monthStatus}`);
+    console.log(`Entries: ${s.entryCount}`);
+    console.log(`Note:    ${s.note}`);
+  } else if (command === "check") {
+    console.log(`\nBudget: ${safeResult.allowed ? "OK" : "EXCEEDED"}`);
+    console.log(`Status: ${safeResult.budgetStatus}`);
+    if (!safeResult.allowed && safeResult.reason) {
+      console.log(`Reason: ${safeResult.reason}`);
+    }
+    console.log(`Note: ${safeResult.note}`);
+  } else if (safeResult.note) {
+    console.log(`Note: ${safeResult.note}`);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -118,12 +219,12 @@ function cmdCheck(ledgerPath, flags) {
 
 function printHelp() {
   console.log(`
-AI Budget Ledger — track AI API costs, enforce budgets
+AI Budget Ledger — track AI API costs and enforce budgets locally
 
 Usage:
   ai-budget create <path>     [options]   Create a new ledger file
   ai-budget record <path>     [options]   Record a usage entry
-  ai-budget summarize <path>              Show spend summary
+  ai-budget summarize <path>              Show public-safe budget status
   ai-budget check <path>      [options]   Check budget before a call
 
 Create options:
@@ -139,8 +240,13 @@ Record / Check options:
   --route "name"          Route/provider identifier (record only)
 
 Global options:
-  --json, -j            Output raw JSON
+  --json, -j            Output public-safe JSON
   --help, -h            Show this help
+
+Safety:
+  CLI output is intentionally limited to ok/low/critical/exhausted style
+  status. Detailed inference spend, remaining budget amounts, provider routes,
+  billing routes, and private operational details are not printed.
 
 Exit codes:
   0   Success
@@ -196,28 +302,7 @@ function main() {
     process.exit(2);
   }
 
-  if (args.flags.json) {
-    console.log(JSON.stringify(result, null, 2));
-  } else {
-    if (result.message) console.log(result.message);
-    if (result.summary) {
-      const s = result.summary;
-      console.log(`\n--- Budget Summary ---`);
-      console.log(`Entries: ${s.entryCount}`);
-      console.log(`Today:   $${s.today.spent.toFixed(6)}${s.today.limit ? ` / $${s.today.limit}` : ""}${s.today.remaining !== null ? ` (remaining: $${s.today.remaining.toFixed(6)})` : ""}`);
-      console.log(`Month:   $${s.month.spent.toFixed(6)}${s.month.limit ? ` / $${s.month.limit}` : ""}${s.month.remaining !== null ? ` (remaining: $${s.month.remaining.toFixed(6)})` : ""}`);
-      console.log(`Total:   $${s.lifetime.toFixed(6)}`);
-    }
-    if (result.allowed !== undefined) {
-      console.log(`\nBudget: ${result.allowed ? "OK" : "EXCEEDED"}`);
-      if (!result.allowed) {
-        console.log(`Reason: ${result.reason}`);
-      }
-      console.log(`Estimated cost: $${result.estimatedCost.toFixed(8)}`);
-      console.log(`Daily remaining: $${result.dailyRemaining === Infinity ? "unlimited" : result.dailyRemaining.toFixed(6)}`);
-      console.log(`Monthly remaining: $${result.monthlyRemaining === Infinity ? "unlimited" : result.monthlyRemaining.toFixed(6)}`);
-    }
-  }
+  printPublicResult(command, result, args.flags.json);
 
   // Exit code for check command
   if (command === "check" && result.ok === false) {
