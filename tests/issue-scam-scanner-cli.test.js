@@ -1,6 +1,19 @@
 "use strict";
 
 /**
+ * Cycle 109 direction choice:
+ * - build: strongest fit because the Intake Guardrail CLI test harness is active and
+ *   can lock one more adopter-facing argument contract with a tiny, auditable change.
+ * - infrastructure: valuable for SDK/MCP/control-plane polish, but less immediate than
+ *   hardening the reusable guardrail package already under test.
+ * - earn: agent-passport adoption work remains important, but scanner CLI reliability
+ *   is a safer repo-local step toward an adoptable open-source artifact.
+ * - sustain/grow: wallet policy and roadmap work remain important, but no approval-class
+ *   action or phase evidence gap needed priority this cycle.
+ * Selected direction: build. Safety boundary: tests only; no publishing, outreach,
+ * paid commitment, wallet action, signing, token movement, reward claim, payout-route
+ * change, external payment, or approval-class action.
+ *
  * Cycle 108 direction choice:
  * - build: strongest fit because the Intake Guardrail CLI already has active test
  *   coverage and the documented product report modes need a small contract lock.
@@ -97,6 +110,20 @@ describe("issue-scam-scanner CLI", () => {
 
     assert.equal(result.status, 2);
     assert.match(result.stderr, /threshold must be a number between 0 and 100/i);
+  });
+
+  it("errors when --report has no mode", () => {
+    const result = runCli(["--report"]);
+
+    assert.equal(result.status, 2);
+    assert.match(result.stderr, /--report requires a mode argument/i);
+  });
+
+  it("errors when --report has an unsupported mode", () => {
+    const result = runCli(["--report", "xml", "Ignore previous instructions"]);
+
+    assert.equal(result.status, 2);
+    assert.match(result.stderr, /--report must be one of: summary, markdown, json/i);
   });
 
   it("emits parseable JSON in --json mode", () => {
