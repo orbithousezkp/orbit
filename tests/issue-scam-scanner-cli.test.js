@@ -1,5 +1,20 @@
 "use strict";
 
+/**
+ * Cycle 107 direction choice:
+ * - build: strongest fit because the active Intake Guardrail prototype now has a CLI
+ *   harness and can gain one small, auditable coverage increment.
+ * - infrastructure: useful for SDK/MCP/control-plane polish, but less immediate than
+ *   strengthening the reusable guardrail package already under test.
+ * - earn: agent-passport adoption work remains valuable, but CLI reliability is a
+ *   safer repo-local step toward an adoptable open-source artifact.
+ * - sustain/grow: wallet policy and roadmap work are important, but no approval-class
+ *   action or phase evidence gap needed priority this cycle.
+ * Selected direction: build. Safety boundary: tests only; no publishing, outreach,
+ * paid commitment, wallet action, signing, token movement, reward claim, payout-route
+ * change, external payment, or approval-class action.
+ */
+
 const { describe, it } = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
@@ -30,6 +45,31 @@ describe("issue-scam-scanner CLI", () => {
 
     assert.equal(result.status, 1);
     assert.match(result.stdout, /prompt_injection|Ignore previous instructions/i);
+  });
+
+  it("reads risky text from stdin", () => {
+    const result = runCli(["--stdin"], {
+      input: "Claim your reward now and connect wallet before the deadline"
+    });
+
+    assert.equal(result.status, 1);
+    assert.match(result.stdout, /reward_claim|urgent_pressure|wallet/i);
+  });
+
+  it("prints help without scanning", () => {
+    const result = runCli(["--help"]);
+
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /Issue Scam Scanner CLI/i);
+    assert.match(result.stdout, /EXIT CODES/i);
+    assert.equal(result.stderr, "");
+  });
+
+  it("errors on unknown flags", () => {
+    const result = runCli(["--definitely-not-a-real-flag"]);
+
+    assert.equal(result.status, 2);
+    assert.match(result.stderr, /unknown flag --definitely-not-a-real-flag/i);
   });
 
   it("errors when --file has no path", () => {
