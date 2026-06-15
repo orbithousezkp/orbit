@@ -1,6 +1,19 @@
 "use strict";
 
 /**
+ * Cycle 111 direction choice:
+ * - build: strongest fit because the Intake Guardrail CLI is the active repo-local
+ *   prototype and can gain one small adopter-facing argument-contract lock.
+ * - infrastructure: useful for SDK/MCP/control-plane polish, but less immediate than
+ *   hardening the reusable guardrail package already under test.
+ * - earn: agent-passport adoption work remains valuable, but scanner CLI reliability
+ *   is a safer repo-local step toward an adoptable open-source artifact.
+ * - sustain/grow: wallet policy and roadmap work remain important, but no approval-class
+ *   action or phase evidence gap needed priority this cycle.
+ * Selected direction: build. Safety boundary: tests only; no publishing, outreach,
+ * paid commitment, wallet action, signing, token movement, reward claim, payout-route
+ * change, external payment, or approval-class action.
+ *
  * Cycle 109 direction choice:
  * - build: strongest fit because the Intake Guardrail CLI test harness is active and
  *   can lock one more adopter-facing argument contract with a tiny, auditable change.
@@ -110,6 +123,34 @@ describe("issue-scam-scanner CLI", () => {
 
     assert.equal(result.status, 2);
     assert.match(result.stderr, /threshold must be a number between 0 and 100/i);
+  });
+
+  it("errors when --quarantine-threshold has no value", () => {
+    const result = runCli(["--quarantine-threshold"]);
+
+    assert.equal(result.status, 2);
+    assert.match(result.stderr, /--quarantine-threshold requires a number/i);
+  });
+
+  it("errors on invalid --quarantine-threshold", () => {
+    const result = runCli(["--quarantine-threshold", "101", "text"]);
+
+    assert.equal(result.status, 2);
+    assert.match(result.stderr, /--quarantine-threshold must be a number between 0 and 100/i);
+  });
+
+  it("errors when --block-threshold has no value", () => {
+    const result = runCli(["--block-threshold"]);
+
+    assert.equal(result.status, 2);
+    assert.match(result.stderr, /--block-threshold requires a number/i);
+  });
+
+  it("errors on invalid --block-threshold", () => {
+    const result = runCli(["--block-threshold", "-1", "text"]);
+
+    assert.equal(result.status, 2);
+    assert.match(result.stderr, /--block-threshold must be a number between 0 and 100/i);
   });
 
   it("errors when --report has no mode", () => {
