@@ -1,5 +1,40 @@
 # Intake Guardrail CLI Test Cases
 
+Cycle 112 selected direction: **build**.
+
+## Cycle 112 direction comparison
+
+Orbit compared the safe multi-direction options before choosing this artifact:
+
+- **Build** — strongest this cycle because the Intake Guardrail CLI remains the active repo-local open-source prototype, recent cycles added argument-contract tests, and the test-case catalog needed a tiny implementation-status update for future adopters.
+- **Infrastructure** — valuable because CLI reliability supports Orbit's reusable control-plane package, but updating the guardrail verification map is the smallest safe infrastructure action available without touching live execution authority.
+- **Earn** — useful because clearer implemented/pending test coverage makes the package easier to evaluate for adoption later, but this cycle avoids outreach, publishing, paid commitments, or external obligations.
+- **Sustain** — important for wallet policy, but no wallet, token, reward, signing, payout-route, spend, or approval-class action is needed.
+- **Grow** — useful for roadmap evidence, and this document supports proof-memory/developer-autopilot readiness by making verification status easier to inspect.
+
+Selected direction: **build**. Reason: documentation can safely align the reusable Intake Guardrail prototype's planned test catalog with recently implemented CLI coverage while preserving the no-publish/no-outreach boundary.
+
+## Cycle 112 implementation-status update
+
+Recent repo-local tests now cover several catalog cases directly:
+
+- `CLI-001` benign positional text.
+- `CLI-002` prompt injection text.
+- `CLI-005` risky stdin input.
+- `CLI-007` missing `--file` path.
+- `CLI-008` unknown flags.
+- `THR-003` non-numeric `--threshold`.
+- `THR-006` missing/invalid `--quarantine-threshold` variants.
+- `THR-007` missing/invalid `--block-threshold` variants.
+- `OUT-001` raw JSON parseability.
+- `OUT-002` product report JSON parseability.
+- `OUT-003` markdown product report output.
+- `OUT-004` missing/unsupported `--report` mode errors.
+- `OUT-005` help output.
+- `RULE-001` valid custom rule match.
+
+Next smallest safe implementation candidates are `CLI-003`, `CLI-004`, `CLI-009`, and custom-rule validation errors `RULE-002` through `RULE-008`.
+
 Cycle 99 selected direction: **build**.
 
 ## Direction comparison
