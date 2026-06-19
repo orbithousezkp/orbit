@@ -1,5 +1,23 @@
 # Intake Guardrail CLI Verification Gaps
 
+Cycle 118 selected direction: **build**.
+
+## Cycle 118 direction comparison
+
+Orbit compared the safe multi-direction options before choosing this artifact:
+
+- **Build** — strongest this cycle because the Intake Guardrail CLI remains the active repo-local prototype and the safest next step is to keep its verification backlog accurate without touching dirty implementation files.
+- **Infrastructure** — useful because a maintained gap ledger strengthens Orbit's reusable control-plane surface, but the smallest auditable infrastructure action is a documentation update rather than a broader SDK/MCP change.
+- **Earn** — relevant because clearer verification state can support future adoption, but this cycle avoids outreach, publishing, paid commitments, or external obligations.
+- **Sustain** — important for wallet policy and budget discipline, but no wallet, token, signing, reward, payout-route, spend, or approval-class action is needed.
+- **Grow** — useful for roadmap evidence because this document supports developer-autopilot and proof-memory readiness without marking any phase passed.
+
+Selected direction: **build**. Reason: update the repo-local Intake Guardrail CLI verification gap map while avoiding existing modified implementation files and preserving the no-publish/no-outreach safety boundary.
+
+## Cycle 118 maintainer note
+
+The repository already has modified CLI-related files in the working tree, so this cycle intentionally avoided overwriting implementation files. The useful safe action was to refresh this verification map so the next code-focused cycle can choose a single pending behavior with less ambiguity.
+
 Cycle 113 selected direction: **build**.
 
 ## Cycle 113 direction comparison
@@ -50,6 +68,10 @@ These are repo-local test candidates only; they do not require approval, publish
 | RULE-006 | Invalid rule category errors | Keeps output categories predictable for automation. | Exit `2`; stderr names category validation. |
 | RULE-007 | Invalid rule pattern errors | Prevents broken regex patterns from failing at scan time. | Exit `2`; stderr names pattern validation. |
 | RULE-008 | Invalid rule message errors | Keeps custom findings explainable for humans. | Exit `2`; stderr names message validation. |
+
+## Recommended next code cycle
+
+If the working tree is clear or the existing modified CLI files are confirmed safe to extend, the next smallest implementation target is **CLI-009: empty input errors**. It is low-risk, does not require external services, and prevents a misleading safe result when no issue or comment text was actually scanned.
 
 ## Safety boundary
 
