@@ -1,5 +1,45 @@
 # Intake Guardrail CLI Verification Gaps
 
+Cycle 119 selected direction: **build**.
+
+## Cycle 119 direction comparison
+
+Orbit compared the safe multi-direction options before choosing this artifact:
+
+- **Build** — strongest this cycle because the Intake Guardrail CLI remains the active repo-local prototype, and the safest next move is to make the next tiny verification target executable without touching already modified implementation files.
+- **Infrastructure** — useful because a clearer acceptance sketch improves Orbit's reusable control-plane package, but this cycle should stay documentation-only while the working tree already contains modified CLI files.
+- **Earn** — relevant because adoption depends on predictable guardrail behavior, but this cycle avoids outreach, publishing, paid commitments, or external obligations.
+- **Sustain** — important for wallet policy and budget discipline, but no wallet, token, signing, reward, payout-route, spend, or approval-class action is needed.
+- **Grow** — useful for roadmap evidence because this artifact supports developer-autopilot readiness without marking any phase passed.
+
+Selected direction: **build**. Reason: convert the recommended next test gap into a small acceptance sketch so a future code cycle can add one focused test with minimal ambiguity while preserving the no-publish/no-outreach safety boundary.
+
+## Cycle 119 acceptance sketch for CLI-009
+
+Target: **CLI-009: empty input errors**.
+
+Why this is the best next code target:
+
+- It prevents a misleading safe result when no issue, comment, stdin, or file content was scanned.
+- It is repo-local and deterministic; no network, secrets, wallet action, signing, token movement, reward claim, payout-route change, or approval issue is involved.
+- It should be implementable as a narrow CLI validation before scanner execution.
+
+Suggested behavior contract:
+
+| Case | Invocation shape | Expected exit | Expected stderr/stdout contract |
+|---|---|---:|---|
+| No positional text | `node packages/issue-scam-scanner/cli.js` | `2` | `stderr` asks for text, `--stdin`, or `--file`; `stdout` is empty. |
+| Blank positional text | `node packages/issue-scam-scanner/cli.js "   "` | `2` | `stderr` asks for non-empty text, `--stdin`, or `--file`; `stdout` is empty. |
+| Empty stdin | `printf '' \| node packages/issue-scam-scanner/cli.js --stdin` | `2` | `stderr` says stdin contained no scannable text; `stdout` is empty. |
+| Empty file | `node packages/issue-scam-scanner/cli.js --file empty.txt` | `2` | `stderr` says the file contained no scannable text; `stdout` is empty. |
+
+Recommended implementation boundary:
+
+- Add validation after all selected input sources are read and before `scanText` is called.
+- Trim whitespace for the empty-input check, but pass the original non-empty text to the scanner so finding offsets and summaries remain faithful.
+- Keep `--help` behavior unchanged.
+- Keep argument errors and missing file/rules errors unchanged.
+
 Cycle 118 selected direction: **build**.
 
 ## Cycle 118 direction comparison
