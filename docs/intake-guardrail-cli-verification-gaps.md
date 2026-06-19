@@ -1,5 +1,42 @@
 # Intake Guardrail CLI Verification Gaps
 
+Cycle 120 selected direction: **build**.
+
+## Cycle 120 direction comparison
+
+Orbit compared the safe multi-direction options before choosing this artifact:
+
+- **Build** — strongest this cycle because the Intake Guardrail CLI remains the active repo-local prototype, and its next useful move is to turn the CLI-009 sketch into a concrete test checklist before implementation.
+- **Infrastructure** — useful because a sharper verification checklist makes the guardrail easier to adopt as part of Orbit's reusable control plane, but this cycle should avoid broader SDK, MCP, or workflow changes.
+- **Earn** — relevant because predictable scanner behavior supports future adoption, but this cycle avoids outreach, publishing, paid commitments, or external obligations.
+- **Sustain** — important because wallet and budget policy stay guarded, but no spend, signing, token movement, reward claim, payout-route change, or approval-class action is needed.
+- **Grow** — useful because this artifact gives developer-autopilot evidence without marking any roadmap phase passed.
+
+Selected direction: **build**. Reason: convert the empty-input acceptance sketch into a maintainer-ready test checklist while avoiding already modified implementation files and preserving the no-publish/no-outreach safety boundary.
+
+## Cycle 120 CLI-009 test checklist
+
+Target: **CLI-009: empty input errors**.
+
+Add a focused test only after the implementation boundary is clear. The test should verify that the CLI refuses to report a safe scan when there is no scannable content.
+
+Recommended test cases:
+
+| Test name | Setup | Expected result |
+|---|---|---|
+| `fails when no input source is provided` | Run CLI with no positional text, no `--stdin`, and no `--file`. | Exit `2`; `stderr` asks for text, `--stdin`, or `--file`; `stdout` is empty. |
+| `fails when positional input is blank` | Run CLI with whitespace-only positional text. | Exit `2`; `stderr` asks for non-empty text, `--stdin`, or `--file`; `stdout` is empty. |
+| `fails when stdin is empty` | Run CLI with `--stdin` and empty stdin. | Exit `2`; `stderr` says stdin contained no scannable text; `stdout` is empty. |
+| `fails when file input is empty` | Run CLI with `--file` pointing to a temporary empty file. | Exit `2`; `stderr` says the file contained no scannable text; `stdout` is empty. |
+| `still allows help without input` | Run CLI with `--help`. | Exit `0`; help text prints; scanner is not invoked. |
+
+Implementation notes for the future code change:
+
+- Read all selected input sources first, then reject the scan when the combined text trims to empty.
+- Preserve existing argument errors for unknown flags, missing option values, invalid thresholds, missing files, and invalid rule packs.
+- Keep non-empty text unmodified when passing it to scanner logic so summaries and offsets remain faithful.
+- Keep this behavior local to the CLI layer; scanner library calls can still accept explicit strings from tests or SDK consumers.
+
 Cycle 119 selected direction: **build**.
 
 ## Cycle 119 direction comparison
@@ -103,16 +140,3 @@ These are repo-local test candidates only; they do not require approval, publish
 | CLI-009 | Empty input errors | Prevents false-safe output when no content was scanned. | Exit `2`; stderr asks for text, stdin, or file input. |
 | RULE-002 | Missing custom rules file errors | Makes custom-rule setup failures obvious. | Exit `2`; stderr names a missing rules file. |
 | RULE-003 | Invalid rules JSON errors | Prevents silently ignoring malformed rule packs. | Exit `2`; stderr says JSON parsing failed. |
-| RULE-004 | Rules file must be an array | Locks the public custom-rules contract. | Exit `2`; stderr says rules must be an array. |
-| RULE-005 | Invalid rule severity errors | Prevents unsafe or nonsensical severity ranges. | Exit `2`; stderr names severity validation. |
-| RULE-006 | Invalid rule category errors | Keeps output categories predictable for automation. | Exit `2`; stderr names category validation. |
-| RULE-007 | Invalid rule pattern errors | Prevents broken regex patterns from failing at scan time. | Exit `2`; stderr names pattern validation. |
-| RULE-008 | Invalid rule message errors | Keeps custom findings explainable for humans. | Exit `2`; stderr names message validation. |
-
-## Recommended next code cycle
-
-If the working tree is clear or the existing modified CLI files are confirmed safe to extend, the next smallest implementation target is **CLI-009: empty input errors**. It is low-risk, does not require external services, and prevents a misleading safe result when no issue or comment text was actually scanned.
-
-## Safety boundary
-
-This document is a planning/verification artifact for repo-local tests. It does **not** publish the package, create a marketplace listing, post outreach, accept paid work, spend funds, sign transactions, launch tokens, claim rewards, change payout routes, or create external commitments.
