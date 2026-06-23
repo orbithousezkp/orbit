@@ -280,79 +280,43 @@ async function main() {
       process.exit(2);
     }
     input = fs.readFileSync(filePath, "utf8");
-  } else if (args.stdin || (!input && !process.stdin.isTTY)) {
+  } else if (args.stdin) {
+    if (process.stdin.isTTY) {
+      console.error("Error: --stdin specified but no stdin data was provided.");
+      process.exit(2);
+    }
     input = await readStdin();
   }
 
-  if (!input || !input.trim()) {
-    console.error("Error: no input provided. Use --stdin, --file, or pass text as an argument.");
-    console.error("Run with --help for usage information.");
+  // Validate input presence
+  if (!input || input.trim() === "") {
+    console.error("Error: no input provided. Use a positional text argument, --stdin, or --file.");
     process.exit(2);
   }
 
-  // Scan
-  const scanOptions = {
+  // Build report
+  const opts = {
     threshold: args.threshold,
-    quarantineThreshold: args.quarantineThreshold || args.threshold,
+    quarantineThreshold: args.quarantineThreshold,
     blockThreshold: args.blockThreshold,
-    customRules: customRules || undefined
+    customRules,
   };
-  const result = scanText(input, scanOptions);
-  const report = buildReport(input, scanOptions);
-  const aboveThreshold = result.flags.filter((f) => f.severity >= args.threshold);
 
-  // Output
-  if (args.json || args.report === "json") {
-    console.log(
-      JSON.stringify(
-        {
-          ...report,
-          threshold: args.threshold,
-          customRuleCount: customRules ? customRules.length : 0
-        },
-        null,
-        2
-      )
-    );
+  const report = buildReport(input, opts);
+
+  // Output formatting
+  if (args.report === "json" || args.json) {
+    console.log(JSON.stringify(report, null, 2));
   } else if (args.report === "markdown") {
-    console.log(`# Orbit Intake Guardrail`);
-    console.log(`- action: ${report.action}`);
-    console.log(`- score: ${report.score}`);
-    console.log(`- level: ${report.level}`);
-    console.log(`- categories: ${report.categories.join(", ") || "none"}`);
-    console.log(`- summary: ${report.summary}`);
-    if (report.guidance.length) {
-      console.log("");
-      console.log("## Guidance");
-      for (const item of report.guidance) {
-        console.log(`- ${item}`);
-      }
-    }
+    console.log(report.markdown || formatSummary(report));
   } else {
-    console.log(formatSummary(result, "Orbit Intake Guardrail"));
-
-    if (customRules) {
-      console.log(`\nCustom rules loaded: ${customRules.length}`);
-    }
-
-    if (aboveThreshold.length > 0) {
-      console.log("");
-      console.log("Flags above threshold:");
-      for (const flag of aboveThreshold) {
-        const source = flag.source === "custom" ? " [custom]" : "";
-        console.log(`  [${flag.severity}] ${flag.category}${source}: ${flag.message}`);
-      }
-
-      console.log("");
-      console.log(`Recommended action: ${report.action}`);
-    }
+    console.log(formatSummary(report));
   }
 
-  // Exit code: 0 = safe, 1 = risky
-  process.exit(aboveThreshold.length > 0 ? 1 : 0);
+  process.exit(report.safe ? 0 : 1);
 }
 
 main().catch((err) => {
-  console.error("Scanner failed:", err.message || err);
+  console.error(`Error: ${err.message}`);
   process.exit(2);
 });
