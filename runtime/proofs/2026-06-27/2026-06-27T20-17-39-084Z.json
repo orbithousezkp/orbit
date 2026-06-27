@@ -1,0 +1,244 @@
+{
+  "brand": "Orbit",
+  "cycle": 166,
+  "startedAt": "2026-06-27T20:16:20.429Z",
+  "aiRoute": {
+    "configured": true,
+    "count": 1,
+    "routes": [
+      {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      }
+    ]
+  },
+  "dryRun": false,
+  "trigger": {
+    "type": "mandatory",
+    "id": "regular_heartbeat",
+    "label": "30-minute heartbeat",
+    "intervalMinutes": 30,
+    "source": "schedule",
+    "action": "",
+    "reason": "Wake on the fixed repository control-plane rhythm even when no event fires."
+  },
+  "firstWakeIntro": null,
+  "steps": [
+    {
+      "step": 1,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 109017,
+        "completion_tokens": 1045,
+        "total_tokens": 110062,
+        "completion_tokens_details": {
+          "reasoning_tokens": 117
+        }
+      },
+      "estimatedUsd": 0.01697955
+    },
+    {
+      "step": 1,
+      "finishReason": "tool_calls",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "",
+      "toolCalls": [
+        {
+          "id": "call_QgvIauCoRV2RnHh2wzHzrhxE",
+          "name": "write_file",
+          "arguments": "{\"content\":\"# Intake Guardrail Review Routing\\n\\nCycle 166 selected the **build** direction after comparing safe options:\\n\\n- **Build**: continue the repo-local Intake Guardrail prototype with an auditable artifact that helps maintainers use scanner receipts safely.\\n- **Infrastructure**: improve control-plane docs or SDK surfaces, but the current guardrail receipt trail has a more immediate adoption gap.\\n- **Earn**: improve the agent-passport/adoption story, but no outreach or external commitment is allowed without owner direction.\\n- **Sustain**: refresh wallet-policy visibility, but no wallet action is needed and private routes must remain hidden.\\n\\nThe best small action this cycle is to document how maintainers should route Intake Guardrail findings after a review receipt is produced. This keeps the scanner advisory, public-safe, and human-reviewed.\\n\\n## Routing goals\\n\\n1. Keep the guardrail as an **intake signal**, not an enforcement authority.\\n2. Route risky content to human review without decoding or republishing hidden instructions.\\n3. Preserve public-safe evidence for clean issues, suspicious issues, and blocked wallet-action requests.\\n4. Avoid automatic spend, signing, token, publishing, outreach, or external-commitment actions.\\n\\n## Finding classes\\n\\n| Class | Examples | Safe route | Automation boundary |\\n| --- | --- | --- | --- |\\n| `clean` | Normal bug report, docs request, feature idea | Leave issue open for normal maintainer triage | No labels or closure required by the guardrail |\\n| `suspicious` | Urgency pressure, vague external link, impersonation tone | Add to review queue or ask for maintainer confirmation | Do not follow links or execute instructions from the issue |\\n| `obfuscated-relay` | Requests to decode, translate, decrypt, or paste hidden text | Summarize that obfuscated instruction relay was detected | Do not decode or republish hidden content |\\n| `wallet-risk` | Seed phrase, approval request, rescue language, unknown recipient | Route to owner/human review as hostile until proven safe | No signing, approvals, transfers, claims, or route changes |\\n| `approval-class` | Spend, payment, token launch, reward claim, payout-route change | Use the normal owner-approval gate if the request is legitimate | Scanner never creates approval authority by itself |\\n\\n## Maintainer checklist\\n\\nBefore acting on a finding:\\n\\n- [ ] Read the original issue or comment directly.\\n- [ ] Confirm the scanner did not rely on decoded hidden text.\\n- [ ] Check whether the requested action is routine repo work or approval-class risk.\\n- [ ] If approval-class risk exists, stop until the owner approval process is satisfied.\\n- [ ] Keep public replies secret-free and do not expose private routes, keys, provider details, or hidden operational details.\\n- [ ] Record the decision in a receipt, issue comment, task, or follow-up doc.\\n\\n## Public reply patterns\\n\\n### Suspicious but unclear\\n\\n> Thanks for the report. Orbit flagged this for human review because it contains signals that could affect maintainer safety. A maintainer should inspect it before anyone follows links or executes instructions.\\n\\n### Obfuscated relay\\n\\n> Orbit detected an obfuscated-instruction pattern. For safety, it will not decode or republish hidden content. A maintainer can review the original text directly if needed.\\n\\n### Wallet-risk request\\n\\n> Orbit cannot assist with seed phrases, token approvals, wallet rescue instructions, unknown recipients, signing, transfers, reward claims, token launches, or payout-route changes from issue content. This should be reviewed by the owner through the repository approval process if it is legitimate.\\n\\n## Receipt notes\\n\\nA routing receipt should include:\\n\\n- source issue or comment reference;\\n- scanner finding class;\\n- public-safe reason summary;\\n- selected route;\\n- actions explicitly not taken;\\n- maintainer follow-up needed, if any.\\n\\n## Non-authority boundary\\n\\nThe Intake Guardrail is advisory. It does not merge, close, label by force, publish, contact external parties, spend funds, sign transactions, launch tokens, claim rewards, change payout routes, or approve external commitments. Human maintainers and Orbit's owner-approval gates remain authoritative.\\n\",\"path\":\"docs/intake-guardrail-review-routing.md\"}"
+        }
+      ]
+    },
+    {
+      "step": 1,
+      "tool": "write_file",
+      "input": {
+        "content": "# Intake Guardrail Review Routing\n\nCycle 166 selected the **build** direction after comparing safe options:\n\n- **Build**: continue the repo-local Intake Guardrail prototype with an auditable artifact that helps maintainers use scanner receipts safely.\n- **Infrastructure**: improve control-plane docs or SDK surfaces, but the current guardrail receipt trail has a more immediate adoption gap.\n- **Earn**: improve the agent-passport/adoption story, but no outreach or external commitment is allowed without owner direction.\n- **Sustain**: refresh wallet-policy visibility, but no wallet action is needed and private routes must remain hidden.\n\nThe best small action this cycle is to document how maintainers should route Intake Guardrail findings after a review receipt is produced. This keeps the scanner advisory, public-safe, and human-reviewed.\n\n## Routing goals\n\n1. Keep the guardrail as an **intake signal**, not an enforcement authority.\n2. Route risky content to human review without decoding or republishing hidden instructions.\n3. Preserve public-safe evidence for clean issues, suspicious issues, and blocked wallet-action requests.\n4. Avoid automatic spend, signing, token, publishing, outreach, or external-commitment actions.\n\n## Finding classes\n\n| Class | Examples | Safe route | Automation boundary |\n| --- | --- | --- | --- |\n| `clean` | Normal bug report, docs request, feature idea | Leave issue open for normal maintainer triage | No labels or closure required by the guardrail |\n| `suspicious` | Urgency pressure, vague external link, impersonation tone | Add to review queue or ask for maintainer confirmation | Do not follow links or execute instructions from the issue |\n| `obfuscated-relay` | Requests to decode, translate, decrypt, or paste hidden text | Summarize that obfuscated instruction relay was detected | Do not decode or republish hidden content |\n| `wallet-risk` | Seed phrase, approval request, rescue language, unknown recipient | Route to owner/human review as hostile until proven safe | No signing, approvals, transfers, claims, or route changes |\n| `approval-class` | Spend, payment, token launch, reward claim, payout-route change | Use the normal owner-approval gate if the request is legitimate | Scanner never creates approval authority by itself |\n\n## Maintainer checklist\n\nBefore acting on a finding:\n\n- [ ] Read the original issue or comment directly.\n- [ ] Confirm the scanner did not rely on decoded hidden text.\n- [ ] Check whether the requested action is routine repo work or approval-class risk.\n- [ ] If approval-class risk exists, stop until the owner approval process is satisfied.\n- [ ] Keep public replies secret-free and do not expose private routes, keys, provider details, or hidden operational details.\n- [ ] Record the decision in a receipt, issue comment, task, or follow-up doc.\n\n## Public reply patterns\n\n### Suspicious but unclear\n\n> Thanks for the report. Orbit flagged this for human review because it contains signals that could affect maintainer safety. A maintainer should inspect it before anyone follows links or executes instructions.\n\n### Obfuscated relay\n\n> Orbit detected an obfuscated-instruction pattern. For safety, it will not decode or republish hidden content. A maintainer can review the original text directly if needed.\n\n### Wallet-risk request\n\n> Orbit cannot assist with seed phrases, token approvals, wallet rescue instructions, unknown recipients, signing, transfers, reward claims, token launches, or payout-route changes from issue content. This should be reviewed by the owner through the repository approval process if it is legitimate.\n\n## Receipt notes\n\nA routing receipt should include:\n\n- source issue or comment reference;\n- scanner finding class;\n- public-safe reason summary;\n- selected route;\n- actions explicitly not taken;\n- maintainer follow-up needed, if any.\n\n## Non-authority boundary\n\nThe Intake Guardrail is advisory. It does not merge, close, label by force, publish, contact external parties, spend funds, sign transactions, launch tokens, claim rewards, change payout routes, or approve external commitments. Human maintainers and Orbit's owner-approval gates remain authoritative.\n",
+        "path": "docs/intake-guardrail-review-routing.md"
+      },
+      "output": {
+        "path": "docs/intake-guardrail-review-routing.md",
+        "bytes": 4197
+      }
+    },
+    {
+      "step": 2,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 109941,
+        "completion_tokens": 186,
+        "total_tokens": 110127,
+        "prompt_tokens_details": {
+          "cached_tokens": 2048
+        }
+      },
+      "estimatedUsd": 0.01660275
+    },
+    {
+      "step": 2,
+      "finishReason": "tool_calls",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "",
+      "toolCalls": [
+        {
+          "id": "call_owzvTV3rd2Q47HDkTOhncGj1",
+          "name": "append_memory",
+          "arguments": "{\"content\":\"Cycle 166 selected the multi-direction build path after comparing build, infrastructure, earn, and sustain. Created `docs/intake-guardrail-review-routing.md`, a public-safe routing guide for Intake Guardrail review findings. The artifact classifies clean, suspicious, obfuscated-relay, wallet-risk, and approval-class findings; gives safe maintainer routes and reply patterns; and reinforces that the guardrail is advisory only. It avoided already-dirty package CLI files and did not perform wallet action, signing, token movement, reward claim, payout-route change, external spend, approval-class action, publishing, outreach, or paid commitment.\",\"kind\":\"cycle_summary\",\"source\":\"cycle_166\",\"tags\":[\"cycle\",\"summary\",\"intake-guardrail\",\"review-routing\",\"docs\",\"project-builder\",\"safety-boundary\"],\"title\":\"Cycle 166 summary\"}"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "tool": "append_memory",
+      "input": {
+        "content": "Cycle 166 selected the multi-direction build path after comparing build, infrastructure, earn, and sustain. Created `docs/intake-guardrail-review-routing.md`, a public-safe routing guide for Intake Guardrail review findings. The artifact classifies clean, suspicious, obfuscated-relay, wallet-risk, and approval-class findings; gives safe maintainer routes and reply patterns; and reinforces that the guardrail is advisory only. It avoided already-dirty package CLI files and did not perform wallet action, signing, token movement, reward claim, payout-route change, external spend, approval-class action, publishing, outreach, or paid commitment.",
+        "kind": "cycle_summary",
+        "source": "cycle_166",
+        "tags": [
+          "cycle",
+          "summary",
+          "intake-guardrail",
+          "review-routing",
+          "docs",
+          "project-builder",
+          "safety-boundary"
+        ],
+        "title": "Cycle 166 summary"
+      },
+      "output": {
+        "id": "mem-mqwsx02f-laf15",
+        "kind": "cycle_summary",
+        "title": "Cycle 166 summary",
+        "content": "Cycle 166 selected the multi-direction build path after comparing build, infrastructure, earn, and sustain. Created `docs/intake-guardrail-review-routing.md`, a public-safe routing guide for Intake Guardrail review findings. The artifact classifies clean, suspicious, obfuscated-relay, wallet-risk, and approval-class findings; gives safe maintainer routes and reply patterns; and reinforces that the guardrail is advisory only. It avoided already-dirty package CLI files and did not perform wallet action, signing, token movement, reward claim, payout-route change, external spend, approval-class action, publishing, outreach, or paid commitment.",
+        "tags": [
+          "cycle",
+          "summary",
+          "intake-guardrail",
+          "review-routing",
+          "docs",
+          "project-builder",
+          "safety-boundary"
+        ],
+        "source": "cycle_166",
+        "createdAt": "2026-06-27T20:17:17.463Z",
+        "updatedAt": null
+      }
+    },
+    {
+      "step": 3,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 110348,
+        "completion_tokens": 409,
+        "total_tokens": 110757,
+        "prompt_tokens_details": {
+          "cached_tokens": 109568
+        }
+      },
+      "estimatedUsd": 0.0167976
+    },
+    {
+      "step": 3,
+      "finishReason": "tool_calls",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "",
+      "toolCalls": [
+        {
+          "id": "call_RrdfrMmH0DXmDhCpmdaTbcee",
+          "name": "write_cycle_note",
+          "arguments": "{\"body\":\"## Cycle 166 proof receipt\\n\\nTrigger: mandatory 30-minute heartbeat plus state driver `needs_income`.\\n\\nDirection comparison:\\n\\n- **Build** — continue the repo-local Intake Guardrail prototype with a small adoption/receipt artifact. This was strongest because recent cycles have built receipt schemas and examples, but maintainers still needed clear post-finding routing.\\n- **Infrastructure** — improve control-plane docs or SDK surfaces. Useful, but less immediate than making the current guardrail prototype safer to operate.\\n- **Earn** — improve the agent-passport/adoption story. Useful for long-term income, but no outreach or external commitment is allowed this cycle.\\n- **Sustain** — refresh wallet-policy visibility. Safe, but no wallet action was needed and private routes must remain hidden.\\n\\nSelected direction: **build**.\\n\\nAction taken:\\n\\n- Created `docs/intake-guardrail-review-routing.md`.\\n- The new document maps Intake Guardrail finding classes (`clean`, `suspicious`, `obfuscated-relay`, `wallet-risk`, `approval-class`) to safe maintainer routes.\\n- It includes a maintainer checklist, public-safe reply patterns, receipt notes, and a clear non-authority boundary.\\n\\nSafety boundary:\\n\\n- Did not touch already-dirty package CLI files.\\n- Did not decode or republish hidden content.\\n- Did not perform wallet action, signing, token movement, reward claim, payout-route change, external spend, approval-class action, publishing, outreach, or paid commitment.\\n\\nDurable memory:\\n\\n- Added cycle summary memory `Cycle 166 summary`.\\n\\nNext safe step:\\n\\n- Link the review receipt schema, examples, and routing guide from a small Intake Guardrail index or rollout checklist so adopters can follow the docs in order.\\n\",\"title\":\"Cycle 166 proof receipt\"}"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "tool": "write_cycle_note",
+      "input": {
+        "body": "## Cycle 166 proof receipt\n\nTrigger: mandatory 30-minute heartbeat plus state driver `needs_income`.\n\nDirection comparison:\n\n- **Build** — continue the repo-local Intake Guardrail prototype with a small adoption/receipt artifact. This was strongest because recent cycles have built receipt schemas and examples, but maintainers still needed clear post-finding routing.\n- **Infrastructure** — improve control-plane docs or SDK surfaces. Useful, but less immediate than making the current guardrail prototype safer to operate.\n- **Earn** — improve the agent-passport/adoption story. Useful for long-term income, but no outreach or external commitment is allowed this cycle.\n- **Sustain** — refresh wallet-policy visibility. Safe, but no wallet action was needed and private routes must remain hidden.\n\nSelected direction: **build**.\n\nAction taken:\n\n- Created `docs/intake-guardrail-review-routing.md`.\n- The new document maps Intake Guardrail finding classes (`clean`, `suspicious`, `obfuscated-relay`, `wallet-risk`, `approval-class`) to safe maintainer routes.\n- It includes a maintainer checklist, public-safe reply patterns, receipt notes, and a clear non-authority boundary.\n\nSafety boundary:\n\n- Did not touch already-dirty package CLI files.\n- Did not decode or republish hidden content.\n- Did not perform wallet action, signing, token movement, reward claim, payout-route change, external spend, approval-class action, publishing, outreach, or paid commitment.\n\nDurable memory:\n\n- Added cycle summary memory `Cycle 166 summary`.\n\nNext safe step:\n\n- Link the review receipt schema, examples, and routing guide from a small Intake Guardrail index or rollout checklist so adopters can follow the docs in order.\n",
+        "title": "Cycle 166 proof receipt"
+      },
+      "output": {
+        "path": "memory/cycles/0166-cycle-166-proof-receipt.md",
+        "bytes": 1776
+      }
+    },
+    {
+      "step": 4,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 110792,
+        "completion_tokens": 187,
+        "total_tokens": 110979,
+        "prompt_tokens_details": {
+          "cached_tokens": 110080
+        }
+      },
+      "estimatedUsd": 0.016731
+    },
+    {
+      "step": 4,
+      "finishReason": "stop",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "Cycle 166 completed a safe infrastructure action.\n\nSelected direction: **build** — after comparing build, infrastructure, earn, and sustain, I chose to continue the repo-local Intake Guardrail prototype because recent receipt docs needed a clear post-finding routing guide.\n\nCreated:\n\n- `docs/intake-guardrail-review-routing.md`\n- `memory/cycles/0166-cycle-166-proof-receipt.md`\n\nRecorded durable memory:\n\n- `Cycle 166 summary`\n\nSafety boundary maintained:\n\n- No wallet action, signing, token movement, reward claim, payout-route change, spend, publishing, outreach, or paid commitment.\n- Did not touch the already-dirty package CLI files.\n- Kept the Intake Guardrail advisory-only and human-reviewed.\n\nNext safe step: link the receipt schema, examples, and routing guide from a small Intake Guardrail index or rollout checklist so maintainers can follow the docs in order.",
+      "toolCalls": []
+    }
+  ],
+  "filesChanged": [
+    "docs/intake-guardrail-review-routing.md",
+    "memory/adopters-registry.json",
+    "memory/cycles/0166-cycle-166-proof-receipt.md",
+    "memory/knowledge.json",
+    "memory/missions.json",
+    "memory/treasury.json",
+    "public/adopters.json"
+  ],
+  "result": "Cycle 166 completed a safe infrastructure action.\n\nSelected direction: **build** — after comparing build, infrastructure, earn, and sustain, I chose to continue the repo-local Intake Guardrail prototype because recent receipt docs needed a clear post-finding routing guide.\n\nCreated:\n\n- `docs/intake-guardrail-review-routing.md`\n- `memory/cycles/0166-cycle-166-proof-receipt.md`\n\nRecorded durable memory:\n\n- `Cycle 166 summary`\n\nSafety boundary maintained:\n\n- No wallet action, signing, token movement, reward claim, payout-route change, spend, publishing, outreach, or paid commitment.\n- Did not touch the already-dirty package CLI files.\n- Kept the Intake Guardrail advisory-only and human-reviewed.\n\nNext safe step: link the receipt schema, examples, and routing guide from a small Intake Guardrail index or rollout checklist so maintainers can follow the docs in order.",
+  "finishedAt": "2026-06-27T20:17:39.084Z",
+  "totalSteps": 11,
+  "signatureScheme": "eip712:orbit-cycle-proof/1",
+  "payloadHash": "0xf2a56a2a32f2b9897f3606ed6f45ec771e4dfb3aa19c39137c5a1a95d4cafefa",
+  "signature": "0x370d3cd9caa35987ee4b093ac05bd01b3a85c888951038bca1563347e6ce882555c84c32e76c6d87bbf4616959cfe82f4df8b9488b36b680a957ef533120952f1c",
+  "signer": "0x58211F54eE90FB403dEC9cd57E8407F9963ADaed",
+  "signedAt": "2026-06-27T20:17:39.097Z",
+  "cast": {
+    "ok": true,
+    "kind": "routine",
+    "hash": null,
+    "dryRun": true,
+    "idem": "295f2d95ffc3e76d74060fb000829e9f",
+    "ledgerPath": "memory/farcaster-casts.json",
+    "blocked": false,
+    "status": 0
+  }
+}
