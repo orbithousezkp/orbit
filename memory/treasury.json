@@ -24,15 +24,6 @@
     "refills": [],
     "ledger": [
       {
-        "timestamp": "2026-05-24T06:13:36.831Z",
-        "aiRoute": "private-ai-route-1",
-        "note": "cycle 40 step 8",
-        "promptTokens": 89547,
-        "completionTokens": 481,
-        "totalTokens": 90028,
-        "estimatedUsd": 0.01372065
-      },
-      {
         "timestamp": "2026-05-24T08:45:48.548Z",
         "aiRoute": "private-ai-route-1",
         "note": "cycle 41 step 1",
@@ -4522,6 +4513,15 @@
         "completionTokens": 116,
         "totalTokens": 120889,
         "estimatedUsd": 0.01818555
+      },
+      {
+        "timestamp": "2026-06-28T11:54:54.957Z",
+        "aiRoute": "private-ai-route-1",
+        "note": "cycle 171 step 1",
+        "promptTokens": 109020,
+        "completionTokens": 132,
+        "totalTokens": 109152,
+        "estimatedUsd": 0.0164322
       }
     ]
   },
@@ -4561,29 +4561,16 @@
         "id": "ai-routing-margin",
         "type": "ai_routing_margin",
         "status": "experimental",
-        "lifetimeRevenueWei": "315423700000000000",
+        "lifetimeRevenueWei": "316245300000000000",
         "lastClaim": {
-          "ts": "2026-06-28T05:26:15.326Z",
-          "amountWei": "909300000000000",
+          "ts": "2026-06-28T11:54:54.950Z",
+          "amountWei": "821600000000000",
           "source": "ai_call",
           "txHash": null
         },
         "unitEconomics": {
           "marginBps": 500,
           "perCallSamples": [
-            {
-              "ts": "2026-06-21T10:55:56.442Z",
-              "provider": "vip-sg",
-              "model": "gpt-5.5",
-              "promptTokens": 124803,
-              "completionTokens": 128,
-              "wholesaleCostWei": "18797000000000000",
-              "marginWei": "939850000000000",
-              "billedWei": "19736850000000000",
-              "marginBps": 500,
-              "cycle": 0,
-              "adopterId": null
-            },
             {
               "ts": "2026-06-21T16:59:35.639Z",
               "provider": "vip-sg",
@@ -5870,9 +5857,22 @@
               "marginBps": 500,
               "cycle": 0,
               "adopterId": null
+            },
+            {
+              "ts": "2026-06-28T11:54:54.950Z",
+              "provider": "vip-sg",
+              "model": "gpt-5.5",
+              "promptTokens": 109020,
+              "completionTokens": 132,
+              "wholesaleCostWei": "16432000000000000",
+              "marginWei": "821600000000000",
+              "billedWei": "17253600000000000",
+              "marginBps": 500,
+              "cycle": 0,
+              "adopterId": null
             }
           ],
-          "totalCallsBilled": 372
+          "totalCallsBilled": 373
         },
         "createdAt": "2026-05-29T04:41:06.456Z",
         "sunsetCriteria": null
