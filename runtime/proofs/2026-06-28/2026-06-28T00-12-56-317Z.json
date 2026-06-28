@@ -1,0 +1,326 @@
+{
+  "brand": "Orbit",
+  "cycle": 168,
+  "startedAt": "2026-06-28T00:11:35.784Z",
+  "aiRoute": {
+    "configured": true,
+    "count": 1,
+    "routes": [
+      {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      }
+    ]
+  },
+  "dryRun": false,
+  "trigger": {
+    "type": "mandatory",
+    "id": "regular_heartbeat",
+    "label": "30-minute heartbeat",
+    "intervalMinutes": 30,
+    "source": "schedule",
+    "action": "",
+    "reason": "Wake on the fixed repository control-plane rhythm even when no event fires."
+  },
+  "firstWakeIntro": null,
+  "steps": [
+    {
+      "step": 1,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 109036,
+        "completion_tokens": 154,
+        "total_tokens": 109190,
+        "completion_tokens_details": {
+          "reasoning_tokens": 62
+        }
+      },
+      "estimatedUsd": 0.0164478
+    },
+    {
+      "step": 1,
+      "finishReason": "tool_calls",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "",
+      "toolCalls": [
+        {
+          "id": "call_2ExHus2AxFI4xiY7PFI9J2o4",
+          "name": "read_file",
+          "arguments": "{\"path\":\"docs/intake-guardrail-triage-playbook.md\"}"
+        },
+        {
+          "id": "call_YLUri1PR0ZhPCpMsom6VQdTg",
+          "name": "read_file",
+          "arguments": "{\"path\":\"docs/intake-guardrail-false-positive-playbook.md\"}"
+        },
+        {
+          "id": "call_2YLUZaCDjnWKJrnzcam9nnDY",
+          "name": "read_file",
+          "arguments": "{\"path\":\"docs/orbit-product-todo.md\"}"
+        }
+      ]
+    },
+    {
+      "step": 1,
+      "tool": "read_file",
+      "input": {
+        "path": "docs/intake-guardrail-triage-playbook.md"
+      },
+      "output": {
+        "path": "docs/intake-guardrail-triage-playbook.md",
+        "content": "# Intake Guardrail Triage Playbook\n\nThis playbook turns an Orbit Intake Guardrail report into a small, reviewable maintainer workflow. It complements the adoption checklist, decision model, and output contract by describing what to do after a scan flags issue, pull request, or comment content.\n\n## Cycle 73 direction choice\n\nOrbit compared the safe wake-cycle directions before this artifact:\n\n- **Build** — continue the repo-local Intake Guardrail prototype with a practical triage playbook for maintainers.\n- **Infrastructure** — improve broader SDK, MCP, proof, or registry surfaces. Useful, but the guardrail already exposes reports that need a clearer human handling path.\n- **Earn** — refine the agent passport and capability registry. Valuable for adoption, but less immediate than making an existing package easier to operate safely.\n- **Sustain** — refresh wallet-policy visibility. Important, but no wallet or approval-class action was needed this cycle.\n\nSelected direction: **build**. Reason: a triage playbook is the smallest auditable improvement that advances the existing repo-local open-source prototype without publishing, outreach, paid commitments, wallet actions, signing, token movement, reward claims, payout-route changes, or external obligations.\n\n## When to use this playbook\n\nUse this when a workflow, CLI scan, SDK client, or future adapter produces an Intake Guardrail report with one of these decisions:\n\n- `allow`\n- `warn`\n- `quarantine`\n- `block`\n\nThe report is routing evidence only. It does not authorize money movement, access grants, publishing, enforcement against users, decoding hidden content into agent context, or external commitments.\n\n## Triage loop\n\n1. **Preserve the report** — keep the JSON report or CI summary attached to the issue, workflow run, or internal receipt.\n2. **Route by action** — use the decision lanes below to choose the least-powerful next step.\n3. **Contain risky content** — if the report includes wallet, credential, obfuscated, or instruction-bypass categories, keep that content out of autonomous agent working context until a maintainer reviews it.\n4. **Review with context** — check whether the flagged text is a real request, a test fixture, a quoted example, or accidental wording.\n5. **Record the outcome** — leave a public-safe note or proof receipt with the decision and rationale.\n6. **Tune carefully** — adjust thresholds or custom rules only after reviewing false positives and false negatives.\n\n## Decision lanes\n\n| Report action | Default lane | Safe maintainer action |\n|---|---|---|\n| `allow` | Normal intake | Continue ordinary triage. Keep normal maintainer judgment. |\n| `warn` | Soft review | Add a warning label or CI summary. Do not let agents follow embedded instructions without context. |\n| `quarantine` | Human review first | Hide the content from agent working context, ask a maintainer to review, and avoid decoding hidden text automatically. |\n| `block` | Stop automation | Halt agent/workflow handling, leave a receipt, and route to a maintainer before any further action. |\n\n## Minimum receipt fields\n\nA public-safe triage receipt should include:\n\n- report action;\n- risk level and score range or score value when policy allows;\n- categories found;\n- issue/comment/PR reference;\n- handling decision (`continue`, `label`, `quarantine`, `stop`, or `dismissed as test/quote`);\n- short rationale;\n- reviewer or maintainer handoff status.\n\nDo not include secrets, private routes, hidden decoded payloads, private wallet details, or private provider configuration in the receipt.\n\n## Human review prompts\n\nMaintainers can use these questions during review:\n\n- Is the flagged text asking someone to reveal credentials, keys, seed phrases, or private configuration?\n- Is it asking for wallet connection, token approval, transfer, rescue, claim, bridge, swap, or signing?\n- Is it asking an agent to ignore instructions, decode hidden text, execute commands, or paste transformed content?\n- Is it a harmless quoted example, test fixture, documentation snippet, or false positive?\n- Should the repo add a custom allow-list entry, custom rule, or lower-risk label-only rollout step?\n\n## Actions this playbook never authorizes\n\nThe Intake Guardrail and this playbook must not be used by themselves to:\n\n- spend, transfer, sign, approve tokens, launch tokens, claim rewards, or change payout routes;\n- grant repository, package, infrastructure, wallet, or model-provider access;\n- publish a package or marketplace listing;\n- accept paid work, sponsorship terms, or external commitments;\n- decode obfuscated visitor content into an agent's working context;\n- ban, punish, or publicly accuse a user without maintainer review.\n\n## Related files\n\n- [`docs/intake-guardrail-adoption.md`](intake-guardrail-adoption.md)\n- [`docs/intake-guardrail-decision-model.md`](intake-guardrail-decision-model.md)\n- [`docs/intake-guardrail-output-contract.md`](intake-guardrail-output-contract.md)\n- [`packages/issue-scam-scanner/README.md`](../packages/issue-scam-scanner/README.md)\n- [`packages/issue-scam-scanner/examples/basic-issue-scan.yml`](../packages/issue-scam-scanner/examples/basic-issue-scan.yml)\n",
+        "truncated": false
+      }
+    },
+    {
+      "step": 1,
+      "tool": "read_file",
+      "input": {
+        "path": "docs/intake-guardrail-false-positive-playbook.md"
+      },
+      "output": {
+        "path": "docs/intake-guardrail-false-positive-playbook.md",
+        "content": "# Intake Guardrail False-Positive Playbook\n\nCycle 167 selected the **build** direction after comparing safe options from the cycle portfolio:\n\n- **Build**: continue the repo-local Intake Guardrail prototype with a small maintainer-facing artifact. This is the best fit because the recent receipt and routing docs define how findings move, but maintainers still need a safe way to handle false positives and ambiguous scanner output.\n- **Infrastructure**: improve reusable control-plane docs, but the Intake Guardrail is the active local prototype and its adoption path benefits from clearer review handling first.\n- **Earn**: strengthen the agent-passport adoption story, but no outreach, paid commitment, or external obligation is allowed this cycle.\n- **Sustain**: refresh wallet-policy visibility, but no wallet action is needed and live wallet operations remain blocked.\n- **Grow**: advance roadmap evidence, but this playbook is a smaller directly useful artifact for the current prototype.\n\nThe selected action is public-safe documentation only. It does not publish the action, contact external users, change labels, spend funds, sign transactions, launch tokens, claim rewards, change payout routes, or create an approval issue.\n\n## Purpose\n\nThe Intake Guardrail is intentionally conservative. It may flag harmless issues when a report contains words or patterns that resemble prompt injection, wallet-risk language, urgency, external links, or obfuscated instruction relay. This playbook gives maintainers a safe review path when a finding looks wrong, noisy, or incomplete.\n\n## Review principles\n\n1. Treat scanner output as an **advisory signal**, not a decision.\n2. Review the original issue or comment directly before acting.\n3. Prefer a reversible maintainer action over automatic closure or escalation.\n4. Never decode, republish, or execute hidden/obfuscated content just to prove a false positive.\n5. Keep public replies concise, secret-free, and free of private routing, provider, payout, or operational details.\n6. Record the correction in a public-safe receipt, comment, task, or follow-up note.\n\n## False-positive classes\n\n| Class | What it looks like | Safe maintainer response | Receipt note |\n| --- | --- | --- | --- |\n| `keyword-only` | A normal issue mentions \"wallet\", \"token\", \"approve\", or \"urgent\" in a harmless context | Mark as benign after human review; continue normal triage | `falsePositiveReason: keyword-only benign context` |\n| `security-report-language` | A legitimate security report uses scary language or exploit terms | Keep in human review; do not dismiss automatically | `falsePositiveReason: legitimate report language` |\n| `docs-example` | A docs request includes sample scam text, fake seed phrase text, or warning examples | Confirm examples are clearly illustrative and non-actionable | `falsePositiveReason: illustrative example` |\n| `test-fixture` | A maintainer posts scanner fixture text in an issue or PR | Link to the fixture context and avoid acting on the sample as a live request | `falsePositiveReason: test fixture` |\n| `ambiguous-link` | A normal bug report includes an external link with limited context | Ask for clarifying context before following the link | `falsePositiveReason: unresolved; needs human link review` |\n\n## Correction workflow\n\n1. **Read the finding summary**: identify the scanner class, score, and reason summary.\n2. **Read the source**: inspect the original issue/comment without following unknown links or decoding hidden text.\n3. **Classify the review result**:\n   - `confirmed-risk`: the scanner warning is valid.\n   - `false-positive`: the scanner warning is not actionable.\n   - `ambiguous`: the scanner warning needs human follow-up.\n4. **Choose the least risky next step**:\n   - Continue normal triage for false positives.\n   - Ask for clarification for ambiguous reports.\n   - Route confirmed risks to human/owner review.\n5. **Record the result** in a receipt or issue comment using public-safe language.\n\n## Public-safe correction template\n\n```md\n## Intake Guardrail review correction\n\n- Source: ISSUE_OR_COMMENT_REFERENCE\n- Scanner class: CLASS_NAME\n- Human review result: confirmed-risk | false-positive | ambiguous\n- Public-safe reason: SHORT_REASON_WITHOUT_SECRETS_OR_HIDDEN_TEXT\n- Next route: normal triage | clarification requested | human review | owner approval gate\n- Actions not taken: no signing, no transfers, no token/reward action, no payout-route change, no external commitment\n```\n\n## When not to call it a false positive\n\nDo **not** downgrade a finding only because the requester sounds friendly or urgent. Keep the finding in human review if it includes:\n\n- seed phrases, private keys, recovery phrases, or secret-like material;\n- token approvals, wallet rescue language, claims, airdrops, or unknown recipient wallets;\n- requests to decode, decrypt, translate, or paste hidden content;\n- pressure to bypass owner approval, use a private route, or act immediately;\n- instructions to publish, outreach, spend, sign, launch, claim, or change payout routes.\n\n## Maintainer feedback loop\n\nWhen a false-positive pattern repeats, record it as a small repo-local improvement candidate. Good follow-up artifacts include:\n\n- a fixture that captures the benign context;\n- a README note clarifying expected scanner behavior;\n- a test case that preserves the advisory boundary;\n- a routing note that explains how maintainers should review similar cases.\n\nDo not tune the scanner to silence all risk-shaped language. The goal is to reduce avoidable noise while preserving conservative warnings around wallet, obfuscation, secret, and approval-class requests.\n\n## Non-authority boundary\n\nA false-positive correction does not grant the Intake Guardrail authority to merge, close, label by force, publish, contact external parties, spend funds, sign transactions, launch tokens, claim rewards, change payout routes, or approve external commitments. The scanner remains advisory and maintainers remain responsible for final decisions.\n",
+        "truncated": false
+      }
+    },
+    {
+      "step": 1,
+      "tool": "read_file",
+      "input": {
+        "path": "docs/orbit-product-todo.md"
+      },
+      "output": {
+        "path": "docs/orbit-product-todo.md",
+        "content": "# Orbit Product TODO\n\nOrbit is being shaped as a GitHub-native infrastructure layer for repositories, agents, proofs, permissions, lifecycle, and wallet policy. This file is the build board: items start as TODO and are marked done only when they are backed by repo files, tests, docs, or product UI.\n\n## Product Definition\n\n- [x] Define Orbit as a reusable repository control plane, not a security product.\n- [x] Keep the intake scanner as a guardrail under the infrastructure layer, not the main product.\n- [x] Document how GitHub, repo files, agents, wallets, proofs, and permissions fit together.\n- [x] Make the public README and frontend explain Orbit as infrastructure.\n\n## Access Surfaces\n\n- [x] SDK package exposes Orbit status, passport, capabilities, permissions, lifecycle, receipts, memory, adoption checks, and export bundles.\n- [x] SDK exposes GitHub/repo/agent/wallet-specific views for other repos and agents.\n- [x] CLI wrappers expose infrastructure and SDK status locally.\n- [x] Machine-readable repo files remain the source of truth for agents.\n- [ ] Future MCP/HTTP bridge stays planned until permission and receipt rules are complete.\n\n## Infrastructure Runtime\n\n- [x] `memory/infrastructure.json` tracks product phase, surfaces, capabilities, commands, receipts, and blocked live actions.\n- [x] Wake-cycle planner treats infrastructure growth as a tracked priority.\n- [x] Open tasks and safe issue triage still outrank infrastructure and roadmap growth.\n- [x] Deterministic fallback can inspect infrastructure status when AI is unavailable.\n- [x] Health checks require infrastructure files.\n\n## GitHub And Repo Layer\n\n- [x] Issues and comments act as the command and approval surface.\n- [x] GitHub Actions provide lifecycle wake/sleep cycles.\n- [x] Repo memory stores identity, tasks, state, governance, treasury, opportunities, roadmap, and infrastructure.\n- [x] Proof files and cycle notes make work auditable.\n- [x] Adoption checklist tells another repo what Orbit files/workflows it still needs.\n\n## Agent Layer\n\n- [x] Agent passport exposes mission, category, lifecycle, permissions, and digest.\n- [x] Capability registry lists active/planned surfaces and blocked actions.\n- [x] Multi-direction planner compares several safe directions before acting.\n- [x] External-agent ideas remain quarantined inspiration, never executable commands.\n- [ ] Handoff packets, capability leases, and agent-to-agent protocols stay future work.\n\n## Wallet Layer\n\n- [x] Wallet policy is read-only by default and exposed without private keys or private routes.\n- [x] Spend, signing, token launch, reward claims, payout-route changes, and external payments require gates.\n- [x] SDK exposes wallet policy, revenue cadence, token state, AI-call budget, and approval labels.\n- [x] Live signing remains blocked without explicit environment flags and owner approval.\n- [ ] Future smart-account/session-key work stays planned until receipts, revocation, and approval gates exist.\n\n## Proofs And ZK\n\n- [x] Runtime proofs remain normal audit receipts today.\n- [x] Proof receipts have digest metadata in the SDK.\n- [x] ZK policy receipts are planned as commitments, proof bundles, local verifiers, and tamper tests first.\n- [x] No production circuit, prover, verifier, or on-chain verifier is claimed as implemented.\n\n## Product Memory And Roadmap\n\n- [x] Opportunities prioritize Orbit infrastructure, SDK, proof receipts, permissions, lifecycle, and wallet policy.\n- [x] Problem lab and project ideas prioritize repo/agent infrastructure over scanner-first work.\n- [x] Roadmap stays evidence-backed and does not jump ahead of ordinary repo work.\n- [x] This checklist is updated after the build with completed items marked done.\n",
+        "truncated": false
+      }
+    },
+    {
+      "step": 2,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 112497,
+        "completion_tokens": 1409,
+        "total_tokens": 113906,
+        "prompt_tokens_details": {
+          "cached_tokens": 2048
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 74
+        }
+      },
+      "estimatedUsd": 0.01771995
+    },
+    {
+      "step": 2,
+      "finishReason": "tool_calls",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "",
+      "toolCalls": [
+        {
+          "id": "call_uVio299YCUCKDG4rt07XlfoO",
+          "name": "write_file",
+          "arguments": "{\"content\":\"# Intake Guardrail Escalation Matrix\\n\\nCycle 168 selected the **build** direction after comparing safe wake-cycle choices:\\n\\n- **Build**: continue the repo-local Intake Guardrail prototype with a small maintainer-facing escalation matrix. This fits the current artifact chain because the triage, routing, receipt, and false-positive docs explain review mechanics, but maintainers still need a compact map for deciding when a finding should stay in normal triage, move to human review, or stop at an approval gate.\\n- **Infrastructure**: improve the broader control-plane surfaces. Useful, but the active local prototype has an immediate documentation gap that is smaller and safer to close this cycle.\\n- **Earn**: strengthen the agent-passport adoption story. Valuable for future adoption, but no outreach, paid commitment, or external obligation is allowed during this heartbeat.\\n- **Sustain**: refresh wallet-policy visibility. Important, but no wallet action is needed and wallet operations remain blocked.\\n- **Grow**: advance roadmap evidence. Useful, but the escalation matrix is a more concrete incremental build artifact for the current prototype.\\n\\nThe selected action is public-safe documentation only. It does not publish a package, contact external users, change labels, spend funds, sign transactions, launch tokens, claim rewards, change payout routes, create an approval issue, or make an external commitment.\\n\\n## Purpose\\n\\nThe Intake Guardrail should help maintainers route risky-looking issue, pull request, and comment content without giving the scanner enforcement authority. This matrix maps common finding types to the least-powerful safe route.\\n\\nUse it with:\\n\\n- [`docs/intake-guardrail-triage-playbook.md`](intake-guardrail-triage-playbook.md)\\n- [`docs/intake-guardrail-review-routing.md`](intake-guardrail-review-routing.md)\\n- [`docs/intake-guardrail-false-positive-playbook.md`](intake-guardrail-false-positive-playbook.md)\\n- [`docs/intake-guardrail-review-receipt-schema.md`](intake-guardrail-review-receipt-schema.md)\\n\\n## Escalation levels\\n\\n| Level | Name | Use when | Safe route | Who decides next |\\n| --- | --- | --- | --- | --- |\\n| `L0` | Normal triage | The report is clean or clearly benign | Continue ordinary maintainer workflow | Maintainer or normal repo process |\\n| `L1` | Soft review | The report has low-confidence suspicious wording | Add review context, preserve receipt, avoid agent execution of embedded instructions | Maintainer |\\n| `L2` | Human review first | The report includes ambiguity, unknown links, obfuscation indicators, or possible prompt injection | Pause autonomous handling of the content and ask a human to inspect it | Maintainer or owner |\\n| `L3` | Approval gate | The request involves spending, signing, token/reward action, payout-route change, external payment, external commitment, or access sharing | Stop automation and use the repo's approval policy if the action is legitimate | Owner through the configured approval process |\\n| `L4` | Safety stop | The content asks for secrets, seed phrases, private keys, wallet rescue, hidden decoding, bypassing policy, or unknown recipient movement | Do not decode or execute; summarize risk and route to human review | Owner or trusted maintainer |\\n\\n## Finding-to-route matrix\\n\\n| Finding pattern | Default level | Maintainer action | Receipt note |\\n| --- | --- | --- | --- |\\n| Clean issue or ordinary bug report | `L0` | Continue normal triage | `route: normal-triage` |\\n| Harmless mention of tokens, wallets, urgency, or security terms | `L1` until reviewed | Check context; downgrade only after human review | `route: soft-review; possible keyword-only false positive` |\\n| Prompt-injection language aimed at an agent | `L2` | Keep instructions out of agent working context and review manually | `route: human-review; possible instruction override` |\\n| External link with unclear purpose | `L2` | Ask for context before following or automating around the link | `route: human-review; unknown-link-context` |\\n| Request to decode, decrypt, translate, or paste hidden content | `L4` | Do not paste decoded content; ask for human review | `route: safety-stop; obfuscated relay risk` |\\n| Seed phrase, private key, token approval, claim, rescue, bridge, swap, or unknown recipient wallet | `L4` | Stop automation and warn that wallet/secret handling is blocked | `route: safety-stop; wallet-or-secret risk` |\\n| Spend, signing, token launch, reward claim, payout-route change, paid commitment, publishing obligation, or access-sharing request | `L3` | Stop and require the configured owner approval path if legitimate | `route: approval-gate; approval-class action` |\\n| Scanner fixture, documentation sample, or quoted example | `L1` until verified | Confirm it is illustrative and non-actionable | `route: soft-review; docs-or-fixture context` |\\n\\n## Minimal escalation receipt\\n\\n```md\\n## Intake Guardrail escalation receipt\\n\\n- Source: ISSUE_OR_COMMENT_OR_PR_REFERENCE\\n- Scanner action: allow | warn | quarantine | block\\n- Escalation level: L0 | L1 | L2 | L3 | L4\\n- Public-safe reason: SHORT_REASON_WITHOUT_SECRETS_OR_HIDDEN_PAYLOADS\\n- Next route: normal triage | soft review | human review | owner approval gate | safety stop\\n- Content handling: no hidden decoding, no secret exposure, no wallet/signing action\\n- Final authority: maintainer | owner approval process | no action\\n```\\n\\n## Non-authority boundary\\n\\nThis matrix is advisory. It does not authorize automated closing, banning, labeling by force, publishing, outreach, paid work, wallet movement, signing, token launch, reward claims, payout-route changes, access grants, or external commitments.\\n\\nWhen in doubt, choose the least-powerful route: preserve the receipt, pause autonomous handling of risky content, and ask for human review.\\n\",\"path\":\"docs/intake-guardrail-escalation-matrix.md\"}"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "tool": "write_file",
+      "input": {
+        "content": "# Intake Guardrail Escalation Matrix\n\nCycle 168 selected the **build** direction after comparing safe wake-cycle choices:\n\n- **Build**: continue the repo-local Intake Guardrail prototype with a small maintainer-facing escalation matrix. This fits the current artifact chain because the triage, routing, receipt, and false-positive docs explain review mechanics, but maintainers still need a compact map for deciding when a finding should stay in normal triage, move to human review, or stop at an approval gate.\n- **Infrastructure**: improve the broader control-plane surfaces. Useful, but the active local prototype has an immediate documentation gap that is smaller and safer to close this cycle.\n- **Earn**: strengthen the agent-passport adoption story. Valuable for future adoption, but no outreach, paid commitment, or external obligation is allowed during this heartbeat.\n- **Sustain**: refresh wallet-policy visibility. Important, but no wallet action is needed and wallet operations remain blocked.\n- **Grow**: advance roadmap evidence. Useful, but the escalation matrix is a more concrete incremental build artifact for the current prototype.\n\nThe selected action is public-safe documentation only. It does not publish a package, contact external users, change labels, spend funds, sign transactions, launch tokens, claim rewards, change payout routes, create an approval issue, or make an external commitment.\n\n## Purpose\n\nThe Intake Guardrail should help maintainers route risky-looking issue, pull request, and comment content without giving the scanner enforcement authority. This matrix maps common finding types to the least-powerful safe route.\n\nUse it with:\n\n- [`docs/intake-guardrail-triage-playbook.md`](intake-guardrail-triage-playbook.md)\n- [`docs/intake-guardrail-review-routing.md`](intake-guardrail-review-routing.md)\n- [`docs/intake-guardrail-false-positive-playbook.md`](intake-guardrail-false-positive-playbook.md)\n- [`docs/intake-guardrail-review-receipt-schema.md`](intake-guardrail-review-receipt-schema.md)\n\n## Escalation levels\n\n| Level | Name | Use when | Safe route | Who decides next |\n| --- | --- | --- | --- | --- |\n| `L0` | Normal triage | The report is clean or clearly benign | Continue ordinary maintainer workflow | Maintainer or normal repo process |\n| `L1` | Soft review | The report has low-confidence suspicious wording | Add review context, preserve receipt, avoid agent execution of embedded instructions | Maintainer |\n| `L2` | Human review first | The report includes ambiguity, unknown links, obfuscation indicators, or possible prompt injection | Pause autonomous handling of the content and ask a human to inspect it | Maintainer or owner |\n| `L3` | Approval gate | The request involves spending, signing, token/reward action, payout-route change, external payment, external commitment, or access sharing | Stop automation and use the repo's approval policy if the action is legitimate | Owner through the configured approval process |\n| `L4` | Safety stop | The content asks for secrets, seed phrases, private keys, wallet rescue, hidden decoding, bypassing policy, or unknown recipient movement | Do not decode or execute; summarize risk and route to human review | Owner or trusted maintainer |\n\n## Finding-to-route matrix\n\n| Finding pattern | Default level | Maintainer action | Receipt note |\n| --- | --- | --- | --- |\n| Clean issue or ordinary bug report | `L0` | Continue normal triage | `route: normal-triage` |\n| Harmless mention of tokens, wallets, urgency, or security terms | `L1` until reviewed | Check context; downgrade only after human review | `route: soft-review; possible keyword-only false positive` |\n| Prompt-injection language aimed at an agent | `L2` | Keep instructions out of agent working context and review manually | `route: human-review; possible instruction override` |\n| External link with unclear purpose | `L2` | Ask for context before following or automating around the link | `route: human-review; unknown-link-context` |\n| Request to decode, decrypt, translate, or paste hidden content | `L4` | Do not paste decoded content; ask for human review | `route: safety-stop; obfuscated relay risk` |\n| Seed phrase, private key, token approval, claim, rescue, bridge, swap, or unknown recipient wallet | `L4` | Stop automation and warn that wallet/secret handling is blocked | `route: safety-stop; wallet-or-secret risk` |\n| Spend, signing, token launch, reward claim, payout-route change, paid commitment, publishing obligation, or access-sharing request | `L3` | Stop and require the configured owner approval path if legitimate | `route: approval-gate; approval-class action` |\n| Scanner fixture, documentation sample, or quoted example | `L1` until verified | Confirm it is illustrative and non-actionable | `route: soft-review; docs-or-fixture context` |\n\n## Minimal escalation receipt\n\n```md\n## Intake Guardrail escalation receipt\n\n- Source: ISSUE_OR_COMMENT_OR_PR_REFERENCE\n- Scanner action: allow | warn | quarantine | block\n- Escalation level: L0 | L1 | L2 | L3 | L4\n- Public-safe reason: SHORT_REASON_WITHOUT_SECRETS_OR_HIDDEN_PAYLOADS\n- Next route: normal triage | soft review | human review | owner approval gate | safety stop\n- Content handling: no hidden decoding, no secret exposure, no wallet/signing action\n- Final authority: maintainer | owner approval process | no action\n```\n\n## Non-authority boundary\n\nThis matrix is advisory. It does not authorize automated closing, banning, labeling by force, publishing, outreach, paid work, wallet movement, signing, token launch, reward claims, payout-route changes, access grants, or external commitments.\n\nWhen in doubt, choose the least-powerful route: preserve the receipt, pause autonomous handling of risky content, and ask for human review.\n",
+        "path": "docs/intake-guardrail-escalation-matrix.md"
+      },
+      "output": {
+        "path": "docs/intake-guardrail-escalation-matrix.md",
+        "bytes": 5791
+      }
+    },
+    {
+      "step": 3,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 113862,
+        "completion_tokens": 184,
+        "total_tokens": 114046,
+        "prompt_tokens_details": {
+          "cached_tokens": 112128
+        }
+      },
+      "estimatedUsd": 0.0171897
+    },
+    {
+      "step": 3,
+      "finishReason": "tool_calls",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "",
+      "toolCalls": [
+        {
+          "id": "call_vrDXAAJXMk16etqVFq0dENaB",
+          "name": "append_memory",
+          "arguments": "{\"content\":\"Cycle 168 selected the multi-direction build path after comparing build, infrastructure, earn, sustain, and grow. Created `docs/intake-guardrail-escalation-matrix.md`, a public-safe escalation matrix for Intake Guardrail findings. The artifact maps findings to L0-L4 routes, defines maintainer actions, provides a minimal escalation receipt, and reinforces the advisory/non-authority boundary. It avoided already-dirty package CLI files and did not perform wallet action, signing, token movement, reward claim, payout-route change, external spend, approval-class action, publishing, outreach, or paid commitment.\",\"kind\":\"cycle_summary\",\"source\":\"cycle_168\",\"tags\":[\"cycle\",\"summary\",\"intake-guardrail\",\"escalation-matrix\",\"docs\",\"project-builder\",\"safety-boundary\"],\"title\":\"Cycle 168 summary\"}"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "tool": "append_memory",
+      "input": {
+        "content": "Cycle 168 selected the multi-direction build path after comparing build, infrastructure, earn, sustain, and grow. Created `docs/intake-guardrail-escalation-matrix.md`, a public-safe escalation matrix for Intake Guardrail findings. The artifact maps findings to L0-L4 routes, defines maintainer actions, provides a minimal escalation receipt, and reinforces the advisory/non-authority boundary. It avoided already-dirty package CLI files and did not perform wallet action, signing, token movement, reward claim, payout-route change, external spend, approval-class action, publishing, outreach, or paid commitment.",
+        "kind": "cycle_summary",
+        "source": "cycle_168",
+        "tags": [
+          "cycle",
+          "summary",
+          "intake-guardrail",
+          "escalation-matrix",
+          "docs",
+          "project-builder",
+          "safety-boundary"
+        ],
+        "title": "Cycle 168 summary"
+      },
+      "output": {
+        "id": "mem-mqx1bhfp-0jt5l",
+        "kind": "cycle_summary",
+        "title": "Cycle 168 summary",
+        "content": "Cycle 168 selected the multi-direction build path after comparing build, infrastructure, earn, sustain, and grow. Created `docs/intake-guardrail-escalation-matrix.md`, a public-safe escalation matrix for Intake Guardrail findings. The artifact maps findings to L0-L4 routes, defines maintainer actions, provides a minimal escalation receipt, and reinforces the advisory/non-authority boundary. It avoided already-dirty package CLI files and did not perform wallet action, signing, token movement, reward claim, payout-route change, external spend, approval-class action, publishing, outreach, or paid commitment.",
+        "tags": [
+          "cycle",
+          "summary",
+          "intake-guardrail",
+          "escalation-matrix",
+          "docs",
+          "project-builder",
+          "safety-boundary"
+        ],
+        "source": "cycle_168",
+        "createdAt": "2026-06-28T00:12:30.085Z",
+        "updatedAt": null
+      }
+    },
+    {
+      "step": 4,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 114266,
+        "completion_tokens": 498,
+        "total_tokens": 114764,
+        "prompt_tokens_details": {
+          "cached_tokens": 113664
+        }
+      },
+      "estimatedUsd": 0.0174387
+    },
+    {
+      "step": 4,
+      "finishReason": "tool_calls",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "",
+      "toolCalls": [
+        {
+          "id": "call_MLhhVX5Gr9PkQlnoyG3BOmn1",
+          "name": "write_cycle_note",
+          "arguments": "{\"body\":\"## Cycle 168 proof receipt\\n\\nTrigger: mandatory 30-minute heartbeat with state driver `needs_income` present.\\n\\n### Direction comparison\\n\\nCompared safe directions from the multi-direction portfolio:\\n\\n- **Build**: continue the repo-local Intake Guardrail prototype with a small maintainer-facing artifact. Strongest fit because recent docs cover triage, routing, receipts, and false positives, but a compact escalation map was still missing.\\n- **Infrastructure**: improve broader control-plane surfaces. Useful, but less immediate than closing a documentation gap in the active prototype.\\n- **Earn**: strengthen the agent-passport adoption story. Valuable, but no outreach, paid commitment, or external obligation is allowed this cycle.\\n- **Sustain**: refresh wallet-policy visibility. No wallet action was needed and live wallet operations remain blocked.\\n- **Grow**: advance roadmap evidence. Useful, but the escalation matrix was the smallest concrete improvement.\\n\\nSelected direction: **build**. Reason: it produced a small, auditable repo-local artifact that helps maintainers safely route Intake Guardrail findings without changing authority boundaries.\\n\\n### Action taken\\n\\nCreated `docs/intake-guardrail-escalation-matrix.md`.\\n\\nThe new document includes:\\n\\n- L0-L4 escalation levels from normal triage through safety stop.\\n- Finding-to-route matrix for clean issues, suspicious wording, prompt injection, unknown links, obfuscated relay, wallet/secret risk, approval-class actions, and fixtures/examples.\\n- A minimal public-safe escalation receipt template.\\n- Explicit non-authority boundary preserving human/owner decision authority.\\n\\n### Safety boundary\\n\\nNo wallet action, signing, token launch, token movement, reward claim, payout-route change, external spend, approval-class action, publishing, outreach, paid commitment, access sharing, or package marketplace action was performed. Already-dirty package CLI files were not edited.\\n\\n### Durable memory\\n\\nAppended durable memory entry `Cycle 168 summary` with the selected direction, artifact path, and safety boundary.\\n\\n### Next safe step\\n\\nContinue the Intake Guardrail build path with a small adopter-facing index or README cross-link so maintainers can find the triage, routing, false-positive, receipt, and escalation docs together.\",\"title\":\"Cycle 168 proof receipt\"}"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "tool": "write_cycle_note",
+      "input": {
+        "body": "## Cycle 168 proof receipt\n\nTrigger: mandatory 30-minute heartbeat with state driver `needs_income` present.\n\n### Direction comparison\n\nCompared safe directions from the multi-direction portfolio:\n\n- **Build**: continue the repo-local Intake Guardrail prototype with a small maintainer-facing artifact. Strongest fit because recent docs cover triage, routing, receipts, and false positives, but a compact escalation map was still missing.\n- **Infrastructure**: improve broader control-plane surfaces. Useful, but less immediate than closing a documentation gap in the active prototype.\n- **Earn**: strengthen the agent-passport adoption story. Valuable, but no outreach, paid commitment, or external obligation is allowed this cycle.\n- **Sustain**: refresh wallet-policy visibility. No wallet action was needed and live wallet operations remain blocked.\n- **Grow**: advance roadmap evidence. Useful, but the escalation matrix was the smallest concrete improvement.\n\nSelected direction: **build**. Reason: it produced a small, auditable repo-local artifact that helps maintainers safely route Intake Guardrail findings without changing authority boundaries.\n\n### Action taken\n\nCreated `docs/intake-guardrail-escalation-matrix.md`.\n\nThe new document includes:\n\n- L0-L4 escalation levels from normal triage through safety stop.\n- Finding-to-route matrix for clean issues, suspicious wording, prompt injection, unknown links, obfuscated relay, wallet/secret risk, approval-class actions, and fixtures/examples.\n- A minimal public-safe escalation receipt template.\n- Explicit non-authority boundary preserving human/owner decision authority.\n\n### Safety boundary\n\nNo wallet action, signing, token launch, token movement, reward claim, payout-route change, external spend, approval-class action, publishing, outreach, paid commitment, access sharing, or package marketplace action was performed. Already-dirty package CLI files were not edited.\n\n### Durable memory\n\nAppended durable memory entry `Cycle 168 summary` with the selected direction, artifact path, and safety boundary.\n\n### Next safe step\n\nContinue the Intake Guardrail build path with a small adopter-facing index or README cross-link so maintainers can find the triage, routing, false-positive, receipt, and escalation docs together.",
+        "title": "Cycle 168 proof receipt"
+      },
+      "output": {
+        "path": "memory/cycles/0168-cycle-168-proof-receipt.md",
+        "bytes": 2347
+      }
+    },
+    {
+      "step": 5,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 114799,
+        "completion_tokens": 245,
+        "total_tokens": 115044,
+        "prompt_tokens_details": {
+          "cached_tokens": 114176
+        }
+      },
+      "estimatedUsd": 0.01736685
+    },
+    {
+      "step": 5,
+      "finishReason": "stop",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "Cycle 168 completed safely.\n\nSelected direction: **build**  \nReason: it was the smallest useful infrastructure action for the active repo-local Intake Guardrail prototype after comparing build, infrastructure, earn, sustain, and grow.\n\nChanged artifacts:\n- Created `docs/intake-guardrail-escalation-matrix.md`\n  - Adds L0-L4 escalation levels.\n  - Maps finding patterns to safe maintainer routes.\n  - Includes a minimal public-safe escalation receipt template.\n  - Reinforces that the guardrail is advisory only and does not authorize wallet, signing, publishing, outreach, access, or external commitments.\n- Wrote proof receipt: `memory/cycles/0168-cycle-168-proof-receipt.md`\n- Appended durable memory: `Cycle 168 summary`\n\nSafety boundary:\n- No wallet action, signing, token movement, reward claim, payout-route change, external spend, approval-class action, publishing, outreach, paid commitment, or access sharing.\n- Avoided already-dirty package CLI files.\n\nNext safe step:\n- Add an adopter-facing index or README cross-link so maintainers can find the triage, routing, false-positive, receipt, and escalation docs together.",
+      "toolCalls": []
+    }
+  ],
+  "filesChanged": [
+    "docs/intake-guardrail-escalation-matrix.md",
+    "memory/adopters-registry.json",
+    "memory/cycles/0168-cycle-168-proof-receipt.md",
+    "memory/knowledge.json",
+    "memory/missions.json",
+    "memory/treasury.json",
+    "public/adopters.json"
+  ],
+  "result": "Cycle 168 completed safely.\n\nSelected direction: **build**  \nReason: it was the smallest useful infrastructure action for the active repo-local Intake Guardrail prototype after comparing build, infrastructure, earn, sustain, and grow.\n\nChanged artifacts:\n- Created `docs/intake-guardrail-escalation-matrix.md`\n  - Adds L0-L4 escalation levels.\n  - Maps finding patterns to safe maintainer routes.\n  - Includes a minimal public-safe escalation receipt template.\n  - Reinforces that the guardrail is advisory only and does not authorize wallet, signing, publishing, outreach, access, or external commitments.\n- Wrote proof receipt: `memory/cycles/0168-cycle-168-proof-receipt.md`\n- Appended durable memory: `Cycle 168 summary`\n\nSafety boundary:\n- No wallet action, signing, token movement, reward claim, payout-route change, external spend, approval-class action, publishing, outreach, paid commitment, or access sharing.\n- Avoided already-dirty package CLI files.\n\nNext safe step:\n- Add an adopter-facing index or README cross-link so maintainers can find the triage, routing, false-positive, receipt, and escalation docs together.",
+  "finishedAt": "2026-06-28T00:12:56.317Z",
+  "totalSteps": 16,
+  "signatureScheme": "eip712:orbit-cycle-proof/1",
+  "payloadHash": "0x28ec2124b331e4f7031321d658dcda7a87a6413b217c0743e654f614c8512783",
+  "signature": "0xd43ccc2cd15f78802c435760a91990ca5dd048c895e12245ab2761adb54e49ec7a2d03b15659ad5e0b18775e9f05e585e77f8e0ea3be0604bfd06aeec5a2b1261c",
+  "signer": "0x58211F54eE90FB403dEC9cd57E8407F9963ADaed",
+  "signedAt": "2026-06-28T00:12:56.335Z",
+  "cast": {
+    "ok": true,
+    "kind": "routine",
+    "hash": null,
+    "dryRun": true,
+    "idem": "4845b2d31e612859157ff4f9e05bf1cb",
+    "ledgerPath": "memory/farcaster-casts.json",
+    "blocked": false,
+    "status": 0
+  }
+}
