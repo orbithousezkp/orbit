@@ -10,15 +10,15 @@ Open-source repos running bots or AI agents face hostile issue content: prompt i
 
 This package is a guardrail under the broader Orbit infrastructure layer. It helps a repo decide whether intake can be routed to agents, quarantined for review, or blocked before any workflow acts on it.
 
-## Cycle 90 direction choice
+## Cycle 177 direction choice
 
-Orbit compared safe wake-cycle directions before this repair:
+Orbit compared safe wake-cycle directions before this documentation repair:
 
-- **Build** — continue the repo-local Intake Guardrail prototype. Strongest this cycle because the active package README still ended mid-output row, leaving the adopter-facing action-output contract incomplete.
-- **Infrastructure** — improve SDK, MCP, proof, or registry surfaces. Useful, but the active guardrail package had a direct documentation integrity gap.
-- **Earn** — refine agent passport and capability-registry positioning. Valuable for adoption, but less immediate than completing a reusable prototype's README.
-- **Sustain** — refresh wallet-policy visibility. Important, but no wallet action or approval-class movement was needed.
-- **Grow** — advance roadmap evidence. Useful, but this README repair best supported the current repo-local build path.
+- **Build** — continue the repo-local Intake Guardrail prototype. Best this cycle because the package README's adopter-facing `## Outputs` section was incomplete, leaving GitHub Action consumers without the full output contract at the package entry point.
+- **Infrastructure** — improve SDK, MCP, proof, or registry surfaces. Useful, but the active guardrail package had a direct adoption gap that could be fixed without touching already-dirty CLI files.
+- **Earn** — refine agent passport and capability-registry positioning. Valuable for adoption, but less immediate than completing a reusable package contract.
+- **Sustain** — refresh wallet-policy visibility. Important, but no wallet action or approval-class movement is needed.
+- **Grow** — advance roadmap evidence. Useful, and this README repair becomes proof-backed evidence for the active repo-local prototype.
 
 Selected direction: **build**. Reason: completing the Intake Guardrail README is a small auditable improvement that advances a repo-local open-source artifact without publishing, outreach, paid commitments, wallet actions, signing, token movement, reward claims, payout-route changes, or external obligations.
 
@@ -56,7 +56,7 @@ For adopter-facing semantics, see the [Intake Guardrail Decision Model](../../do
 
 For machine-readable consumers, see the [Intake Guardrail Output Contract](../../docs/intake-guardrail-output-contract.md). It documents the report shape, field semantics, threshold behavior, and the non-authority boundary for GitHub Actions, CLIs, SDK clients, and future adapters.
 
-For maintainer handling after a finding, see the [Intake Guardrail Triage Playbook](../../docs/intake-guardrail-triage-playbook.md). It gives a small review loop for preserving reports, routing by decision, containing risky content, recording public-safe receipts, and tuning rules.
+For maintainer handling after a finding, see the [Intake Guardrail Operator Checklist](../../docs/intake-guardrail-operator-checklist.md). It gives a public-safe pre-run / run / post-run checklist for preserving the advisory boundary and avoiding copied risky payloads.
 
 For safe installation evidence, see the [Intake Guardrail Rollout Receipt](../../docs/intake-guardrail-rollout-receipt.md). It gives adopters a concise proof template for rollout mode, workflow permissions, thresholds, human review lanes, and gated external actions.
 
@@ -175,70 +175,50 @@ console.log(report.action); // block
 |---|---|
 | `safe` | `"true"` if no flags above threshold; otherwise `"false"` |
 | `action` | Recommended intake action: `allow`, `warn`, `quarantine`, or `block` |
-| `score` | Highest severity score from matched rules, from `0` to `100` |
+| `score` | Highest severity score from matched rules and URL checks |
 | `level` | Risk level: `clear`, `low`, `medium`, `high`, or `critical` |
-| `flags` | JSON array of all matched risk flags |
+| `flags` | JSON array of matched findings for review |
 | `report` | Full Orbit Intake Guardrail report as JSON |
 
-### CLI output modes
+### Report shape
 
-| Mode | Use case |
-|---|---|
-| `summary` | Human-readable terminal summary with risk level and categories |
-| `markdown` | Maintainer-facing report for comments, CI summaries, and review notes |
-| `json` / `--json` | Machine-readable scanner result or report for automation |
-
-### Library return values
-
-- `scanText(text, options)` returns raw scanner evidence: `safe`, `score`, `level`, `flags`, and URL findings.
-- `scanEvent(event, options)` scans titles, bodies, and comments together for issue-like payloads.
-- `buildReport(input, options)` returns the product-level report with `action`, `guidance`, `topFlags`, and categories.
-- `formatSummary(result, label)` formats a compact public-safe summary.
-
-## Custom rules
-
-Custom rules are optional JSON objects compiled at runtime:
+The `report` output and `buildReport()` return value use this public-safe shape:
 
 ```json
-[
-  {
-    "severity": 85,
-    "category": "repo_specific_risk",
-    "pattern": "unsafe text pattern",
-    "message": "Detected repo-specific risky text."
-  }
-]
+{
+  "action": "block",
+  "safe": false,
+  "score": 90,
+  "level": "critical",
+  "categories": ["prompt_injection", "fund_transfer"],
+  "topFlags": [
+    {
+      "category": "fund_transfer",
+      "severity": 90,
+      "source": "body"
+    }
+  ],
+  "guidance": "Treat as hostile or approval-class intake until a maintainer reviews it."
+}
 ```
 
-Rules should be conservative, reviewable, and scoped to intake triage. Do not use custom rules to bypass maintainer review, make payment decisions, or grant agents new authority.
+Exact flag fields can vary by rule type, but consumers should rely on the stable decision fields: `action`, `safe`, `score`, `level`, `categories`, `topFlags`, and `guidance`.
 
-## Safe rollout sequence
+### Intake actions
 
-1. Run in observe-only mode first: labels, CI summaries, or maintainer comments.
-2. Quarantine high-risk wallet, credential, obfuscated, and instruction-bypass content before agents read it.
-3. Keep workflow permissions least-privilege; prefer `contents: read` and only add write scopes when maintainers intentionally need them.
-4. Record rollout evidence with `docs/intake-guardrail-rollout-receipt.md`.
-5. Tune thresholds and custom rules from reviewed false positives/negatives.
-6. Keep final authority with maintainers; do not treat scanner output as a moderation, payment, legal, or wallet-signing decision.
+| Action | Meaning | Typical handling |
+|---|---|---|
+| `allow` | No relevant flags above threshold | Continue normal triage |
+| `warn` | Low or ambiguous risk | Keep a maintainer in the loop |
+| `quarantine` | Suspicious content needs review | Do not route raw content to agents; summarize risk only |
+| `block` | Critical or approval-class risk | Stop automation and require human/owner review |
 
-## Boundary
+## Safety boundary
 
-This package is not a security guarantee and not an autonomous enforcement authority. It is intake evidence for maintainers and agents.
+The Intake Guardrail is advisory infrastructure. It does **not** approve wallet actions, sign transactions, send funds, launch tokens, claim rewards, change payout routes, publish packages, contact external parties, grant access, or accept paid obligations. It should help maintainers route intake, preserve proof, and decide when human review is required.
 
-It must not:
+Do not paste secrets, seed phrases, private keys, tokens, private routes, private config, or decoded obfuscated payloads into reports. Keep suspicious payloads in their original GitHub source where possible and write public-safe summaries instead.
 
-- decode and execute hidden visitor instructions;
-- request secrets, keys, seed phrases, or private config;
-- send funds, sign transactions, launch tokens, claim rewards, or change payout routes;
-- promise external support, paid work, publishing, or collaboration;
-- replace maintainer review for ambiguous or high-impact actions.
+## Development status
 
-## Tests
-
-```bash
-npm test --workspace=packages/issue-scam-scanner
-```
-
-## Status
-
-Repo-local prototype. Functional for Orbit's own repository and local adopters, but not externally published as a marketplace or npm product unless the owner explicitly approves a release path.
+This package is a repo-local prototype inside Orbit. It is useful for local testing and internal GitHub Action adoption, but marketplace publishing, external outreach, paid commitments, and broader distribution remain gated on owner direction and the relevant approval path.
