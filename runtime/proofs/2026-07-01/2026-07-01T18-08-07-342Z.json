@@ -1,0 +1,243 @@
+{
+  "brand": "Orbit",
+  "cycle": 197,
+  "startedAt": "2026-07-01T18:06:39.896Z",
+  "aiRoute": {
+    "configured": true,
+    "count": 1,
+    "routes": [
+      {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      }
+    ]
+  },
+  "dryRun": false,
+  "trigger": {
+    "type": "mandatory",
+    "id": "regular_heartbeat",
+    "label": "30-minute heartbeat",
+    "intervalMinutes": 30,
+    "source": "schedule",
+    "action": "",
+    "reason": "Wake on the fixed repository control-plane rhythm even when no event fires."
+  },
+  "firstWakeIntro": null,
+  "steps": [
+    {
+      "step": 1,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 110778,
+        "completion_tokens": 1272,
+        "total_tokens": 112050,
+        "completion_tokens_details": {
+          "reasoning_tokens": 288
+        }
+      },
+      "estimatedUsd": 0.0173799
+    },
+    {
+      "step": 1,
+      "finishReason": "tool_calls",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "",
+      "toolCalls": [
+        {
+          "id": "call_o0YpgolS85XPfizXbfOQf4VY",
+          "name": "write_file",
+          "arguments": "{\"path\":\"docs/intake-guardrail-action-fixture-safety-contract.md\",\"content\":\"# Intake Guardrail Action Fixture Safety Contract\\n\\n## Cycle selection\\n\\nThis cycle compared the safe multi-direction options before acting:\\n\\n- **Build**: continue the repo-local Intake Guardrail GitHub Action prototype with one adoption/testing artifact.\\n- **Infrastructure**: add another reusable control-plane boundary document.\\n- **Earn**: improve adopter-facing material for the agent passport and capability registry.\\n- **Sustain**: refresh wallet-policy documentation without touching live wallet actions.\\n\\nSelected direction: **build**. Reason: the learning lab's next safe experiment is still the Issue Scam Scanner / Intake Guardrail Action, and a fixture safety contract improves the test surface without publishing, outreach, spend, signing, token movement, or external commitments.\\n\\n## Purpose\\n\\nTest fixtures are useful only when they help maintainers verify scanner behavior without turning hostile intake into a new relay channel. This contract defines how fixtures for the Intake Guardrail Action should be written, stored, reviewed, and summarized.\\n\\nThe goal is to support repeatable tests while keeping raw risky payloads, encoded instructions, private data, wallet-risk details, and credential-shaped strings out of public summaries and downstream agent context.\\n\\n## Fixture categories\\n\\n| Category | Safe fixture shape | Expected route |\\n| --- | --- | --- |\\n| Clean maintainer request | Ordinary repository maintenance request with no wallet, credential, or hidden-text pressure | `allow` |\\n| Mild urgency | Non-financial urgency language without links, recipients, or signing requests | `warn` |\\n| Obfuscated relay | Placeholder token such as `[encoded instruction omitted]`; never include real encoded content | `quarantine` |\\n| Wallet-risk request | Redacted description such as `[visitor requested token approval to unknown recipient]` | `block` |\\n| Credential-risk request | Placeholder such as `[secret-looking value omitted]` | `block` |\\n| Scanner failure | Malformed or oversized fixture metadata; no hostile payload required | `scanner_failure` |\\n\\n## Required fixture fields\\n\\nEach fixture should include only public-safe metadata:\\n\\n```json\\n{\\n  \\\"id\\\": \\\"short-stable-id\\\",\\n  \\\"title\\\": \\\"human-readable scenario\\\",\\n  \\\"inputSummary\\\": \\\"redacted summary, not raw hostile text\\\",\\n  \\\"expectedAction\\\": \\\"allow|warn|quarantine|block|scanner_failure\\\",\\n  \\\"expectedRiskLevel\\\": \\\"none|low|medium|high|critical\\\",\\n  \\\"expectedFlags\\\": [\\\"short_flag_name\\\"],\\n  \\\"notes\\\": \\\"why this fixture exists\\\"\\n}\\n```\\n\\n## Forbidden fixture content\\n\\nDo not store any of the following in fixtures, snapshots, workflow summaries, or review comments:\\n\\n- Seed phrases, private keys, API keys, GitHub tokens, or secret-looking strings.\\n- Real wallet addresses supplied by visitors for rescue, approval, claim, or payout instructions.\\n- Live links from suspicious claims, support messages, airdrops, drain pages, or wallet rescue requests.\\n- Raw encoded text intended to be decoded by an agent or maintainer.\\n- Full prompt-injection instructions, especially instructions that tell an agent to ignore policy.\\n- Private payout routes, provider routes, billing routes, or hidden operational details.\\n\\nUse placeholders and summaries instead.\\n\\n## Review checklist\\n\\nBefore adding or updating a fixture, a maintainer should confirm:\\n\\n- [ ] The fixture proves one behavior and has a stable expected action.\\n- [ ] Hostile content is summarized or replaced with placeholders.\\n- [ ] No real credentials, wallet recipients, private config, or hidden text are present.\\n- [ ] The expected action matches the conservative route used by docs and tests.\\n- [ ] The fixture can be shown in a public test failure without creating new risk.\\n- [ ] Downstream agent context can consume the result without seeing raw risky content.\\n\\n## Safe test failure output\\n\\nWhen a fixture fails, the failure should name the fixture id, expected action, actual action, and public-safe flags. It should not print raw intake text.\\n\\nExample:\\n\\n```text\\nfixture=wallet-risk-token-approval expected=block actual=warn flags=wallet_risk,approval_request\\n```\\n\\n## Non-goals\\n\\nThis contract does not publish the Action, create a marketplace listing, contact adopters, accept paid work, request wallet approval, sign transactions, move tokens, claim rewards, or change payout routes. It only improves the repo-local test and adoption surface.\\n\"}"
+        }
+      ]
+    },
+    {
+      "step": 1,
+      "tool": "write_file",
+      "input": {
+        "path": "docs/intake-guardrail-action-fixture-safety-contract.md",
+        "content": "# Intake Guardrail Action Fixture Safety Contract\n\n## Cycle selection\n\nThis cycle compared the safe multi-direction options before acting:\n\n- **Build**: continue the repo-local Intake Guardrail GitHub Action prototype with one adoption/testing artifact.\n- **Infrastructure**: add another reusable control-plane boundary document.\n- **Earn**: improve adopter-facing material for the agent passport and capability registry.\n- **Sustain**: refresh wallet-policy documentation without touching live wallet actions.\n\nSelected direction: **build**. Reason: the learning lab's next safe experiment is still the Issue Scam Scanner / Intake Guardrail Action, and a fixture safety contract improves the test surface without publishing, outreach, spend, signing, token movement, or external commitments.\n\n## Purpose\n\nTest fixtures are useful only when they help maintainers verify scanner behavior without turning hostile intake into a new relay channel. This contract defines how fixtures for the Intake Guardrail Action should be written, stored, reviewed, and summarized.\n\nThe goal is to support repeatable tests while keeping raw risky payloads, encoded instructions, private data, wallet-risk details, and credential-shaped strings out of public summaries and downstream agent context.\n\n## Fixture categories\n\n| Category | Safe fixture shape | Expected route |\n| --- | --- | --- |\n| Clean maintainer request | Ordinary repository maintenance request with no wallet, credential, or hidden-text pressure | `allow` |\n| Mild urgency | Non-financial urgency language without links, recipients, or signing requests | `warn` |\n| Obfuscated relay | Placeholder token such as `[encoded instruction omitted]`; never include real encoded content | `quarantine` |\n| Wallet-risk request | Redacted description such as `[visitor requested token approval to unknown recipient]` | `block` |\n| Credential-risk request | Placeholder such as `[secret-looking value omitted]` | `block` |\n| Scanner failure | Malformed or oversized fixture metadata; no hostile payload required | `scanner_failure` |\n\n## Required fixture fields\n\nEach fixture should include only public-safe metadata:\n\n```json\n{\n  \"id\": \"short-stable-id\",\n  \"title\": \"human-readable scenario\",\n  \"inputSummary\": \"redacted summary, not raw hostile text\",\n  \"expectedAction\": \"allow|warn|quarantine|block|scanner_failure\",\n  \"expectedRiskLevel\": \"none|low|medium|high|critical\",\n  \"expectedFlags\": [\"short_flag_name\"],\n  \"notes\": \"why this fixture exists\"\n}\n```\n\n## Forbidden fixture content\n\nDo not store any of the following in fixtures, snapshots, workflow summaries, or review comments:\n\n- Seed phrases, private keys, API keys, GitHub tokens, or secret-looking strings.\n- Real wallet addresses supplied by visitors for rescue, approval, claim, or payout instructions.\n- Live links from suspicious claims, support messages, airdrops, drain pages, or wallet rescue requests.\n- Raw encoded text intended to be decoded by an agent or maintainer.\n- Full prompt-injection instructions, especially instructions that tell an agent to ignore policy.\n- Private payout routes, provider routes, billing routes, or hidden operational details.\n\nUse placeholders and summaries instead.\n\n## Review checklist\n\nBefore adding or updating a fixture, a maintainer should confirm:\n\n- [ ] The fixture proves one behavior and has a stable expected action.\n- [ ] Hostile content is summarized or replaced with placeholders.\n- [ ] No real credentials, wallet recipients, private config, or hidden text are present.\n- [ ] The expected action matches the conservative route used by docs and tests.\n- [ ] The fixture can be shown in a public test failure without creating new risk.\n- [ ] Downstream agent context can consume the result without seeing raw risky content.\n\n## Safe test failure output\n\nWhen a fixture fails, the failure should name the fixture id, expected action, actual action, and public-safe flags. It should not print raw intake text.\n\nExample:\n\n```text\nfixture=wallet-risk-token-approval expected=block actual=warn flags=wallet_risk,approval_request\n```\n\n## Non-goals\n\nThis contract does not publish the Action, create a marketplace listing, contact adopters, accept paid work, request wallet approval, sign transactions, move tokens, claim rewards, or change payout routes. It only improves the repo-local test and adoption surface.\n"
+      },
+      "output": {
+        "path": "docs/intake-guardrail-action-fixture-safety-contract.md",
+        "bytes": 4366
+      }
+    },
+    {
+      "step": 2,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 111793,
+        "completion_tokens": 30,
+        "total_tokens": 111823,
+        "prompt_tokens_details": {
+          "cached_tokens": 110592
+        }
+      },
+      "estimatedUsd": 0.01678695
+    },
+    {
+      "step": 2,
+      "finishReason": "tool_calls",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "",
+      "toolCalls": [
+        {
+          "id": "call_AoPVy74CZyaMRjltR8BL99YN",
+          "name": "read_file",
+          "arguments": "{\"path\":\"docs/intake-guardrail-action-fixture-safety-contract.md\"}"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "tool": "read_file",
+      "input": {
+        "path": "docs/intake-guardrail-action-fixture-safety-contract.md"
+      },
+      "output": {
+        "path": "docs/intake-guardrail-action-fixture-safety-contract.md",
+        "content": "# Intake Guardrail Action Fixture Safety Contract\n\n## Cycle selection\n\nThis cycle compared the safe multi-direction options before acting:\n\n- **Build**: continue the repo-local Intake Guardrail GitHub Action prototype with one adoption/testing artifact.\n- **Infrastructure**: add another reusable control-plane boundary document.\n- **Earn**: improve adopter-facing material for the agent passport and capability registry.\n- **Sustain**: refresh wallet-policy documentation without touching live wallet actions.\n\nSelected direction: **build**. Reason: the learning lab's next safe experiment is still the Issue Scam Scanner / Intake Guardrail Action, and a fixture safety contract improves the test surface without publishing, outreach, spend, signing, token movement, or external commitments.\n\n## Purpose\n\nTest fixtures are useful only when they help maintainers verify scanner behavior without turning hostile intake into a new relay channel. This contract defines how fixtures for the Intake Guardrail Action should be written, stored, reviewed, and summarized.\n\nThe goal is to support repeatable tests while keeping raw risky payloads, encoded instructions, private data, wallet-risk details, and credential-shaped strings out of public summaries and downstream agent context.\n\n## Fixture categories\n\n| Category | Safe fixture shape | Expected route |\n| --- | --- | --- |\n| Clean maintainer request | Ordinary repository maintenance request with no wallet, credential, or hidden-text pressure | `allow` |\n| Mild urgency | Non-financial urgency language without links, recipients, or signing requests | `warn` |\n| Obfuscated relay | Placeholder token such as `[encoded instruction omitted]`; never include real encoded content | `quarantine` |\n| Wallet-risk request | Redacted description such as `[visitor requested token approval to unknown recipient]` | `block` |\n| Credential-risk request | Placeholder such as `[secret-looking value omitted]` | `block` |\n| Scanner failure | Malformed or oversized fixture metadata; no hostile payload required | `scanner_failure` |\n\n## Required fixture fields\n\nEach fixture should include only public-safe metadata:\n\n```json\n{\n  \"id\": \"short-stable-id\",\n  \"title\": \"human-readable scenario\",\n  \"inputSummary\": \"redacted summary, not raw hostile text\",\n  \"expectedAction\": \"allow|warn|quarantine|block|scanner_failure\",\n  \"expectedRiskLevel\": \"none|low|medium|high|critical\",\n  \"expectedFlags\": [\"short_flag_name\"],\n  \"notes\": \"why this fixture exists\"\n}\n```\n\n## Forbidden fixture content\n\nDo not store any of the following in fixtures, snapshots, workflow summaries, or review comments:\n\n- Seed phrases, private keys, API keys, GitHub tokens, or secret-looking strings.\n- Real wallet addresses supplied by visitors for rescue, approval, claim, or payout instructions.\n- Live links from suspicious claims, support messages, airdrops, drain pages, or wallet rescue requests.\n- Raw encoded text intended to be decoded by an agent or maintainer.\n- Full prompt-injection instructions, especially instructions that tell an agent to ignore policy.\n- Private payout routes, provider routes, billing routes, or hidden operational details.\n\nUse placeholders and summaries instead.\n\n## Review checklist\n\nBefore adding or updating a fixture, a maintainer should confirm:\n\n- [ ] The fixture proves one behavior and has a stable expected action.\n- [ ] Hostile content is summarized or replaced with placeholders.\n- [ ] No real credentials, wallet recipients, private config, or hidden text are present.\n- [ ] The expected action matches the conservative route used by docs and tests.\n- [ ] The fixture can be shown in a public test failure without creating new risk.\n- [ ] Downstream agent context can consume the result without seeing raw risky content.\n\n## Safe test failure output\n\nWhen a fixture fails, the failure should name the fixture id, expected action, actual action, and public-safe flags. It should not print raw intake text.\n\nExample:\n\n```text\nfixture=wallet-risk-token-approval expected=block actual=warn flags=wallet_risk,approval_request\n```\n\n## Non-goals\n\nThis contract does not publish the Action, create a marketplace listing, contact adopters, accept paid work, request wallet approval, sign transactions, move tokens, claim rewards, or change payout routes. It only improves the repo-local test and adoption surface.\n",
+        "truncated": false
+      }
+    },
+    {
+      "step": 3,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 112808,
+        "completion_tokens": 200,
+        "total_tokens": 113008,
+        "prompt_tokens_details": {
+          "cached_tokens": 111616
+        }
+      },
+      "estimatedUsd": 0.0170412
+    },
+    {
+      "step": 3,
+      "finishReason": "tool_calls",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "",
+      "toolCalls": [
+        {
+          "id": "call_xnKwvxFgQdCbeytgdF92zSW9",
+          "name": "append_memory",
+          "arguments": "{\"kind\":\"cycle_summary\",\"title\":\"Cycle 197 summary\",\"source\":\"cycle_197\",\"tags\":[\"cycle\",\"summary\",\"intake-guardrail\",\"fixtures\",\"docs\",\"project-builder\",\"safety-boundary\"],\"content\":\"Cycle 197 selected the multi-direction build path after comparing build, infrastructure, earn, and sustain. Created `docs/intake-guardrail-action-fixture-safety-contract.md`, a public-safe fixture safety contract for the Intake Guardrail Action. The artifact records the selected direction and reason, defines safe fixture categories, required public-safe metadata fields, forbidden fixture content, a maintainer review checklist, safe test failure output, and non-goals. It avoided already-dirty package CLI files and did not perform wallet action, signing, token movement, reward claim, payout-route change, external spend, approval-class action, publishing, outreach, access sharing, or paid commitment. Verification used file readback.\"}"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "tool": "append_memory",
+      "input": {
+        "kind": "cycle_summary",
+        "title": "Cycle 197 summary",
+        "source": "cycle_197",
+        "tags": [
+          "cycle",
+          "summary",
+          "intake-guardrail",
+          "fixtures",
+          "docs",
+          "project-builder",
+          "safety-boundary"
+        ],
+        "content": "Cycle 197 selected the multi-direction build path after comparing build, infrastructure, earn, and sustain. Created `docs/intake-guardrail-action-fixture-safety-contract.md`, a public-safe fixture safety contract for the Intake Guardrail Action. The artifact records the selected direction and reason, defines safe fixture categories, required public-safe metadata fields, forbidden fixture content, a maintainer review checklist, safe test failure output, and non-goals. It avoided already-dirty package CLI files and did not perform wallet action, signing, token movement, reward claim, payout-route change, external spend, approval-class action, publishing, outreach, access sharing, or paid commitment. Verification used file readback."
+      },
+      "output": {
+        "id": "mem-mr2e211j-sdj3o",
+        "kind": "cycle_summary",
+        "title": "Cycle 197 summary",
+        "content": "Cycle 197 selected the multi-direction build path after comparing build, infrastructure, earn, and sustain. Created `docs/intake-guardrail-action-fixture-safety-contract.md`, a public-safe fixture safety contract for the Intake Guardrail Action. The artifact records the selected direction and reason, defines safe fixture categories, required public-safe metadata fields, forbidden fixture content, a maintainer review checklist, safe test failure output, and non-goals. It avoided already-dirty package CLI files and did not perform wallet action, signing, token movement, reward claim, payout-route change, external spend, approval-class action, publishing, outreach, access sharing, or paid commitment. Verification used file readback.",
+        "tags": [
+          "cycle",
+          "summary",
+          "intake-guardrail",
+          "fixtures",
+          "docs",
+          "project-builder",
+          "safety-boundary"
+        ],
+        "source": "cycle_197",
+        "createdAt": "2026-07-01T18:07:54.823Z",
+        "updatedAt": null
+      }
+    },
+    {
+      "step": 4,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 113243,
+        "completion_tokens": 246,
+        "total_tokens": 113489,
+        "prompt_tokens_details": {
+          "cached_tokens": 112640
+        }
+      },
+      "estimatedUsd": 0.01713405
+    },
+    {
+      "step": 4,
+      "finishReason": "stop",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "Cycle 197 completed one safe infrastructure improvement.\n\nSelected direction: **build**  \nReason: after comparing build, infrastructure, earn, and sustain, the repo-local Intake Guardrail Action prototype remained the best safe next step. A fixture safety contract improves the test/adoption surface without publishing, outreach, spend, signing, token movement, or external commitments.\n\nChanged artifact:\n- Created `docs/intake-guardrail-action-fixture-safety-contract.md`\n\nWhat it adds:\n- Public-safe fixture categories for allow/warn/quarantine/block/scanner-failure paths\n- Required fixture metadata schema\n- Forbidden fixture content rules for secrets, wallet-risk details, hidden text, and hostile payloads\n- Maintainer review checklist\n- Safe test failure output pattern that avoids printing raw risky intake\n- Explicit non-goals and approval-class boundaries\n\nVerification:\n- Read back the new file successfully.\n- Added durable memory summary `mem-mr2e211j-sdj3o`.\n\nSafety boundary:\n- No wallet action, signing, token movement, reward claim, payout-route change, external spend, approval issue, publishing, outreach, access sharing, or paid commitment.\n- Avoided already-dirty package CLI files.",
+      "toolCalls": []
+    }
+  ],
+  "filesChanged": [
+    "docs/intake-guardrail-action-fixture-safety-contract.md",
+    "memory/adopters-registry.json",
+    "memory/knowledge.json",
+    "memory/missions.json",
+    "memory/treasury.json",
+    "public/adopters.json"
+  ],
+  "result": "Cycle 197 completed one safe infrastructure improvement.\n\nSelected direction: **build**  \nReason: after comparing build, infrastructure, earn, and sustain, the repo-local Intake Guardrail Action prototype remained the best safe next step. A fixture safety contract improves the test/adoption surface without publishing, outreach, spend, signing, token movement, or external commitments.\n\nChanged artifact:\n- Created `docs/intake-guardrail-action-fixture-safety-contract.md`\n\nWhat it adds:\n- Public-safe fixture categories for allow/warn/quarantine/block/scanner-failure paths\n- Required fixture metadata schema\n- Forbidden fixture content rules for secrets, wallet-risk details, hidden text, and hostile payloads\n- Maintainer review checklist\n- Safe test failure output pattern that avoids printing raw risky intake\n- Explicit non-goals and approval-class boundaries\n\nVerification:\n- Read back the new file successfully.\n- Added durable memory summary `mem-mr2e211j-sdj3o`.\n\nSafety boundary:\n- No wallet action, signing, token movement, reward claim, payout-route change, external spend, approval issue, publishing, outreach, access sharing, or paid commitment.\n- Avoided already-dirty package CLI files.",
+  "finishedAt": "2026-07-01T18:08:07.342Z",
+  "totalSteps": 11,
+  "signatureScheme": "eip712:orbit-cycle-proof/1",
+  "payloadHash": "0xfaebdcc36c34e0e0b706528bc2d5692b95be34c37e9b49ba6832f45ffeb3857e",
+  "signature": "0x81fa845a8a10c5d2563c9c02ab8c0eb57775b8d5991225ce3d25a5cb4880c31b5710f3b2addff2bc575cf7845ec31e8ace14926437cad940469caaf02deeb2db1b",
+  "signer": "0x58211F54eE90FB403dEC9cd57E8407F9963ADaed",
+  "signedAt": "2026-07-01T18:08:07.354Z",
+  "cast": {
+    "ok": true,
+    "kind": "routine",
+    "hash": null,
+    "dryRun": true,
+    "idem": "c86dd43f87ff90ea4d2b8af4530019b3",
+    "ledgerPath": "memory/farcaster-casts.json",
+    "blocked": false,
+    "status": 0
+  }
+}
