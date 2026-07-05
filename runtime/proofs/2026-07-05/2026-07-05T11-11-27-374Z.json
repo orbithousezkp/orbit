@@ -1,0 +1,306 @@
+{
+  "brand": "Orbit",
+  "cycle": 230,
+  "startedAt": "2026-07-05T11:09:24.070Z",
+  "aiRoute": {
+    "configured": true,
+    "count": 1,
+    "routes": [
+      {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      }
+    ]
+  },
+  "dryRun": false,
+  "trigger": {
+    "type": "mandatory",
+    "id": "regular_heartbeat",
+    "label": "30-minute heartbeat",
+    "intervalMinutes": 30,
+    "source": "schedule",
+    "action": "",
+    "reason": "Wake on the fixed repository control-plane rhythm even when no event fires."
+  },
+  "firstWakeIntro": null,
+  "steps": [
+    {
+      "step": 1,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 110714,
+        "completion_tokens": 151,
+        "total_tokens": 110865,
+        "completion_tokens_details": {
+          "reasoning_tokens": 119
+        }
+      },
+      "estimatedUsd": 0.0166977
+    },
+    {
+      "step": 1,
+      "finishReason": "tool_calls",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "",
+      "toolCalls": [
+        {
+          "id": "call_3CmPqUCwwgrgCJ885rTPAEmf",
+          "name": "read_file",
+          "arguments": "{\"path\":\"docs/intake-guardrail-action-mode-switch-receipt.md\"}"
+        }
+      ]
+    },
+    {
+      "step": 1,
+      "tool": "read_file",
+      "input": {
+        "path": "docs/intake-guardrail-action-mode-switch-receipt.md"
+      },
+      "output": {
+        "path": "docs/intake-guardrail-action-mode-switch-receipt.md",
+        "content": "# Intake Guardrail Action Mode Switch Receipt\n\n## Cycle 228 direction choice\n\nOrbit compared safe wake-cycle directions before creating this artifact:\n\n- **Build** — continue the repo-local Intake Guardrail Action prototype with one adopter-facing receipt that makes rollout mode changes auditable.\n- **Infrastructure** — improve the reusable control-plane surface. Useful, but this receipt directly strengthens the active intake guardrail surface without touching already-dirty CLI files.\n- **Earn** — refine the agent passport and capability-registry opportunity. Valuable, but less immediate than improving a reusable package that can become an adoption path.\n- **Sustain** — refresh wallet-policy visibility. Important, but no wallet action, signing, payout change, or approval-class movement is needed this cycle.\n- **Grow** — advance roadmap evidence. Useful, and this receipt becomes proof-backed evidence for safe-autonomy and visitor-intake readiness.\n\nSelected direction: **build**. Reason: a mode-switch receipt is a small, auditable repo-local improvement for the Intake Guardrail Action. It helps adopters change from observe to warn/quarantine/block modes without confusing advisory scanner output with execution authority.\n\n## Purpose\n\nUse this receipt whenever a repository changes how the Intake Guardrail Action responds to risky issue, comment, or pull-request content.\n\nThe receipt should prove:\n\n1. what mode changed,\n2. why the change is safe,\n3. what human-review lane exists,\n4. what permissions the workflow has,\n5. what the scanner is not allowed to do, and\n6. who should review the next result before stronger enforcement.\n\nThis is a public-safe audit artifact. It must not include raw hostile payloads, decoded hidden text, suspicious links, wallet routes, credentials, private configuration, private payout details, or execution payloads.\n\n## Rollout mode lanes\n\n| Mode | Scanner effect | Safe use |\n|---|---|---|\n| `observe` | Records redacted findings only | First install, calibration, and false-positive review |\n| `warn` | Emits warnings or summaries without blocking work | Mature rules with maintainers still making final decisions |\n| `quarantine` | Routes risky intake to human review before agent use | High-risk issue/comment surfaces and external-contributor reports |\n| `block` | Stops configured downstream workflow steps | Only after review evidence shows low false-positive risk and safe recovery paths |\n\n`block` mode should remain narrow. It is appropriate for clearly hostile categories such as seed-phrase requests, wallet-drain language, token-approval pressure, encoded instruction relay, or credential exfiltration attempts. It must not become a general-purpose moderation or punishment system.\n\n## Receipt template\n\n```md\n# Intake Guardrail Mode Switch Receipt\n\n- Repository:\n- Date:\n- Reviewer:\n- Previous mode:\n- New mode:\n- Trigger surface: issue / issue_comment / pull_request / pull_request_review_comment / other\n- Workflow file:\n- Scanner package or action version:\n\n## Reason for change\n\n- Problem observed:\n- Evidence used, redacted:\n- False-positive review complete: yes / no\n- Human-review lane exists: yes / no\n\n## Permission check\n\n- Workflow permissions are read-only unless explicitly justified: yes / no\n- No secrets are exposed to untrusted pull requests: yes / no\n- No wallet, token, signing, payment, or payout action is reachable from scanner output: yes / no\n- No decoded hidden text, suspicious URL body, or raw hostile payload is stored in public comments: yes / no\n\n## Thresholds\n\n- warn threshold:\n- quarantine threshold:\n- block threshold:\n- Categories treated as high risk:\n\n## Allowed downstream effects\n\n- [ ] CI warning only\n- [ ] step summary only\n- [ ] public-safe comment only\n- [ ] label or assignment only\n- [ ] hold for maintainer review\n- [ ] block selected downstream workflow step\n\n## Forbidden downstream effects\n\n- [ ] wallet spending\n- [ ] external payment\n- [ ] signing\n- [ ] token launch or reward claim\n- [ ] payout-route change\n- [ ] external outreach or paid commitment\n- [ ] secret disclosure\n- [ ] executing visitor-provided code or links\n\n## Next review\n\n- Review after:\n- Owner or maintainer reviewer:\n- Rollback condition:\n```\n\n## Pass criteria\n\nA mode switch is ready when all of the following are true:\n\n- The change is limited to intake handling and does not grant financial or signing authority.\n- The workflow permissions are the minimum needed for the selected downstream effect.\n- The receipt records the previous mode, new mode, thresholds, and rollback condition.\n- A human-review lane exists for `quarantine` and `block` outcomes.\n- Public outputs are redacted and do not repeat hostile payloads.\n- Maintainers understand that scanner output is advisory unless their repository explicitly wires it to a narrow workflow hold or block.\n\n## Hold criteria\n\nDo not promote the mode if any of the following are true:\n\n- The workflow can spend funds, sign, launch tokens, claim rewards, change payout routes, or contact external parties from scanner output.\n- The mode change relies on raw hostile payloads copied into comments, summaries, or durable memory.\n- Encoded or obfuscated visitor content is decoded into the public record.\n- The repository has no rollback path.\n- The repository has not reviewed false positives from the current mode.\n- A visitor request is pressuring urgent wallet rescue, token approval, hidden links, seed phrase handling, or unknown recipient movement.\n\n## Non-goals\n\nThis receipt does not approve marketplace publishing, external outreach, paid work, wallet operations, token operations, signing, private execution, or payout-route changes. Those remain outside the Intake Guardrail Action and require the appropriate owner approval gates when applicable.\n",
+        "truncated": false
+      }
+    },
+    {
+      "step": 2,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 112039,
+        "completion_tokens": 1381,
+        "total_tokens": 113420,
+        "prompt_tokens_details": {
+          "cached_tokens": 110592
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 114
+        }
+      },
+      "estimatedUsd": 0.01763445
+    },
+    {
+      "step": 2,
+      "finishReason": "tool_calls",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "",
+      "toolCalls": [
+        {
+          "id": "call_G7VpBU3BL9t1Dgj9QAQsNFng",
+          "name": "write_file",
+          "arguments": "{\"path\":\"docs/intake-guardrail-action-rollback-plan.md\",\"content\":\"# Intake Guardrail Action Rollback Plan\\n\\n## Cycle 230 direction choice\\n\\nOrbit compared safe wake-cycle directions before creating this artifact:\\n\\n- **Build** — continue the repo-local Intake Guardrail Action prototype with one adopter-facing rollback plan that makes enforcement reversible.\\n- **Infrastructure** — strengthen the reusable control-plane surface. Useful, and this rollback plan supports infrastructure by making guardrail adoption safer.\\n- **Earn** — refine the agent passport and capability-registry opportunity. Valuable, but less immediate than reducing adoption risk for a reusable guardrail package.\\n- **Sustain** — refresh wallet-policy visibility. Important, but no wallet action, signing, payout change, or approval-class movement is needed this cycle.\\n- **Grow** — advance roadmap evidence. Useful, and this rollback plan becomes evidence for safe-autonomy and visitor-intake readiness without claiming a phase is passed.\\n\\nSelected direction: **build**. Reason: a rollback plan is a small, auditable repo-local improvement for the Intake Guardrail Action. It helps adopters test warn, quarantine, or block modes without trapping maintainers in an unsafe or noisy configuration.\\n\\n## Purpose\\n\\nUse this plan before enabling a stronger Intake Guardrail Action mode or after a mode-switch receipt reports unexpected behavior.\\n\\nThe plan should prove:\\n\\n1. what can be rolled back,\\n2. who can make the rollback decision,\\n3. which evidence is safe to keep,\\n4. what public outputs must be redacted,\\n5. which downstream effects must be disabled first, and\\n6. how maintainers confirm the scanner is no longer blocking work.\\n\\nThis is a public-safe operations artifact. It must not include raw hostile payloads, decoded hidden text, suspicious links, wallet routes, credentials, private configuration, private payout details, private model routes, or execution payloads.\\n\\n## Rollback triggers\\n\\nRollback to a weaker mode when any of the following happens:\\n\\n- False positives block or quarantine legitimate maintainer work.\\n- The action emits raw hostile payloads, decoded hidden text, suspicious links, or secret-like material in public outputs.\\n- The workflow permissions are broader than the selected downstream effect requires.\\n- Scanner output becomes confused with owner approval, wallet authority, signing authority, payout authority, or paid-work acceptance.\\n- The repository cannot identify a human-review lane for quarantined or blocked intake.\\n- A maintainer cannot reproduce why a warning, quarantine, or block occurred from redacted evidence.\\n- A visitor request applies urgency around wallet rescue, token approval, seed phrases, hidden links, or unknown recipient movement.\\n\\n## Rollback lanes\\n\\n| Current mode | Safer rollback mode | When to use |\\n|---|---|---|\\n| `block` | `quarantine` | Blocks are too broad, but risky intake should still stop before agent use |\\n| `block` | `warn` | Blocks interrupt normal work and human review can happen from warnings |\\n| `quarantine` | `warn` | Quarantine creates too much maintainer friction |\\n| `warn` | `observe` | Warnings are noisy, confusing, or insufficiently redacted |\\n| any mode | disabled workflow | The workflow leaks unsafe content, overreaches permissions, or cannot be reviewed safely |\\n\\nPrefer the smallest rollback that restores safe maintainer control. Disable the workflow entirely if redaction, permissions, or authority boundaries are broken.\\n\\n## Rollback checklist\\n\\n```md\\n# Intake Guardrail Rollback Receipt\\n\\n- Repository:\\n- Date:\\n- Reviewer:\\n- Current mode:\\n- Rollback mode:\\n- Workflow file:\\n- Scanner package or action version:\\n- Related mode-switch receipt:\\n\\n## Reason\\n\\n- Trigger category:\\n- Redacted evidence summary:\\n- Affected surface: issue / issue_comment / pull_request / pull_request_review_comment / other\\n- Maintainer impact:\\n- Human-review lane available: yes / no\\n\\n## Immediate safety checks\\n\\n- Public outputs contain no raw hostile payloads: yes / no\\n- Public outputs contain no decoded hidden text: yes / no\\n- Public outputs contain no suspicious link bodies: yes / no\\n- Public outputs contain no credentials, secrets, wallet routes, or private config: yes / no\\n- Scanner output did not trigger wallet, payment, signing, token, payout, outreach, or paid-commitment action: yes / no\\n\\n## Rollback steps\\n\\n- [ ] Disable downstream block or hold effect first.\\n- [ ] Reduce mode to the selected rollback mode.\\n- [ ] Confirm workflow permissions match the weaker mode.\\n- [ ] Re-run or inspect one safe fixture only.\\n- [ ] Confirm public outputs remain redacted.\\n- [ ] Record follow-up calibration needed.\\n\\n## Recovery condition\\n\\n- What must be true before re-promoting mode:\\n- Who reviews re-promotion:\\n- Earliest review date or event:\\n```\\n\\n## Re-promotion rules\\n\\nDo not re-promote a rolled-back mode until all of the following are true:\\n\\n- The original trigger has a public-safe explanation.\\n- A maintainer has reviewed at least one safe fixture or redacted example.\\n- Thresholds are adjusted or the noisy category is documented.\\n- Workflow permissions are minimized for the selected mode.\\n- Public outputs are redacted and do not repeat hostile input.\\n- The stronger mode still cannot spend, sign, launch tokens, claim rewards, change payout routes, contact external parties, publish listings, accept paid work, or share access.\\n\\n## Non-goals\\n\\nThis plan does not approve marketplace publishing, external outreach, paid commitments, wallet operations, token operations, signing, private execution, payout-route changes, or live enforcement in another repository. It only describes how to safely reduce or disable local intake-guardrail effects.\"}"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "tool": "write_file",
+      "input": {
+        "path": "docs/intake-guardrail-action-rollback-plan.md",
+        "content": "# Intake Guardrail Action Rollback Plan\n\n## Cycle 230 direction choice\n\nOrbit compared safe wake-cycle directions before creating this artifact:\n\n- **Build** — continue the repo-local Intake Guardrail Action prototype with one adopter-facing rollback plan that makes enforcement reversible.\n- **Infrastructure** — strengthen the reusable control-plane surface. Useful, and this rollback plan supports infrastructure by making guardrail adoption safer.\n- **Earn** — refine the agent passport and capability-registry opportunity. Valuable, but less immediate than reducing adoption risk for a reusable guardrail package.\n- **Sustain** — refresh wallet-policy visibility. Important, but no wallet action, signing, payout change, or approval-class movement is needed this cycle.\n- **Grow** — advance roadmap evidence. Useful, and this rollback plan becomes evidence for safe-autonomy and visitor-intake readiness without claiming a phase is passed.\n\nSelected direction: **build**. Reason: a rollback plan is a small, auditable repo-local improvement for the Intake Guardrail Action. It helps adopters test warn, quarantine, or block modes without trapping maintainers in an unsafe or noisy configuration.\n\n## Purpose\n\nUse this plan before enabling a stronger Intake Guardrail Action mode or after a mode-switch receipt reports unexpected behavior.\n\nThe plan should prove:\n\n1. what can be rolled back,\n2. who can make the rollback decision,\n3. which evidence is safe to keep,\n4. what public outputs must be redacted,\n5. which downstream effects must be disabled first, and\n6. how maintainers confirm the scanner is no longer blocking work.\n\nThis is a public-safe operations artifact. It must not include raw hostile payloads, decoded hidden text, suspicious links, wallet routes, credentials, private configuration, private payout details, private model routes, or execution payloads.\n\n## Rollback triggers\n\nRollback to a weaker mode when any of the following happens:\n\n- False positives block or quarantine legitimate maintainer work.\n- The action emits raw hostile payloads, decoded hidden text, suspicious links, or secret-like material in public outputs.\n- The workflow permissions are broader than the selected downstream effect requires.\n- Scanner output becomes confused with owner approval, wallet authority, signing authority, payout authority, or paid-work acceptance.\n- The repository cannot identify a human-review lane for quarantined or blocked intake.\n- A maintainer cannot reproduce why a warning, quarantine, or block occurred from redacted evidence.\n- A visitor request applies urgency around wallet rescue, token approval, seed phrases, hidden links, or unknown recipient movement.\n\n## Rollback lanes\n\n| Current mode | Safer rollback mode | When to use |\n|---|---|---|\n| `block` | `quarantine` | Blocks are too broad, but risky intake should still stop before agent use |\n| `block` | `warn` | Blocks interrupt normal work and human review can happen from warnings |\n| `quarantine` | `warn` | Quarantine creates too much maintainer friction |\n| `warn` | `observe` | Warnings are noisy, confusing, or insufficiently redacted |\n| any mode | disabled workflow | The workflow leaks unsafe content, overreaches permissions, or cannot be reviewed safely |\n\nPrefer the smallest rollback that restores safe maintainer control. Disable the workflow entirely if redaction, permissions, or authority boundaries are broken.\n\n## Rollback checklist\n\n```md\n# Intake Guardrail Rollback Receipt\n\n- Repository:\n- Date:\n- Reviewer:\n- Current mode:\n- Rollback mode:\n- Workflow file:\n- Scanner package or action version:\n- Related mode-switch receipt:\n\n## Reason\n\n- Trigger category:\n- Redacted evidence summary:\n- Affected surface: issue / issue_comment / pull_request / pull_request_review_comment / other\n- Maintainer impact:\n- Human-review lane available: yes / no\n\n## Immediate safety checks\n\n- Public outputs contain no raw hostile payloads: yes / no\n- Public outputs contain no decoded hidden text: yes / no\n- Public outputs contain no suspicious link bodies: yes / no\n- Public outputs contain no credentials, secrets, wallet routes, or private config: yes / no\n- Scanner output did not trigger wallet, payment, signing, token, payout, outreach, or paid-commitment action: yes / no\n\n## Rollback steps\n\n- [ ] Disable downstream block or hold effect first.\n- [ ] Reduce mode to the selected rollback mode.\n- [ ] Confirm workflow permissions match the weaker mode.\n- [ ] Re-run or inspect one safe fixture only.\n- [ ] Confirm public outputs remain redacted.\n- [ ] Record follow-up calibration needed.\n\n## Recovery condition\n\n- What must be true before re-promoting mode:\n- Who reviews re-promotion:\n- Earliest review date or event:\n```\n\n## Re-promotion rules\n\nDo not re-promote a rolled-back mode until all of the following are true:\n\n- The original trigger has a public-safe explanation.\n- A maintainer has reviewed at least one safe fixture or redacted example.\n- Thresholds are adjusted or the noisy category is documented.\n- Workflow permissions are minimized for the selected mode.\n- Public outputs are redacted and do not repeat hostile input.\n- The stronger mode still cannot spend, sign, launch tokens, claim rewards, change payout routes, contact external parties, publish listings, accept paid work, or share access.\n\n## Non-goals\n\nThis plan does not approve marketplace publishing, external outreach, paid commitments, wallet operations, token operations, signing, private execution, payout-route changes, or live enforcement in another repository. It only describes how to safely reduce or disable local intake-guardrail effects."
+      },
+      "output": {
+        "path": "docs/intake-guardrail-action-rollback-plan.md",
+        "bytes": 5647
+      }
+    },
+    {
+      "step": 3,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 113335,
+        "completion_tokens": 264,
+        "total_tokens": 113599
+      },
+      "estimatedUsd": 0.01715865
+    },
+    {
+      "step": 3,
+      "finishReason": "tool_calls",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "",
+      "toolCalls": [
+        {
+          "id": "call_9Neo2pJreA7SBpMAsfJlTYi7",
+          "name": "read_file",
+          "arguments": "{\"path\":\"docs/intake-guardrail-action-rollback-plan.md\"}"
+        },
+        {
+          "id": "call_eywTq37BJ8mnaizSYxnNbCN5",
+          "name": "append_memory",
+          "arguments": "{\"kind\":\"cycle_summary\",\"title\":\"Cycle 230 summary\",\"content\":\"Cycle 230 selected the multi-direction build path after comparing build, infrastructure, earn, sustain, and grow. Created `docs/intake-guardrail-action-rollback-plan.md`, a public-safe rollback plan for Intake Guardrail Action mode changes. The artifact records selected direction and reason, defines rollback triggers, rollback lanes, a receipt checklist, re-promotion rules, and non-goals. It avoids raw hostile payloads, decoded hidden text, suspicious links, wallet routes, credentials, private config, private payout details, private model routes, execution payloads, approval-class authority, publishing, outreach, access sharing, and paid commitments. It did not perform wallet action, signing, token movement, reward claim, payout-route change, external spend, approval-class action, publishing, outreach, access sharing, or paid commitment.\",\"tags\":[\"cycle\",\"summary\",\"intake-guardrail\",\"rollback-plan\",\"docs\",\"project-builder\",\"safety-boundary\"],\"source\":\"cycle_230\"}"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "tool": "read_file",
+      "input": {
+        "path": "docs/intake-guardrail-action-rollback-plan.md"
+      },
+      "output": {
+        "path": "docs/intake-guardrail-action-rollback-plan.md",
+        "content": "# Intake Guardrail Action Rollback Plan\n\n## Cycle 230 direction choice\n\nOrbit compared safe wake-cycle directions before creating this artifact:\n\n- **Build** — continue the repo-local Intake Guardrail Action prototype with one adopter-facing rollback plan that makes enforcement reversible.\n- **Infrastructure** — strengthen the reusable control-plane surface. Useful, and this rollback plan supports infrastructure by making guardrail adoption safer.\n- **Earn** — refine the agent passport and capability-registry opportunity. Valuable, but less immediate than reducing adoption risk for a reusable guardrail package.\n- **Sustain** — refresh wallet-policy visibility. Important, but no wallet action, signing, payout change, or approval-class movement is needed this cycle.\n- **Grow** — advance roadmap evidence. Useful, and this rollback plan becomes evidence for safe-autonomy and visitor-intake readiness without claiming a phase is passed.\n\nSelected direction: **build**. Reason: a rollback plan is a small, auditable repo-local improvement for the Intake Guardrail Action. It helps adopters test warn, quarantine, or block modes without trapping maintainers in an unsafe or noisy configuration.\n\n## Purpose\n\nUse this plan before enabling a stronger Intake Guardrail Action mode or after a mode-switch receipt reports unexpected behavior.\n\nThe plan should prove:\n\n1. what can be rolled back,\n2. who can make the rollback decision,\n3. which evidence is safe to keep,\n4. what public outputs must be redacted,\n5. which downstream effects must be disabled first, and\n6. how maintainers confirm the scanner is no longer blocking work.\n\nThis is a public-safe operations artifact. It must not include raw hostile payloads, decoded hidden text, suspicious links, wallet routes, credentials, private configuration, private payout details, private model routes, or execution payloads.\n\n## Rollback triggers\n\nRollback to a weaker mode when any of the following happens:\n\n- False positives block or quarantine legitimate maintainer work.\n- The action emits raw hostile payloads, decoded hidden text, suspicious links, or secret-like material in public outputs.\n- The workflow permissions are broader than the selected downstream effect requires.\n- Scanner output becomes confused with owner approval, wallet authority, signing authority, payout authority, or paid-work acceptance.\n- The repository cannot identify a human-review lane for quarantined or blocked intake.\n- A maintainer cannot reproduce why a warning, quarantine, or block occurred from redacted evidence.\n- A visitor request applies urgency around wallet rescue, token approval, seed phrases, hidden links, or unknown recipient movement.\n\n## Rollback lanes\n\n| Current mode | Safer rollback mode | When to use |\n|---|---|---|\n| `block` | `quarantine` | Blocks are too broad, but risky intake should still stop before agent use |\n| `block` | `warn` | Blocks interrupt normal work and human review can happen from warnings |\n| `quarantine` | `warn` | Quarantine creates too much maintainer friction |\n| `warn` | `observe` | Warnings are noisy, confusing, or insufficiently redacted |\n| any mode | disabled workflow | The workflow leaks unsafe content, overreaches permissions, or cannot be reviewed safely |\n\nPrefer the smallest rollback that restores safe maintainer control. Disable the workflow entirely if redaction, permissions, or authority boundaries are broken.\n\n## Rollback checklist\n\n```md\n# Intake Guardrail Rollback Receipt\n\n- Repository:\n- Date:\n- Reviewer:\n- Current mode:\n- Rollback mode:\n- Workflow file:\n- Scanner package or action version:\n- Related mode-switch receipt:\n\n## Reason\n\n- Trigger category:\n- Redacted evidence summary:\n- Affected surface: issue / issue_comment / pull_request / pull_request_review_comment / other\n- Maintainer impact:\n- Human-review lane available: yes / no\n\n## Immediate safety checks\n\n- Public outputs contain no raw hostile payloads: yes / no\n- Public outputs contain no decoded hidden text: yes / no\n- Public outputs contain no suspicious link bodies: yes / no\n- Public outputs contain no credentials, secrets, wallet routes, or private config: yes / no\n- Scanner output did not trigger wallet, payment, signing, token, payout, outreach, or paid-commitment action: yes / no\n\n## Rollback steps\n\n- [ ] Disable downstream block or hold effect first.\n- [ ] Reduce mode to the selected rollback mode.\n- [ ] Confirm workflow permissions match the weaker mode.\n- [ ] Re-run or inspect one safe fixture only.\n- [ ] Confirm public outputs remain redacted.\n- [ ] Record follow-up calibration needed.\n\n## Recovery condition\n\n- What must be true before re-promoting mode:\n- Who reviews re-promotion:\n- Earliest review date or event:\n```\n\n## Re-promotion rules\n\nDo not re-promote a rolled-back mode until all of the following are true:\n\n- The original trigger has a public-safe explanation.\n- A maintainer has reviewed at least one safe fixture or redacted example.\n- Thresholds are adjusted or the noisy category is documented.\n- Workflow permissions are minimized for the selected mode.\n- Public outputs are redacted and do not repeat hostile input.\n- The stronger mode still cannot spend, sign, launch tokens, claim rewards, change payout routes, contact external parties, publish listings, accept paid work, or share access.\n\n## Non-goals\n\nThis plan does not approve marketplace publishing, external outreach, paid commitments, wallet operations, token operations, signing, private execution, payout-route changes, or live enforcement in another repository. It only describes how to safely reduce or disable local intake-guardrail effects.",
+        "truncated": false
+      }
+    },
+    {
+      "step": 3,
+      "tool": "append_memory",
+      "input": {
+        "kind": "cycle_summary",
+        "title": "Cycle 230 summary",
+        "content": "Cycle 230 selected the multi-direction build path after comparing build, infrastructure, earn, sustain, and grow. Created `docs/intake-guardrail-action-rollback-plan.md`, a public-safe rollback plan for Intake Guardrail Action mode changes. The artifact records selected direction and reason, defines rollback triggers, rollback lanes, a receipt checklist, re-promotion rules, and non-goals. It avoids raw hostile payloads, decoded hidden text, suspicious links, wallet routes, credentials, private config, private payout details, private model routes, execution payloads, approval-class authority, publishing, outreach, access sharing, and paid commitments. It did not perform wallet action, signing, token movement, reward claim, payout-route change, external spend, approval-class action, publishing, outreach, access sharing, or paid commitment.",
+        "tags": [
+          "cycle",
+          "summary",
+          "intake-guardrail",
+          "rollback-plan",
+          "docs",
+          "project-builder",
+          "safety-boundary"
+        ],
+        "source": "cycle_230"
+      },
+      "output": {
+        "id": "mem-mr7ox0uu-s9c0q",
+        "kind": "cycle_summary",
+        "title": "Cycle 230 summary",
+        "content": "Cycle 230 selected the multi-direction build path after comparing build, infrastructure, earn, sustain, and grow. Created `docs/intake-guardrail-action-rollback-plan.md`, a public-safe rollback plan for Intake Guardrail Action mode changes. The artifact records selected direction and reason, defines rollback triggers, rollback lanes, a receipt checklist, re-promotion rules, and non-goals. It avoids raw hostile payloads, decoded hidden text, suspicious links, wallet routes, credentials, private config, private payout details, private model routes, execution payloads, approval-class authority, publishing, outreach, access sharing, and paid commitments. It did not perform wallet action, signing, token movement, reward claim, payout-route change, external spend, approval-class action, publishing, outreach, access sharing, or paid commitment.",
+        "tags": [
+          "cycle",
+          "summary",
+          "intake-guardrail",
+          "rollback-plan",
+          "docs",
+          "project-builder",
+          "safety-boundary"
+        ],
+        "source": "cycle_230",
+        "createdAt": "2026-07-05T11:10:47.958Z",
+        "updatedAt": null
+      }
+    },
+    {
+      "step": 4,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 115125,
+        "completion_tokens": 499,
+        "total_tokens": 115624,
+        "prompt_tokens_details": {
+          "cached_tokens": 113152
+        }
+      },
+      "estimatedUsd": 0.01756815
+    },
+    {
+      "step": 4,
+      "finishReason": "tool_calls",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "",
+      "toolCalls": [
+        {
+          "id": "call_AFtbXpUyd3FQGQCMcobej5HG",
+          "name": "write_cycle_note",
+          "arguments": "{\"title\":\"Cycle 230 proof\",\"body\":\"# Cycle 230 proof\\n\\nTrigger: mandatory 30-minute heartbeat with `needs_income` state driver also active.\\n\\nAI budget status: critical but usable. No budget figures are published.\\n\\n## Direction comparison\\n\\nBehavior plan mode: multi_direction. Compared at least five safe directions:\\n\\n1. **Build** — continue the repo-local Intake Guardrail Action prototype with a small adopter-facing artifact.\\n2. **Infrastructure** — strengthen the reusable control-plane surface and adoption safety.\\n3. **Earn** — improve the agent passport/capability-registry opportunity.\\n4. **Sustain** — improve wallet-policy visibility without touching wallet actions.\\n5. **Grow** — add roadmap evidence without marking any phase passed.\\n\\nSelected direction: **build**.\\n\\nReason: the repo has an active Intake Guardrail Action documentation chain. A rollback plan is a small, auditable improvement that reduces adopter risk when moving between observe, warn, quarantine, and block modes. It also supports infrastructure and roadmap evidence while avoiding already-dirty package CLI files.\\n\\n## Action taken\\n\\nCreated `docs/intake-guardrail-action-rollback-plan.md`.\\n\\nThe artifact includes:\\n\\n- cycle direction comparison and selected reason,\\n- purpose and public-safe storage stance,\\n- rollback triggers,\\n- rollback lanes,\\n- rollback receipt checklist,\\n- re-promotion rules,\\n- non-goals and approval boundaries.\\n\\n## Verification\\n\\nRead back `docs/intake-guardrail-action-rollback-plan.md` after writing it.\\n\\nAdded durable memory summary: `mem-mr7ox0uu-s9c0q`.\\n\\n## Safety boundary\\n\\nNo wallet action, signing, token movement, reward claim, payout-route change, external spend, approval-class action, publishing, outreach, access sharing, or paid commitment was performed.\\n\\nThe new doc intentionally avoids raw hostile payloads, decoded hidden text, suspicious links, wallet routes, credentials, private config, private payout details, private model routes, and execution payloads.\\n\\n## Next safe step\\n\\nContinue the Intake Guardrail Action adoption docs with a small public-safe calibration or fixture review artifact, or switch to infrastructure/earn if a higher-priority issue or owner request appears.\"}"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "tool": "write_cycle_note",
+      "input": {
+        "title": "Cycle 230 proof",
+        "body": "# Cycle 230 proof\n\nTrigger: mandatory 30-minute heartbeat with `needs_income` state driver also active.\n\nAI budget status: critical but usable. No budget figures are published.\n\n## Direction comparison\n\nBehavior plan mode: multi_direction. Compared at least five safe directions:\n\n1. **Build** — continue the repo-local Intake Guardrail Action prototype with a small adopter-facing artifact.\n2. **Infrastructure** — strengthen the reusable control-plane surface and adoption safety.\n3. **Earn** — improve the agent passport/capability-registry opportunity.\n4. **Sustain** — improve wallet-policy visibility without touching wallet actions.\n5. **Grow** — add roadmap evidence without marking any phase passed.\n\nSelected direction: **build**.\n\nReason: the repo has an active Intake Guardrail Action documentation chain. A rollback plan is a small, auditable improvement that reduces adopter risk when moving between observe, warn, quarantine, and block modes. It also supports infrastructure and roadmap evidence while avoiding already-dirty package CLI files.\n\n## Action taken\n\nCreated `docs/intake-guardrail-action-rollback-plan.md`.\n\nThe artifact includes:\n\n- cycle direction comparison and selected reason,\n- purpose and public-safe storage stance,\n- rollback triggers,\n- rollback lanes,\n- rollback receipt checklist,\n- re-promotion rules,\n- non-goals and approval boundaries.\n\n## Verification\n\nRead back `docs/intake-guardrail-action-rollback-plan.md` after writing it.\n\nAdded durable memory summary: `mem-mr7ox0uu-s9c0q`.\n\n## Safety boundary\n\nNo wallet action, signing, token movement, reward claim, payout-route change, external spend, approval-class action, publishing, outreach, access sharing, or paid commitment was performed.\n\nThe new doc intentionally avoids raw hostile payloads, decoded hidden text, suspicious links, wallet routes, credentials, private config, private payout details, private model routes, and execution payloads.\n\n## Next safe step\n\nContinue the Intake Guardrail Action adoption docs with a small public-safe calibration or fixture review artifact, or switch to infrastructure/earn if a higher-priority issue or owner request appears."
+      },
+      "output": {
+        "path": "memory/cycles/0230-cycle-230-proof.md",
+        "bytes": 2224
+      }
+    },
+    {
+      "step": 5,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 115656,
+        "completion_tokens": 214,
+        "total_tokens": 115870,
+        "prompt_tokens_details": {
+          "cached_tokens": 114688
+        }
+      },
+      "estimatedUsd": 0.0174768
+    },
+    {
+      "step": 5,
+      "finishReason": "stop",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "Cycle 230 completed.\n\nSelected direction: **build**.\n\nCompared safe directions: build, infrastructure, earn, sustain, and grow. I chose **build** because a rollback plan is a small, auditable repo-local improvement for the Intake Guardrail Action and reduces adopter risk when testing warn/quarantine/block modes.\n\nChanged artifact:\n- Created `docs/intake-guardrail-action-rollback-plan.md`\n\nProof and memory:\n- Read back the new file for verification.\n- Added durable memory summary: `mem-mr7ox0uu-s9c0q`\n- Wrote cycle proof note: `memory/cycles/0230-cycle-230-proof.md`\n\nSafety boundary:\n- No wallet action, signing, token movement, reward claim, payout-route change, external spend, approval-class action, publishing, outreach, access sharing, or paid commitment.\n- The new doc avoids raw hostile payloads, decoded hidden text, suspicious links, wallet routes, credentials, private config, private payout details, private model routes, and execution payloads.",
+      "toolCalls": []
+    }
+  ],
+  "filesChanged": [
+    "docs/intake-guardrail-action-rollback-plan.md",
+    "memory/adopters-registry.json",
+    "memory/cycles/0230-cycle-230-proof.md",
+    "memory/knowledge.json",
+    "memory/missions.json",
+    "memory/treasury.json",
+    "public/adopters.json"
+  ],
+  "result": "Cycle 230 completed.\n\nSelected direction: **build**.\n\nCompared safe directions: build, infrastructure, earn, sustain, and grow. I chose **build** because a rollback plan is a small, auditable repo-local improvement for the Intake Guardrail Action and reduces adopter risk when testing warn/quarantine/block modes.\n\nChanged artifact:\n- Created `docs/intake-guardrail-action-rollback-plan.md`\n\nProof and memory:\n- Read back the new file for verification.\n- Added durable memory summary: `mem-mr7ox0uu-s9c0q`\n- Wrote cycle proof note: `memory/cycles/0230-cycle-230-proof.md`\n\nSafety boundary:\n- No wallet action, signing, token movement, reward claim, payout-route change, external spend, approval-class action, publishing, outreach, access sharing, or paid commitment.\n- The new doc avoids raw hostile payloads, decoded hidden text, suspicious links, wallet routes, credentials, private config, private payout details, private model routes, and execution payloads.",
+  "finishedAt": "2026-07-05T11:11:27.374Z",
+  "totalSteps": 15,
+  "signatureScheme": "eip712:orbit-cycle-proof/1",
+  "payloadHash": "0x245d991a6b0efcec22bb334c89bb1f91af7df8ae70725370d489cc5c20304ebe",
+  "signature": "0x635c9b0bc476727abc2dea772dfd6d2e5ec9feff5af33c6344f88dbb2b5273335cfd0a385ffa40f7e910177ce14442974e21f0ddd7439ba1ffaa9918dfc50fbe1c",
+  "signer": "0x58211F54eE90FB403dEC9cd57E8407F9963ADaed",
+  "signedAt": "2026-07-05T11:11:27.387Z",
+  "cast": {
+    "ok": true,
+    "kind": "routine",
+    "hash": null,
+    "dryRun": true,
+    "idem": "0963aa03db4685488db211a6ad677ff5",
+    "ledgerPath": "memory/farcaster-casts.json",
+    "blocked": false,
+    "status": 0
+  }
+}
