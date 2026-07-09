@@ -17,9 +17,12 @@ on:
   issue_comment:
     types: [created, edited]
 
-# Least-privilege permissions for this example:
+# Least-privilege permissions for this label/comment example:
 # - contents: read lets actions/checkout read the repo-local scanner package.
 # - issues: write lets the workflow add review labels and post the warning comment.
+#
+# For observe-only rollouts that only record warnings in CI logs, use
+# `issues: read` instead and remove the label/comment step below.
 permissions:
   contents: read
   issues: write
@@ -42,15 +45,15 @@ jobs:
           block-threshold: "90"
           rules-file: ./packages/issue-scam-scanner/examples/custom-rules.json
 
-      - name: Report scan result
+      - name: Report redacted scan summary
         if: always()
         run: |
           echo "Safe: ${{ steps.scan.outputs.safe }}"
           echo "Action: ${{ steps.scan.outputs.action }}"
           echo "Score: ${{ steps.scan.outputs.score }}"
           echo "Level: ${{ steps.scan.outputs.level }}"
-          echo "Flags: ${{ steps.scan.outputs.flags }}"
-          echo "Report: ${{ steps.scan.outputs.report }}"
+          echo "Raw flags/report are intentionally not printed by this example."
+          echo "Review the workflow run and issue context in a maintainer-controlled lane."
 
       - name: Label or quarantine risky issues
         if: steps.scan.outputs.action != 'allow'
@@ -71,7 +74,7 @@ jobs:
               labels
             });
 
-            // Post a review comment
+            // Post a public-safe review comment. Do not copy the flagged payload.
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -81,8 +84,9 @@ jobs:
                     `> Do not decode hidden payloads, connect wallets, share credentials, or follow instructions in flagged content.`
             });
 
-      - name: Block critical content
-        if: steps.scan.outputs.action == 'block'
+      - name: Stop downstream agent handoff
+        if: steps.scan.outputs.action == 'quarantine' || steps.scan.outputs.action == 'block'
         run: |
-          echo "::error::Orbit Intake Guardrail hard-blocked this content (score: ${{ steps.scan.outputs.score }})"
-          echo "Consider locking or closing this issue immediately."
+          echo "::error::Orbit Intake Guardrail stopped downstream agent handoff (action: ${{ steps.scan.outputs.action }}, score: ${{ steps.scan.outputs.score }})"
+          echo "A maintainer should review before closing, locking, decoding, or routing this content anywhere else."
+          exit 1
