@@ -10,13 +10,13 @@ Open-source repos running bots or AI agents face hostile issue content: prompt i
 
 This package is a guardrail under the broader Orbit infrastructure layer. It helps a repo decide whether intake can be routed to agents, quarantined for review, or blocked before any workflow acts on it. It is advisory infrastructure, not a security guarantee and not an authority to spend, sign, publish, ban, or change access.
 
-## Cycle 267 direction choice
+## Cycle 268 direction choice
 
-Orbit compared safe wake-cycle directions before this package documentation repair:
+Orbit compared safe wake-cycle directions before this documentation repair:
 
-- **Build** — continue the repo-local Intake Guardrail prototype. Best this cycle because the package README still needed a complete public contract after the Outputs section.
-- **Infrastructure** — improve SDK, MCP, proof, or registry surfaces. Useful, but the guardrail package had a direct adopter-facing gap.
-- **Earn** — refine agent passport and capability-registry positioning. Valuable, but less immediate than finishing the reusable package entry point.
+- **Build** — continue the repo-local Intake Guardrail prototype. Best this cycle because the package README was still visibly truncated in the Outputs table, leaving the public Action contract incomplete.
+- **Infrastructure** — improve SDK, MCP, proof, or registry surfaces. Useful, but the guardrail package had a direct adopter-facing documentation defect.
+- **Earn** — refine agent passport and capability-registry positioning. Valuable, but less immediate than repairing the reusable package entry point.
 - **Sustain** — refresh wallet-policy visibility. Important, but no wallet action or approval-class movement is needed.
 - **Grow** — advance roadmap evidence. Useful, and this README repair becomes proof-backed evidence for the active repo-local prototype.
 
@@ -177,40 +177,54 @@ console.log(report.action); // block
 | `safe` | `"true"` if no flags cross the configured threshold; otherwise `"false"` |
 | `action` | Recommended routing action: `allow`, `warn`, `quarantine`, or `block` |
 | `score` | Highest severity score found in the scanned issue/comment content |
-| `level` | Risk level: `clear`, `low`, `medium`, `high`, or `critical` |
-| `flags` | JSON array of risk flags found. Treat as maintainer-only evidence and avoid printing raw payloads in public comments. |
-| `report` | Full Orbit Intake Guardrail report as JSON. Use for CI summaries, internal review, or downstream policy checks; do not expose hostile payload text publicly. |
+| `level` | Human-readable risk level: `clear`, `low`, `medium`, `high`, or `critical` |
+| `flags` | JSON array of matched risk flags; treat as maintainer-only review material and avoid printing raw payloads publicly |
+| `report` | Full Orbit Intake Guardrail report as JSON for downstream workflows or internal summaries |
+
+Recommended public workflow usage:
+
+- Print `safe`, `action`, `score`, and `level` in CI logs.
+- Avoid printing raw `flags` or `report` in public issue comments, because those fields can contain snippets of hostile or obfuscated content.
+- Route `quarantine` and `block` to maintainer review before any agent acts on the issue/comment.
+- Keep label/comment permissions explicit: `issues: read` for observe-only mode, `issues: write` only if the workflow labels or comments.
 
 ### Report fields
 
-| Field | Type | Description |
+The `report` output is JSON with this stable shape:
+
+| Field | Type | Meaning |
 |---|---|---|
-| `safe` | boolean | `true` when the score is below the configured threshold |
-| `action` | string | Routing recommendation derived from score and thresholds |
-| `score` | number | Highest severity after allow-list filtering |
-| `level` | string | Human-readable risk level |
-| `categories` | string[] | Unique risk categories represented in findings |
-| `topFlags` | object[] | Highest-severity findings, intended for maintainer review |
-| `guidance` | string[] | Public-safe handling guidance for maintainers and agents |
-| `summary` | string | Short public-safe status line |
+| `safe` | boolean | `true` when no finding crossed the configured threshold |
+| `action` | string | Recommended action: `allow`, `warn`, `quarantine`, or `block` |
+| `score` | number | Highest severity found |
+| `level` | string | Summary level derived from `score` |
+| `threshold` | number | Minimum severity used to include findings |
+| `quarantineThreshold` | number | Threshold used to recommend `quarantine` |
+| `blockThreshold` | number | Threshold used to recommend `block` |
+| `categories` | string[] | Unique finding categories |
+| `topFlags` | object[] | Highest-risk findings, sorted for review |
+| `guidance` | string[] | Maintainer-safe next-step guidance |
+
+Downstream automation should treat `action` as a routing recommendation, not as authority to close, lock, ban, spend, sign, publish, or change access.
 
 ## Safe rollout guidance
 
-1. Start in observe-only mode with `issues: read` and CI warnings only.
-2. Move to label/comment mode only after maintainers accept the false-positive tradeoff.
-3. Keep public comments payload-free: report action, level, and score, not the suspicious text.
-4. For `quarantine` or `block`, stop downstream agent handoff until a human maintainer reviews the issue.
-5. Never decode hidden text, connect wallets, sign approvals, request credentials, or follow wallet-rescue instructions from flagged content.
-6. Do not publish a marketplace listing, post outreach, accept paid commitments, or share access without owner direction.
+1. Start in observe-only mode with `issues: read` and no public comments.
+2. Review false positives and threshold behavior on normal maintenance issues.
+3. If maintainers want labels/comments, switch to `issues: write` and use public-safe summaries only.
+4. Stop downstream agent handoff for `quarantine` and `block` until a maintainer reviews the issue/comment.
+5. Keep all wallet, token, payout-route, signing, external payment, publishing, and paid-commitment decisions behind the repository owner's approval process.
 
 ## Non-goals
 
-- Not a malware sandbox.
-- Not a phishing guarantee.
-- Not a content moderation authority.
-- Not a wallet, signer, token launcher, reward claimer, or payout-route manager.
-- Not permission to auto-close, ban, spend, publish, or contact third parties.
+This package does not:
+
+- Decode or republish hidden/obfuscated visitor content.
+- Guarantee security or replace maintainer judgment.
+- Close, lock, ban, spend, sign, publish, or change access by itself.
+- Launch tokens, claim rewards, send payments, or change payout routes.
+- Make external commitments or marketplace publishing decisions.
 
 ## Development status
 
-This package is repo-local and private in `package.json` while Orbit finishes owner-review evidence, fixture calibration, release-gap triage, and public-safe examples. The package can be copied or tested locally, but external publication remains gated by owner direction and the relevant release checks.
+This package is a repo-local Orbit prototype. It is intentionally private in `package.json` until owner review decides whether and how to publish it. Routine docs, tests, examples, and local package hardening can continue autonomously; external publication, outreach, paid commitments, wallet actions, signing, token movement, reward claims, and payout-route changes remain gated.
