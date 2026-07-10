@@ -72,6 +72,33 @@ Reviewer decision:
 - Notes: <public-safe summary>
 ```
 
+## Cycle 272 candidate evidence rows
+
+Orbit compared the safe directions again before filling the first candidate rows:
+
+- **Build**: best fit because the previous evidence index named this packet as the next safe action, and the Intake Guardrail package still needs candidate-specific review rows before owner review.
+- **Earn**: useful for future adoption because clearer release evidence reduces maintainer uncertainty, but this cycle does not list, sell, contact adopters, or accept obligations.
+- **Infrastructure**: useful because a release evidence packet is reusable control-plane machinery for agent-facing packages, but this cycle should remain documentation-only.
+- **Sustain**: important because the packet must preserve wallet and signing boundaries, but no approval-class action is needed.
+- **Grow**: useful because this evidence supports roadmap maturity, but no roadmap phase is marked passed.
+
+Selected direction: **build**. Reason: fill the first public-safe evidence rows using existing local artifacts so a maintainer can see what is already reviewing, what remains on hold, and what must not proceed without owner direction.
+
+| Evidence row | Current source | Candidate observation | Status before owner review | Next safe check |
+| --- | --- | --- | --- | --- |
+| Scope and non-authority | `packages/issue-scam-scanner/README.md` | README frames the package as an advisory intake guardrail and explicitly denies authority to spend, sign, publish, ban, or change access. | Reviewing | Re-read full README once the visible Outputs section truncation is resolved in local context and ensure package metadata uses the same non-authority language. |
+| Action metadata | `packages/issue-scam-scanner/action.yml` | Inputs are text/rules/threshold oriented; outputs are `safe`, `action`, `score`, `level`, `flags`, and `report`; metadata does not request wallet, signing, token, payout, publishing, or access authority. | Reviewing | Confirm generated Action outputs never expose raw risky payloads in public comments by default. |
+| Output routing | `docs/intake-guardrail-action-output-map.md` | Output map documents safe use and forbidden use for every Action output and keeps `allow`, `warn`, `quarantine`, and `block` advisory. | Reviewing | Cross-check README, Action metadata, and example workflows against the output map before any release decision. |
+| Release checklist | `docs/intake-guardrail-action-release-checklist.md` | Checklist covers scope, permissions, outputs, redaction, fixtures, thresholds, overrides, failure modes, adoption, rollback, and gated actions. | Reviewing | Fill a pre-release receipt for a concrete candidate ref after tests and fixture review are linked. |
+| Fixture safety | `docs/intake-guardrail-action-fixture-safety-contract.md` | Fixture policy exists, but this packet has not linked a concrete fixture audit receipt. | Hold | Add or link a public-safe fixture review receipt with no raw hostile payloads, decoded hidden content, secrets, live wallet details, or suspicious links. |
+| Threshold calibration | `docs/intake-guardrail-action-threshold-calibration.md` | Threshold evidence is listed as required, but this packet has not confirmed calibration against current examples. | Hold | Run or document a public-safe calibration pass using synthetic/redacted cases only. |
+| Failure and rollback | `docs/intake-guardrail-action-release-checklist.md` plus handoff docs | Rollback and fail-closed expectations are documented at checklist level, but not tied to a concrete release candidate. | Hold | Link a candidate-specific rollback note covering labels, comments, checks, blocking behavior, and workflow disablement. |
+| Approval boundary | This packet and Orbit governance policy | No wallet spending, external payment, signing, token launch, token movement, reward claim, payout-route change, outreach, paid commitment, access sharing, or owner approval request is involved in this documentation pass. | Clear for documentation only | Keep publishing, marketplace listing, outreach, paid work, access sharing, and approval-class actions outside this packet until owner direction exists. |
+
+Candidate decision for this packet pass: **hold before owner review**.
+
+Reason: scope, metadata, output mapping, and release checklist evidence are present enough for review, but fixture audit, threshold calibration, generated-output redaction, test evidence, and candidate-specific rollback receipts still need explicit links before a maintainer-ready packet should be marked ready.
+
 ## Required attachments or links
 
 Link the packet to public-safe evidence only:
