@@ -1,0 +1,298 @@
+{
+  "brand": "Orbit",
+  "cycle": 277,
+  "startedAt": "2026-07-11T00:06:11.205Z",
+  "aiRoute": {
+    "configured": true,
+    "count": 1,
+    "routes": [
+      {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      }
+    ]
+  },
+  "dryRun": false,
+  "trigger": {
+    "type": "mandatory",
+    "id": "regular_heartbeat",
+    "label": "30-minute heartbeat",
+    "intervalMinutes": 30,
+    "source": "schedule",
+    "action": "",
+    "reason": "Wake on the fixed repository control-plane rhythm even when no event fires."
+  },
+  "firstWakeIntro": null,
+  "steps": [
+    {
+      "step": 1,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 109487,
+        "completion_tokens": 171,
+        "total_tokens": 109658,
+        "completion_tokens_details": {
+          "reasoning_tokens": 71
+        }
+      },
+      "estimatedUsd": 0.01652565
+    },
+    {
+      "step": 1,
+      "finishReason": "tool_calls",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "",
+      "toolCalls": [
+        {
+          "id": "call_RWnRnQKMBl9lzIPt5tbA5EOK",
+          "name": "read_file",
+          "arguments": "{\"path\":\"docs/intake-guardrail-action-fixture-audit-note.md\"}"
+        },
+        {
+          "id": "call_83jssPUQpx7rBSOPs9EA91OQ",
+          "name": "read_file",
+          "arguments": "{\"path\":\"docs/intake-guardrail-action-fixture-corpus-template.md\"}"
+        },
+        {
+          "id": "call_GF9baZUod8SXAyg3Beucl3MR",
+          "name": "read_file",
+          "arguments": "{\"path\":\"docs/intake-guardrail-action-fixture-review-packet.md\"}"
+        }
+      ]
+    },
+    {
+      "step": 1,
+      "tool": "read_file",
+      "input": {
+        "path": "docs/intake-guardrail-action-fixture-audit-note.md"
+      },
+      "output": {
+        "path": "docs/intake-guardrail-action-fixture-audit-note.md",
+        "content": "# Intake Guardrail Action Fixture Audit Note\n\n## Cycle 276 Direction Choice\n\nOrbit compared safe wake-cycle directions before acting:\n\n- **Build**: strongest this cycle because the Intake Guardrail Action remains the active repo-local prototype, and the previous candidate verification note named fixture audit evidence as the next safe hold-clearing artifact.\n- **Infrastructure**: useful because fixture audit notes are reusable release-readiness evidence for agent-facing packages, but this cycle should stay documentation-only and avoid unrelated SDK, MCP, or lifecycle changes.\n- **Earn**: relevant because clearer release evidence can support later adoption, but this cycle does not publish, list, sell, contact adopters, or accept obligations.\n- **Sustain**: important because fixture handling must preserve wallet, signing, token, payout-route, spend, private-route, and access boundaries, but no approval-class action is needed.\n- **Grow**: useful because this evidence supports roadmap maturity, but it does not mark any roadmap phase passed.\n\nSelected direction: **build**.\n\nReason: add one narrow public-safe fixture audit note so future owner-review preparation can distinguish actual fixture coverage from remaining hold points without copying risky intake content or unlocking any external action.\n\n## Scope\n\nThis note reviews existing public-safe fixture and test evidence around `packages/issue-scam-scanner`. It is documentation-only evidence for the repo-local Intake Guardrail Action candidate. It is not a release approval, owner approval request, marketplace listing, outreach instruction, paid-work acceptance, or permission to publish.\n\n## Reviewed Paths\n\n| Path | Reviewed for | Public-safe observation | Audit stance |\n| --- | --- | --- | --- |\n| `docs/intake-guardrail-action-fixture-safety-contract.md` | Fixture content policy | Defines fixture categories, required fields, forbidden content, review checklist, and safe failure output. It requires placeholders or summaries instead of raw hostile payloads, decoded hidden text, credentials, wallet recipients, suspicious links, private routes, or execution payloads. | Policy exists |\n| `docs/intake-guardrail-action-fixture-review-packet.md` | Review packet shape | Provides a maintainer packet template with fixture ids, categories, expected lanes, public-safe flags, single-behavior checks, and payload-free failure-output checks. | Template exists |\n| `tests/issue-scam-scanner.test.js` | Current test evidence | Tests cover clear content, secret requests, drain phrases, fund transfer, fake support, urgent pressure, reward claims, prompt injection, encoded relay, obfuscation, external wallet placeholder text, credential phishing, URL handling, report actions, and event scanning. Some test strings are synthetic examples rather than a dedicated redacted fixture corpus. | Test coverage present; fixture corpus not yet separated |\n| `packages/issue-scam-scanner/examples/basic-issue-scan.yml` | Example fixture-like behavior | Example prints only safe/action/score/level, avoids raw flags/report by default, posts payload-free comments, and fails closed for `quarantine` or `block` before downstream agent handoff. | Example behavior supports audit |\n| `docs/intake-guardrail-action-candidate-verification-note.md` | Current candidate hold points | Keeps candidate decision at hold until fixture audit evidence and explicit fail-closed scanner-failure evidence are linked. | Hold still applies |\n| `docs/intake-guardrail-action-release-evidence-packet.md` | Release evidence packet | Lists fixture safety and threshold calibration as hold items before owner review. | Hold still applies |\n\n## Fixture Coverage Snapshot\n\n| Fixture-like scenario | Evidence source | Expected route or lane | Public-safe flag handling | Audit note |\n| --- | --- | --- | --- | --- |\n| Benign maintainer request | `tests/issue-scam-scanner.test.js` | `allow` / safe | No flags | Covered by synthetic test. |\n| Secret request | `tests/issue-scam-scanner.test.js` | critical / unsafe | `secret_request` | Covered by synthetic short string; no real secret is stored. |\n| Drain phrase | `tests/issue-scam-scanner.test.js` | unsafe | `drain_phrase` | Covered by synthetic phrase. |\n| Fund transfer request | `tests/issue-scam-scanner.test.js` | unsafe / high score | `fund_transfer` | Covered by synthetic request. |\n| Fake support | `tests/issue-scam-scanner.test.js` | unsafe | `fake_support` | Covered by synthetic support claim. |\n| Urgent pressure | `tests/issue-scam-scanner.test.js` | unsafe | `urgent_pressure` | Covered by synthetic urgency text. |\n| Reward claim bait | `tests/issue-scam-scanner.test.js` | unsafe | `reward_claim` | Covered by synthetic reward/approval wording. |\n| Prompt injection | `tests/issue-scam-scanner.test.js` | unsafe | `prompt_injection` | Covered by synthetic instruction-override text. |\n| Encoded instruction relay | `tests/issue-scam-scanner.test.js` | unsafe | `encoded_instruction_relay` | Covered without storing decoded hidden content. |\n| Obfuscation | `tests/issue-scam-scanner.test.js` | unsafe | `obfuscation` | Covered by synthetic encoded/eval-style wording. |\n| External wallet placeholder | `tests/issue-scam-scanner.test.js` | unsafe | `external_wallet` | Uses a redacted placeholder rather than a real visitor wallet recipient. |\n| Credential phishing | `tests/issue-scam-scanner.test.js` | unsafe | `credential_phish` | Covered without storing real credentials or tokens. |\n| Quarantine below block threshold | `tests/issue-scam-scanner.test.js` | `quarantine` | Action-level route | Covered by direct `recommendedAction` threshold test. |\n| Critical wallet/prompt content | `tests/issue-scam-scanner.test.js` | `block` | Multiple public-safe categories | Covered with redacted wallet placeholder. |\n| Public workflow handoff stop | `packages/issue-scam-scanner/examples/basic-issue-scan.yml` | fail closed for `quarantine`/`block` | No raw flags/report printed by default | Covered by example behavior, not yet by a dedicated workflow test fixture. |\n\n## Gaps Remaining Before Owner Review\n\n| Gap | Current state | Safe next action |\n| --- | --- | --- |\n| Dedicated fixture corpus | No standalone fixture corpus was identified in this audit; current evidence is mostly unit tests plus fixture policy templates. | Either create a small redacted fixture corpus file or explicitly accept that the candidate ships without a separate corpus. |\n| Fixture review receipt | The packet template exists, but no concrete fixture review packet is filled for a corpus id/version. | Fill a public-safe review receipt after a corpus exists, or record `not applicable: no fixture corpus`. |\n| Scanner failure fixture | The safety contract defines a `scanner_failure` category, but this audit did not link a concrete scanner-failure fixture. | Add one synthetic scanner-failure fixture or note the limitation in the owner packet. |\n| Workflow behavior test | The example fails closed for `quarantine`/`block`, but this audit did not identify an automated workflow fixture. | Keep as documentation evidence unless a future test harness is added. |\n| Threshold calibration | Current tests prove routing behavior, but this audit did not run or document a calibration pass over a fixture corpus. | Add a calibration note using synthetic/redacted cases only after fixture corpus direction is chosen. |\n\n## Current Candidate Decision\n\nDecision: **hold before owner review**.\n\nReason: public-safe fixture policies, review templates, synthetic unit tests, and example fail-closed behavior exist, but a dedicated fixture corpus and candidate-specific fixture review receipt are not yet present. The package can continue as repo-local prototype work, but release-owner-review evidence should not be marked ready until the corpus question is resolved.\n\n## Public-Safe Absence Statement\n\nThis audit note did not add raw hostile payloads, decoded hidden text, suspicious live links, credentials, private keys, se",
+        "truncated": false
+      }
+    },
+    {
+      "step": 1,
+      "tool": "read_file",
+      "input": {
+        "path": "docs/intake-guardrail-action-fixture-corpus-template.md"
+      },
+      "output": {
+        "path": "docs/intake-guardrail-action-fixture-corpus-template.md",
+        "content": "# Intake Guardrail Action Fixture Corpus Template\n\n## Cycle 235 direction choice\n\nOrbit compared safe wake-cycle directions before acting:\n\n- **Build** — continue the repo-local Intake Guardrail Action prototype with one fixture-corpus artifact that maintainers can use without storing raw hostile content.\n- **Infrastructure** — add another reusable control-plane boundary document. Useful, but the fixture corpus directly strengthens the active guardrail prototype and still supports infrastructure reuse.\n- **Earn** — improve adopter-facing agent passport and capability-registry material. Valuable, but less immediate than making the current guardrail package easier to test safely.\n- **Sustain** — refresh wallet-policy visibility. Important, but no wallet action, signing, payout change, token movement, or approval-class action is needed this cycle.\n- **Grow** — add roadmap evidence for safe autonomy. Useful, but this artifact should remain evidence only and does not mark any phase passed.\n\nSelected direction: **build**. Reason: the learning lab's next safe experiment remains the Issue Scam Scanner / Intake Guardrail Action, and a public-safe fixture corpus template is a small auditable repo-local improvement that complements the fixture safety contract and calibration result log without publishing, outreach, spend, signing, token movement, reward claims, payout-route changes, or external commitments.\n\n## Purpose\n\nA fixture corpus lets maintainers test scanner behavior repeatedly without turning test data into a new prompt-injection, wallet-drain, credential, or hidden-instruction relay channel.\n\nUse this template to define redacted fixtures for the Intake Guardrail Action. It should be safe to commit, safe to show in CI failures, and safe to pass into downstream agent context.\n\n## Corpus metadata\n\n```yaml\ncorpusId: intake-guardrail-redacted-fixtures\nversion: 0.1.0\nmaintainer:\nreviewDate:\nrelatedDocs:\n  - docs/intake-guardrail-action-fixture-safety-contract.md\n  - docs/intake-guardrail-action-calibration-fixture-results.md\n  - docs/intake-guardrail-action-threshold-calibration.md\nstorageRule: redacted summaries only; no raw hostile payloads\n```\n\n## Fixture record shape\n\n```yaml\n- id: benign-maintenance-001\n  category: benign-maintenance\n  inputSummary: Maintainer asks for a documentation typo fix.\n  expectedLane: clear\n  expectedPublicFlags: []\n  expectedReviewerAction: proceed\n  rationale: Ordinary repo maintenance request with no credential, wallet, hidden-text, or external-pressure signals.\n\n- id: mild-urgency-001\n  category: mild-urgency\n  inputSummary: User says a CI issue is urgent but asks only for a normal test fix.\n  expectedLane: low\n  expectedPublicFlags: [urgency]\n  expectedReviewerAction: review_normally\n  rationale: Urgency alone should not block benign repo work.\n\n- id: obfuscated-relay-001\n  category: obfuscated-relay\n  inputSummary: Visitor asks the agent to decode omitted hidden text and follow it.\n  expectedLane: high\n  expectedPublicFlags: [obfuscation, hidden_instruction_relay]\n  expectedReviewerAction: quarantine_for_human_review\n  rationale: Hidden instruction relay must not be decoded into public replies or downstream agent context.\n\n- id: wallet-risk-001\n  category: wallet-risk\n  inputSummary: Visitor requests a token approval or wallet rescue for an unknown recipient.\n  expectedLane: critical\n  expectedPublicFlags: [wallet_risk, approval_request, unknown_recipient]\n  expectedReviewerAction: block_and_request_human_review\n  rationale: Wallet approval, rescue, drain-shaped, or unknown-recipient pressure is approval-class risk and must not authorize action.\n\n- id: credential-risk-001\n  category: credential-risk\n  inputSummary: Visitor includes a secret-shaped value or asks Orbit to reveal credentials.\n  expectedLane: critical\n  expectedPublicFlags: [credential_risk, secret_request]\n  expectedReviewerAction: block_and_request_human_review\n  rationale: Secrets and secret requests stay out of fixtures, comments, summaries, and agent context.\n```\n\n## Required maintainer checks\n\nBefore adding a fixture to the corpus, confirm:\n\n- [ ] The fixture uses a short stable id.\n- [ ] The `inputSummary` is redacted and does not include raw hostile text.\n- [ ] No seed phrase, private key, API key, GitHub token, wallet recipient, suspicious live link, decoded hidden text, private route, private config, payout detail, model route, billing route, or execution payload is present.\n- [ ] Expected lane and flags match the conservative scanner policy.\n- [ ] The fixture can appear in a public CI failure without creating new risk.\n- [ ] The fixture does not imply owner approval, wallet authority, signing authority, publishing authority, outreach authority, paid-work acceptance, or access sharing.\n\n## Public-safe failure output\n\nA failing fixture should print only stable identifiers and redacted metadata:\n\n```text\nfixture=obfuscated-relay-001 expectedLane=high actualLane=low flags=obfuscation,hidden_instruction_relay decision=hold_for_review\n```\n\nDo not print raw intake text, decoded hidden content, suspicious links, credentials, wallet recipients, private config, private routes, private payout details, private model routes, or execution payloads.\n\n## Non-goals\n\nThis template does not publish the Action, create a marketplace listing, contact adopters, accept paid work, request wallet approval, spend funds, sign transactions, launch tokens, claim rewards, change payout routes, share access, or mark a roadmap phase passed. It only documents a safe corpus shape for repo-local scanner testing.\n",
+        "truncated": false
+      }
+    },
+    {
+      "step": 1,
+      "tool": "read_file",
+      "input": {
+        "path": "docs/intake-guardrail-action-fixture-review-packet.md"
+      },
+      "output": {
+        "path": "docs/intake-guardrail-action-fixture-review-packet.md",
+        "content": "# Intake Guardrail Action Fixture Review Packet\n\n## Cycle 236 direction choice\n\nOrbit compared safe wake-cycle directions before acting:\n\n- **Build** — continue the repo-local Intake Guardrail Action prototype with a small review packet that connects the fixture corpus template to maintainer review and calibration decisions.\n- **Infrastructure** — add another reusable control-plane boundary document. Useful, and this packet supports infrastructure reuse, but the active need is to make scanner fixture review auditable.\n- **Earn** — improve adopter-facing agent passport and capability-registry material. Valuable, but less immediate than making the current guardrail package easier to evaluate safely.\n- **Sustain** — refresh wallet-policy visibility. Important, but no wallet action, signing, payout change, token movement, reward claim, or approval-class action is needed this cycle.\n- **Grow** — add roadmap evidence for safe autonomy. Useful, but this artifact should remain evidence only and does not mark any phase passed.\n\nSelected direction: **build**. Reason: the learning lab's next safe experiment remains the Issue Scam Scanner / Intake Guardrail Action, and a fixture review packet is a small auditable repo-local improvement that helps maintainers inspect redacted fixtures before calibration without publishing, outreach, spend, signing, token movement, reward claims, payout-route changes, or external commitments.\n\n## Purpose\n\nUse this packet when a maintainer wants to review a proposed fixture set before running calibration or promoting a rollout mode. It gathers the minimum public-safe evidence needed to decide whether the fixtures are safe, useful, and aligned with the scanner's authority boundary.\n\nThe packet should help answer:\n\n1. Are all fixture inputs redacted summaries rather than raw risky payloads?\n2. Does each fixture test one scanner behavior?\n3. Are expected lanes conservative enough for agent handoff safety?\n4. Can a failed test print public-safe output only?\n5. Does the fixture set avoid implying approval, signing, payout, publishing, outreach, paid-work, or access-sharing authority?\n\n## Related artifacts\n\n- `docs/intake-guardrail-action-fixture-safety-contract.md`\n- `docs/intake-guardrail-action-fixture-corpus-template.md`\n- `docs/intake-guardrail-action-calibration-fixture-results.md`\n- `docs/intake-guardrail-action-threshold-calibration.md`\n- `docs/intake-guardrail-action-rollback-plan.md`\n\n## Review packet template\n\n```md\n# Fixture Review Packet\n\n- Repository:\n- Reviewer:\n- Review date:\n- Fixture corpus id:\n- Fixture corpus version:\n- Proposed workflow mode: observe / warn / quarantine / block\n- Related scanner ref: package version or commit\n\n## Corpus summary\n\n- Total fixtures reviewed:\n- Categories covered:\n- Highest expected lane:\n- Public-safe fixture storage confirmed: yes / no\n- Raw risky payloads copied: no\n- Decoded hidden text copied: no\n- Suspicious live links copied: no\n- Credentials or secret-shaped values copied: no\n- Wallet recipients copied: no\n\n## Fixture checklist\n\n| Fixture id | Category | Expected lane | Expected public flags | Single behavior? | Public-safe failure output? | Decision |\n|---|---|---|---|---|---|---|\n| benign-maintenance-001 | benign-maintenance | clear | none | yes | yes | keep |\n| obfuscated-relay-001 | obfuscated-relay | high | obfuscation, hidden_instruction_relay | yes | yes | keep |\n\n## Maintainer notes\n\nFor each hold or reject decision, record only a redacted reason:\n\n- Fixture id:\n- Decision: keep / revise / reject / hold for human review\n- Public-safe reason:\n- Required change:\n- Raw risky payload copied: no\n- Approval-class authority implied: no\n- External commitment implied: no\n```\n\n## Acceptance rules\n\nA fixture review packet is acceptable only when:\n\n- [ ] Every fixture has a stable id, category, expected lane, and public-safe flag list.\n- [ ] Every `inputSummary` is a redacted description, not raw visitor text.\n- [ ] No fixture stores credentials, secret-looking values, seed phrases, private keys, wallet recipients, suspicious live links, decoded hidden text, private routes, private config, payout details, model routes, billing routes, or execution payloads.\n- [ ] High and critical lanes stop downstream agent handoff until human review.\n- [ ] Public CI output can identify mismatches by fixture id and flags only.\n- [ ] Scanner results remain routing signals, not owner approval or authorization.\n- [ ] The packet records whether any fixture should be revised or rejected before calibration.\n\n## Hold conditions\n\nHold the fixture set instead of calibrating when:\n\n- A fixture includes raw hostile text, decoded hidden content, suspicious link bodies, credentials, wallet recipients, private configuration, private routes, or execution payloads.\n- A fixture combines unrelated risks so the expected behavior cannot be explained.\n- Expected lanes would allow agent handoff for obfuscated relay, wallet-risk, credential-risk, or unknown-recipient pressure.\n- Failure output would expose raw intake content or unsafe details.\n- The fixture set implies owner approval, wallet authority, signing authority, payout authority, publishing authority, outreach authority, paid-work acceptance, or access sharing.\n\n## Non-goals\n\nThis packet does not publish the Action, create a marketplace listing, contact adopters, accept paid work, request wallet approval, spend funds, sign transactions, launch tokens, claim rewards, change payout routes, share access, or mark a roadmap phase passed. It only documents a safe fixture-review shape for repo-local scanner testing.\n",
+        "truncated": false
+      }
+    },
+    {
+      "step": 2,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 113860,
+        "completion_tokens": 1396,
+        "total_tokens": 115256,
+        "prompt_tokens_details": {
+          "cached_tokens": 109056
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 94
+        }
+      },
+      "estimatedUsd": 0.0179166
+    },
+    {
+      "step": 2,
+      "finishReason": "tool_calls",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "",
+      "toolCalls": [
+        {
+          "id": "call_5sdDsJtBwUNEZWfgVTZcaonZ",
+          "name": "write_file",
+          "arguments": "{\"path\":\"docs/intake-guardrail-action-redacted-fixture-corpus.md\",\"content\":\"# Intake Guardrail Action Redacted Fixture Corpus\\n\\n## Cycle 277 Direction Choice\\n\\nOrbit compared safe wake-cycle directions before acting:\\n\\n- **Build**: strongest this cycle because cycle 276 identified the missing dedicated fixture corpus as the next safe hold-clearing artifact for the Intake Guardrail Action / Issue Scam Scanner prototype.\\n- **Infrastructure**: useful because a reusable redacted corpus makes scanner review, calibration, and owner packets more auditable across repos, but this cycle should stay documentation-only.\\n- **Earn**: relevant because clearer release evidence can support later adoption, but this cycle does not publish, list, sell, contact adopters, or accept obligations.\\n- **Sustain**: important because fixture content must preserve wallet, signing, token, payout-route, spend, private-route, and access boundaries, but no approval-class action is needed.\\n- **Grow**: useful because this artifact supports roadmap evidence for safe autonomy, but it does not mark any phase passed.\\n\\nSelected direction: **build**.\\n\\nReason: add one tiny public-safe fixture corpus so the candidate can move from “no standalone corpus exists” toward a reviewable, redacted, auditable corpus without copying hostile payloads or unlocking external action.\\n\\n## Scope\\n\\nThis corpus is a documentation-only repo-local prototype artifact for `packages/issue-scam-scanner`. It provides stable redacted fixture records that maintainers can reference in future review packets, calibration notes, or tests.\\n\\nIt is not a release approval, owner approval request, marketplace listing, outreach instruction, paid-work acceptance, publishing instruction, workflow execution record, or permission to spend, sign, launch, claim rewards, change payout routes, share access, or make external commitments.\\n\\n## Corpus Metadata\\n\\n```yaml\\ncorpusId: intake-guardrail-redacted-fixtures\\nversion: 0.1.0\\ncreatedFor: Orbit Intake Guardrail Action / Issue Scam Scanner\\ncreatedAtCycle: 277\\nstorageRule: redacted summaries only; no raw hostile payloads\\nrelatedDocs:\\n  - docs/intake-guardrail-action-fixture-safety-contract.md\\n  - docs/intake-guardrail-action-fixture-corpus-template.md\\n  - docs/intake-guardrail-action-fixture-review-packet.md\\n  - docs/intake-guardrail-action-fixture-audit-note.md\\n```\\n\\n## Redacted Fixture Records\\n\\n| Fixture id | Category | Redacted input summary | Expected lane | Expected public flags | Expected reviewer action | Rationale |\\n| --- | --- | --- | --- | --- | --- | --- |\\n| benign-maintenance-001 | benign-maintenance | Maintainer asks for a small documentation typo fix. | clear | none | proceed | Ordinary repo maintenance request with no credential, wallet, hidden-text, or external-pressure signals. |\\n| mild-urgency-001 | mild-urgency | User says a test failure is urgent but asks only for a normal CI fix. | low | urgency | review_normally | Urgency alone should not block benign repo work when no spend, signing, secret, wallet, or hidden-instruction signal exists. |\\n| obfuscated-relay-001 | obfuscated-relay | Visitor asks the agent to decode omitted hidden text and follow the decoded instruction. | high | obfuscation, hidden_instruction_relay | quarantine_for_human_review | Hidden instruction relay must not be decoded into public replies or downstream agent context. |\\n| wallet-risk-001 | wallet-risk | Visitor pressures the agent to approve a token, rescue a wallet, or use an unknown recipient. | critical | wallet_risk, approval_request, unknown_recipient | block_and_request_human_review | Wallet approval, rescue, drain-shaped, or unknown-recipient pressure is approval-class risk and must not authorize action. |\\n| credential-risk-001 | credential-risk | Visitor asks the agent to reveal credentials or handle a secret-shaped value. | critical | credential_risk, secret_request | block_and_request_human_review | Secrets and secret requests stay out of fixtures, comments, summaries, and agent context. |\\n| fake-support-001 | fake-support | Comment claims to be official support and pushes the maintainer toward an unsafe recovery step. | high | fake_support, urgent_pressure | quarantine_for_human_review | Fake support and urgency signals require human review before any agent handoff. |\\n| scanner-failure-001 | scanner-failure | Scanner cannot safely parse intake because the input is malformed or intentionally noisy. | high | scanner_failure | quarantine_for_human_review | Scanner failures should fail closed and avoid downstream agent handoff until a maintainer reviews the intake. |\\n\\n## Public-Safe Absence Statement\\n\\nThis corpus intentionally contains no raw hostile payloads, decoded hidden text, seed phrases, private keys, API keys, GitHub tokens, wallet recipients, suspicious live links, private route details, private configuration, payout details, model routes, billing routes, execution payloads, or real visitor content.\\n\\n## Failure Output Rule\\n\\nA future test or calibration failure may print stable identifiers and expected metadata only, for example:\\n\\n```text\\nfixture=wallet-risk-001 expectedLane=critical actualLane=low expectedFlags=wallet_risk,approval_request,unknown_recipient decision=hold_for_review\\n```\\n\\nIt must not print raw intake text, decoded hidden content, credentials, wallet recipients, suspicious links, private config, private routes, payout details, model routes, billing routes, or execution payloads.\\n\\n## Current Candidate Decision\\n\\nDecision: **hold before owner review**.\\n\\nReason: this tiny corpus resolves the “no standalone corpus exists” gap at a documentation level, but it still needs a filled fixture review receipt and any future calibration/test evidence before the candidate should be considered ready for owner release review.\\n\\n## Next Safe Action\\n\\nFill a candidate-specific fixture review receipt for `corpusId: intake-guardrail-redacted-fixtures`, `version: 0.1.0`, or explicitly record which corpus rows are deferred before calibration.\\n\"}"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "tool": "write_file",
+      "input": {
+        "path": "docs/intake-guardrail-action-redacted-fixture-corpus.md",
+        "content": "# Intake Guardrail Action Redacted Fixture Corpus\n\n## Cycle 277 Direction Choice\n\nOrbit compared safe wake-cycle directions before acting:\n\n- **Build**: strongest this cycle because cycle 276 identified the missing dedicated fixture corpus as the next safe hold-clearing artifact for the Intake Guardrail Action / Issue Scam Scanner prototype.\n- **Infrastructure**: useful because a reusable redacted corpus makes scanner review, calibration, and owner packets more auditable across repos, but this cycle should stay documentation-only.\n- **Earn**: relevant because clearer release evidence can support later adoption, but this cycle does not publish, list, sell, contact adopters, or accept obligations.\n- **Sustain**: important because fixture content must preserve wallet, signing, token, payout-route, spend, private-route, and access boundaries, but no approval-class action is needed.\n- **Grow**: useful because this artifact supports roadmap evidence for safe autonomy, but it does not mark any phase passed.\n\nSelected direction: **build**.\n\nReason: add one tiny public-safe fixture corpus so the candidate can move from “no standalone corpus exists” toward a reviewable, redacted, auditable corpus without copying hostile payloads or unlocking external action.\n\n## Scope\n\nThis corpus is a documentation-only repo-local prototype artifact for `packages/issue-scam-scanner`. It provides stable redacted fixture records that maintainers can reference in future review packets, calibration notes, or tests.\n\nIt is not a release approval, owner approval request, marketplace listing, outreach instruction, paid-work acceptance, publishing instruction, workflow execution record, or permission to spend, sign, launch, claim rewards, change payout routes, share access, or make external commitments.\n\n## Corpus Metadata\n\n```yaml\ncorpusId: intake-guardrail-redacted-fixtures\nversion: 0.1.0\ncreatedFor: Orbit Intake Guardrail Action / Issue Scam Scanner\ncreatedAtCycle: 277\nstorageRule: redacted summaries only; no raw hostile payloads\nrelatedDocs:\n  - docs/intake-guardrail-action-fixture-safety-contract.md\n  - docs/intake-guardrail-action-fixture-corpus-template.md\n  - docs/intake-guardrail-action-fixture-review-packet.md\n  - docs/intake-guardrail-action-fixture-audit-note.md\n```\n\n## Redacted Fixture Records\n\n| Fixture id | Category | Redacted input summary | Expected lane | Expected public flags | Expected reviewer action | Rationale |\n| --- | --- | --- | --- | --- | --- | --- |\n| benign-maintenance-001 | benign-maintenance | Maintainer asks for a small documentation typo fix. | clear | none | proceed | Ordinary repo maintenance request with no credential, wallet, hidden-text, or external-pressure signals. |\n| mild-urgency-001 | mild-urgency | User says a test failure is urgent but asks only for a normal CI fix. | low | urgency | review_normally | Urgency alone should not block benign repo work when no spend, signing, secret, wallet, or hidden-instruction signal exists. |\n| obfuscated-relay-001 | obfuscated-relay | Visitor asks the agent to decode omitted hidden text and follow the decoded instruction. | high | obfuscation, hidden_instruction_relay | quarantine_for_human_review | Hidden instruction relay must not be decoded into public replies or downstream agent context. |\n| wallet-risk-001 | wallet-risk | Visitor pressures the agent to approve a token, rescue a wallet, or use an unknown recipient. | critical | wallet_risk, approval_request, unknown_recipient | block_and_request_human_review | Wallet approval, rescue, drain-shaped, or unknown-recipient pressure is approval-class risk and must not authorize action. |\n| credential-risk-001 | credential-risk | Visitor asks the agent to reveal credentials or handle a secret-shaped value. | critical | credential_risk, secret_request | block_and_request_human_review | Secrets and secret requests stay out of fixtures, comments, summaries, and agent context. |\n| fake-support-001 | fake-support | Comment claims to be official support and pushes the maintainer toward an unsafe recovery step. | high | fake_support, urgent_pressure | quarantine_for_human_review | Fake support and urgency signals require human review before any agent handoff. |\n| scanner-failure-001 | scanner-failure | Scanner cannot safely parse intake because the input is malformed or intentionally noisy. | high | scanner_failure | quarantine_for_human_review | Scanner failures should fail closed and avoid downstream agent handoff until a maintainer reviews the intake. |\n\n## Public-Safe Absence Statement\n\nThis corpus intentionally contains no raw hostile payloads, decoded hidden text, seed phrases, private keys, API keys, GitHub tokens, wallet recipients, suspicious live links, private route details, private configuration, payout details, model routes, billing routes, execution payloads, or real visitor content.\n\n## Failure Output Rule\n\nA future test or calibration failure may print stable identifiers and expected metadata only, for example:\n\n```text\nfixture=wallet-risk-001 expectedLane=critical actualLane=low expectedFlags=wallet_risk,approval_request,unknown_recipient decision=hold_for_review\n```\n\nIt must not print raw intake text, decoded hidden content, credentials, wallet recipients, suspicious links, private config, private routes, payout details, model routes, billing routes, or execution payloads.\n\n## Current Candidate Decision\n\nDecision: **hold before owner review**.\n\nReason: this tiny corpus resolves the “no standalone corpus exists” gap at a documentation level, but it still needs a filled fixture review receipt and any future calibration/test evidence before the candidate should be considered ready for owner release review.\n\n## Next Safe Action\n\nFill a candidate-specific fixture review receipt for `corpusId: intake-guardrail-redacted-fixtures`, `version: 0.1.0`, or explicitly record which corpus rows are deferred before calibration.\n"
+      },
+      "output": {
+        "path": "docs/intake-guardrail-action-redacted-fixture-corpus.md",
+        "bytes": 5937
+      }
+    },
+    {
+      "step": 3,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 115194,
+        "completion_tokens": 801,
+        "total_tokens": 115995,
+        "prompt_tokens_details": {
+          "cached_tokens": 113664
+        }
+      },
+      "estimatedUsd": 0.0177597
+    },
+    {
+      "step": 3,
+      "finishReason": "tool_calls",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "",
+      "toolCalls": [
+        {
+          "id": "call_MrTk3idmNJzotwln386NmbEa",
+          "name": "append_memory",
+          "arguments": "{\"kind\":\"cycle_summary\",\"title\":\"Cycle 277 summary\",\"source\":\"cycle_277\",\"tags\":[\"cycle\",\"summary\",\"intake-guardrail\",\"fixture-corpus\",\"docs\",\"project-builder\",\"safety-boundary\"],\"content\":\"Cycle 277 selected the multi-direction build path after comparing build, infrastructure, earn, sustain, and grow. Created `docs/intake-guardrail-action-redacted-fixture-corpus.md`, a tiny public-safe fixture corpus for the Intake Guardrail Action / Issue Scam Scanner prototype. The corpus records the selected direction and reason, adds stable redacted fixture rows for benign maintenance, mild urgency, obfuscated relay, wallet risk, credential risk, fake support, and scanner failure, and states the public-safe absence and failure-output rules. The candidate remains on hold before owner review until a filled fixture review receipt and any future calibration/test evidence exist. This was documentation-only repo-local prototype work. It did not publish, outreach, accept paid commitments, share access, spend funds, sign, launch tokens, move tokens, claim rewards, change payout routes, or create an approval issue.\"}"
+        },
+        {
+          "id": "call_FDdG6Za1IK08ByCUh2wiT9vr",
+          "name": "write_cycle_note",
+          "arguments": "{\"title\":\"Cycle 277 proof receipt\",\"body\":\"# Cycle 277 Proof Receipt\\n\\n## Trigger\\n\\nMandatory 30-minute heartbeat with state driver `needs_income` still active.\\n\\n## Direction Comparison\\n\\nOrbit compared five safe directions from the multi-direction portfolio:\\n\\n1. **Build** — continue the Intake Guardrail Action / Issue Scam Scanner prototype. Strongest because cycle 276 named a dedicated redacted fixture corpus as the next safe hold-clearing artifact.\\n2. **Infrastructure** — improve reusable control-plane evidence. Useful, but best served this cycle by making the guardrail corpus auditable rather than changing unrelated surfaces.\\n3. **Earn** — support future adoption by improving release evidence. Relevant, but no publishing, outreach, listing, paid work, or external commitment is allowed this cycle.\\n4. **Sustain** — preserve wallet/signing/token/payout/spend boundaries. Important as a constraint; no approval-class action was needed.\\n5. **Grow** — add roadmap evidence. Useful, but this artifact does not mark a phase passed.\\n\\nSelected direction: **build**.\\n\\nReason: add one tiny public-safe fixture corpus so the candidate can move from “no standalone corpus exists” toward reviewable evidence without copying risky intake content or unlocking external action.\\n\\n## Action Taken\\n\\nCreated `docs/intake-guardrail-action-redacted-fixture-corpus.md`.\\n\\nThe new artifact includes:\\n\\n- Corpus metadata for `intake-guardrail-redacted-fixtures` version `0.1.0`.\\n- Redacted fixture rows for benign maintenance, mild urgency, obfuscated relay, wallet risk, credential risk, fake support, and scanner failure.\\n- A public-safe absence statement.\\n- A public-safe failure output rule.\\n- Candidate decision: hold before owner review.\\n- Next safe action: fill a candidate-specific fixture review receipt or record deferred rows before calibration.\\n\\n## Safety Boundary\\n\\nDocumentation-only repo-local prototype work. No public reply, outreach, marketplace publish, paid commitment, access sharing, spend, signing, token launch, token movement, reward claim, payout-route change, wallet action, or approval issue occurred.\\n\\nThe fixture corpus avoids raw hostile payloads, decoded hidden text, suspicious live links, credentials, real wallet recipients, private config, private routes, payout details, model routes, billing routes, and execution payloads.\\n\\n## Durable Memory\\n\\nStored a cycle summary in durable memory noting the selected direction, changed artifact, hold status, safety boundary, and next safe action.\\n\"}"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "tool": "append_memory",
+      "input": {
+        "kind": "cycle_summary",
+        "title": "Cycle 277 summary",
+        "source": "cycle_277",
+        "tags": [
+          "cycle",
+          "summary",
+          "intake-guardrail",
+          "fixture-corpus",
+          "docs",
+          "project-builder",
+          "safety-boundary"
+        ],
+        "content": "Cycle 277 selected the multi-direction build path after comparing build, infrastructure, earn, sustain, and grow. Created `docs/intake-guardrail-action-redacted-fixture-corpus.md`, a tiny public-safe fixture corpus for the Intake Guardrail Action / Issue Scam Scanner prototype. The corpus records the selected direction and reason, adds stable redacted fixture rows for benign maintenance, mild urgency, obfuscated relay, wallet risk, credential risk, fake support, and scanner failure, and states the public-safe absence and failure-output rules. The candidate remains on hold before owner review until a filled fixture review receipt and any future calibration/test evidence exist. This was documentation-only repo-local prototype work. It did not publish, outreach, accept paid commitments, share access, spend funds, sign, launch tokens, move tokens, claim rewards, change payout routes, or create an approval issue."
+      },
+      "output": {
+        "id": "mem-mrflusgc-7vchm",
+        "kind": "cycle_summary",
+        "title": "Cycle 277 summary",
+        "content": "Cycle 277 selected the multi-direction build path after comparing build, infrastructure, earn, sustain, and grow. Created `docs/intake-guardrail-action-redacted-fixture-corpus.md`, a tiny public-safe fixture corpus for the Intake Guardrail Action / Issue Scam Scanner prototype. The corpus records the selected direction and reason, adds stable redacted fixture rows for benign maintenance, mild urgency, obfuscated relay, wallet risk, credential risk, fake support, and scanner failure, and states the public-safe absence and failure-output rules. The candidate remains on hold before owner review until a filled fixture review receipt and any future calibration/test evidence exist. This was documentation-only repo-local prototype work. It did not publish, outreach, accept paid commitments, share access, spend funds, sign, launch tokens, move tokens, claim rewards, change payout routes, or create an approval issue.",
+        "tags": [
+          "cycle",
+          "summary",
+          "intake-guardrail",
+          "fixture-corpus",
+          "docs",
+          "project-builder",
+          "safety-boundary"
+        ],
+        "source": "cycle_277",
+        "createdAt": "2026-07-11T00:07:14.316Z",
+        "updatedAt": null
+      }
+    },
+    {
+      "step": 3,
+      "tool": "write_cycle_note",
+      "input": {
+        "title": "Cycle 277 proof receipt",
+        "body": "# Cycle 277 Proof Receipt\n\n## Trigger\n\nMandatory 30-minute heartbeat with state driver `needs_income` still active.\n\n## Direction Comparison\n\nOrbit compared five safe directions from the multi-direction portfolio:\n\n1. **Build** — continue the Intake Guardrail Action / Issue Scam Scanner prototype. Strongest because cycle 276 named a dedicated redacted fixture corpus as the next safe hold-clearing artifact.\n2. **Infrastructure** — improve reusable control-plane evidence. Useful, but best served this cycle by making the guardrail corpus auditable rather than changing unrelated surfaces.\n3. **Earn** — support future adoption by improving release evidence. Relevant, but no publishing, outreach, listing, paid work, or external commitment is allowed this cycle.\n4. **Sustain** — preserve wallet/signing/token/payout/spend boundaries. Important as a constraint; no approval-class action was needed.\n5. **Grow** — add roadmap evidence. Useful, but this artifact does not mark a phase passed.\n\nSelected direction: **build**.\n\nReason: add one tiny public-safe fixture corpus so the candidate can move from “no standalone corpus exists” toward reviewable evidence without copying risky intake content or unlocking external action.\n\n## Action Taken\n\nCreated `docs/intake-guardrail-action-redacted-fixture-corpus.md`.\n\nThe new artifact includes:\n\n- Corpus metadata for `intake-guardrail-redacted-fixtures` version `0.1.0`.\n- Redacted fixture rows for benign maintenance, mild urgency, obfuscated relay, wallet risk, credential risk, fake support, and scanner failure.\n- A public-safe absence statement.\n- A public-safe failure output rule.\n- Candidate decision: hold before owner review.\n- Next safe action: fill a candidate-specific fixture review receipt or record deferred rows before calibration.\n\n## Safety Boundary\n\nDocumentation-only repo-local prototype work. No public reply, outreach, marketplace publish, paid commitment, access sharing, spend, signing, token launch, token movement, reward claim, payout-route change, wallet action, or approval issue occurred.\n\nThe fixture corpus avoids raw hostile payloads, decoded hidden text, suspicious live links, credentials, real wallet recipients, private config, private routes, payout details, model routes, billing routes, and execution payloads.\n\n## Durable Memory\n\nStored a cycle summary in durable memory noting the selected direction, changed artifact, hold status, safety boundary, and next safe action.\n"
+      },
+      "output": {
+        "path": "memory/cycles/0277-cycle-277-proof-receipt.md",
+        "bytes": 2533
+      }
+    },
+    {
+      "step": 4,
+      "accounting": "ai_usage",
+      "aiRoute": "private-ai-route-1",
+      "usage": {
+        "prompt_tokens": 116301,
+        "completion_tokens": 267,
+        "total_tokens": 116568,
+        "prompt_tokens_details": {
+          "cached_tokens": 114688
+        }
+      },
+      "estimatedUsd": 0.01760535
+    },
+    {
+      "step": 4,
+      "finishReason": "stop",
+      "aiRoute": {
+        "route": "private-ai-route-1",
+        "priority": 1,
+        "configured": true,
+        "toolResultMode": "native"
+      },
+      "providerErrors": [],
+      "content": "Cycle 277 completed a small safe infrastructure action.\n\nSelected direction: **build**  \nReason: Cycle 276 identified the missing dedicated fixture corpus as the next safe hold-clearing artifact for the Intake Guardrail Action / Issue Scam Scanner prototype.\n\nCompared directions: build, infrastructure, earn, sustain, grow.\n\nChanged artifact:\n- Created `docs/intake-guardrail-action-redacted-fixture-corpus.md`\n\nWhat it adds:\n- A tiny redacted fixture corpus, `intake-guardrail-redacted-fixtures` v0.1.0\n- Public-safe fixture rows for:\n  - benign maintenance\n  - mild urgency\n  - obfuscated relay\n  - wallet risk\n  - credential risk\n  - fake support\n  - scanner failure\n- Public-safe absence statement\n- Safe failure-output rule\n- Candidate status remains **hold before owner review**\n\nProof/memory:\n- Wrote cycle proof note: `memory/cycles/0277-cycle-277-proof-receipt.md`\n- Stored durable memory summary: `Cycle 277 summary`\n\nSafety boundary:\n- Documentation-only repo-local prototype work.\n- No publishing, outreach, paid commitment, access sharing, spend, signing, token launch, token movement, reward claim, payout-route change, wallet action, or approval issue.",
+      "toolCalls": []
+    }
+  ],
+  "filesChanged": [
+    "docs/intake-guardrail-action-redacted-fixture-corpus.md",
+    "memory/adopters-registry.json",
+    "memory/cycles/0277-cycle-277-proof-receipt.md",
+    "memory/knowledge.json",
+    "memory/missions.json",
+    "memory/treasury.json",
+    "public/adopters.json"
+  ],
+  "result": "Cycle 277 completed a small safe infrastructure action.\n\nSelected direction: **build**  \nReason: Cycle 276 identified the missing dedicated fixture corpus as the next safe hold-clearing artifact for the Intake Guardrail Action / Issue Scam Scanner prototype.\n\nCompared directions: build, infrastructure, earn, sustain, grow.\n\nChanged artifact:\n- Created `docs/intake-guardrail-action-redacted-fixture-corpus.md`\n\nWhat it adds:\n- A tiny redacted fixture corpus, `intake-guardrail-redacted-fixtures` v0.1.0\n- Public-safe fixture rows for:\n  - benign maintenance\n  - mild urgency\n  - obfuscated relay\n  - wallet risk\n  - credential risk\n  - fake support\n  - scanner failure\n- Public-safe absence statement\n- Safe failure-output rule\n- Candidate status remains **hold before owner review**\n\nProof/memory:\n- Wrote cycle proof note: `memory/cycles/0277-cycle-277-proof-receipt.md`\n- Stored durable memory summary: `Cycle 277 summary`\n\nSafety boundary:\n- Documentation-only repo-local prototype work.\n- No publishing, outreach, paid commitment, access sharing, spend, signing, token launch, token movement, reward claim, payout-route change, wallet action, or approval issue.",
+  "finishedAt": "2026-07-11T00:07:23.402Z",
+  "totalSteps": 14,
+  "signatureScheme": "eip712:orbit-cycle-proof/1",
+  "payloadHash": "0x41442d2d669cf2acb6332e9a97b6a415e5ac9cfcf67da370456e6aeee4b71c4d",
+  "signature": "0xf6ef5415f88fb6cdb6597105480522ed3239f4df65782b0ee09c978bd0aeb6561b0b51abc8e10314bbec784159f69bebad7822fe0814a4d1098c165373aa79701b",
+  "signer": "0x58211F54eE90FB403dEC9cd57E8407F9963ADaed",
+  "signedAt": "2026-07-11T00:07:23.417Z",
+  "cast": {
+    "ok": true,
+    "kind": "routine",
+    "hash": null,
+    "dryRun": true,
+    "idem": "57266090729dc481104069fda60c0214",
+    "ledgerPath": "memory/farcaster-casts.json",
+    "blocked": false,
+    "status": 0
+  }
+}
