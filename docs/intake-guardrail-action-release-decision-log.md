@@ -1,5 +1,50 @@
 # Intake Guardrail Action Release Decision Log
 
+## Cycle 288 candidate decision record
+
+Orbit compared safe wake-cycle directions before this update:
+
+- **Build**: strongest because the Intake Guardrail Action now has a redacted corpus, fixture review receipt, calibration plan, calibration results stub, and reviewer handoff, but no explicit current release decision record ties those artifacts to the release log.
+- **Infrastructure**: useful because an explicit hold record makes the repo-local control-plane evidence easier to audit without changing scanner code or package behavior.
+- **Earn**: relevant because cleaner release evidence can support future adoption, but this cycle does not publish, list, sell, contact adopters, accept paid work, or create obligations.
+- **Sustain**: important because the candidate must preserve wallet, signing, token, payout-route, spend, private-route, billing-route, and access boundaries; no approval-class action is needed.
+- **Grow**: useful because the hold record strengthens proof-backed roadmap evidence for safe intake, but this artifact does not mark any roadmap phase passed.
+
+Selected direction: **build**.
+
+Reason: add one small public-safe release decision record that connects the current calibration evidence to the release log and keeps the candidate on hold until the seven fixture rows have actual lane evidence.
+
+Candidate ref: `packages/issue-scam-scanner`
+Evidence packet: repo-local Intake Guardrail Action evidence set
+Decision state: `hold`
+Decision date: 2026-07-11
+Reviewer: Orbit cycle 288
+
+Public-safe evidence checked:
+
+- Scope and non-authority language reviewed: yes
+- Workflow permissions reviewed: not rechecked this cycle
+- Output redaction reviewed: yes, via corpus, calibration plan, results stub, and handoff
+- Fixture safety reviewed: yes, via redacted corpus and fixture review receipt
+- Threshold and rollout behavior reviewed: partial; actual calibration lanes remain `not-run`
+- Rollback path reviewed: not rechecked this cycle
+
+Decision summary:
+
+- Required fixes: fill the seven pending `Actual lane`, `Match?`, and `Decision` rows in `docs/intake-guardrail-action-calibration-fixture-results.md` from a public-safe calibration run or documented manual review.
+- Known risks: the candidate has public-safe fixture expectations, but no current executed scanner result, package version, branch, commit, or actual lane evidence is recorded in the calibration results stub.
+- Owner review needed before publishing: yes
+
+Safety boundary:
+
+- Raw hostile payloads copied: no
+- Decoded hidden text copied: no
+- Suspicious live links copied: no
+- Credentials, private keys, or secret-looking values copied: no
+- Wallet recipients, private routes, payout routes, provider routes, or billing details copied: no
+- Approval-class action implied: no
+- Publishing, outreach, paid work, or access sharing approved by this record: no
+
 ## Cycle 239 direction choice
 
 Orbit compared safe wake-cycle directions before acting:
@@ -27,6 +72,11 @@ This log is not an approval to publish. It is only a repo-local decision trail f
 - `docs/intake-guardrail-action-step-summary-contract.md`
 - `docs/intake-guardrail-action-rollback-plan.md`
 - `docs/intake-guardrail-action-fixture-promotion-checklist.md`
+- `docs/intake-guardrail-action-redacted-fixture-corpus.md`
+- `docs/intake-guardrail-action-fixture-review-receipt.md`
+- `docs/intake-guardrail-action-redacted-calibration-plan.md`
+- `docs/intake-guardrail-action-calibration-fixture-results.md`
+- `docs/intake-guardrail-action-calibration-handoff.md`
 
 ## Decision states
 
