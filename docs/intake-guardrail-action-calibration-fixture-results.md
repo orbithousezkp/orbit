@@ -1,5 +1,54 @@
 # Intake Guardrail Action Calibration Fixture Results
 
+## Cycle 285 Calibration Evidence Stub
+
+Orbit compared safe wake-cycle directions before this update:
+
+- **Build**: strongest this cycle because the redacted corpus, fixture review receipt, and calibration plan now exist, but this results file had not yet been tied to the seven stable fixture ids or the current hold condition.
+- **Infrastructure**: useful because a filled evidence stub makes the Intake Guardrail Action easier for future maintainers and adopters to audit, but this cycle should avoid package behavior changes while package CLI files are already dirty.
+- **Earn**: relevant because clearer guardrail release evidence can support future adoption, but this cycle does not publish, list, sell, contact adopters, or accept paid obligations.
+- **Sustain**: important because calibration evidence must preserve wallet, signing, token, payout-route, spend, private-route, and access boundaries, but no approval-class action is needed.
+- **Grow**: useful because the stub strengthens proof-backed roadmap evidence for safe intake, but it does not mark a roadmap phase passed.
+
+Selected direction: **build**.
+
+Reason: add one small public-safe calibration evidence stub for the seven redacted fixture ids so the next cycle can run or review specific checks without exposing risky payloads, changing package code, publishing the Action, or weakening the hold-before-owner-release stance.
+
+### Stub metadata
+
+- Repository: Orbit
+- Review cycle: 285
+- Fixture corpus id: `intake-guardrail-redacted-fixtures`
+- Fixture corpus version: `0.1.0`
+- Corpus path: `docs/intake-guardrail-action-redacted-fixture-corpus.md`
+- Calibration plan: `docs/intake-guardrail-action-redacted-calibration-plan.md`
+- Fixture review receipt: `docs/intake-guardrail-action-fixture-review-receipt.md`
+- Candidate package: `packages/issue-scam-scanner`
+- Evidence type: documentation-only stub; no scanner command was run by this artifact
+- Current candidate decision: hold before owner release review
+
+### Seven-fixture calibration rows
+
+| Fixture id | Category | Expected lane | Expected public flags | Actual lane | Match? | Decision | Public-safe note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| benign-maintenance-001 | benign-maintenance | clear | none | not-run | pending | hold | Await a safe run or explicit accepted-risk note confirming normal repo maintenance stays clear. |
+| mild-urgency-001 | mild-urgency | low | urgency | not-run | pending | hold | Await evidence that urgency alone does not route benign repo work to quarantine or block. |
+| obfuscated-relay-001 | obfuscated-relay | high | obfuscation, hidden_instruction_relay | not-run | pending | hold | Await evidence that hidden instruction relay is not decoded and stops downstream handoff. |
+| wallet-risk-001 | wallet-risk | critical | wallet_risk, approval_request, unknown_recipient | not-run | pending | hold | Await evidence that wallet, approval, rescue, or unknown-recipient pressure reaches critical. |
+| credential-risk-001 | credential-risk | critical | credential_risk, secret_request | not-run | pending | hold | Await evidence that secret requests reach critical without storing secret-shaped values. |
+| fake-support-001 | fake-support | high | fake_support, urgent_pressure | not-run | pending | hold | Await evidence that fake support plus pressure reaches high and requires human review. |
+| scanner-failure-001 | scanner-failure | high | scanner_failure | not-run | pending | hold | Await evidence that scanner uncertainty fails closed before downstream handoff. |
+
+### Hold status
+
+Decision: **hold before owner release review**.
+
+Reason: the current evidence set has a redacted corpus, a fixture review receipt, and a calibration plan, but this stub records no runtime output, candidate ref, package version, branch, commit, or executed scanner result. A future cycle should either run an allowed narrow calibration command or document why a manual review remains sufficient.
+
+### Safe next action
+
+Run or document a public-safe calibration pass that fills `Actual lane`, `Match?`, and `Decision` for each of the seven fixture ids. Any mismatch should be recorded by fixture id and public-safe flags only, then routed through the hold criteria in `docs/intake-guardrail-action-redacted-calibration-plan.md`.
+
 ## Cycle 231 direction choice
 
 Orbit compared safe wake-cycle directions before creating this artifact:
