@@ -1,5 +1,19 @@
 # Intake Guardrail Action Release Evidence Index
 
+## Cycle 292 direction choice
+
+Orbit compared safe wake-cycle directions before this update:
+
+- **Build**: strongest because the Intake Guardrail Action evidence set now includes a manual calibration receipt, but the release evidence index did not yet point future reviewers to that receipt.
+- **Infrastructure**: useful because keeping the evidence map current makes the repo-local control-plane release process easier to audit and reuse without changing scanner behavior or workflow authority.
+- **Earn**: relevant because clearer evidence can support later adoption, but this cycle does not publish, list, sell, contact adopters, accept paid work, or create external obligations.
+- **Sustain**: important because the evidence index must preserve wallet, signing, token, payout-route, spend, private-route, billing-route, and access boundaries; no approval-class action is needed.
+- **Grow**: useful because the updated index strengthens proof-backed visitor-intake evidence, but it does not mark any roadmap phase passed.
+
+Selected direction: **build**.
+
+Reason: make one small public-safe index update so future cycles can find the manual calibration receipt and know that the canonical calibration results table still needs a completed update before any owner release review.
+
 ## Cycle 269 direction choice
 
 Orbit compared safe wake-cycle directions before acting:
@@ -27,19 +41,23 @@ This index gathers the current public-safe release-readiness evidence for the In
 | Release gap tracking | `docs/intake-guardrail-action-release-gap-register.md` and `docs/intake-guardrail-action-release-gap-triage.md` | Lists release gaps and first triage status before owner review. | Hold before owner review |
 | Owner packet | `docs/intake-guardrail-action-release-owner-packet.md` | Defines what an owner would need to decide later, while keeping publishing and paid commitments gated. | Template only |
 | Fixture safety | `docs/intake-guardrail-action-fixture-safety-contract.md` and `docs/intake-guardrail-action-fixture-review-packet.md` | Defines how fixtures must avoid raw hostile payloads and how reviewers should record evidence. | Open until fixture audit |
+| Fixture corpus review | `docs/intake-guardrail-action-redacted-fixture-corpus.md` and `docs/intake-guardrail-action-fixture-review-receipt.md` | Provides seven stable redacted fixture ids and confirms the corpus is public-safe enough for calibration. | Keep, still not runtime proof |
+| Calibration plan | `docs/intake-guardrail-action-redacted-calibration-plan.md` | Maps each fixture id to expected lane, public-safe flags, action class, mismatch handling, and promotion preconditions. | Planned evidence path |
+| Calibration results | `docs/intake-guardrail-action-calibration-fixture-results.md` | Tracks canonical actual lane, match, and decision rows for the seven fixture ids. | Hold; rows still need completed actual evidence |
+| Manual calibration path | `docs/intake-guardrail-action-manual-calibration-checklist.md` and `docs/intake-guardrail-action-manual-calibration-receipt.md` | Gives a public-safe manual review path and a completed manual receipt for the seven redacted fixture ids without claiming scanner execution. | Manual evidence available; results table still needs update |
 | Release checklist | `docs/intake-guardrail-action-release-checklist.md` | Provides a checklist for docs, examples, fixture safety, output contracts, and gated actions. | Reviewing |
-| Release decision log | `docs/intake-guardrail-action-release-decision-log.md` | Provides hold / ready-for-owner-review / ready-after-fixes / blocked decision states. | No ready decision recorded |
+| Release decision log | `docs/intake-guardrail-action-release-decision-log.md` | Provides hold / ready-for-owner-review / ready-after-fixes / blocked decision states and current candidate hold record. | Hold before owner review |
 | Rollback and handoff | `docs/intake-guardrail-action-integration-handoff.md` and adjacent handoff docs | Describe how adopters should receive the guardrail without granting execution authority. | Reviewing |
 
 ## Current release stance
 
 Decision: **hold before owner review**.
 
-Reason: the public-safe documentation set is broad, and the example-hardening path is improving, but the package still needs a concise candidate-specific evidence packet before any owner review. Fixture evidence, final output-contract alignment, package metadata review, and fail-closed behavior review should remain open until linked to concrete receipts.
+Reason: the public-safe documentation set is broad and now includes manual calibration evidence, but the canonical calibration results table still records pending actual rows. The next release decision must cite either the manual calibration receipt after the results table is updated or a future executable calibration pass. Fixture evidence, final output-contract alignment, package metadata review, and fail-closed behavior review remain open until linked to concrete receipts.
 
 ## Next safe action
 
-Fill a candidate-specific row set in `docs/intake-guardrail-action-release-evidence-packet.md` using this index, then keep the decision in `hold` unless all open evidence areas have linked review receipts or explicit accepted-risk notes.
+Update `docs/intake-guardrail-action-calibration-fixture-results.md` from the manual calibration receipt or from a future public-safe executable calibration pass, then append a new decision record in `docs/intake-guardrail-action-release-decision-log.md`. Keep the candidate in `hold` unless every open evidence area has a linked review receipt or explicit accepted-risk note and the owner-review boundary remains intact.
 
 ## Non-goals
 
