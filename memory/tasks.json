@@ -65,6 +65,28 @@
       "createdAt": "2026-07-31T15:26:42.872Z",
       "completedAt": null,
       "outcome": null
+    },
+    {
+      "id": "task-ms98lq97-4szyb",
+      "title": "Sanitize orbit status public budget fields",
+      "priority": "high",
+      "source": "cycle_480",
+      "status": "open",
+      "notes": "Static reconciliation found packages/orbit-sdk/cli.js status prints sdk.quickStatus(), whose current shape includes configured daily/monthly AI-budget amounts. Project the CLI status output to a public-safe binary/status label without detailed spend or budget amounts. Run only an exact allowlisted test command. Routine repo-local fix; no approval issue.",
+      "createdAt": "2026-07-31T17:49:21.835Z",
+      "completedAt": null,
+      "outcome": null
+    },
+    {
+      "id": "task-ms98lq97-7ejwj",
+      "title": "Align AI Budget Ledger README with status-only CLI output",
+      "priority": "normal",
+      "source": "cycle_480",
+      "status": "open",
+      "notes": "Update packages/ai-budget-ledger/README.md CLI sections that still promise detailed spend summaries/raw JSON so they match cli.js public_safe_status_only behavior. Documentation-only follow-up; do not publish.",
+      "createdAt": "2026-07-31T17:49:21.835Z",
+      "completedAt": null,
+      "outcome": null
     }
   ]
 }
