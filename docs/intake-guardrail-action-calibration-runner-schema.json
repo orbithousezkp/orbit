@@ -1,0 +1,166 @@
+{
+  "$schema": "orbit-intake-guardrail-calibration-runner/1",
+  "status": "review_only",
+  "candidate": "packages/issue-scam-scanner",
+  "selectedDirection": {
+    "direction": "build",
+    "reason": "Cycle 478 compared build, infrastructure, earn, sustain, and grow. Build was selected because the runner contract and acceptance cases exist, but their validation boundary was not machine-readable. This schema is the smallest auditable bridge toward implementation while four CLI entry points remain modified; infrastructure and earn already have active adoption surfaces, wallet policy has no urgent defect, and roadmap growth needs executable evidence."
+  },
+  "canonicalFixtureIds": [
+    "benign-maintenance-001",
+    "mild-urgency-001",
+    "obfuscated-relay-001",
+    "wallet-risk-001",
+    "credential-risk-001",
+    "fake-support-001",
+    "scanner-failure-001"
+  ],
+  "allowedLanes": [
+    "clear",
+    "low",
+    "medium",
+    "high",
+    "critical"
+  ],
+  "allowedCategories": [
+    "credential_phish",
+    "drain_phrase",
+    "encoded_instruction_relay",
+    "external_wallet",
+    "fake_support",
+    "fund_transfer",
+    "malformed_url",
+    "obfuscation",
+    "prompt_injection",
+    "reward_claim",
+    "secret_request",
+    "shortened_url",
+    "unicode_url",
+    "unknown_financial_domain",
+    "urgent_pressure"
+  ],
+  "inputRecord": {
+    "required": [
+      "fixtureId",
+      "expectedLane",
+      "sourceRef",
+      "expectedCategories"
+    ],
+    "additionalProperties": false,
+    "properties": {
+      "fixtureId": {
+        "type": "string",
+        "enumRef": "canonicalFixtureIds"
+      },
+      "expectedLane": {
+        "type": "string",
+        "enumRef": "allowedLanes"
+      },
+      "sourceRef": {
+        "type": "string",
+        "constraints": [
+          "repo_relative",
+          "no_parent_traversal",
+          "no_absolute_path",
+          "no_url",
+          "no_network_load"
+        ]
+      },
+      "expectedCategories": {
+        "type": "array",
+        "uniqueItems": true,
+        "itemsEnumRef": "allowedCategories"
+      }
+    }
+  },
+  "manifest": {
+    "type": "array",
+    "exactLength": 7,
+    "itemsRef": "inputRecord",
+    "uniqueBy": "fixtureId",
+    "requiredFixtureSetRef": "canonicalFixtureIds"
+  },
+  "outputRecord": {
+    "required": [
+      "fixtureId",
+      "expectedLane",
+      "actualLane",
+      "match",
+      "categories",
+      "decision"
+    ],
+    "additionalProperties": false,
+    "properties": {
+      "fixtureId": {
+        "type": "string",
+        "enumRef": "canonicalFixtureIds"
+      },
+      "expectedLane": {
+        "type": "string",
+        "enumRef": "allowedLanes"
+      },
+      "actualLane": {
+        "type": "string",
+        "enumRef": "allowedLanes"
+      },
+      "match": {
+        "type": "boolean"
+      },
+      "categories": {
+        "type": "array",
+        "uniqueItems": true,
+        "itemsEnumRef": "allowedCategories"
+      },
+      "decision": {
+        "type": "string",
+        "enum": [
+          "keep",
+          "hold"
+        ]
+      },
+      "errorClass": {
+        "type": "string",
+        "enum": [
+          "input_invalid",
+          "fixture_missing",
+          "scanner_failure",
+          "output_invalid",
+          "incomplete_run"
+        ]
+      }
+    }
+  },
+  "exitContract": {
+    "0": "exactly seven fixtures evaluated and every lane matched",
+    "1": "exactly seven fixtures evaluated and at least one lane mismatched",
+    "2": "validation, loading, scanner, output-schema, or incomplete-run failure"
+  },
+  "publicSafeAbsence": [
+    "raw_fixture_body",
+    "decoded_hidden_text",
+    "matched_substring",
+    "url",
+    "wallet_address",
+    "credential",
+    "private_configuration",
+    "provider_route",
+    "payout_route",
+    "execution_payload",
+    "host_path",
+    "stack_trace"
+  ],
+  "invariants": {
+    "networkAllowed": false,
+    "deterministicOrderRef": "canonicalFixtureIds",
+    "partialSuccessAllowed": false,
+    "fabricatedScannerFindingAllowed": false,
+    "releaseDecision": "hold_before_owner_review"
+  },
+  "evidence": [
+    "docs/intake-guardrail-action-cli-calibration-contract.md",
+    "docs/intake-guardrail-action-calibration-runner-test-cases.md",
+    "docs/intake-guardrail-action-calibration-taxonomy.json",
+    "docs/intake-guardrail-action-redacted-fixture-corpus.md"
+  ],
+  "nextStep": "After existing CLI changes are reconciled, implement a pure validator against this schema and the documented runner cases, then run only an exact allowlisted test command."
+}
