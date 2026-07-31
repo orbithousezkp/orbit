@@ -13,14 +13,14 @@
  *   orbit health [--repo /path/to/repo]
  *   orbit files [--repo /path/to/repo]
  *
- * Cycle 92 direction choice:
- * - Compared build, infrastructure, earn, sustain, and grow.
- * - Selected infrastructure/build because the SDK CLI is an adoption surface and
- *   its public budget command needed to enforce the shared toolkit safety
- *   contract without changing wallet, token, publishing, or external behavior.
+ * Cycle 481 direction choice:
+ * - Compared build (scanner prototype), earn (agent passport), maintain (open
+ *   CLI safety task), and infrastructure (control-plane growth).
+ * - Selected maintain because removing detailed AI-budget fields from the
+ *   public status command is the smallest live safety obligation and unblocks
+ *   later calibration work without expanding execution authority.
  */
 
-const path = require('path');
 const { create } = require('./index');
 
 function parseArgs(argv) {
@@ -75,6 +75,22 @@ function publicBudgetSummary(sdk) {
   };
 }
 
+function publicStatusSummary(sdk) {
+  const status = sdk.quickStatus();
+  return {
+    cycle: status.cycle,
+    born: status.born,
+    lastActive: status.lastActive,
+    lastStatus: status.lastStatus,
+    currentLevel: status.currentLevel,
+    currentLevelStatus: status.currentLevelStatus,
+    activeLane: status.activeLane,
+    openTaskCount: status.openTaskCount,
+    completedTaskCount: status.completedTaskCount,
+    aiBudget: publicBudgetSummary(sdk),
+  };
+}
+
 function help() {
   console.log(`
 Orbit CLI — Query Orbit's machine-readable state.
@@ -114,7 +130,7 @@ function main() {
 
   switch (args.command) {
     case 'status':
-      printJson(sdk.quickStatus());
+      printJson(publicStatusSummary(sdk));
       break;
 
     case 'budget':

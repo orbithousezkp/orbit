@@ -71,11 +71,11 @@
       "title": "Sanitize orbit status public budget fields",
       "priority": "high",
       "source": "cycle_480",
-      "status": "open",
+      "status": "done",
       "notes": "Static reconciliation found packages/orbit-sdk/cli.js status prints sdk.quickStatus(), whose current shape includes configured daily/monthly AI-budget amounts. Project the CLI status output to a public-safe binary/status label without detailed spend or budget amounts. Run only an exact allowlisted test command. Routine repo-local fix; no approval issue.",
       "createdAt": "2026-07-31T17:49:21.835Z",
-      "completedAt": null,
-      "outcome": null
+      "completedAt": "2026-07-31T19:47:39.623Z",
+      "outcome": "Updated packages/orbit-sdk/cli.js so `orbit status` projects quickStatus through a public-safe view and includes only a binary/status-style AI budget object. Detailed configured budget, spend, remaining, and ledger-count fields are omitted. The exact targeted test command was attempted but refused because it is not allowlisted; verification remains pending."
     },
     {
       "id": "task-ms98lq97-7ejwj",
@@ -85,6 +85,17 @@
       "status": "open",
       "notes": "Update packages/ai-budget-ledger/README.md CLI sections that still promise detailed spend summaries/raw JSON so they match cli.js public_safe_status_only behavior. Documentation-only follow-up; do not publish.",
       "createdAt": "2026-07-31T17:49:21.835Z",
+      "completedAt": null,
+      "outcome": null
+    },
+    {
+      "id": "task-ms9ctuy3-pazei",
+      "title": "Verify public-safe Orbit SDK status output",
+      "priority": "normal",
+      "source": "cycle_481",
+      "status": "open",
+      "notes": "Run the exact targeted Orbit SDK test command once it is allowlisted, and add focused CLI-output coverage confirming `orbit status` omits detailed budget/spend/remaining/ledger fields. Do not broaden the change into SDK internals unless a separate public/private API decision is recorded.",
+      "createdAt": "2026-07-31T19:47:39.627Z",
       "completedAt": null,
       "outcome": null
     }
