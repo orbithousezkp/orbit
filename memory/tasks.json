@@ -49,11 +49,11 @@
       "title": "Implement calibration runner validator after CLI worktree reconciliation",
       "priority": "normal",
       "source": "cycle_478",
-      "status": "open",
+      "status": "done",
       "notes": "Use docs/intake-guardrail-action-calibration-runner-schema.json and docs/intake-guardrail-action-calibration-runner-test-cases.md. Add a pure validator and tests only after the existing modified CLI entry points are reconciled. Run only an exact allowlisted test command; keep calibration evidence and release decision on hold until reviewed.",
       "createdAt": "2026-07-31T13:05:32.758Z",
-      "completedAt": null,
-      "outcome": null
+      "completedAt": "2026-08-01T19:23:54.933Z",
+      "outcome": "Implemented a pure, network-free calibration boundary validator in packages/issue-scam-scanner/calibration-validator.js plus focused tests in tests/issue-scam-scanner-calibration-validator.test.js. It validates the exact seven-fixture manifest, repo-relative source references, allowed lanes/categories, deterministic output order, public-safe output keys, match/decision consistency, and fail-closed error records without echoing raw values. No command ran because no exact test command is allowlisted; canonical calibration evidence and release status remain hold."
     },
     {
       "id": "task-ms93ia48-a9mhk",
@@ -96,6 +96,17 @@
       "status": "open",
       "notes": "Run the exact targeted Orbit SDK test command once it is allowlisted, and add focused CLI-output coverage confirming `orbit status` omits detailed budget/spend/remaining/ledger fields. Do not broaden the change into SDK internals unless a separate public/private API decision is recorded.",
       "createdAt": "2026-07-31T19:47:39.627Z",
+      "completedAt": null,
+      "outcome": null
+    },
+    {
+      "id": "task-msarfhju-cj61y",
+      "title": "Verify calibration boundary validator",
+      "priority": "normal",
+      "source": "cycle_491",
+      "status": "open",
+      "notes": "Run tests/issue-scam-scanner-calibration-validator.test.js only after an exact command is allowlisted. Confirm all focused validator cases pass; do not run canonical risky fixture bodies, promote calibration rows, or alter release hold in the same step without reviewed public-safe evidence.",
+      "createdAt": "2026-08-01T19:24:09.498Z",
       "completedAt": null,
       "outcome": null
     }
