@@ -11,12 +11,20 @@ Read-only JavaScript library and CLI for querying Orbit's machine-readable repos
 
 ---
 
+## Public CLI vs. trusted local library
+
+The CLI is a public-safe inspection surface. `orbit status` and `orbit budget` expose only a status label, whether AI-backed work can continue, the public-output policy, and a short note. They intentionally omit configured limits, spend, remaining amounts, lifetime totals, and ledger counts.
+
+The JavaScript library is a trusted local API over repository files. `quickStatus()` and `budgetSummary()` can return detailed budget calculations to callers that already have local repository access. Do not forward those detailed objects to public logs, issue comments, dashboards, or receipts without applying a separate public-safe projection.
+
+---
+
 ## Library Usage
 
 ```js
 const orbit = require('@orbithouse/sdk');
 
-// Quick status — cycle, budget, tasks, level, staleness
+// Trusted local status — may include detailed budget calculations.
 const status = orbit.quickStatus('/path/to/orbit/repo');
 console.log(status);
 // {
@@ -30,7 +38,7 @@ console.log(status);
 //   ...
 // }
 
-// Budget summary with lifetime and daily calculations
+// Trusted local budget summary with lifetime and daily calculations.
 const budget = orbit.budgetSummary();
 console.log(budget.lifetimeSpendUsd, budget.dailyRemainingUsd);
 
@@ -56,10 +64,10 @@ const files = orbit.machineReadableFiles();
 ## CLI Usage
 
 ```bash
-# Quick status
+# Public-safe quick status (budget status only; no amounts)
 node cli.js status
 
-# Budget summary
+# Public-safe budget status (no limits, spend, remaining, or ledger detail)
 node cli.js budget
 
 # Open high-priority tasks
@@ -90,6 +98,21 @@ node cli.js files
 node cli.js status /path/to/orbit/repo
 ```
 
+### Public-safe budget shape
+
+Both `status.aiBudget` and the top-level result of `budget` use this bounded shape:
+
+```js
+{
+  status: 'ok', // ok | low | critical | exhausted
+  canUseAi: true,
+  policy: 'public_safe_status_only',
+  note: 'Detailed AI budget and spend values are intentionally omitted.'
+}
+```
+
+Callers must not infer or append detailed amounts from repository files when presenting this CLI output on a public surface.
+
 ---
 
 ## API Reference
@@ -113,12 +136,12 @@ node cli.js status /path/to/orbit/repo
 
 | Function | Description |
 |---|---|
-| `quickStatus(repoPath?)` | Compact status: cycle, budget, tasks, level, staleness |
+| `quickStatus(repoPath?)` | Trusted local status: cycle, budget, tasks, level, staleness |
 | `activeCapabilities(repoPath?)` | Capabilities with `status === 'active'` |
 | `blockedActions(repoPath?)` | Blocked wallet and external actions |
 | `checkApprovalRequired(repoPath?, category)` | Whether an action category needs approval |
 | `openTasks(repoPath?, priority?)` | Open tasks, optionally filtered by priority |
-| `budgetSummary(repoPath?)` | Budget limits, lifetime/daily spend, remaining |
+| `budgetSummary(repoPath?)` | Trusted local budget limits, lifetime/daily spend, remaining |
 | `revenueStatus(repoPath?)` | Revenue policy and token status |
 | `activeLanes(repoPath?)` | Active roadmap lanes |
 | `activePhaseChecks(repoPath?)` | Active phase checks with evidence |
@@ -141,6 +164,8 @@ node cli.js status /path/to/orbit/repo
 ## Privacy Rules
 
 - **No secrets** — Never exposes provider names, model names, API bases, billing routes, private keys, or seed phrases.
+- **Status-only public budget output** — CLI `status` and `budget` omit detailed limits, spend, remaining amounts, lifetime totals, and ledger counts.
+- **Trusted local detail** — Library budget views may contain detailed repository values and must not be copied directly to public surfaces.
 - **Read-only** — No write, sign, spend, or execute operations. Read files only.
 - **Fail-closed** — `safeReadJson` returns `null` on missing files; `readJson` throws.
 
@@ -152,7 +177,7 @@ node cli.js status /path/to/orbit/repo
 - **Auditable** — Code is small enough to read in one sitting (~350 lines library + ~150 lines CLI).
 - **Schema-aligned** — Matches the [Data Contract](../../docs/data-contract.md) field definitions.
 - **Agent-friendly** — Returns plain objects, no class wrappers or framework magic.
-- **Safe defaults** — `quickStatus` and `budgetSummary` calculate derived values to prevent common mistakes.
+- **Safe defaults** — Public CLI budget views are status-only; trusted local library views retain detailed calculations.
 
 ---
 
