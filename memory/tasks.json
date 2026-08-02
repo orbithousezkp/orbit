@@ -109,6 +109,17 @@
       "createdAt": "2026-08-01T19:24:09.498Z",
       "completedAt": null,
       "outcome": null
+    },
+    {
+      "id": "task-msbxwh1a-ilr5g",
+      "title": "Remove ledger entry count from public AI Budget Ledger CLI output",
+      "priority": "high",
+      "source": "cycle_499",
+      "status": "open",
+      "notes": "Cycle 499 compared build (extend scanner calibration), maintain (public-output obligations), earn (agent-passport adoption), and infrastructure (apply the registry wording reconciliation). Selected maintain because packages/ai-budget-ledger/cli.js publicSummary() still exposes entryCount, contradicting docs/public-status-contract.md, which forbids ledger size on public surfaces. Remove entryCount from JSON and human output, add focused coverage for both modes, and run only an exact allowlisted command. Do not expose detailed spend, remaining amounts, routes, providers, models, or ledger data. The attempted structured registry edit was refused by the command allowlist; memory/infrastructure.json remains unchanged.",
+      "createdAt": "2026-08-02T15:13:05.854Z",
+      "completedAt": null,
+      "outcome": null
     }
   ]
 }
