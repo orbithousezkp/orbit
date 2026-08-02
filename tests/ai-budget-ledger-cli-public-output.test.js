@@ -3,14 +3,14 @@
 /**
  * Public-output regression coverage for the AI Budget Ledger CLI.
  *
- * Cycle 500 direction decision:
+ * Cycle 501 direction decision:
  * - Compared build (extend scanner calibration), earn (agent-passport adoption),
- *   maintain (close the live public-output contract gap), and infrastructure
- *   (reconcile shared registry wording).
- * - Selected maintain because the CLI currently exposes ledger size through
- *   `entryCount`, which conflicts with docs/public-status-contract.md. Focused
- *   human and JSON coverage is the smallest auditable step toward removing the
- *   leak without broadening trusted local ledger APIs.
+ *   maintain (finish the high-priority budget CLI contract fix), and
+ *   infrastructure (reconcile shared registry wording).
+ * - Selected maintain because the implementation still exposes ledger size and
+ *   this focused suite is the acceptance boundary. The prior broad text regex
+ *   also matched the public-safe explanatory note itself, so this cycle makes
+ *   the regression check structural before the implementation change lands.
  */
 
 const { describe, it } = require("node:test");
@@ -24,7 +24,35 @@ const { createLedger, record } = require("../packages/ai-budget-ledger/ledger");
 const { save } = require("../packages/ai-budget-ledger/persist");
 
 const cliPath = path.join(__dirname, "..", "packages", "ai-budget-ledger", "cli.js");
-const forbiddenOutput = /entryCount|Entries:|dailyBudgetUsd|monthlyBudgetUsd|estimatedUsd|remaining|promptTokens|completionTokens|route|provider|model/i;
+const forbiddenKeys = new Set([
+  "entryCount",
+  "dailyBudgetUsd",
+  "monthlyBudgetUsd",
+  "estimatedUsd",
+  "remaining",
+  "dailyRemaining",
+  "monthlyRemaining",
+  "promptTokens",
+  "completionTokens",
+  "route",
+  "provider",
+  "model",
+]);
+const forbiddenHumanLabels = /Entries:|Daily budget:|Monthly budget:|Remaining:|Prompt tokens:|Completion tokens:|Provider:|Model:/i;
+const privateFixtureValues = /local fixture|private fixture route/i;
+
+function collectKeys(value, keys = []) {
+  if (Array.isArray(value)) {
+    for (const item of value) collectKeys(item, keys);
+    return keys;
+  }
+  if (!value || typeof value !== "object") return keys;
+  for (const [key, nested] of Object.entries(value)) {
+    keys.push(key);
+    collectKeys(nested, keys);
+  }
+  return keys;
+}
 
 function withLedger(run) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "orbit-ai-budget-cli-"));
@@ -57,6 +85,12 @@ function invoke(args) {
   });
 }
 
+function assertPublicJson(output) {
+  const leakedKeys = collectKeys(output).filter((key) => forbiddenKeys.has(key));
+  assert.deepEqual(leakedKeys, []);
+  assert.equal(privateFixtureValues.test(JSON.stringify(output)), false);
+}
+
 describe("AI Budget Ledger CLI public output", () => {
   it("keeps summarize JSON status-only and omits ledger size", () => {
     withLedger((ledgerPath) => {
@@ -73,7 +107,7 @@ describe("AI Budget Ledger CLI public output", () => {
         "policy",
         "todayStatus",
       ]);
-      assert.equal(forbiddenOutput.test(result.stdout), false, result.stdout);
+      assertPublicJson(output);
     });
   });
 
@@ -85,7 +119,8 @@ describe("AI Budget Ledger CLI public output", () => {
       assert.match(result.stdout, /Status:/);
       assert.match(result.stdout, /Today:/);
       assert.match(result.stdout, /Month:/);
-      assert.equal(forbiddenOutput.test(result.stdout), false, result.stdout);
+      assert.equal(forbiddenHumanLabels.test(result.stdout), false, result.stdout);
+      assert.equal(privateFixtureValues.test(result.stdout), false, result.stdout);
     });
   });
 });
